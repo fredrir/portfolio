@@ -1,23 +1,21 @@
 import React from "react";
 
-export default function InfoBox({
-  children,
-  darkMode,
-}: {
-  children: React.ReactNode;
-  darkMode: boolean;
-}) {
+export function InfoBox({ darkMode }: { darkMode: boolean }) {
   return (
-    <div className="my-4 mx-auto w-full md:w-1/2 lg:w-1/3">
-      <div
-        className={`rounded border-2 p-4 shadow-lg text-center ${
-          darkMode
-            ? "border-gray-700 bg-gray-800 text-white"
-            : "border-gray-200 bg-white text-black"
+    <div
+      className={`my-4 rounded border-2 p-4  shadow-lg ${
+        darkMode
+          ? "bg-gradient-to-r from-indigo-800 via-pink-900 to-purple-800"
+          : "bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500"
+      }`}
+    >
+      <p
+        className={`text-shadow text-3xl font-semibold ${
+          darkMode ? `text-white` : `text-black`
         }`}
       >
-        {children}
-      </div>
+        {"Hi! I'm <Fredrik/>"}
+      </p>
     </div>
   );
 }
