@@ -1,41 +1,75 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { GitLogo } from "./logos";
-import { LinkLogo } from "./logos";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import { GitLogo, LinkLogo } from "./logos";
+import {
+  Bars3Icon,
+  MoonIcon as MoonIconOutline,
+} from "@heroicons/react/24/outline";
+import { MoonIcon as MoonIconSolid } from "@heroicons/react/24/solid";
+import { useSpring, animated } from "@react-spring/web";
 
-export default function Navbar() {
+export default function Navbar({
+  darkMode,
+  toggleDarkMode,
+}: {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
+  const navbarProps = useSpring({
+    background: darkMode
+      ? "linear-gradient(to right, #232526, #414345)"
+      : "linear-gradient(to right, #ff7e5f, #feb47b)",
+  });
+
   return (
-    <div className="relative">
-      <div className="flex items-center mb-4 p-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-2xl">
+    <animated.div style={navbarProps} className="relative">
+      <div className="flex items-center mb-4 p-6 text-2xl">
         <div className="w-1/3 hidden md:block">
-          <p>Fredrik Hansteen</p>
+          <p className="text-3xl">Fredrik Hansteen</p>
         </div>
-        <div className="w-1/5 hidden md:block">
-          <a href="/">Home</a>
+        <div className="w-1/5 hidden md:block cv-box">
+          <a
+            href="/about"
+            className="rounded-full border-2 border-white py-1 px-4 cv-text"
+          >
+            CV
+          </a>
         </div>
-        <div className="w-1/5 hidden md:block">
-          <a href="/about">CV</a>
+        <div className="w-1/5 hidden md:block cv-box">
+          <a
+            href="/"
+            className="rounded-full border-2 border-white py-1 px-4 cv-text"
+          >
+            Home
+          </a>
         </div>
-        <div className="w-1/5 hidden md:block">
-          <a href="/contact">Contact</a>
+        <div className="w-1/5 hidden md:block cv-box">
+          <a
+            href="/contact"
+            className="rounded-full border-2 border-white py-1 px-4 cv-text"
+          >
+            Contact
+          </a>
         </div>
-        <div className="flex w-1/5 items-center justify-end hidden md:flex">
-          <div className="mr-8">
-            <Link href="https://www.linkedin.com/in/fredrik-carsten-hansteen-655287281/">
-              <LinkLogo />
-            </Link>
-          </div>
-          <div>
-            <Link href="https://github.com/fredrir">
-              <GitLogo />
-            </Link>
-          </div>
+        <div className="flex w-1/6 items-center justify-between hidden md:flex">
+          <Link href="https://www.linkedin.com/in/fredrik-carsten-hansteen-655287281/">
+            <LinkLogo />
+          </Link>
+          <Link href="https://github.com/fredrir">
+            <GitLogo />
+          </Link>
+          <button className="group" onClick={toggleDarkMode}>
+            {darkMode ? (
+              <MoonIconSolid className="h-10 w-10 text-white group-hover:fill-current" />
+            ) : (
+              <MoonIconOutline className="h-10 w-10 text-white group-hover:fill-current" />
+            )}
+          </button>
         </div>
         <div className="flex md:hidden w-full justify-between items-center">
           <p className="w-3/4">Fredrik Hansteen</p>
@@ -72,6 +106,6 @@ export default function Navbar() {
           )}
         </div>
       </div>
-    </div>
+    </animated.div>
   );
 }
