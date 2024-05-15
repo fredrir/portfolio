@@ -8,6 +8,9 @@ export function InfoBox({ darkMode }: { darkMode: boolean }) {
           ? "bg-gradient-to-r from-indigo-800 via-pink-900 to-purple-800"
           : "bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500"
       }`}
+      style={{
+        maxWidth: "600px",
+      }}
     >
       <p
         className={`text-shadow text-3xl font-semibold ${

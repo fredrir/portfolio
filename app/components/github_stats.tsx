@@ -5,17 +5,75 @@ interface GitHubStatsProps {
   darkMode: boolean;
 }
 
+interface LanguageCount {
+  [key: string]: number;
+}
+
+const fetchGitHubStats = async () => {
+  const username = "fredrir";
+  try {
+    const commitResponse = await axios.get(
+      `https://api.github.com/search/commits?q=author:${username}+author-date:>${new Date().getFullYear()}-01-01`,
+      {
+        headers: {
+          Accept: "application/vnd.github.cloak-preview",
+        },
+      }
+    );
+
+    const reposResponse = await axios.get(
+      `https://api.github.com/users/${username}/repos`
+    );
+
+    const languages: LanguageCount = {};
+    const repoNames = reposResponse.data.map((repo: any) => repo.name);
+
+    for (const repo of reposResponse.data) {
+      const languageResponse = await axios.get(repo.languages_url);
+      for (const [language, count] of Object.entries(languageResponse.data)) {
+        if (!languages[language]) {
+          languages[language] = 0;
+        }
+        languages[language] += count as number;
+      }
+    }
+
+    const mostUsedLanguage = Object.keys(languages).reduce((a, b) =>
+      languages[a] > languages[b] ? a : b
+    );
+
+    return {
+      commitCount: commitResponse.data.total_count,
+      repoCount: reposResponse.data.length,
+      mostUsedLanguage,
+    };
+  } catch (error) {
+    console.error("Error fetching GitHub stats:", error);
+    return null;
+  }
+};
+
 export const GithubStats: React.FC<GitHubStatsProps> = ({ darkMode }) => {
-  const [commitCount, setCommitCount] = useState<number | null>(null);
+  const [stats, setStats] = useState<{
+    commitCount: number | null;
+    repoCount: number | null;
+    mostUsedLanguage: string | null;
+  }>({
+    commitCount: null,
+    repoCount: null,
+    mostUsedLanguage: null,
+  });
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const getData = async () => {
-      try {
-        const response = await axios.get("/api/github-stats");
-        setCommitCount(response.data.commitCount);
-      } catch (error) {
-        setError("Failed to fetch GitHub stats. Please try again later.");
+      const stats = await fetchGitHubStats();
+      if (stats !== null) {
+        setStats(stats);
+      } else {
+        setError(
+          "Failed to fetch GitHub stats. Please check your token and network connection."
+        );
       }
     };
 
@@ -35,7 +93,7 @@ export const GithubStats: React.FC<GitHubStatsProps> = ({ darkMode }) => {
           darkMode ? "text-white" : "text-black"
         }`}
       >
-        GitHub Stats
+        Public GitHub Stats
       </p>
       {error ? (
         <p
@@ -43,12 +101,30 @@ export const GithubStats: React.FC<GitHubStatsProps> = ({ darkMode }) => {
         >
           {error}
         </p>
-      ) : commitCount !== null ? (
-        <p
-          className={`text-2xl mt-2 ${darkMode ? "text-white" : "text-black"}`}
-        >
-          Commits this year: {commitCount}
-        </p>
+      ) : stats.commitCount !== null && stats.repoCount !== null ? (
+        <>
+          <p
+            className={`text-2xl mt-2 ${
+              darkMode ? "text-white" : "text-black"
+            }`}
+          >
+            Commits this year: {stats.commitCount}
+          </p>
+          <p
+            className={`text-2xl mt-2 ${
+              darkMode ? "text-white" : "text-black"
+            }`}
+          >
+            Repositories worked on: {stats.repoCount}
+          </p>
+          <p
+            className={`text-2xl mt-2 ${
+              darkMode ? "text-white" : "text-black"
+            }`}
+          >
+            Most used language: {stats.mostUsedLanguage}
+          </p>
+        </>
       ) : (
         <p
           className={`text-2xl mt-2 ${darkMode ? "text-white" : "text-black"}`}
