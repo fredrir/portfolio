@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-interface GitHubStatsProps {
-  darkMode: boolean;
-}
-
 interface LanguageCount {
   [key: string]: number;
 }
@@ -53,7 +49,7 @@ const fetchGitHubStats = async () => {
   }
 };
 
-export const GithubStats: React.FC<GitHubStatsProps> = ({ darkMode }) => {
+export const GithubStats: React.FC = () => {
   const [stats, setStats] = useState<{
     commitCount: number | null;
     repoCount: number | null;
@@ -81,56 +77,26 @@ export const GithubStats: React.FC<GitHubStatsProps> = ({ darkMode }) => {
   }, []);
 
   return (
-    <div
-      className={`my-4 rounded border-2 p-4 shadow-lg ${
-        darkMode
-          ? "bg-gradient-to-r from-indigo-800 via-pink-900 to-purple-800"
-          : "bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500"
-      }`}
-    >
-      <p
-        className={`text-shadow text-3xl font-semibold ${
-          darkMode ? "text-white" : "text-black"
-        }`}
-      >
+    <div className="my-4 rounded border-2 p-4 dark:text-white  shadow-lg dark:bg-gradient-to-r dark:from-indigo-800 dark:via-pink-900 dark:to-purple-800 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500">
+      <p className="text-shadow text-3xl font-semibold text-black dark:text-white">
         Public GitHub Stats
       </p>
       {error ? (
-        <p
-          className={`text-2xl mt-2 ${darkMode ? "text-white" : "text-black"}`}
-        >
-          {error}
-        </p>
+        <p className="text-2xl mt-2 text-black dark:text-black">{error}</p>
       ) : stats.commitCount !== null && stats.repoCount !== null ? (
         <>
-          <p
-            className={`text-2xl mt-2 ${
-              darkMode ? "text-white" : "text-black"
-            }`}
-          >
+          <p className="text-2xl mt-2 text-black dark:text-white">
             Commits this year: {stats.commitCount}
           </p>
-          <p
-            className={`text-2xl mt-2 ${
-              darkMode ? "text-white" : "text-black"
-            }`}
-          >
+          <p className="text-2xl mt-2 text-black dark:text-white">
             Repositories worked on: {stats.repoCount}
           </p>
-          <p
-            className={`text-2xl mt-2 ${
-              darkMode ? "text-white" : "text-black"
-            }`}
-          >
+          <p className="text-2xl mt-2 text-black dark:text-white">
             Most used language: {stats.mostUsedLanguage}
           </p>
         </>
       ) : (
-        <p
-          className={`text-2xl mt-2 ${darkMode ? "text-white" : "text-black"}`}
-        >
-          Loading...
-        </p>
+        <p className="text-2xl mt-2 text-black dark:text-white">Loading...</p>
       )}
     </div>
   );
