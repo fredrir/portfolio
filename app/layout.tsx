@@ -20,7 +20,9 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <Toaster />
         <Navbar />
-        <main className="flex-grow">{children}</main>
+        <main className="flex-grow bg-fixed bg-[#D0C6DF] dark:bg-[#301856] bg-hero-pattern-light dark:bg-hero-pattern-light">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

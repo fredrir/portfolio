@@ -10,21 +10,24 @@ const config: Config = {
   theme: {
     extend: {
       backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        'hero-pattern-dark': 'url("/circuit-board-dark.svg")',
+        'hero-pattern-light': 'url("/circuit-board-light.svg")',
       },
-      colors:{
-        portfolio:{
-        darkBlue: "#001C7C",
-        lightBlue: "#0350F7",
-        lightGreen: "#D1FFC2",
-        snowWhite: "#edf6ff",
-        white: "#fdfdfe",
-      }
+      backgroundAttachment: {
+        'fixed': 'fixed',
+      },
+      colors: {
+        portfolio: {
+          darkBlue: "#001C7C",
+          lightBlue: "#0350F7",
+          lightGreen: "#D1FFC2",
+          snowWhite: "#edf6ff",
+          white: "#fdfdfe",
+        }
       }
     },
   },
   plugins: [],
 };
+
 export default config;
