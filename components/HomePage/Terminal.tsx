@@ -9,9 +9,10 @@ const TerminalComponent = () => {
   useEffect(() => {
     let index = 0;
     const interval = setInterval(() => {
-      setText((prev) => prev + fullText[index]);
-      index++;
-      if (index === fullText.length) {
+      if (index < fullText.length - 1) {
+        setText((prev) => prev + fullText[index]);
+        index++;
+      } else {
         clearInterval(interval);
       }
     }, 50);
@@ -20,7 +21,7 @@ const TerminalComponent = () => {
 
   return (
     <div className="w-full max-w-lg bg-black text-green-500 font-mono p-4 rounded-lg shadow-lg">
-      <div className="whitespace-pre-wrap">{text}</div>
+      <article className="whitespace-pre-wrap">{text}</article>
     </div>
   );
 };
