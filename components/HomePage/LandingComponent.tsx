@@ -4,7 +4,7 @@ import TerminalComponent from "./Terminal";
 
 const LandingComponent = () => {
   return (
-    <div className="flex flex-col items-center justify-center pt-32 px-10">
+    <div className="flex flex-col items-center justify-center pt-32 px-10 h-[700px]">
       <div className="rounded-full overflow-hidden w-52 h-52 border-solid border-white border-4">
         <Image
           src={"/Fredrik_Hansteen.jpeg"}
@@ -19,7 +19,7 @@ const LandingComponent = () => {
           {"Hi, I'm <Fredrik/>"}
         </h1>
       </div>
-      <div className="pt-10">
+      <div className="pt-10 w-full max-w-lg">
         <TerminalComponent />
       </div>
     </div>
