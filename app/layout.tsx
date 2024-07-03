@@ -13,6 +13,8 @@ export const metadata: Metadata = {
 const roboto = Roboto({
   subsets: ["latin"],
   weight: "400",
+  display: "swap",
+  variable: "--font-roboto",
 });
 
 export default function RootLayout({
@@ -21,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="no">
-      <body className="flex flex-col min-h-screen bg-white dark:text-white dark:bg-gray-900 roboto.className">
+    <html lang="no" className={roboto.variable}>
+      <body className="flex flex-col min-h-screen bg-white dark:text-white dark:bg-gray-900 font-monograph">
         <link rel="icon" href="/favicon.ico" />
         <Toaster />
         <Navbar />

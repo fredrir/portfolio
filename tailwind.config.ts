@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        monograph: ["var(--font-roboto)"], 
+      },
       backgroundImage: {
         'hero-pattern-dark': 'url("/circuit-board-dark.svg")',
         'hero-pattern-light': 'url("/circuit-board-light.svg")',
