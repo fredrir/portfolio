@@ -67,7 +67,7 @@ export function RolldownMenu({
       tabIndex={-1}
       ref={rolldownMenuRef}
     >
-      <h2 id={titleId} className="sr-only">
+      <h2 id={titleId} className="">
         Navigation menu
       </h2>
       {children}
