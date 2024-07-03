@@ -37,7 +37,7 @@ export default function Navbar() {
               />
 
               <Button
-                title="Kontakt"
+                title="Contact"
                 color="green"
                 size="small"
                 hiddenMobile={true}
