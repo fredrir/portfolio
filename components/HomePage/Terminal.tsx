@@ -26,7 +26,7 @@ const TerminalComponent = () => {
   const mainTextLength = mainText.length;
 
   return (
-    <div className="max-w-lg bg-black text-green-500 font-mono p-4 rounded-lg shadow-lg h-[180px]">
+    <div className="max-w-lg bg-black text-green-500 font-mono p-4 rounded-lg shadow-lg min-h-[180px]">
       <article className="whitespace-pre-wrap">
         <span className="text-white">{text.slice(0, prefixLength)}</span>
         <span>{text.slice(prefixLength, prefixLength + mainTextLength)}</span>

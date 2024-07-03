@@ -2,9 +2,10 @@ const ProjectDescriptions = [
     {
         id: 1,
         title: "Admission Page",
-        description: "A page for students to apply for admission to the roles in the student organization.",
+        description: "A page for students to apply for admission for roles in the student organization.",
         languages: "Next.js / MongoDB",
         imageUri: "/online-opptak.png",
+        githubLink: "https://github.com/appKom/online-opptak/",
     },
     {
         id: 2,
@@ -12,6 +13,7 @@ const ProjectDescriptions = [
         description: "A mobile app, designed for students, where they can sign up for events, get notified about events, and play games",
         languages: "Flutter / Firebase",
         imageUri: "/app-picture.png",
+        githubLink: "https://github.com/appKom/online_events",
     },
     {
         id: 3,
@@ -19,6 +21,7 @@ const ProjectDescriptions = [
         description: "A web app where you can track the movies you have watched and want to watch. Created as a project for a course in web development, in collaboration with 5 other students.",
         languages: "Next.js / PostgreSQL",
         imageUri: "/movie-tracker.png",
+        githubLink: "https://github.com/fredrir/MovieTracker",
     },
     {
         id: 4,
@@ -26,6 +29,7 @@ const ProjectDescriptions = [
         description: "Created to showcase my projects and skills",
         languages: "Next.js / Tailwind CSS",
         imageUri: "/portfolio.png",
+        githubLink: "https://github.com/fredrir/portfolioV2",
     }
 ];
 

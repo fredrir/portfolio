@@ -4,4 +4,5 @@ export type projectType ={
     description: string;
     languages: string;
     imageUri: string;
+    githubLink: string;
 }
