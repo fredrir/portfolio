@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="no" className={roboto.variable}>
-      <body className="flex flex-col min-h-screen bg-white dark:text-white dark:bg-gray-900 font-monograph">
+      <body className="flex flex-col min-h-screen bg-white dark:bg-gray-900 dark:text-white font-monograph">
         <link rel="icon" href="/favicon.ico" />
         <Toaster />
         <Navbar />

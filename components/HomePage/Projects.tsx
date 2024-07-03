@@ -10,7 +10,7 @@ const Projects = () => {
           <h1 className="text-2xl font-bold">Projects</h1>
         </div>
       </div>
-      <div className="flex flex-col justify-center mt-4 px-12">
+      <div className="flex flex-col justify-center mt-4 px-12 gap-10 items-center">
         {ProjectDescriptions.map((project) => (
           <ProjectCard key={project.id} project={project} />
         ))}
