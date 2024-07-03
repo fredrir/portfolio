@@ -68,7 +68,7 @@ export default function Navbar() {
             >
               <ul className="mt-4 grid gap-4 bg-rif-darkBlue">
                 <li>
-                  <Link href="/" className="text-white">
+                  <Link href="/" className="">
                     Home
                   </Link>
                 </li>

@@ -3,11 +3,17 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
+import { Roboto } from "next/font/google";
 
 export const metadata: Metadata = {
   title: "Fredrik Hansteen",
   description: "Fredrik Hansteen's personal website",
 };
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: "400",
+});
 
 export default function RootLayout({
   children,
@@ -16,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="no">
-      <body className="flex flex-col min-h-screen bg-white dark:text-white dark:bg-gray-900">
+      <body className="flex flex-col min-h-screen bg-white dark:text-white dark:bg-gray-900 roboto.className">
         <link rel="icon" href="/favicon.ico" />
         <Toaster />
         <Navbar />
