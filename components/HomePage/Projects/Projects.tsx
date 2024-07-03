@@ -1,6 +1,6 @@
 import React from "react";
 import ProjectCard from "./ProjectCard";
-import ProjectDescriptions from "../../../lib/ProjectDescription";
+import ProjectDescriptions from "../../../lib/descriptions/ProjectDescription";
 
 const Projects = () => {
   return (
