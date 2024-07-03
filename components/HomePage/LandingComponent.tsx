@@ -13,7 +13,9 @@ const LandingComponent = () => {
           className="object-cover w-full h-full"
         />
       </div>
-      <h1 className="text-6xl font-bold mt-4">Fredrik Hansteen</h1>
+      <div className="bg-white rounded-3xl px-4 py-2 mt-4">
+        <h1 className="text-2xl font-bold text-center">{"Hi, I'm Fredrik"}</h1>
+      </div>
     </div>
   );
 };
