@@ -10,7 +10,7 @@ const Journey = () => {
     <div className="flex flex-col items-center justify-center py-32">
       <div className="pb-32">
         <div className="bg-white dark:bg-gray-900 dark:text-white rounded-3xl px-4 py-2 mt-4 w-fit text-center">
-          <h1 className="text-2xl font-bold">My Journey</h1>
+          <h1 className="text-4xl font-bold">My Journey</h1>
         </div>
       </div>
       <div className="hidden md:flex flex flex-col justify-center mt-4 px-12 gap-20 items-center max-w-4xl border-solid rounded-2xl overflow-hidden">
