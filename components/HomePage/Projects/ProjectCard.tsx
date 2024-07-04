@@ -27,14 +27,7 @@ const ProjectCard = ({ project }: Props) => {
         <p className="mt-2">{project.description}</p>
         <div className="pt-4 flex justify-center items-center">
           <Link href={project.githubLink}>
-            <button
-              type="button"
-              className={
-                "font-medium text-center py-3 px-2 transition-all rounded-lg shadow-sm focus:ring focus:ring-primary-200 inline-flex items-center gap-4 bg-portfolio-white text-online-darkBlue hover:text-portfolio-darkBlue border dark:bg-inherit dark:text-white dark:hover:text-gray-300 dark:hover:border-gray-300"
-              }
-            >
-              Read More
-            </button>
+            <Button title={"Read more"} color={"white"} />
           </Link>
         </div>
       </div>

@@ -2,7 +2,6 @@ interface Props {
   title: string;
   color: "white" | "green";
   size?: "small";
-  hiddenMobile?: boolean;
   icon?: React.ReactNode;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
@@ -10,7 +9,6 @@ interface Props {
 const Button = (props: Props) => {
   let colorClasses = "";
   let sizeClasses = "";
-  let hiddenMobileClasses = "";
 
   // if (props.color === "blue") {
   //   colorClasses =
@@ -30,13 +28,7 @@ const Button = (props: Props) => {
     sizeClasses = "px-6 py-3";
   }
 
-  if (props.hiddenMobile) {
-    hiddenMobileClasses = "hidden md:flex ";
-  } else if (!props.hiddenMobile) {
-    hiddenMobileClasses = "md:hidden";
-  }
-
-  const className = `font-medium text-center justify-center transition-all rounded-lg shadow-sm focus:ring focus:ring-primary-200 inline-flex items-center gap-1.5 ${colorClasses} ${sizeClasses} ${hiddenMobileClasses}`;
+  const className = `font-medium text-center justify-center transition-all rounded-lg shadow-sm focus:ring focus:ring-primary-200 inline-flex items-center gap-1.5 ${colorClasses} ${sizeClasses}`;
 
   return (
     <button type="button" onClick={props.onClick} className={className}>

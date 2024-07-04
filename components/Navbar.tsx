@@ -29,19 +29,14 @@ export default function Navbar() {
               <h2 className="text-3xl font-bold">Fredrik Hansteen</h2>
             </Link>
             <div className="flex flex-col items-end gap-2 sm:flex-row sm:gap-5 sm:items-center text-online-darkTeal dark:text-white">
-              <Button
-                title="CV"
-                color="white"
-                size="small"
-                hiddenMobile={true}
-              />
-
-              <Button
-                title="Contact"
-                color="green"
-                size="small"
-                hiddenMobile={true}
-              />
+              <div className="hidden md:flex">
+                <Button title="CV" color="white" size="small" />
+              </div>
+              <div className="hidden md:flex">
+                <Link href={"#contact-me"}>
+                  <Button title="Contact" color="green" size="small" />
+                </Link>
+              </div>
 
               <ThemeToggle />
               <button

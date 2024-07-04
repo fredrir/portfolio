@@ -50,7 +50,10 @@ const Contact = () => {
   };
   return (
     <div className="flex flex-col items-center w-full py-10 px-10">
-      <div className="flex flex-col w-full  max-w-lg bg-[#D0C6DF] dark:bg-[#301856] p-4 mx-auto border-solid rounded-2xl border border-gray-400 dark:border-gray-700">
+      <div
+        id="contact-me"
+        className="flex flex-col w-full  max-w-lg bg-[#D0C6DF] dark:bg-[#301856] p-4 mx-auto border-solid rounded-2xl border border-gray-400 dark:border-gray-700"
+      >
         <h1 className="text-center font-bold text-3xl">Contact me</h1>
         <form onSubmit={handleSubmit} className="w-full">
           <label

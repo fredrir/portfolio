@@ -3,6 +3,7 @@ import JourneyCard from "./JourneyCard";
 import JourneyDescriptions from "@/lib/descriptions/JourneyDescriptions";
 import Image from "next/image";
 import JourneyImage from "./JourneyImage";
+import JourneyImageMobile from "./JourneyMobile";
 
 const Journey = () => {
   return (
@@ -12,7 +13,7 @@ const Journey = () => {
           <h1 className="text-2xl font-bold">My Journey</h1>
         </div>
       </div>
-      <div className="flex flex-col justify-center mt-4 px-12 gap-20 items-center max-w-4xl border-solid rounded-2xl overflow-hidden">
+      <div className="hidden md:flex flex flex-col justify-center mt-4 px-12 gap-20 items-center max-w-4xl border-solid rounded-2xl overflow-hidden">
         {JourneyDescriptions.map((journey, index) => (
           <div key={journey.id} className="flex items-center w-full">
             {index % 2 !== 0 && (
@@ -26,6 +27,20 @@ const Journey = () => {
                 <JourneyCard journey={journey} />
               </div>
             )}
+          </div>
+        ))}
+      </div>
+      <div className="md:hidden flex flex-col justify-center mt-4 px-10 gap-20 items-center max-w-4xl border-solid rounded-2xl overflow-hidden">
+        {JourneyDescriptions.map((journey, index) => (
+          <div
+            key={journey.id}
+            className="flex flex-col gap-4 items-center w-full"
+          >
+            <JourneyImageMobile journey={journey} />
+
+            <div className="">
+              <JourneyCard journey={journey} />
+            </div>
           </div>
         ))}
       </div>
