@@ -30,7 +30,9 @@ export default function Navbar() {
             </Link>
             <div className="flex flex-col items-end gap-2 sm:flex-row sm:gap-5 sm:items-center text-online-darkTeal dark:text-white">
               <div className="hidden md:flex">
-                <Button title="CV" color="white" size="small" />
+                <Link href="/cv">
+                  <Button title="CV" color="white" size="small" />
+                </Link>
               </div>
               <div className="hidden md:flex">
                 <Link href={"#contact-me"}>
