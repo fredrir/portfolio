@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -39,9 +40,11 @@ const Contact = () => {
           phone: "",
           message: "",
         });
+        toast.success("Message sent successfully");
       })
       .catch((err) => {
         setStatus({ submitted: false, message: "Error sending message" });
+        toast.error("Error sending message");
         setButtonText("Submit");
       });
   };
