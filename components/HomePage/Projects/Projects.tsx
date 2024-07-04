@@ -4,7 +4,7 @@ import ProjectDescriptions from "../../../lib/descriptions/ProjectDescription";
 
 const Projects = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen pt-32 ">
+    <div className="flex flex-col items-center justify-center min-h-screen ">
       <div className="pb-32">
         <div className="bg-white dark:bg-gray-900 dark:text-white rounded-3xl px-4 py-2 mt-4 w-fit text-center">
           <h1 className="text-2xl font-bold">Projects</h1>

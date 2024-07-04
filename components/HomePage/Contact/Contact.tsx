@@ -52,9 +52,9 @@ const Contact = () => {
     <div className="flex flex-col items-center w-full py-10 px-10">
       <div
         id="contact-me"
-        className="flex flex-col w-full  max-w-lg bg-[#D0C6DF] dark:bg-[#301856] p-4 mx-auto border-solid rounded-2xl border border-gray-400 dark:border-gray-700"
+        className="flex flex-col w-full  max-w-3xl bg-[#D0C6DF] dark:bg-[#301856] bg-hideout-dark p-4 mx-auto border-solid rounded-2xl border border-gray-400 dark:border-gray-700"
       >
-        <h1 className="text-center font-bold text-3xl">Contact me</h1>
+        <h1 className="text-center font-extrabold text-4xl ">Contact me</h1>
         <form onSubmit={handleSubmit} className="w-full">
           <label
             className="text-shadow block text-xl font-medium"
@@ -69,7 +69,7 @@ const Contact = () => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="my-2 p-2 w-full"
+            className="my-2 p-2 w-full rounded-3xl"
           />
           <label
             className="text-shadow block text-xl font-medium"
@@ -84,10 +84,10 @@ const Contact = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            className="my-2 p-2 w-full"
+            className="my-2 p-2 w-full rounded-3xl"
           />
           <label
-            className="text-shadow block text-xl font-medium"
+            className="text-shadow block text-xl font-medium "
             htmlFor="phone"
           >
             Phone:
@@ -98,10 +98,10 @@ const Contact = () => {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className="my-2 p-2 w-full"
+            className="my-2 p-2 w-full rounded-3xl"
           />
           <label
-            className="text-shadow block text-xl font-medium"
+            className="text-shadow block text-xl font-medium "
             htmlFor="message"
           >
             Message:
@@ -112,13 +112,13 @@ const Contact = () => {
             value={formData.message}
             onChange={handleChange}
             required
-            className="my-2 p-2 w-full"
+            className="my-2 p-2 w-full rounded-3xl"
           />
           <div className="py-5 text-center">
             <button
               type="submit"
               className={
-                "font-medium  text-center py-3 px-2 transition-all rounded-lg shadow-sm focus:ring focus:ring-primary-200 inline-flex items-center gap-4 bg-portfolio-white text-online-darkBlue hover:text-portfolio-darkBlue border dark:bg-inherit dark:text-white dark:hover:text-gray-300 dark:hover:border-gray-300"
+                "font-medium text-center py-3 px-6 transition-all rounded-lg shadow-sm focus:ring focus:ring-primary-200 inline-flex items-center gap-4 bg-portfolio-white text-online-darkBlue hover:text-portfolio-darkBlue dark:border dark:bg-gray-900  dark:text-white dark:hover:text-gray-300 dark:hover:border-gray-300"
               }
             >
               Submit

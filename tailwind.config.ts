@@ -15,6 +15,8 @@ const config: Config = {
       backgroundImage: {
         'hero-pattern-dark': 'url("/circuit-board-dark.svg")',
         'hero-pattern-light': 'url("/circuit-board-light.svg")',
+        'hideout-dark': 'url("/hideout-dark.svg")',
+        'hideout-light': 'url("/hideout-light.svg")',
       },
       backgroundAttachment: {
         'fixed': 'fixed',

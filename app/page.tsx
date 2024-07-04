@@ -7,8 +7,9 @@ export default function Home() {
   return (
     <div className="min-h-screen ">
       <LandingComponent />
-      <Projects />
       <Journey />
+      <Projects />
+
       <Contact />
     </div>
   );
