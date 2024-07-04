@@ -67,9 +67,9 @@ export default function Navbar() {
           <div className="relative">
             <button onClick={toggleDropdown} className="flex justify-end">
               {isDropdownOpen ? (
-                <XMarkIcon className="w-10 h-10 text-gray-500 transition-transform transform rotate-45 dark:text-white" />
+                <XMarkIcon className="w-10 h-10 text-black transition-transform transform rotate-45 dark:text-white" />
               ) : (
-                <Bars3Icon className="w-10 h-10 text-gray-500 transition-transform transform dark:text-white" />
+                <Bars3Icon className="w-10 h-10 text-black transition-transform transform dark:text-white" />
               )}
             </button>
             {isDropdownOpen && <DropdownMenu toggleDropdown={toggleDropdown} />}
