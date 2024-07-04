@@ -13,5 +13,6 @@ export type journeyType = {
     company: string;
     description: string;
     date: string;
-    imageUri: string;
+    lightModeImageUri: string;
+    darkModeImageUri: string;
 };

@@ -2,6 +2,7 @@ import React from "react";
 import JourneyCard from "./JourneyCard";
 import JourneyDescriptions from "@/lib/descriptions/JourneyDescriptions";
 import Image from "next/image";
+import JourneyImage from "./JourneyImage";
 
 const Journey = () => {
   return (
@@ -19,13 +20,7 @@ const Journey = () => {
                 <JourneyCard journey={journey} />
               </div>
             )}
-            <Image
-              src={journey.imageUri}
-              alt={journey.jobTitle}
-              width={200}
-              height={200}
-              className="w-1/4 h-auto mx-8 rounded-lg"
-            />
+            <JourneyImage journey={journey} />
             {index % 2 === 0 && (
               <div className="flex-1 flex justify-start pl-24">
                 <JourneyCard journey={journey} />
