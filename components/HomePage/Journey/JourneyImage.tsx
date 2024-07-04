@@ -13,13 +13,13 @@ const JourneyImage = ({ journey }: Props) => {
     theme === "dark" ? journey.darkModeImageUri : journey.lightModeImageUri;
 
   return (
-    <div className="w-1/4">
+    <div className="w-1/4 max-h-full flex items-center justify-center">
       <Image
         src={imageSrc}
         alt={journey.jobTitle}
         width={200}
         height={200}
-        className="w-full h-auto mx-8 rounded-lg"
+        className="max-w-full h-auto mx-8 rounded-lg"
       />
     </div>
   );
