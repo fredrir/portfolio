@@ -38,14 +38,14 @@ const ThemeToggle = () => {
           )}
         </button>
       </div>
-      {/* <div className="md:hidden">
+      <div className="md:hidden">
         <button
           className="w-full p-2 px-4 py-2 text-left text-gray-700 cursor-pointer group dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
           onClick={toggleTheme}
         >
           {theme === "dark" ? <p>Lightmode</p> : <p>Darkmode</p>}
         </button>
-      </div> */}
+      </div>
     </div>
   );
 };
