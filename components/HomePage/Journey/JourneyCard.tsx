@@ -6,7 +6,7 @@ interface Props {
 
 const JourneyCard = ({ journey }: Props) => {
   return (
-    <div className="flex flex-col w-full bg-white dark:bg-gray-900 rounded-2xl p-4">
+    <div className="flex flex-col w-full bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-md">
       <h1 className="text-center font-bold text-xl">{journey.jobTitle}</h1>
       <h2>{journey.company}</h2>
       <p>{journey.description}</p>

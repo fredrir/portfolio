@@ -9,7 +9,7 @@ interface Props {
 
 const ProjectCard = ({ project }: Props) => {
   return (
-    <div className="bg-white dark:bg-gray-900 w-full border-solid rounded-2xl overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 w-full border-solid rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-700">
       <div className="flex flex-col relative w-full h-52">
         <Image
           src={project.imageUri}

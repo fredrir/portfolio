@@ -28,7 +28,7 @@ const TerminalComponent = () => {
   return (
     <div className="max-w-lg bg-black text-green-500 font-mono p-4 rounded-lg shadow-lg min-h-[180px]">
       <article className="whitespace-pre-wrap">
-        <span className="text-white">{text.slice(0, prefixLength)}</span>
+        <span className="text-white">Fredrik:~$ </span>
         <span>{text.slice(prefixLength, prefixLength + mainTextLength)}</span>
         <span className="text-red-500">
           {text.slice(prefixLength + mainTextLength)}
