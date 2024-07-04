@@ -11,6 +11,7 @@ import { RolldownMenu } from "./RollDownMenu";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -20,11 +21,31 @@ export default function Navbar() {
     }
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <nav className="w-full">
       <FocusTrap active={isMenuOpen}>
         <div>
-          <div className="flex justify-between w-full py-5 px-5 items-center border-b-[1px] border-gray-200 dark:border-0 dark:bg-rif-darkBlue">
+          <div
+            className={`fixed left-0 right-0 top-0 z-50 flex justify-between w-full py-5 px-5 items-center  dark:bg-rif-darkBlue ${
+              isScrolled ? "bg-transparent" : "bg-white dark:bg-gray-900"
+            }`}
+          >
             <Link href="/">
               <h2 className="text-3xl font-bold">Fredrik Hansteen</h2>
             </Link>

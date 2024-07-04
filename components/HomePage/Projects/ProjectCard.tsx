@@ -19,7 +19,7 @@ const ProjectCard = ({ project }: Props) => {
           className="rounded-t-2xl"
         />
       </div>
-      <div className="p-4">
+      <div className="p-4 dark:bg-gray-800">
         <h1 className="text-xl font-bold">{project.title}</h1>
         <h2 className="text-sm text-gray-600 dark:text-gray-300">
           {project.languages}

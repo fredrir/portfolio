@@ -16,10 +16,10 @@ const Button = (props: Props) => {
   // }
   if (props.color === "white") {
     colorClasses =
-      "bg-portfolio-white text-online-darkBlue hover:text-portfolio-darkBlue border dark:bg-inherit dark:text-white dark:hover:text-gray-300 dark:hover:border-gray-300";
+      "bg-portfolio-white text-online-darkBlue hover:text-portfolio-darkBlue border dark:bg-gray-900 dark:text-white dark:hover:text-gray-300 dark:hover:border-gray-300";
   } else if (props.color === "green") {
     colorClasses =
-      "bg-portfolio-lightGreen text-black hover:text-portfolio-darkBlue border dark:bg-inherit dark:text-green-500 dark:hover:text-green-300 dark:hover:border-portfolio-snowWhite dark:border-green-500 dark:hover:border-green-300";
+      "bg-portfolio-lightGreen text-black hover:text-portfolio-darkBlue border dark:bg-gray-900 dark:text-green-500 dark:hover:text-green-300 dark:hover:border-portfolio-snowWhite dark:border-green-500 dark:hover:border-green-300";
   }
 
   if (props.size === "small") {
