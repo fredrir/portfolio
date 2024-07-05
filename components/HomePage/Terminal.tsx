@@ -42,7 +42,7 @@ const TerminalComponent = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="bg-gray-900 flex flex-row px-3 font-mono text-sm p-1 rounded-t-lg text-white">
+      <div className="bg-gray-900 flex flex-row px-3 font-mono text-sm p-1 pt-2 rounded-t-lg text-white ">
         <p className="mx-auto text-center"></p>
         <div className="flex flex-row text-end gap-2">
           <Image
