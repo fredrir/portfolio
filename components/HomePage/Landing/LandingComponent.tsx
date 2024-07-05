@@ -23,9 +23,8 @@ const LandingComponent = () => {
           {"Hi, I'm <Fredrik/>"}
         </h1>
       </div>
-      <div className="pt-10 w-full max-w-lg">
-        <TerminalComponent />
-      </div>
+
+      <TerminalComponent />
     </div>
   );
 };
