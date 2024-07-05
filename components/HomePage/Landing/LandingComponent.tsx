@@ -18,7 +18,7 @@ const LandingComponent = () => {
           className="object-cover w-full h-full"
         />
       </div>
-      <div className="bg-white dark:bg-gray-900 dark:text-white rounded-3xl px-4 py-2 mt-4">
+      <div className="bg-white dark:bg-gray-900 dark:text-white rounded-3xl px-4 py-2 mt-4 border-solid border-2 border-gray-900 dark:border-white">
         <h1 className="text-2xl font-bold text-center">
           {"Hi, I'm <Fredrik/>"}
         </h1>

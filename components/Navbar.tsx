@@ -1,12 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useTheme } from "@/lib/hooks/UseTheme";
-import Image from "next/image";
 import Button from "./Button";
 import ThemeToggle from "./ThemeToggle";
-import { Suspense, useEffect, useState } from "react";
-import FocusTrap from "focus-trap-react";
+import { useEffect, useState } from "react";
 import DropdownMenu from "./DropDownMenu";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Bars3Icon } from "@heroicons/react/24/solid";
@@ -36,8 +33,10 @@ export default function Navbar() {
     <nav className="w-full">
       <div>
         <div
-          className={`hidden md:flex fixed left-0 right-0 top-0 z-50 flex justify-between w-full py-5 px-5 items-center  dark:bg-rif-darkBlue ${
-            isScrolled ? "bg-transparent" : "bg-white dark:bg-gray-900"
+          className={`hidden md:flex fixed left-0 right-0 top-0 z-50 flex justify-between w-full py-5 px-5 items-center dark:bg-rif-darkBlue ${
+            isScrolled
+              ? "bg-transparent"
+              : "bg-white dark:bg-gray-900 border-b-2 border-gray-900 border-white"
           }`}
         >
           <Link href="/">
