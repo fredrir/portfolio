@@ -7,24 +7,31 @@ const TerminalComponent = () => {
   const [cursorVisible, setCursorVisible] = useState(true);
   const [cursorIsFinished, setCursorIsFinished] = useState(false);
   const mainText =
-    "I'm currently in my final year of a Bachelor's degree in Informatics at the Norwegian University of Science and Technology (NTNU) in Trondheim, Norway. Feel free to explore my CV or get in touch with me.";
+    "II'm currently in my final year of a Bachelor's degree in Informatics at the Norwegian University of Science and Technology (NTNU) in Trondheim, Norway. Feel free to explore my CV or get in touch with me.";
   const errorText = "\nCommand not found";
 
   useEffect(() => {
     let index = 0;
-    const interval = setInterval(() => {
-      if (index < mainText.length - 1) {
-        setText((prev) => prev + mainText[index]);
-        index++;
-      } else {
-        clearInterval(interval);
-        setTimeout(() => {
-          setCursorIsFinished(true);
-          setText((prev) => prev + errorText);
-        }, 700);
-      }
-    }, 50);
-    return () => clearInterval(interval);
+    let interval: NodeJS.Timeout;
+    const startTyping = () => {
+      interval = setInterval(() => {
+        if (index < mainText.length - 1) {
+          setText((prev) => prev + mainText[index]);
+          index++;
+        } else {
+          clearInterval(interval);
+          setTimeout(() => {
+            setCursorIsFinished(true);
+            setText((prev) => prev + errorText);
+          }, 700);
+        }
+      }, 50);
+    };
+    const timer = setTimeout(startTyping, 1000);
+    return () => {
+      clearTimeout(timer);
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
   useEffect(() => {
