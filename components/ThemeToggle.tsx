@@ -7,9 +7,9 @@ import {
 const ThemeToggle = () => {
   const [theme, setTheme] = useState(() => {
     if (typeof window !== "undefined" && window.localStorage) {
-      return window.localStorage.getItem("theme") || "light";
+      return window.localStorage.getItem("theme") || "dark";
     }
-    return "light";
+    return "dark";
   });
 
   useEffect(() => {
@@ -34,9 +34,9 @@ const ThemeToggle = () => {
           onClick={toggleTheme}
         >
           {theme === "dark" ? (
-            <MoonIconSolid className="w-6 h-6 transition-transform duration-300 ease-in-out group-hover:scale-110" />
+            <MoonIconSolid className="w-8 h-8 transition-transform duration-300 ease-in-out group-hover:scale-110" />
           ) : (
-            <SunIconSolid className="w-6 h-6 transition-transform duration-300 ease-in-out group-hover:scale-110" />
+            <SunIconSolid className="w-8 h-8 transition-transform duration-300 ease-in-out group-hover:scale-110" />
           )}
         </button>
       </div>
