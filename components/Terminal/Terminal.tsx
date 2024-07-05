@@ -118,14 +118,14 @@ const TerminalComponent = () => {
             </button>
           </div>
         </div>
-        <div className="hidden md:flex bg-gray-900 px-3 flex flex-row gap-2 font-mono text-sm text-white">
+        {/* <div className="hidden md:flex bg-gray-900 px-3 flex flex-row gap-2 font-mono text-sm text-white">
           <p>File</p>
           <p>Edit</p>
           <p>View</p>
           <p>Search</p>
           <p>Terminal</p>
           <p>Help</p>
-        </div>
+        </div> */}
         <div
           className={`bg-black text-green-500 font-mono p-4 rounded-b-lg shadow-lg ${
             isExpanded ? "min-h-[360px]" : "min-h-[180px]"
