@@ -11,7 +11,7 @@ const JourneyDescriptions = [
     },
     {
         id: 2,
-        jobTitle: 'Leader of the Application Committee',
+        jobTitle: 'Head of the Application Committee',
         company: "Online - Student Organization",
         description: "Responsible for a team of 17 developers, who are divided into various projects. Overall responsibility for daily operations and administrative work related to the development and maintenance of our own IT systems.",
         date: "August 2023 - Present",

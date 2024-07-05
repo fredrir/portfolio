@@ -14,7 +14,7 @@ const JourneyCard = ({ journey }: Props) => {
       </p>
       <h2 className="font-bold pb-4 pt-2">{journey.company}</h2>
       <div className="border-solid border-t-2 border-black dark:border-white">
-        <p>{journey.description}</p>
+        <p className="py-2">{journey.description}</p>
       </div>
     </div>
   );
