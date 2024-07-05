@@ -119,7 +119,7 @@ const Contact = () => {
             <button
               type="submit"
               className={
-                "font-medium text-center py-3 px-6 transition-all rounded-lg shadow-sm focus:ring focus:ring-primary-200 inline-flex items-center gap-4 bg-portfolio-white text-online-darkBlue hover:text-portfolio-darkBlue dark:border dark:bg-gray-900 dark:text-white dark:hover:text-gray-300 dark:hover:border-gray-300"
+                "font-medium text-center py-3 px-6 transition-all rounded-lg  inline-flex items-center gap-4 bg-white dark:bg-inherit dark:hover:border-green-400 dark:hover:text-green-400 hover:scale-105  border-solid border-2 border-gray-700 dark:border-white dark:text-whit"
               }
             >
               {buttonText}
