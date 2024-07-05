@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import TerminalTab from "./TerminalTab";
 
 const TerminalComponent = () => {
   const [text, setText] = useState("");
@@ -12,6 +13,7 @@ const TerminalComponent = () => {
 
   const [isClosed, setIsClosed] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSmall, setIsSmall] = useState(false);
 
   useEffect(() => {
     let index = 0;
@@ -50,6 +52,10 @@ const TerminalComponent = () => {
 
   const mainTextLength = mainText.length;
 
+  if (isSmall) {
+    return <TerminalTab setIsSmall={setIsSmall} setIsClosed={setIsClosed} />;
+  }
+
   if (!isClosed) {
     return (
       <div
@@ -60,25 +66,41 @@ const TerminalComponent = () => {
         <div className="bg-gray-900 flex flex-row px-3 font-mono text-sm p-1 pt-2 rounded-t-lg text-white ">
           <p className="mx-auto text-center"></p>
           <div className="flex flex-row text-end gap-2">
-            <Image
-              src={"/minus-icon.svg"}
-              alt={"minus icon"}
-              width={10}
-              height={10}
-              className="relative top-1"
-            />
+            <button
+              className="hover:scale-110"
+              onClick={() => {
+                setIsSmall(true);
+              }}
+            >
+              <Image
+                src={"/minus-icon.svg"}
+                alt={"minus icon"}
+                width={10}
+                height={10}
+                className="relative top-1"
+              />
+            </button>
             <button
               className="hover:scale-110"
               onClick={() => {
                 setIsExpanded(!isExpanded);
               }}
             >
-              <Image
-                src={"square-icon.svg"}
-                alt={"square icon"}
-                width={10}
-                height={10}
-              />
+              {isExpanded ? (
+                <Image
+                  src={"square-icon-expanded.svg"}
+                  alt={"square icon expanded"}
+                  width={10}
+                  height={10}
+                />
+              ) : (
+                <Image
+                  src={"square-icon.svg"}
+                  alt={"square icon"}
+                  width={10}
+                  height={10}
+                />
+              )}
             </button>
 
             <button
