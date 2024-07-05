@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 import { Roboto } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Fredrik Hansteen",
@@ -37,6 +38,7 @@ export default function RootLayout({
         <main className="flex-grow bg-fixed bg-[#D0C6DF] dark:bg-[#301856] bg-hero-pattern-light dark:bg-hero-pattern-light">
           {children}
         </main>
+        <SpeedInsights />
         <Footer />
       </body>
     </html>

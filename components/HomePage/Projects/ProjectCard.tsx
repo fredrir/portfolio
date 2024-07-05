@@ -14,7 +14,7 @@ const ProjectCard = ({ project }: Props) => {
         <Image
           src={project.imageUri}
           alt={project.title}
-          layout="fill"
+          fill
           style={{ objectFit: "cover" }}
           className="rounded-t-2xl"
         />

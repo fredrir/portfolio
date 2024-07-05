@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.4",
+    "@vercel/speed-insights": "^1.0.12",
     "classnames": "^2.5.1",
     "focus-trap-react": "^10.2.3",
     "install": "^0.13.0",
