@@ -50,7 +50,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full py-10 px-10">
+    <div className="flex flex-col items-center w-full py-10 px-7">
       <div
         id="contact-me"
         className="flex flex-col w-full max-w-3xl bg-[#D0C6DF] dark:bg-[#301856] p-4 mx-auto border-solid rounded-2xl border border-2 border-gray-700 dark:border-white"

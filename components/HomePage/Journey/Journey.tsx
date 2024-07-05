@@ -18,7 +18,7 @@ const Journey = () => {
       </div>
       <div
         id="journey"
-        className="hidden md:flex flex flex-col justify-center mt-4 px-12 gap-20 items-center max-w-4xl border-solid rounded-2xl overflow-hidden"
+        className="hidden md:flex flex flex-col justify-center mt-4 px-7 gap-20 items-center max-w-4xl border-solid rounded-2xl overflow-hidden"
       >
         {JourneyDescriptions.map((journey, index) => (
           <div key={journey.id} className="flex items-center w-full">
@@ -36,7 +36,7 @@ const Journey = () => {
           </div>
         ))}
       </div>
-      <div className="md:hidden flex flex-col justify-center mt-4 px-10 gap-20 items-center max-w-4xl border-solid rounded-2xl overflow-hidden">
+      <div className="md:hidden flex flex-col justify-center mt-4 px-7 gap-20 items-center max-w-4xl border-solid rounded-2xl overflow-hidden">
         {JourneyDescriptions.map((journey, index) => (
           <div
             key={journey.id}
