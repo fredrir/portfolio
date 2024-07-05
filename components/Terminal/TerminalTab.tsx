@@ -20,8 +20,9 @@ const TerminalTab = ({ setIsSmall, setIsClosed }: TerminalTabProps) => {
             <Image
               src={"square-icon.svg"}
               alt={"square icon"}
-              width={15}
-              height={15}
+              width={10}
+              height={10}
+              className="relative bottom-0.5"
             />
           </button>
           <button

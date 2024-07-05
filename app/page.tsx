@@ -9,7 +9,6 @@ export default function Home() {
       <LandingComponent />
       <Journey />
       <Projects />
-
       <Contact />
     </div>
   );

@@ -8,13 +8,13 @@ const LandingComponent = () => {
       id="landing-component"
       className="flex flex-col items-center justify-center pt-32 px-7 min-h-[700px]"
     >
-      <div className="rounded-full overflow-hidden w-52 h-52">
+      <div className="rounded-full overflow-hidden w-52 h-60">
         <Image
-          src={"/Fredrik_Hansteen.jpeg"}
+          src={"/Fredrik_Hansteen.png"}
           alt={"Portret of Fredrik Hansteen"}
           priority
-          width={200}
-          height={200}
+          width={400}
+          height={400}
           className="object-cover w-full h-full"
         />
       </div>

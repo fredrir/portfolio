@@ -11,15 +11,20 @@ import { Bars3Icon } from "@heroicons/react/24/solid";
 export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
       }
+
+      setLastScrollY(currentScrollY);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -27,7 +32,7 @@ export default function Navbar() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [lastScrollY]);
 
   return (
     <nav className="w-full">
@@ -36,7 +41,7 @@ export default function Navbar() {
           className={`hidden md:flex fixed left-0 right-0 top-0 z-50 flex justify-between w-full py-5 px-5 items-center dark:bg-rif-darkBlue ${
             isScrolled
               ? "bg-transparent"
-              : "bg-white dark:bg-gray-900 border-b-2 border-gray-900 border-white"
+              : "bg-white dark:bg-gray-900 border-b-2 border-gray-900 dark:border-white"
           }`}
         >
           <Link href="/">
@@ -45,12 +50,12 @@ export default function Navbar() {
           <div className="flex flex-col items-end gap-2 sm:flex-row sm:gap-5 sm:items-center text-online-darkTeal dark:text-white">
             <div className="hidden md:flex">
               <Link href="/cv">
-                <Button title="CV" color="white" size="small" />
+                <Button title="CV" color="white" />
               </Link>
             </div>
             <div className="hidden md:flex">
               <Link href={"#contact-me"}>
-                <Button title="Contact" color="green" size="small" />
+                <Button title="Contact" color="green" />
               </Link>
             </div>
 
