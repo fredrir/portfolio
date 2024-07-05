@@ -55,7 +55,7 @@ const Contact = () => {
         id="contact-me"
         className="flex flex-col w-full max-w-3xl bg-[#D0C6DF] dark:bg-[#301856] p-4 mx-auto border-solid rounded-2xl border border-2 border-gray-700 dark:border-white"
       >
-        <h1 className="text-center font-extrabold text-4xl">Contact me</h1>
+        <h1 className="text-center font-bold text-4xl">Contact me</h1>
         <form onSubmit={handleSubmit} className="w-full">
           <label
             className="text-shadow block text-xl font-medium"
