@@ -4,7 +4,7 @@ const JourneyDescriptions = [
         id: 1,
         jobTitle: 'Summer Intern',
         company: "Maritime Optima",
-        description: "Worked with the testing of the Maritime Optima's products. The platform is a tool for ship operators to optimize their routes and fuel consumption.",
+        description: "Worked with the testing of Maritime Optima's products. Participated in the development of new regression tests for the company's products. ",
         date: "June 2023 - July 2023",
         lightModeImageUri: "/maritime-optima.svg",
         darkModeImageUri: "/maritime-optima-dark.svg",
