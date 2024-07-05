@@ -24,6 +24,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="no" className={roboto.variable}>
+      <head>
+        <meta
+          name="google-site-verification"
+          content="UU8-qICRv5a4sAtHbMB5rFbj9CuO-wzdPKfDur29ai8"
+        />
+      </head>
       <body className="flex flex-col min-h-screen bg-white dark:bg-gray-900 dark:text-white font-monograph">
         <link rel="icon" href="/favicon.ico" />
         <Toaster />
