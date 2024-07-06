@@ -44,9 +44,15 @@ export default function Navbar() {
               : "bg-white dark:bg-gray-900 border-b-2 border-gray-900 dark:border-white"
           }`}
         >
-          <Link href="/">
-            <h2 className="text-3xl font-bold">Fredrik Hansteen</h2>
-          </Link>
+          {" "}
+          {!isScrolled ? (
+            <Link href="/">
+              <h2 className="text-3xl font-bold">Fredrik Hansteen</h2>
+              {/* <Button title="Fredrik Hansteen" color="green" /> */}
+            </Link>
+          ) : (
+            <div></div>
+          )}
           <div className="flex flex-col items-end gap-2 sm:flex-row sm:gap-5 sm:items-center text-online-darkTeal dark:text-white">
             <div className="hidden md:flex">
               <Link href="/cv">
@@ -67,7 +73,11 @@ export default function Navbar() {
             isScrolled ? "bg-transparent" : "bg-white dark:bg-gray-900"
           }`}
         >
-          <h1 className="font-bold text-xl">Hansteen</h1>
+          {!isScrolled ? (
+            <h1 className="font-bold text-xl">Hansteen</h1>
+          ) : (
+            <div></div>
+          )}
           <div className="relative">
             <button onClick={toggleDropdown} className="flex justify-end">
               {isDropdownOpen ? (
