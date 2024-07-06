@@ -84,13 +84,13 @@ export default function Navbar() {
                 className={`p-1 border-2 ${
                   !isScrolled
                     ? "border-transparent"
-                    : "bg-white dark:bg-gray-900 border-solid dark:border-white rounded-full"
+                    : "bg-white dark:bg-gray-900 border-solid dark:border-white border-gray-900 rounded-full"
                 }`}
               >
                 {isDropdownOpen ? (
-                  <XMarkIcon className="w-10 h-10 text-black transition-transform transform rotate-45 dark:text-white" />
+                  <XMarkIcon className="w-10 h-10 text-black  dark:text-white" />
                 ) : (
-                  <Bars3Icon className="w-10 h-10 text-black transition-transform transform dark:text-white" />
+                  <Bars3Icon className="w-10 h-10 text-black  dark:text-white" />
                 )}
               </div>
             </button>
