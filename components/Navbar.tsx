@@ -80,27 +80,19 @@ export default function Navbar() {
           )}
           <div className="relative">
             <button onClick={toggleDropdown} className="flex justify-end">
-              {isDropdownOpen ? (
-                <div>
-                  {!isScrolled ? (
-                    <XMarkIcon className="w-10 h-10 text-black transition-transform transform rotate-45 dark:text-white" />
-                  ) : (
-                    <div className="bg-white dark:bg-gray-900 p-1 border-solid border-2 dark:border-white rounded-full">
-                      <XMarkIcon className="w-10 h-10 text-black transition-transform transform rotate-45 dark:text-white" />
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div>
-                  {!isScrolled ? (
-                    <Bars3Icon className="w-10 h-10 text-black transition-transform transform dark:text-white" />
-                  ) : (
-                    <div className="bg-white dark:bg-gray-900 p-1 border-solid border-2 dark:border-white rounded-full">
-                      <Bars3Icon className="w-10 h-10 text-black transition-transform transform dark:text-white" />
-                    </div>
-                  )}
-                </div>
-              )}
+              <div
+                className={`p-1 border-2 ${
+                  !isScrolled
+                    ? "border-transparent"
+                    : "bg-white dark:bg-gray-900 border-solid dark:border-white rounded-full"
+                }`}
+              >
+                {isDropdownOpen ? (
+                  <XMarkIcon className="w-10 h-10 text-black transition-transform transform rotate-45 dark:text-white" />
+                ) : (
+                  <Bars3Icon className="w-10 h-10 text-black transition-transform transform dark:text-white" />
+                )}
+              </div>
             </button>
             {isDropdownOpen && <DropdownMenu toggleDropdown={toggleDropdown} />}
           </div>
