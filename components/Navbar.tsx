@@ -74,7 +74,9 @@ export default function Navbar() {
           }`}
         >
           {!isScrolled ? (
-            <h1 className="font-bold text-xl">Fredrik Hansteen</h1>
+            <Link href={"/"}>
+              <h1 className="font-bold text-xl">Fredrik Hansteen</h1>
+            </Link>
           ) : (
             <div></div>
           )}

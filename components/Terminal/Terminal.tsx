@@ -56,69 +56,81 @@ const TerminalComponent = () => {
     return <TerminalTab setIsSmall={setIsSmall} setIsClosed={setIsClosed} />;
   }
 
-  if (!isClosed) {
+  if (isClosed) {
     return (
-      <div
-        className={`flex flex-col pt-10 w-full pb-32 ${
-          isExpanded ? "max-w-4xl" : "max-w-lg"
-        }`}
-      >
-        <div className="bg-gray-900 flex flex-row px-3 font-mono text-sm p-1 pt-2 rounded-t-lg text-white ">
-          <p className="mx-auto text-center"></p>
-          <div className="flex flex-row text-end gap-2">
-            <button
-              className="hover:scale-110"
-              onClick={() => {
-                setIsSmall(true);
-              }}
-            >
+      <TerminalTab
+        setIsSmall={setIsSmall}
+        setIsClosed={setIsClosed}
+        minimized={false}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`flex flex-col pt-10 w-full pb-32 ${
+        isExpanded ? "max-w-4xl" : "max-w-lg"
+      }`}
+    >
+      <div className="bg-gray-900 flex flex-row px-3 font-mono text-sm p-1 pt-2 rounded-t-lg text-white ">
+        <p className="mx-auto text-center"></p>
+        <div className="flex flex-row text-end gap-2">
+          <button
+            className="hover:scale-110"
+            onClick={() => {
+              setIsSmall(true);
+            }}
+          >
+            <div className="border-solid border-2 px-2 py-2  border-yellow-500">
               <Image
                 src={"/minus-icon.svg"}
                 alt={"minus icon"}
-                width={10}
-                height={10}
+                width={12}
+                height={12}
                 className="relative top-1"
               />
-            </button>
-            <button
-              className="hover:scale-110"
-              onClick={() => {
-                setIsExpanded(!isExpanded);
-              }}
-            >
-              {isExpanded ? (
+            </div>
+          </button>
+          <button
+            className="hover:scale-110"
+            onClick={() => {
+              setIsExpanded(!isExpanded);
+            }}
+          >
+            {isExpanded ? (
+              <div className="border-solid border-2 px-2 py-1 border-green-500">
                 <Image
                   src={"square-icon-expanded.svg"}
                   alt={"square icon expanded"}
                   width={10}
                   height={10}
                 />
-              ) : (
+              </div>
+            ) : (
+              <div className="border-solid border-2 px-2 py-1 border-green-500">
                 <Image
                   src={"square-icon.svg"}
                   alt={"square icon"}
-                  width={10}
-                  height={10}
+                  width={11}
+                  height={11}
                 />
-              )}
-            </button>
+              </div>
+            )}
+          </button>
 
-            <button
-              className="hover:scale-110"
-              onClick={() => {
-                setIsClosed(true);
-              }}
-            >
-              <Image
-                src={"/close-icon.svg"}
-                alt={"close icon"}
-                width={15}
-                height={15}
-              />
-            </button>
-          </div>
+          <button
+            className="hover:scale-110"
+            onClick={() => {
+              setIsClosed(true);
+            }}
+          >
+            <div className="border-solid border-2 px-2 border-red-400 text-red-400">
+              X
+            </div>
+          </button>
         </div>
-        {/* <div className="hidden md:flex bg-gray-900 px-3 flex flex-row gap-2 font-mono text-sm text-white">
+      </div>
+      {/* <div className="hidden md:flex bg-gray-900 px-3 flex flex-row gap-2 font-mono text-sm text-white">
           <p>File</p>
           <p>Edit</p>
           <p>View</p>
@@ -126,25 +138,24 @@ const TerminalComponent = () => {
           <p>Terminal</p>
           <p>Help</p>
         </div> */}
-        <div
-          className={`bg-black text-green-500 font-mono p-4 rounded-b-lg shadow-lg ${
-            isExpanded ? "min-h-[360px]" : "min-h-[180px]"
-          }`}
-        >
-          <article className="whitespace-pre-wrap">
-            <span className="text-white">Fredrik:~$ </span>
-            <span>{text.slice(0, mainTextLength)}</span>
-            <span className="text-red-500">{text.slice(mainTextLength)}</span>
-            {cursorVisible && (
-              <span className="border-white bg-white border border-1 text-white">
-                |
-              </span>
-            )}
-          </article>
-        </div>
+      <div
+        className={`bg-black text-green-500 font-mono p-4 rounded-b-lg shadow-lg ${
+          isExpanded ? "min-h-[360px]" : "min-h-[180px]"
+        }`}
+      >
+        <article className="whitespace-pre-wrap">
+          <span className="text-white">Fredrik:~$ </span>
+          <span>{text.slice(0, mainTextLength)}</span>
+          <span className="text-red-500">{text.slice(mainTextLength)}</span>
+          {cursorVisible && (
+            <span className="border-white bg-white border border-1 text-white">
+              |
+            </span>
+          )}
+        </article>
       </div>
-    );
-  }
+    </div>
+  );
 };
 
 export default TerminalComponent;
