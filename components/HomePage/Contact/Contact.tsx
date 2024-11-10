@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import toast from "react-hot-toast";
 
 const Contact = () => {
@@ -11,6 +12,7 @@ const Contact = () => {
   });
   const [buttonText, setButtonText] = useState("Submit");
   const [status, setStatus] = useState({ submitted: false, message: "" });
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
@@ -22,16 +24,22 @@ const Contact = () => {
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA.");
+      return;
+    }
     setButtonText("Sending...");
 
-    await fetch("https://formspree.io/f/xeqyqwqv", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => {
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...formData, recaptchaToken }),
+      });
+
+      if (response.ok) {
         setStatus({ submitted: true, message: "Message sent successfully" });
         setButtonText("Submit");
         setFormData({
@@ -40,13 +48,18 @@ const Contact = () => {
           phone: "",
           message: "",
         });
+        setRecaptchaToken(null);
         toast.success("Message sent successfully");
-      })
-      .catch((err) => {
-        setStatus({ submitted: false, message: "Error sending message" });
-        toast.error("Error sending message");
+      } else {
+        setStatus({ submitted: true, message: "Failed to send message" });
         setButtonText("Submit");
-      });
+        toast.error("Failed to send message");
+      }
+    } catch (error) {
+      console.error("Error sending email: ", error);
+      toast.error("Error sending message");
+      setButtonText("Submit");
+    }
   };
 
   return (
@@ -115,6 +128,13 @@ const Contact = () => {
             required
             className="my-2 p-2 h-60 w-full rounded-3xl  dark:bg-gray-900 border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
           />
+          <div className="my-4 flex items-center justify-center">
+            <ReCAPTCHA
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+              onChange={(token) => setRecaptchaToken(token)}
+              onExpired={() => setRecaptchaToken(null)}
+            />
+          </div>
           <div className="py-5 text-center">
             <button
               type="submit"
