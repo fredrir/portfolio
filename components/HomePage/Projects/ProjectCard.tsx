@@ -1,6 +1,8 @@
+"use client";
+import Button from "@/components/Button";
+import { useTheme } from "@/lib/hooks/UseTheme";
 import { projectType } from "@/lib/types/types";
 import Image from "next/image";
-import Button from "../../Button";
 import Link from "next/link";
 
 interface Props {
@@ -8,8 +10,11 @@ interface Props {
 }
 
 const ProjectCard = ({ project }: Props) => {
+  const theme = useTheme();
+  const githubSrc = theme === "dark" ? "/github-dark.svg" : "/github.svg";
+
   return (
-    <div className="bg-white w-full border-solid border-2 dark:border-white border-gray-700 rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-700">
+    <div className="w-full border-solid border-2 dark:border-white dark:bg-gray-800 bg-white border-gray-700 rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-700">
       <div className="flex flex-col relative w-full h-52">
         <Image
           src={project.imageUri}
@@ -19,15 +24,35 @@ const ProjectCard = ({ project }: Props) => {
           className=""
         />
       </div>
-      <div className="p-4 dark:bg-gray-800">
+      <div className="p-4 ">
         <h1 className="text-xl font-bold">{project.title}</h1>
         <h2 className="text-sm text-gray-600 dark:text-gray-300">
           {project.languages}
         </h2>
         <p className="mt-2">{project.description}</p>
-        <div className="pt-4 flex justify-center items-center">
+        <div className="pt-4 flex flex-row justify-around items-center">
+          {project.websiteLink && (
+            <Link href={project.websiteLink}>
+              <Button
+                title={
+                  project.websiteAlias
+                    ? project.websiteAlias
+                    : project.websiteLink
+                        .replace(/https?:\/\//, "")
+                        .replace(/\/$/, "")
+                }
+                color={"white"}
+              />
+            </Link>
+          )}
           <Link href={project.githubLink}>
-            <Button title={"Read more"} color={"white"} />
+            <Image
+              src={githubSrc}
+              alt={"Logo og Github"}
+              width={30}
+              height={30}
+              className="hover:scale-110 transition-transform duration-700 cursor-pointer"
+            />
           </Link>
         </div>
       </div>

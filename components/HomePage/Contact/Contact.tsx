@@ -63,12 +63,12 @@ const Contact = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full py-10 px-7">
+    <div className="flex flex-col items-center w-full py-10 mt-24 px-7">
       <div
         id="contact-me"
-        className="flex flex-col w-full max-w-3xl bg-[#D0C6DF] dark:bg-[#301856] p-4 mx-auto border-solid rounded-2xl border border-2 border-gray-700 dark:border-white"
+        className="flex flex-col w-full max-w-screen-xl  p-4 mx-auto border-solid rounded-2xl border border-2 border-gray-700 dark:border-white"
       >
-        <h1 className="text-center font-bold text-4xl">Contact me</h1>
+        <h1 className="text-center font-semibold text-4xl">Contact me</h1>
         <form onSubmit={handleSubmit} className="w-full">
           <label
             className="text-shadow block text-xl font-medium"
@@ -83,7 +83,7 @@ const Contact = () => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="my-2 p-2 w-full rounded-3xl dark:bg-gray-900 border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
+            className="my-2 p-2 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
           />
           <label
             className="text-shadow block text-xl font-medium"
@@ -98,7 +98,7 @@ const Contact = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            className="my-2 p-2 w-full rounded-3xl dark:bg-gray-900 border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
+            className="my-2 p-2 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
           />
           <label
             className="text-shadow block text-xl font-medium"
@@ -112,7 +112,7 @@ const Contact = () => {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className="my-2 p-2 w-full rounded-3xl dark:bg-gray-900 border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
+            className="my-2 p-2 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
           />
           <label
             className="text-shadow block text-xl font-medium"
@@ -126,7 +126,7 @@ const Contact = () => {
             value={formData.message}
             onChange={handleChange}
             required
-            className="my-2 p-2 h-60 w-full rounded-3xl  dark:bg-gray-900 border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
+            className="my-2 p-2 h-60 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
           />
           <div className="my-4 flex items-center justify-center">
             <ReCAPTCHA
@@ -139,7 +139,7 @@ const Contact = () => {
             <button
               type="submit"
               className={
-                "font-medium text-center py-3 px-6 transition-all rounded-lg  inline-flex items-center gap-4 bg-white dark:bg-inherit dark:hover:border-green-400 dark:hover:text-green-400 hover:scale-105  border-solid border-2 border-gray-700 dark:border-white dark:text-whit"
+                "font-medium text-center py-3 px-6 transition-all rounded-lg  inline-flex items-center gap-4 bg-inherit dark:hover:border-green-400 dark:hover:text-green-400 hover:scale-105  border-solid border-2 border-gray-700 dark:border-white dark:text-whit"
               }
             >
               {buttonText}
