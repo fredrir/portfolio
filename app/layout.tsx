@@ -5,6 +5,9 @@ import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 import { Roboto } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Background } from "@/components/Background";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { AnimatedLinesBackground } from "@/components/AnimatedLinesBackground";
 
 export const metadata: Metadata = {
   title: "Fredrik Hansteen",
@@ -31,15 +34,17 @@ export default function RootLayout({
           content="UU8-qICRv5a4sAtHbMB5rFbj9CuO-wzdPKfDur29ai8"
         />
       </head>
-      <body className="flex flex-col min-h-screen bg-white dark:bg-gray-900 dark:text-white font-mono">
-        <link rel="icon" href="/favicon.ico" />
-        <Toaster />
-        <Navbar />
-        <main className="flex-grow bg-fixed bg-[#D0C6DF] dark:bg-[#301856] bg-hero-pattern-light dark:bg-hero-pattern-light">
-          {children}
-        </main>
-        <SpeedInsights />
-        <Footer />
+      <body className="flex flex-col min-h-screen dark:text-white font-mono">
+        <ThemeProvider>
+          <AnimatedLinesBackground />
+          <Toaster />
+          <Navbar />
+          <main className="flex-grow bg-fixed bg-[#D0C6DF] dark:bg-[#301856]">
+            {children}
+          </main>
+          <SpeedInsights />
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
