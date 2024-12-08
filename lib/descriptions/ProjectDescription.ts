@@ -1,4 +1,6 @@
-const ProjectDescriptions = [
+import { projectType } from "../types/types";
+
+const ProjectDescriptions: projectType[] = [
   {
     id: 1,
     title: "Admission Page",
@@ -7,6 +9,7 @@ const ProjectDescriptions = [
     languages: "Next.js / MongoDB / Tailwind",
     imageUri: "/online-opptak.png",
     githubLink: "https://github.com/appKom/online-opptak/",
+    websiteLink: "https://opptak.online.ntnu.no/",
   },
   {
     id: 5,
@@ -15,7 +18,8 @@ const ProjectDescriptions = [
       "A social media platform where you can share posts, like posts, and follow other users.",
     languages: "Vite / MongoDB / Express / Apache2 / Tailwind",
     imageUri: "/y.png",
-    githubLink: "https://y.hansteen.dev/",
+    githubLink: "https://github.com/fredrir/Y",
+    websiteLink: "https://y.hansteen.dev/",
   },
   {
     id: 2,
@@ -25,6 +29,8 @@ const ProjectDescriptions = [
     languages: "Flutter / Firebase / Google Cloud Platform",
     imageUri: "/app-picture.png",
     githubLink: "https://github.com/appKom/online_events",
+    websiteLink: "https://apps.apple.com/no/app/online/id6476830274",
+    websiteAlias: "App Store",
   },
   {
     id: 3,
@@ -34,6 +40,7 @@ const ProjectDescriptions = [
     languages: "Next.js / PostgreSQL / Tailwind",
     imageUri: "/movie-tracker.png",
     githubLink: "https://github.com/fredrir/MovieTracker",
+    websiteLink: "https://film-bice.vercel.app/",
   },
   {
     id: 4,

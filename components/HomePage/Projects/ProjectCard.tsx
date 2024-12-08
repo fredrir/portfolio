@@ -1,4 +1,5 @@
 "use client";
+import Button from "@/components/Button";
 import { useTheme } from "@/lib/hooks/UseTheme";
 import { projectType } from "@/lib/types/types";
 import Image from "next/image";
@@ -29,9 +30,22 @@ const ProjectCard = ({ project }: Props) => {
           {project.languages}
         </h2>
         <p className="mt-2">{project.description}</p>
-        <div className="pt-4 flex justify-center items-center">
+        <div className="pt-4 flex flex-row justify-around items-center">
+          {project.websiteLink && (
+            <Link href={project.websiteLink}>
+              <Button
+                title={
+                  project.websiteAlias
+                    ? project.websiteAlias
+                    : project.websiteLink
+                        .replace(/https?:\/\//, "")
+                        .replace(/\/$/, "")
+                }
+                color={"white"}
+              />
+            </Link>
+          )}
           <Link href={project.githubLink}>
-            {/* <Button title={"Read more"} color={"white"} /> */}
             <Image
               src={githubSrc}
               alt={"Logo og Github"}
