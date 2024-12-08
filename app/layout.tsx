@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="no" className={roboto.variable}>
+    <html lang="no" className={roboto.variable} suppressHydrationWarning>
       <head>
         <meta
           name="google-site-verification"
@@ -35,13 +35,11 @@ export default function RootLayout({
         />
       </head>
       <body className="flex flex-col min-h-screen dark:text-white font-mono">
-        <ThemeProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AnimatedLinesBackground />
           <Toaster />
           <Navbar />
-          <main className="flex-grow bg-fixed bg-[#D0C6DF] dark:bg-[#301856]">
-            {children}
-          </main>
+          <main className="flex-grow bg-fixed z-20 ">{children}</main>
           <SpeedInsights />
           <Footer />
         </ThemeProvider>
