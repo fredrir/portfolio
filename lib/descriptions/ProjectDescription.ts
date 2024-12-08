@@ -44,11 +44,13 @@ const ProjectDescriptions: projectType[] = [
   },
   {
     id: 4,
-    title: "This Portfolio",
-    description: "Created to showcase my projects and skills",
-    languages: "Next.js / Tailwind",
-    imageUri: "/portfolio.png",
-    githubLink: "https://github.com/fredrir/portfolioV2",
+    title: "The Online Fond",
+    description:
+      "A web app showcasing the student organizations's fond, how it's used and it's performance. It also showcases the fond's members and the projects they have funded.",
+    languages: "Next.js / Prisma/ PostgreSQL / Tailwind",
+    imageUri: "/onlinefondet.png",
+    githubLink: "https://github.com/appkom/onlinefondet",
+    websiteLink: "https://onlinefondet.no",
   },
 ];
 
