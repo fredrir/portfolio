@@ -63,7 +63,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full py-10 mt-24 px-7">
+    <div className="flex flex-col items-center w-full py-10 mt-24">
       <div
         id="contact-me"
         className="flex flex-col w-full max-w-screen-xl  p-4 mx-auto border-solid rounded-2xl border border-2 border-gray-700 dark:border-white"

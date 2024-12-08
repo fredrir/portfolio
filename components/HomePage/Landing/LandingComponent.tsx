@@ -6,7 +6,7 @@ const LandingComponent = () => {
   return (
     <div
       id="landing-component"
-      className="flex flex-col items-center justify-center pt-32 px-7 min-h-[700px]"
+      className="flex flex-col items-center justify-center pt-32 min-h-[700px]"
     >
       <div className="rounded-full overflow-hidden w-52 h-60">
         <Image
