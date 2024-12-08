@@ -2,12 +2,13 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { useTheme } from "next-themes";
+
 import { useAnimatedLines } from "@/lib/hooks/useAnimatedLines";
+import { useTheme } from "@/lib/hooks/UseTheme";
 
 export const AnimatedLinesBackground: React.FC = () => {
   const lines = useAnimatedLines(20);
-  const { theme } = useTheme();
+  const theme = useTheme();
 
   return (
     <div className="fixed inset-0 overflow-hidden transition-colors duration-500 dark:bg-gray-900 bg-gray-100">

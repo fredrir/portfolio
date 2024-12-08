@@ -5,8 +5,6 @@ import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 import { Roboto } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Background } from "@/components/Background";
-import { ThemeProvider } from "@/components/ThemeProvider";
 import { AnimatedLinesBackground } from "@/components/AnimatedLinesBackground";
 
 export const metadata: Metadata = {
@@ -35,14 +33,12 @@ export default function RootLayout({
         />
       </head>
       <body className="flex flex-col min-h-screen dark:text-white font-mono">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AnimatedLinesBackground />
-          <Toaster />
-          <Navbar />
-          <main className="flex-grow bg-fixed z-20 ">{children}</main>
-          <SpeedInsights />
-          <Footer />
-        </ThemeProvider>
+        <AnimatedLinesBackground />
+        <Toaster />
+        <Navbar />
+        <main className="flex-grow bg-fixed z-20 ">{children}</main>
+        <SpeedInsights />
+        <Footer />
       </body>
     </html>
   );
