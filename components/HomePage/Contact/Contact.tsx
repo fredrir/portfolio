@@ -69,7 +69,7 @@ const Contact = () => {
         className="flex flex-col w-full max-w-screen-xl  p-4 mx-auto border-solid rounded-2xl border border-2 border-gray-700 dark:border-white"
       >
         <h1 className="text-center font-semibold text-4xl">Contact me</h1>
-        <form onSubmit={handleSubmit} className="w-full">
+        <form onSubmit={handleSubmit} className="w-full text-xl">
           <label
             className="text-shadow block text-xl font-medium"
             htmlFor="name"
