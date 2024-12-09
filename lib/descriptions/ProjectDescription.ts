@@ -19,7 +19,7 @@ const ProjectDescriptions: projectType[] = [
     languages: "Vite / MongoDB / Express / Apache2 / Tailwind",
     imageUri: "/y.png",
     githubLink: "https://github.com/fredrir/Y",
-    websiteLink: "https://y.hansteen.dev/",
+    websiteLink: "https://yeeter.no/",
   },
   {
     id: 2,
