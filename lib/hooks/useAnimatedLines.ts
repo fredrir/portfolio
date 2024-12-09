@@ -1,25 +1,23 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 
-const randomLine = () => ({
-  x1: Math.random() * 100,
-  y1: Math.random() * 100,
-  x2: Math.random() * 100,
-  y2: Math.random() * 100,
-  opacity: Math.random() * 0.5 + 0.1,
-});
+type Line = {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  opacity: number;
+};
 
-export const useAnimatedLines = (count: number) => {
-  const [lines, setLines] = useState(() =>
-    Array.from({ length: count }, randomLine)
+export const useAnimatedLines = (count: number): Line[] => {
+  return useMemo(
+    () =>
+      Array.from({ length: count }, () => ({
+        x1: Math.random() * 100,
+        y1: Math.random() * 100,
+        x2: Math.random() * 100,
+        y2: Math.random() * 100,
+        opacity: Math.random() * 0.5 + 0.1,
+      })),
+    [count]
   );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLines((prevLines) => prevLines.map(randomLine));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return lines;
 };

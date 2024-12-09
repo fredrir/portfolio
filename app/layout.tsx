@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 import { Roboto } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { AnimatedLinesBackground } from "@/components/AnimatedLinesBackground";
+import { AnimatedBackground } from "@/components/AnimatedLinesBackground";
 
 export const metadata: Metadata = {
   title: "Fredrik Hansteen",
@@ -33,7 +33,7 @@ export default function RootLayout({
         />
       </head>
       <body className="flex flex-col min-h-screen dark:text-white font-mono">
-        <AnimatedLinesBackground />
+        <AnimatedBackground />
         <Toaster />
         <Navbar />
         <main className="flex-grow bg-fixed z-20 ">{children}</main>
