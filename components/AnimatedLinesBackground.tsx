@@ -11,9 +11,20 @@ export const AnimatedBackground: React.FC = () => {
   const theme = useTheme();
 
   const isDark = theme === "dark";
+  const isAmbient = theme === "ambient";
+  const isOrange = theme === "orange";
+
+  const backgroundClasses = {
+    light: "from-gray-100 to-gray-200",
+    dark: "from-gray-900 to-black",
+    ambient: "from-ambient-light to-ambient-dark",
+    orange: "from-orange-light to-orange-dark",
+  };
 
   return (
-    <div className="fixed inset-0 overflow-hidden transition-colors duration-500 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-black">
+    <div
+      className={`fixed inset-0 overflow-hidden transition-colors duration-500 bg-gradient-to-br ${backgroundClasses[theme]}`}
+    >
       <svg className="absolute inset-0 w-full h-full">
         <defs>
           <radialGradient
@@ -26,12 +37,12 @@ export const AnimatedBackground: React.FC = () => {
           >
             <stop
               offset="0%"
-              stopColor={isDark ? "#fff" : "#000"}
+              stopColor={isDark || isAmbient || isOrange ? "#fff" : "#000"}
               stopOpacity="1"
             />
             <stop
               offset="100%"
-              stopColor={isDark ? "#fff" : "#000"}
+              stopColor={isDark || isAmbient || isOrange ? "#fff" : "#000"}
               stopOpacity="0"
             />
           </radialGradient>
@@ -61,7 +72,15 @@ export const AnimatedBackground: React.FC = () => {
               repeat: Infinity,
               repeatType: "reverse",
             }}
-            stroke={isDark ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.2)"}
+            stroke={
+              isDark
+                ? "rgba(255, 255, 255, 0.3)"
+                : isAmbient
+                ? "rgba(255, 223, 0, 0.3)"
+                : isOrange
+                ? "rgba(255, 165, 0, 0.3)"
+                : "rgba(0, 0, 0, 0.2)"
+            }
             strokeWidth="1.5"
             filter="url(#glow)"
           />
@@ -89,7 +108,15 @@ export const AnimatedBackground: React.FC = () => {
           />
         ))}
       </svg>
-      <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-white/10 dark:to-white/5" />
+      <div
+        className={`absolute inset-0 ${
+          isAmbient
+            ? "bg-ambient-overlay"
+            : isOrange
+            ? "bg-orange-overlay"
+            : "bg-gradient-to-t from-transparent via-transparent to-white/10 dark:to-white/5"
+        }`}
+      />
     </div>
   );
 };

@@ -1,18 +1,26 @@
 import { useState, useEffect } from "react";
 
-export const useTheme = () => {
-  const [theme, setTheme] = useState("light");
+const availableThemes = ["light", "dark", "ambient", "orange"] as const;
+type Theme = (typeof availableThemes)[number];
+
+export const useTheme = (): Theme => {
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem("theme") || "light";
+    const storedTheme = (localStorage.getItem("theme") as Theme) || "light";
     setTheme(storedTheme);
 
     const handleThemeChange = () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      setTheme(isDark ? "dark" : "light");
+      const currentTheme = availableThemes.find((t) =>
+        document.documentElement.classList.contains(t)
+      );
+      if (currentTheme) {
+        setTheme(currentTheme);
+      }
     };
 
     handleThemeChange();
+
     const observer = new MutationObserver(handleThemeChange);
     observer.observe(document.documentElement, {
       attributes: true,

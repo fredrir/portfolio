@@ -2,5 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+.from-ambient-light {
+  @apply from-purple-500;
+}
 
+.to-ambient-dark {
+  @apply to-purple-900;
+}
 
+.from-orange-light {
+  @apply from-orange-300;
+}
+
+.to-orange-dark {
+  @apply to-orange-700;
+}
+
+.bg-ambient-overlay {
+  background: rgba(255, 223, 0, 0.1);
+}
+
+.bg-orange-overlay {
+  background: rgba(255, 165, 0, 0.1);
+}
