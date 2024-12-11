@@ -1,99 +1,59 @@
-import { useState, useEffect } from "react";
-import {
-  MoonIcon,
-  SunIcon,
-  ChevronDownIcon,
-  MusicalNoteIcon,
-  SparklesIcon,
-} from "@heroicons/react/24/solid";
+"use client";
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const availableThemes = ["light", "dark", "ambient", "orange"] as const;
-type Theme = (typeof availableThemes)[number];
+import { Sun, Moon, Zap, TreePine, Waves } from "lucide-react";
+import { useTheme } from "@/lib/hooks/UseTheme";
 
-const themeIcons: Record<
-  Theme,
-  React.ComponentType<React.SVGProps<SVGSVGElement>>
-> = {
-  light: SunIcon,
-  dark: MoonIcon,
-  ambient: SparklesIcon,
-  orange: MusicalNoteIcon,
-};
+const themeConfig = {
+  light: { icon: Sun, color: "#F9D71C", background: "#F0F4F8" },
+  dark: { icon: Moon, color: "#A0AEC0", background: "#1A202C" },
+  neon: { icon: Zap, color: "#00FF00", background: "#0D0D0D" },
+  forest: { icon: TreePine, color: "#2ECC71", background: "#1D3B2A" },
+  ocean: { icon: Waves, color: "#3498DB", background: "#1A5276" },
+} as const;
 
-const ThemeToggle: React.FC = () => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      return (window.localStorage.getItem("theme") as Theme) || "dark";
-    }
-    return "dark";
-  });
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    const root = document.documentElement;
-
-    availableThemes.forEach((t) => root.classList.remove(t));
-    root.classList.add(theme);
-
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-
-    if (typeof window !== "undefined" && window.localStorage) {
-      window.localStorage.setItem("theme", theme);
-    }
-  }, [theme]);
-
-  const toggleDropdown = () => setIsOpen(!isOpen);
-
-  const selectTheme = (newTheme: Theme) => {
-    setTheme(newTheme);
-    setIsOpen(false);
-  };
+export function ThemeToggle() {
+  const { theme, cycleTheme } = useTheme();
 
   return (
-    <div className="relative inline-block text-left">
-      <button
-        onClick={toggleDropdown}
-        className="inline-flex justify-center items-center w-full p-2 transition duration-300 ease-in-out rounded-full bg-gray-200 dark:bg-gray-700 focus:outline-none"
-        aria-haspopup="true"
-        aria-expanded={isOpen}
+    <motion.button
+      className="relative w-28 h-12 rounded-full shadow-lg overflow-hidden focus:outline-none"
+      onClick={cycleTheme}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      aria-label={`Current theme: ${theme}. Click to change theme.`}
+    >
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center"
+        animate={{ backgroundColor: themeConfig[theme].background }}
+        transition={{ duration: 0.5 }}
       >
-        {themeIcons[theme] &&
-          React.createElement(themeIcons[theme], {
-            className: "w-6 h-6 text-gray-800 dark:text-gray-200",
-          })}
-        <ChevronDownIcon className="w-5 h-5 ml-2" />
-      </button>
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-40 origin-top-right bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
-          <div className="py-1">
-            {availableThemes.map((t) => (
-              <button
-                key={t}
-                onClick={() => selectTheme(t)}
-                className={`${
-                  theme === t
-                    ? "bg-gray-100 dark:bg-gray-700"
-                    : "hover:bg-gray-50 dark:hover:bg-gray-600"
-                } flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200`}
-              >
-                {themeIcons[t] &&
-                  React.createElement(themeIcons[t], {
-                    className: "w-5 h-5 mr-3",
-                  })}
-                {t.charAt(0).toUpperCase() + t.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={theme}
+            initial={{ y: 20, opacity: 0, rotate: -45 }}
+            animate={{ y: 0, opacity: 1, rotate: 0 }}
+            exit={{ y: -20, opacity: 0, rotate: 45 }}
+            transition={{ duration: 0.3 }}
+          >
+            {React.createElement(themeConfig[theme].icon, {
+              className: "w-8 h-8",
+              style: { color: themeConfig[theme].color },
+            })}
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
+      <motion.div
+        className="absolute inset-0 bg-white mix-blend-overlay"
+        animate={{ opacity: theme === "light" ? 0 : 0.1 }}
+        transition={{ duration: 0.5 }}
+      />
+      <motion.div
+        className="absolute bottom-0 left-0 right-0 h-1"
+        style={{ backgroundColor: themeConfig[theme].color }}
+        layoutId="underline"
+      />
+    </motion.button>
   );
-};
-
-export default ThemeToggle;
+}

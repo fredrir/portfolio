@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import Button from "./Button";
-import ThemeToggle from "./ThemeToggle";
 import { useEffect, useState } from "react";
 import DropdownMenu from "./DropDownMenu";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Bars3Icon } from "@heroicons/react/24/solid";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

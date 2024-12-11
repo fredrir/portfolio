@@ -10,20 +10,24 @@ export const AnimatedBackground: React.FC = () => {
   const stars = useAnimatedStars(30);
   const theme = useTheme();
 
-  const isDark = theme === "dark";
-  const isAmbient = theme === "ambient";
-  const isOrange = theme === "orange";
+  const isDark = theme.theme === "dark";
+  const isNeon = theme.theme === "neon";
+  const isForest = theme.theme === "forest";
+  const isOcean = theme.theme === "ocean";
 
-  const backgroundClasses = {
+  const backgroundClasses: Record<string, string> = {
     light: "from-gray-100 to-gray-200",
     dark: "from-gray-900 to-black",
-    ambient: "from-ambient-light to-ambient-dark",
-    orange: "from-orange-light to-orange-dark",
+    neon: "from-neon-light to-neon-dark",
+    forest: "from-forest-light to-forest-dark",
+    ocean: "from-ocean-light to-ocean-dark",
   };
 
   return (
     <div
-      className={`fixed inset-0 overflow-hidden transition-colors duration-500 bg-gradient-to-br ${backgroundClasses[theme]}`}
+      className={`fixed inset-0 overflow-hidden transition-colors duration-500 bg-gradient-to-br ${
+        backgroundClasses[theme.theme]
+      }`}
     >
       <svg className="absolute inset-0 w-full h-full">
         <defs>
@@ -37,12 +41,16 @@ export const AnimatedBackground: React.FC = () => {
           >
             <stop
               offset="0%"
-              stopColor={isDark || isAmbient || isOrange ? "#fff" : "#000"}
+              stopColor={
+                isDark || isNeon || isForest || isOcean ? "#fff" : "#000"
+              }
               stopOpacity="1"
             />
             <stop
               offset="100%"
-              stopColor={isDark || isAmbient || isOrange ? "#fff" : "#000"}
+              stopColor={
+                isDark || isNeon || isForest || isOcean ? "#fff" : "#000"
+              }
               stopOpacity="0"
             />
           </radialGradient>
@@ -75,10 +83,12 @@ export const AnimatedBackground: React.FC = () => {
             stroke={
               isDark
                 ? "rgba(255, 255, 255, 0.3)"
-                : isAmbient
-                ? "rgba(255, 223, 0, 0.3)"
-                : isOrange
-                ? "rgba(255, 165, 0, 0.3)"
+                : isForest
+                ? "rgba(46, 139, 87, 0.3)"
+                : isOcean
+                ? "rgba(30, 144, 255, 0.3)"
+                : isNeon
+                ? "rgba(0, 255, 0, 0.3)"
                 : "rgba(0, 0, 0, 0.2)"
             }
             strokeWidth="1.5"
@@ -110,10 +120,12 @@ export const AnimatedBackground: React.FC = () => {
       </svg>
       <div
         className={`absolute inset-0 ${
-          isAmbient
+          isForest
             ? "bg-ambient-overlay"
-            : isOrange
+            : isOcean
             ? "bg-orange-overlay"
+            : isNeon
+            ? "bg-neon-overlay" // Add overlay for neon
             : "bg-gradient-to-t from-transparent via-transparent to-white/10 dark:to-white/5"
         }`}
       />

@@ -18,11 +18,14 @@ dependencies:
     specifier: ^11.0.0
     version: 11.0.0(@types/react-dom@19.0.1)(@types/react@19.0.1)(react-dom@19.0.0)(react@19.0.0)
   framer-motion:
-    specifier: ^11.13.1
-    version: 11.13.1(react-dom@19.0.0)(react@19.0.0)
+    specifier: ^11.13.5
+    version: 11.13.5(react-dom@19.0.0)(react@19.0.0)
   install:
     specifier: ^0.13.0
     version: 0.13.0
+  lucide-react:
+    specifier: ^0.468.0
+    version: 0.468.0(react@19.0.0)
   next:
     specifier: 15.0.4
     version: 15.0.4(react-dom@19.0.0)(react@19.0.0)
@@ -1720,12 +1723,12 @@ packages:
       signal-exit: 4.1.0
     dev: true
 
-  /framer-motion@11.13.1(react-dom@19.0.0)(react@19.0.0):
-    resolution: {integrity: sha512-F40tpGTHByhn9h3zdBQPcEro+pSLtzARcocbNqAyfBI+u9S+KZuHH/7O9+z+GEkoF3eqFxfvVw0eBDytohwqmQ==}
+  /framer-motion@11.13.5(react-dom@19.0.0)(react@19.0.0):
+    resolution: {integrity: sha512-rArI0zPU9VkpS3Wt0J7dmRxAFUWtzPWoSofNQAP0UO276CmJ+Xlf5xN19GMw3w2QsdrS2sU+0+Q2vtuz4IEZaw==}
     peerDependencies:
       '@emotion/is-prop-valid': '*'
-      react: ^18.0.0
-      react-dom: ^18.0.0
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@emotion/is-prop-valid':
         optional: true
@@ -2254,6 +2257,14 @@ packages:
   /lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
     dev: true
+
+  /lucide-react@0.468.0(react@19.0.0):
+    resolution: {integrity: sha512-6koYRhnM2N0GGZIdXzSeiNwguv1gt/FAjZOiPl76roBi3xKEXa4WmfpxgQwTTL4KipXjefrnf3oV4IsYhi4JFA==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0-rc
+    dependencies:
+      react: 19.0.0
+    dev: false
 
   /merge2@1.4.1:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
