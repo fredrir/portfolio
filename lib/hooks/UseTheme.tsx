@@ -10,9 +10,27 @@ import React, {
 const themes = ["light", "dark", "neon", "forest", "ocean"] as const;
 type Theme = (typeof themes)[number];
 
+const backgroundColors: Record<Theme, string> = {
+  light: "bg-white",
+  dark: "bg-gray-900",
+  neon: "bg-neon-light",
+  forest: "bg-forest-light",
+  ocean: "bg-ocean-light",
+};
+
+const textColors: Record<Theme, string> = {
+  light: "text-gray-900",
+  dark: "text-white",
+  neon: "text-neon-opposite",
+  forest: "text-forest-opposite",
+  ocean: "text-ocean-opposite",
+};
+
 interface ThemeContextProps {
   theme: Theme;
   cycleTheme: () => void;
+  background: string;
+  text: string;
 }
 
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
@@ -34,8 +52,11 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
     setTheme(themes[nextIndex]);
   };
 
+  const background = backgroundColors[theme];
+  const text = textColors[theme];
+
   return (
-    <ThemeContext.Provider value={{ theme, cycleTheme }}>
+    <ThemeContext.Provider value={{ theme, cycleTheme, background, text }}>
       {children}
     </ThemeContext.Provider>
   );

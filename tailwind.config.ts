@@ -24,10 +24,13 @@ const config: Config = {
       colors: {
         "neon-light": "#39FF14",
         "neon-dark": "#0A0A0A",
+        "neon-opposite": "#063970",
         "forest-light": "#2ECC71",
         "forest-dark": "#1D3B2A",
+        "forest-opposite": "#CC2E89",
         "ocean-light": "#3498DB",
         "ocean-dark": "#1A5276",
+        "ocean-opposite": "#DB7734",
         darkBlue: "#001C7C",
         lightBlue: "#0350F7",
         lightGreen: "#D1FFC2",

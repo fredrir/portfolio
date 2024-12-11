@@ -10,11 +10,13 @@ interface Props {
 }
 
 const ProjectCard = ({ project }: Props) => {
-  const theme = useTheme();
-  const githubSrc = theme === "dark" ? "/github-dark.svg" : "/github.svg";
+  const { theme, background, text } = useTheme();
+  const githubSrc = theme === "light" ? "/github.svg" : "/github-dark.svg";
 
   return (
-    <div className="w-full border-solid border-2 dark:border-white dark:bg-gray-800 bg-white border-gray-700 rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-700">
+    <div
+      className={`w-full border-solid border-2 dark:border-white ${background} ${text} border-gray-700 rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-700`}
+    >
       <div className="flex flex-col relative w-full h-52">
         <Image
           src={project.imageUri}
@@ -26,9 +28,7 @@ const ProjectCard = ({ project }: Props) => {
       </div>
       <div className="p-4 ">
         <h1 className="text-xl font-bold">{project.title}</h1>
-        <h2 className="text-sm text-gray-600 dark:text-gray-300">
-          {project.languages}
-        </h2>
+        <h2 className={`text-sm`}>{project.languages}</h2>
         <p className="mt-2">{project.description}</p>
         <div className="pt-4 flex flex-row justify-around items-center">
           {project.websiteLink && (
