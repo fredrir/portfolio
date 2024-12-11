@@ -8,9 +8,10 @@ import { useTheme } from "@/lib/hooks/UseTheme";
 const Footer = () => {
   const [hearts, setHearts] = useState<{ id: number }[]>([]);
   const theme = useTheme();
-  const githubSrc = theme.theme === "dark" ? "/github-dark.svg" : "/github.svg";
+  const githubSrc =
+    theme.theme === "light" ? "/github.svg" : "/github-dark.svg";
   const linkedInSrc =
-    theme.theme === "dark" ? "/linkedin-dark.svg" : "/linkedin.svg";
+    theme.theme === "light" ? "/linkedin.svg" : "/linkedin-dark.svg";
 
   const handleHeartClick = () => {
     const newHearts = [...hearts];
