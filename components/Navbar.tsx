@@ -7,12 +7,14 @@ import DropdownMenu from "./DropDownMenu";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Bars3Icon } from "@heroicons/react/24/solid";
 import { ThemeToggle } from "./ThemeToggle";
+import { useTheme } from "@/lib/hooks/UseTheme";
 
 export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  const theme = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,14 +36,22 @@ export default function Navbar() {
     };
   }, [lastScrollY]);
 
+  const themes = ["light", "dark", "neon", "forest", "ocean"] as const;
+  const backgroundColors = {
+    light: "bg-white",
+    dark: "bg-gray-900",
+    neon: "bg-neon-light",
+    forest: "bg-forest-light",
+    ocean: "bg-ocean-light",
+  };
+  const background = backgroundColors[theme.theme];
+
   return (
     <nav className="w-full">
       <div>
         <div
           className={`hidden md:flex fixed left-0 right-0 top-0 z-50 flex justify-between w-full py-5 px-5 items-center dark:bg-rif-darkBlue ${
-            isScrolled
-              ? "bg-transparent"
-              : "bg-white dark:bg-gray-900 border-b-2 border-gray-900 dark:border-white"
+            isScrolled ? "bg-transparent" : `${background} border-b-2`
           }`}
         >
           {" "}
