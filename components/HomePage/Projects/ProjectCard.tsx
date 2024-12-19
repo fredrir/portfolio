@@ -14,14 +14,14 @@ const ProjectCard = ({ project }: Props) => {
   const githubSrc = theme === "dark" ? "/github-dark.svg" : "/github.svg";
 
   return (
-    <div className="w-full border-solid border-2 dark:border-white dark:bg-gray-800 bg-white border-gray-700 rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-700">
+    <div className="w-full border-solid border-2 dark:border-gray-600 border-gray-400 rounded-2xl overflow-hidden ">
       <div className="flex flex-col relative w-full h-52">
         <Image
           src={project.imageUri}
           alt={project.title}
           fill
           style={{ objectFit: "cover" }}
-          className=""
+          className="border-b-2 border-solid border-gray-400 dark:border-gray-600"
         />
       </div>
       <div className="p-4 ">

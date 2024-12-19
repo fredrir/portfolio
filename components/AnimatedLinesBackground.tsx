@@ -1,16 +1,56 @@
 "use client";
-import React from "react";
+
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "@/lib/hooks/UseTheme";
-import { useAnimatedLines } from "@/lib/hooks/useAnimatedLines";
-import { useAnimatedStars } from "@/lib/hooks/useAnimatedStars";
+
+type Line = {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  opacity: number;
+};
+
+type Star = {
+  x: number;
+  y: number;
+  radius: number;
+};
 
 export const AnimatedBackground: React.FC = () => {
-  const lines = useAnimatedLines(15);
-  const stars = useAnimatedStars(30);
   const theme = useTheme();
-
   const isDark = theme === "dark";
+
+  const [lines, setLines] = useState<Line[]>([]);
+  const [stars, setStars] = useState<Star[]>([]);
+
+  useEffect(() => {
+    const generateLines = () => {
+      const lineCount = 15;
+      const newLines: Line[] = Array.from({ length: lineCount }, () => ({
+        x1: Math.random() * 100,
+        y1: Math.random() * 100,
+        x2: Math.random() * 100,
+        y2: Math.random() * 100,
+        opacity: Math.random() * 0.5 + 0.1,
+      }));
+      setLines(newLines);
+    };
+
+    const generateStars = () => {
+      const starCount = 30;
+      const newStars: Star[] = Array.from({ length: starCount }, () => ({
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        radius: Math.random() * 3 + 1,
+      }));
+      setStars(newStars);
+    };
+
+    generateLines();
+    generateStars();
+  }, []);
 
   return (
     <div className="fixed inset-0 overflow-hidden transition-colors duration-500 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-black">

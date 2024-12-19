@@ -2,6 +2,7 @@
 import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -63,12 +64,10 @@ const Contact = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full py-10 mt-24">
-      <div
-        id="contact-me"
-        className="flex flex-col w-full max-w-screen-xl  p-4 mx-auto border-solid rounded-2xl border border-2 border-gray-700 dark:border-white"
-      >
-        <h1 className="text-center font-semibold text-4xl">Contact me</h1>
+    <div className="flex flex-row gap-4 justify-center items-stretch px-4 py-10 mt-24 max-w-screen-xl mx-auto border-solid rounded-2xl border-2 border-gray-400 dark:border-gray-600">
+      {/* Contact Form */}
+      <div className="flex flex-col w-full max-w-md p-4">
+        <h1 className="text-center font-semibold text-4xl mb-6">Contact me</h1>
         <form onSubmit={handleSubmit} className="w-full text-xl">
           <label
             className="text-shadow block text-xl font-medium"
@@ -83,7 +82,7 @@ const Contact = () => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="my-2 p-2 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
+            className="my-2 p-2 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-400 dark:border-gray-600 transition-none outline-none focus:border-blue-400 dark:focus:border-blue-600"
           />
           <label
             className="text-shadow block text-xl font-medium"
@@ -98,7 +97,7 @@ const Contact = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            className="my-2 p-2 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
+            className="my-2 p-2 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-400 dark:border-gray-600 transition-none outline-none focus:border-blue-400 dark:focus:border-blue-600"
           />
           <label
             className="text-shadow block text-xl font-medium"
@@ -112,7 +111,7 @@ const Contact = () => {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className="my-2 p-2 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
+            className="my-2 p-2 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-400 dark:border-gray-600 transition-none outline-none focus:border-blue-400 dark:focus:border-blue-600"
           />
           <label
             className="text-shadow block text-xl font-medium"
@@ -126,7 +125,7 @@ const Contact = () => {
             value={formData.message}
             onChange={handleChange}
             required
-            className="my-2 p-2 h-60 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-900 dark:border-white transition-none outline-none"
+            className="my-2 p-2 h-40 w-full rounded-3xl bg-inherit border-solid border-2 border-gray-400 dark:border-gray-600 transition-none outline-none focus:border-blue-400 dark:focus:border-blue-600"
           />
           <div className="my-4 flex items-center justify-center">
             <ReCAPTCHA
@@ -138,14 +137,22 @@ const Contact = () => {
           <div className="py-5 text-center">
             <button
               type="submit"
-              className={
-                "font-medium text-center py-3 px-6 transition-all rounded-lg  inline-flex items-center gap-4 bg-inherit dark:hover:border-green-400 dark:hover:text-green-400 hover:scale-105  border-solid border-2 border-gray-700 dark:border-white dark:text-whit"
-              }
+              className="font-medium text-center py-3 px-6 transition-all rounded-lg inline-flex items-center gap-4 bg-inherit dark:hover:border-green-600 dark:hover:text-green-600 hover:scale-105 border-solid border-2 border-green-700 dark:border-green-400 dark:text-green-400 text-green-700"
             >
               {buttonText}
             </button>
           </div>
         </form>
+      </div>
+      <div className="items-center hidden md:flex justify-center w-full max-w-md">
+        <Image
+          src={"/Fredrik_Hansteen_Pointing.png"}
+          alt={"Contact me"}
+          layout="responsive"
+          width={500}
+          height={500}
+          className="object-contain transform scale-x-[-1]"
+        />
       </div>
     </div>
   );
