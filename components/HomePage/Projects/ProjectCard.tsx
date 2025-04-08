@@ -1,7 +1,7 @@
 "use client";
 import Button from "@/components/Button";
-import { useTheme } from "@/lib/hooks/UseTheme";
 import { projectType } from "@/lib/types/types";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const ProjectCard = ({ project }: Props) => {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const githubSrc = theme === "dark" ? "/github-dark.svg" : "/github.svg";
 
   return (
@@ -45,15 +45,17 @@ const ProjectCard = ({ project }: Props) => {
               />
             </Link>
           )}
-          <Link href={project.githubLink}>
-            <Image
-              src={githubSrc}
-              alt={"Logo og Github"}
-              width={30}
-              height={30}
-              className="hover:scale-110 transition-transform duration-700 cursor-pointer"
-            />
-          </Link>
+          {project.githubLink && (
+            <Link href={project.githubLink}>
+              <Image
+                src={githubSrc}
+                alt={"Logo og Github"}
+                width={30}
+                height={30}
+                className="hover:scale-110 transition-transform duration-700 cursor-pointer"
+              />
+            </Link>
+          )}
         </div>
       </div>
     </div>
