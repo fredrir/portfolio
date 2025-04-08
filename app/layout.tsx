@@ -1,3 +1,4 @@
+import type React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -6,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import { Roboto } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AnimatedBackground } from "@/components/AnimatedLinesBackground";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "Fredrik Hansteen",
@@ -33,12 +35,14 @@ export default function RootLayout({
         />
       </head>
       <body className="flex flex-col min-h-screen dark:text-white font-mono">
-        <AnimatedBackground />
-        <Toaster />
-        <Navbar />
-        <main className="flex-grow bg-fixed z-20 ">{children}</main>
-        <SpeedInsights />
-        <Footer />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AnimatedBackground />
+          <Toaster />
+          <Navbar />
+          <main className="flex-grow bg-fixed z-20">{children}</main>
+          <SpeedInsights />
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

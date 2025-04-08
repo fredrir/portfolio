@@ -2,6 +2,15 @@ import { projectType } from "../types/types";
 
 const ProjectDescriptions: projectType[] = [
   {
+    id: 6,
+    title: "Rif.no",
+    description:
+      "I've developed and designed the main website (rif.no) with Next.js, integrating Sanity as CMS, allowing the staff to dynamically create and update pages and content through custom, pre-designed components. I also built a separate, but integrated survey and event registration dashboard with Next.js and PostgreSQL for administrating the website.",
+    languages: "Next.js / PostgreSQL / Tailwind / Sanity",
+    imageUri: "/rif.png",
+    websiteLink: "https://rif.no/",
+  },
+  {
     id: 1,
     title: "Admission Page",
     description:
@@ -10,6 +19,25 @@ const ProjectDescriptions: projectType[] = [
     imageUri: "/online-opptak.png",
     githubLink: "https://github.com/appKom/online-opptak/",
     websiteLink: "https://opptak.online.ntnu.no/",
+  },
+  {
+    id: 7,
+    title: "Charity Auction - Onlove",
+    description:
+      "A web app for a charity auction, where users can view auctions, bid on items, donate to the charity and view the results of the auction. A total of 66 796 NOK was raised for the charity.",
+    languages: "Next.js / PostgreSQL / Prisma / Tailwind",
+    imageUri: "/onlove.webp",
+    githubLink: "https://github.com/appKom/maccaroni",
+    websiteLink: "https://onlove.no/",
+  },
+  {
+    id: 8,
+    title: "Norges tilstand",
+    description:
+      "A campaign website for the report Norges tilstand. The report is produced by RIF and is a summary of the state of the Norwegian economy.",
+    languages: "Next.js / PostgreSQL / Prisma / Tailwind",
+    imageUri: "/norges-tilstand.png",
+    websiteLink: "https://norgestilstand.no/",
   },
   {
     id: 5,
@@ -23,7 +51,7 @@ const ProjectDescriptions: projectType[] = [
   },
   {
     id: 2,
-    title: "Student Organization App",
+    title: "Online Events",
     description:
       "A mobile app, designed for students, where they can sign up for events, get notified about events, and play games",
     languages: "Flutter / Firebase / Google Cloud Platform",

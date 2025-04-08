@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useTheme } from "@/lib/hooks/UseTheme";
+import { useTheme } from "next-themes";
 
 type Line = {
   x1: number;
@@ -19,7 +19,7 @@ type Star = {
 };
 
 export const AnimatedBackground: React.FC = () => {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const isDark = theme === "dark";
 
   const [lines, setLines] = useState<Line[]>([]);

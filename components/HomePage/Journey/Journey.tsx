@@ -5,10 +5,13 @@ import HeaderText from "@/components/HeaderText";
 
 const Journey = () => {
   return (
-    <div className="flex flex-col items-center justify-center mx-auto container py-16 md:py-24 px-4">
+    <div
+      id="journey"
+      className="flex flex-col items-center justify-center mx-auto container py-16 md:py-24 px-4"
+    >
       <HeaderText title="My Journey" href="#journey" />
 
-      <div id="journey" className="hidden md:block w-full mt-12 relative">
+      <div className="hidden md:block w-full mt-12 relative">
         <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-white/40 to-white transform -translate-x-1/2 rounded-full"></div>
 
         {JourneyDescriptions.map((journey, index) => (
@@ -33,7 +36,7 @@ const Journey = () => {
             </div>
 
             {index % 2 === 0 && (
-              <div className="w-5/12 pl-12 relative group">
+              <div className="w-5/12 md:p-12 pl-4 relative group">
                 <div className="absolute left-0 top-1/2 w-12 h-0.5 bg-gradient-to-r from-white to-white/40 transform -translate-y-1/2 group-hover:scale-110 transition-transform duration-300"></div>
 
                 <div className="transform transition-all duration-500 hover:scale-105">
@@ -49,7 +52,10 @@ const Journey = () => {
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-white/40 to-white rounded-full"></div>
 
         {JourneyDescriptions.map((journey) => (
-          <div key={journey.id} className="flex flex-col mb-16 pl-16 relative">
+          <div
+            key={journey.id}
+            className="flex flex-col mb-16 pl-12 md:pl-16 relative"
+          >
             <div className="absolute left-6 top-8 w-3 h-3 bg-white rounded-full transform -translate-x-1.5 shadow-[0_0_8px_rgba(var(--white-rgb),0.6)]"></div>
 
             <div className="absolute left-7.5 top-8 w-8 h-0.5 bg-gradient-to-r from-white to-white/40 transform -translate-y-1/2"></div>

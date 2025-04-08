@@ -64,8 +64,10 @@ const Contact = () => {
   };
 
   return (
-    <div className="flex flex-row gap-4 justify-center items-stretch px-4 py-10 mt-24 container mx-auto border-solid rounded-2xl border-2 border-gray-400 dark:border-gray-600">
-      {/* Contact Form */}
+    <div
+      id="contact"
+      className="flex flex-row gap-4 justify-center items-stretch px-4 py-10 mt-24 container mx-auto border-solid rounded-2xl border-2 border-gray-400 dark:border-gray-600"
+    >
       <div className="flex flex-col w-full max-w-md p-4">
         <h1 className="text-center font-semibold text-4xl mb-6">Contact me</h1>
         <form onSubmit={handleSubmit} className="w-full text-xl">

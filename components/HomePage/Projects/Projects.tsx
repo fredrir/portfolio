@@ -7,8 +7,8 @@ import ProjectDescriptions from "../../../lib/descriptions/ProjectDescription";
 import HeaderText from "@/components/HeaderText";
 import Image from "next/image";
 import Link from "next/link";
-import { useTheme } from "@/lib/hooks/UseTheme";
 import { ExternalLink } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export default function Projects() {
   return (
@@ -39,7 +39,7 @@ function ProjectSection({ project, index }: ProjectSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: false, amount: 0.3 });
   const controls = useAnimation();
-  const theme = useTheme();
+  const { theme } = useTheme();
   const githubSrc = theme === "dark" ? "/github-dark.svg" : "/github.svg";
 
   useEffect(() => {
@@ -126,22 +126,24 @@ function ProjectSection({ project, index }: ProjectSectionProps) {
                 </button>
               </Link>
             )}
-            <Link
-              href={project.githubLink}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="flex items-center gap-2 px-4 py-2 rounded-md border-2 border-gray-300 dark:border-gray-700 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                <Image
-                  src={githubSrc || "/placeholder.svg"}
-                  alt="GitHub"
-                  width={16}
-                  height={16}
-                  className="h-4 w-4"
-                />
-                View Code
-              </button>
-            </Link>
+            {project.githubLink && (
+              <Link
+                href={project.githubLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="flex items-center gap-2 px-4 py-2 rounded-md border-2 border-gray-300 dark:border-gray-700 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                  <Image
+                    src={githubSrc || "/placeholder.svg"}
+                    alt="GitHub"
+                    width={16}
+                    height={16}
+                    className="h-4 w-4"
+                  />
+                  View Code
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       </div>

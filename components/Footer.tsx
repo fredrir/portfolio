@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import { HeartIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import Image from "next/image";
-import { useTheme } from "@/lib/hooks/UseTheme";
+import { useTheme } from "next-themes";
 
 const Footer = () => {
   const [hearts, setHearts] = useState<{ id: number }[]>([]);
-  const theme = useTheme();
+  const { theme } = useTheme();
   const githubSrc = theme === "dark" ? "/github-dark.svg" : "/github.svg";
   const linkedInSrc = theme === "dark" ? "/linkedin-dark.svg" : "/linkedin.svg";
 
