@@ -1,6 +1,6 @@
 "use client";
 import { useTheme } from "@/lib/hooks/UseTheme";
-import { journeyType } from "@/lib/types/types";
+import type { journeyType } from "@/lib/types/types";
 import Image from "next/image";
 
 interface Props {
@@ -13,15 +13,17 @@ const JourneyImage = ({ journey }: Props) => {
     theme === "dark" ? journey.darkModeImageUri : journey.lightModeImageUri;
 
   return (
-    <div className="w-1/4 max-h-full flex items-center justify-center">
+    <div className="relative z-20 size-32 rounded-full overflow-hidden dark:bg-gray-800 bg-white shadow-lg bg-background flex items-center justify-center">
+      <div className="absolute inset-0 bg-primary/10 rounded-full"></div>
       <Image
-        src={imageSrc}
+        src={imageSrc || "/placeholder.svg"}
         alt={journey.jobTitle}
-        width={200}
-        height={200}
-        className="max-w-full h-auto mx-8 rounded-lg"
+        width={80}
+        height={80}
+        className="object-contain z-50 size-32 p-2 transition-transform duration-300 hover:scale-110"
       />
     </div>
   );
 };
+
 export default JourneyImage;

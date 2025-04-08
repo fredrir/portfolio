@@ -1,4 +1,4 @@
-import { journeyType } from "@/lib/types/types";
+import type { journeyType } from "@/lib/types/types";
 
 interface Props {
   journey: journeyType;
@@ -6,15 +6,25 @@ interface Props {
 
 const JourneyCard = ({ journey }: Props) => {
   return (
-    <div className="flex flex-col w-full rounded-2xl py-4 border-solid border-2 border-gray-400 dark:border-gray-600 ">
-      <h1 className="text-center font-bold text-xl">{journey.jobTitle}</h1>
+    <div className="group flex flex-col w-full rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-card border border-border">
+      <div className="bg-primary/10 p-4">
+        <h1 className="text-center font-bold text-xl text-primary">
+          {journey.jobTitle}
+        </h1>
+        <p className="text-muted-foreground text-center text-sm mt-1">
+          {journey.date}
+        </p>
+      </div>
 
-      <p className="text-gray-800 dark:text-gray-300 text-center">
-        {journey.date}
-      </p>
-      <h2 className="font-bold pb-4 pt-2 px-5">{journey.company}</h2>
-      <div className="border-solid border-t-2 border-gray-400 dark:border-gray-600">
-        <p className="py-2 px-5">{journey.description}</p>
+      <div className="p-5">
+        <h2 className="font-bold text-lg mb-3 group-hover:text-primary transition-colors">
+          {journey.company}
+        </h2>
+        <div className="border-t border-border pt-3">
+          <p className="text-muted-foreground leading-relaxed">
+            {journey.description}
+          </p>
+        </div>
       </div>
     </div>
   );

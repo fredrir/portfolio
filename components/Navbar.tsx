@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import DropdownMenu from "./DropDownMenu";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Bars3Icon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
 
 export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -81,20 +82,31 @@ export default function Navbar() {
             <div></div>
           )}
           <div className="relative">
-            <button onClick={toggleDropdown} className="flex justify-end">
-              <div
-                className={`p-1 border-2 ${
-                  !isScrolled
-                    ? "border-transparent"
-                    : "bg-white dark:bg-gray-900 border-solid dark:border-white border-gray-900 rounded-full"
-                }`}
-              >
-                {isDropdownOpen ? (
-                  <XMarkIcon className="w-10 h-10 text-black  dark:text-white" />
-                ) : (
-                  <Bars3Icon className="w-10 h-10 text-black  dark:text-white" />
+            <button
+              className={`relative flex h-12 w-12 items-center justify-center transition-all duration-500 hover:opacity-70 md:hidden ${
+                !isScrolled
+                  ? "border-transparent"
+                  : "bg-white dark:bg-gray-900 border-solid border-2 dark:border-white border-gray-900 rounded-full"
+              } `}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              aria-label={`${isDropdownOpen ? "Lukk" : "Åpne"} meny`}
+            >
+              <Bars3Icon
+                className={clsx(
+                  "absolute size-8 text-black dark:text-white transition-transform duration-500",
+                  isDropdownOpen
+                    ? "rotate-180 opacity-0"
+                    : "rotate-0 opacity-100"
                 )}
-              </div>
+              />
+              <XMarkIcon
+                className={clsx(
+                  "absolute size-8 text-black dark:text-white transition-transform duration-500",
+                  isDropdownOpen
+                    ? "rotate-0  opacity-100"
+                    : "rotate-180 opacity-0"
+                )}
+              />
             </button>
             {isDropdownOpen && <DropdownMenu toggleDropdown={toggleDropdown} />}
           </div>
