@@ -1,5 +1,15 @@
 const JourneyDescriptions = [
   {
+    id: 5,
+    jobTitle: "Web Developer",
+    company: "RIF - Consulting Engineers’ Association",
+    description:
+      "Designed and developed the website (rif.no) using Next.js, and integrated Sanity as a CMS. Built an integrated dashboard for surveys and event registration using Next.js and PostgreSQL. Developed a campaign site for the report Norges tilstand (norgestilstand.no)",
+    date: "August 2024 - Present",
+    lightModeImageUri: "/rif-logo.svg",
+    darkModeImageUri: "/rif-logo-dark.svg",
+  },
+  {
     id: 1,
     jobTitle: "Summer Intern",
     company: "Maritime Optima",
