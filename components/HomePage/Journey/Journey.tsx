@@ -1,7 +1,16 @@
-import JourneyCard from "./JourneyCard";
+import dynamic from "next/dynamic";
 import JourneyDescriptions from "@/lib/descriptions/JourneyDescriptions";
-import JourneyImage from "./JourneyImage";
 import HeaderText from "@/components/HeaderText";
+import JourneyCard from "./JourneyCard";
+
+const JourneyImage = dynamic(() => import("./JourneyImage"), {
+  ssr: true,
+  loading: () => (
+    <div className="relative z-20 size-32 rounded-full overflow-hidden bg-background flex items-center justify-center">
+      <div className="animate-pulse size-16 bg-muted rounded-full" />
+    </div>
+  ),
+});
 
 const Journey = () => {
   return (
@@ -23,11 +32,8 @@ const Journey = () => {
           >
             {index % 2 !== 0 && (
               <div className="w-5/12 pr-12 relative group">
-                <div className="absolute right-0 top-1/2 w-12 h-0.5 bg-gradient-to-r from-white/40 to-white transform -translate-y-1/2 group-hover:scale-110 transition-transform duration-300"></div>
-
-                <div className="transform transition-all duration-500 hover:scale-105">
-                  <JourneyCard journey={journey} />
-                </div>
+                <div className="absolute right-0 top-1/2 w-12 h-0.5 bg-gradient-to-r from-white/40 to-white transform -translate-y-1/2"></div>
+                <JourneyCard journey={journey} />
               </div>
             )}
 
@@ -37,18 +43,15 @@ const Journey = () => {
 
             {index % 2 === 0 && (
               <div className="w-5/12 md:p-12 pl-4 relative group">
-                <div className="absolute left-0 top-1/2 w-12 h-0.5 bg-gradient-to-r from-white to-white/40 transform -translate-y-1/2 group-hover:scale-110 transition-transform duration-300"></div>
-
-                <div className="transform transition-all duration-500 hover:scale-105">
-                  <JourneyCard journey={journey} />
-                </div>
+                <div className="absolute left-0 top-1/2 w-12 h-0.5 bg-gradient-to-r from-white to-white/40 transform -translate-y-1/2"></div>
+                <JourneyCard journey={journey} />
               </div>
             )}
           </div>
         ))}
       </div>
 
-      <div className="md:hidden flex flex-col w-full  max-w-md mt-8 relative">
+      <div className="md:hidden flex flex-col w-full max-w-md mt-8 relative">
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-white/40 to-white rounded-full"></div>
 
         {JourneyDescriptions.map((journey) => (
@@ -57,10 +60,9 @@ const Journey = () => {
             className="flex flex-col mb-16 pl-12 md:pl-16 relative"
           >
             <div className="absolute left-6 top-8 w-3 h-3 bg-white rounded-full transform -translate-x-1.5 shadow-[0_0_8px_rgba(var(--white-rgb),0.6)]"></div>
-
             <div className="absolute left-7.5 top-8 w-8 h-0.5 bg-gradient-to-r from-white to-white/40 transform -translate-y-1/2"></div>
 
-            <div className="transform transition-all duration-300 hover:translate-x-1">
+            <div>
               <JourneyImage journey={journey} />
               <div className="mt-4">
                 <JourneyCard journey={journey} />
