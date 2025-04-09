@@ -1,5 +1,15 @@
 const JourneyDescriptions = [
   {
+    id: 7,
+    jobTitle: "Student Assistant in KJ2095",
+    company: "NTNU",
+    description:
+      "Teaching assistant in the course Experts in Teamwork – Environmental Impact and Tipping Points. Facilitated interdisciplinary collaboration and guided students in solving real-world challenges",
+    date: "January 2024 - Present",
+    lightModeImageUri: "/ntnu-logo.svg",
+    darkModeImageUri: "/ntnu-logo-dark.svg",
+  },
+  {
     id: 5,
     jobTitle: "Web Developer",
     company: "RIF - Consulting Engineers’ Association",
@@ -8,6 +18,16 @@ const JourneyDescriptions = [
     date: "August 2024 - Present",
     lightModeImageUri: "/rif-logo.svg",
     darkModeImageUri: "/rif-logo-dark.svg",
+  },
+  {
+    id: 6,
+    jobTitle: "Student Assistant in IT1901",
+    company: "NTNU",
+    description:
+      "Provided technical guidance in the course Informatics Project Work I. Led three weekly lab sessions, assisting students with development and problem-solving related to Java and Maven-based projects",
+    date: "August 2024 - December 2024",
+    lightModeImageUri: "/ntnu-logo.svg",
+    darkModeImageUri: "/ntnu-logo-dark.svg",
   },
   {
     id: 1,
@@ -25,13 +45,13 @@ const JourneyDescriptions = [
     company: "Online - Student Organization",
     description:
       "Responsible for a team of 17 developers, who are divided into various projects. Overall responsibility for daily operations and administrative work related to the development and maintenance of our own IT systems.",
-    date: "August 2023 - Present",
+    date: "February 2024 - March 2025",
     lightModeImageUri: "/appkom.svg",
     darkModeImageUri: "/appkom-dark.svg",
   },
   {
     id: 3,
-    jobTitle: "Student Assistant",
+    jobTitle: "Student Assistant in MA0001",
     company: "NTNU",
     description:
       "Provided academic guidance in mathematics to students at NTNU. Conducted weekly tutoring sessions Graded and provided feedback on student assignments.",
