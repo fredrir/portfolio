@@ -12,6 +12,7 @@ import { ThemeProvider } from "next-themes";
 export const metadata: Metadata = {
   title: "Fredrik Hansteen",
   description: "Fredrik Hansteen's personal website",
+  keywords: ["Fredrik Hansteen", "Hansteen"],
 };
 
 const roboto = Roboto({
