@@ -15,7 +15,7 @@ const ProjectDescriptions: projectType[] = [
     title: "Admission Page",
     description:
       "A page for students to apply for admission for roles in the student organization.",
-    languages: "Next.js / MongoDB / Tailwind",
+    languages: "Auth0 / Next.js / MongoDB / Tailwind",
     imageUri: "/online-opptak.png",
     githubLink: "https://github.com/appKom/online-opptak/",
     websiteLink: "https://opptak.online.ntnu.no/",
@@ -25,7 +25,7 @@ const ProjectDescriptions: projectType[] = [
     title: "Charity Auction - Onlove",
     description:
       "A web app for a charity auction, where users can view auctions, bid on items, donate to the charity and view the results of the auction. A total of 66 796 NOK was raised for the charity.",
-    languages: "Next.js / PostgreSQL / Prisma / Tailwind",
+    languages: "Auth0 / Next.js / PostgreSQL / Prisma / Tailwind",
     imageUri: "/onlove.webp",
     githubLink: "https://github.com/appKom/maccaroni",
     websiteLink: "https://onlove.no/",
@@ -34,7 +34,7 @@ const ProjectDescriptions: projectType[] = [
     id: 8,
     title: "Norges tilstand",
     description:
-      "A campaign website for the report Norges tilstand. The report is produced by RIF and is a summary of the state of the Norwegian economy.",
+      "A campaign website for the report Norges tilstand. The report is produced by RIF and is a summary of the state of the Norwegian economy. The website is built with Next.js and has a custom CMS built with Prisma and PostgreSQL.",
     languages: "Next.js / PostgreSQL / Prisma / Tailwind",
     imageUri: "/norges-tilstand.png",
     websiteLink: "https://norgestilstand.no/",
@@ -43,18 +43,28 @@ const ProjectDescriptions: projectType[] = [
     id: 5,
     title: "Y - Social Media",
     description:
-      "A social media platform where you can share posts, like posts, and follow other users.",
+      "A social media platform where you can share posts, like posts, and follow other users. The platform is built with Vite, MongoDB and Express. The platform is built with a focus on performance and scalability, allowing it to handle a large number of users and posts. The project is hosted on a linux server with Apache2 and PM2.",
     languages: "Vite / MongoDB / Express / Apache2 / Tailwind",
     imageUri: "/y.png",
     githubLink: "https://github.com/fredrir/Y",
     websiteLink: "https://yeeter.no/",
   },
   {
+    id: 9,
+    title: "Appkom - Website",
+    description:
+      "A website for the student committee AppKom, where you can find information about the committee, news, members and projects. The website is built with Next.js and has a custom CMS built with Prisma and PostgreSQL.",
+    languages: "Next.js / PostgreSQL / Prisma / Tailwind",
+    imageUri: "/appkom.png",
+    githubLink: "https://github.com/appkom/home",
+    websiteLink: "https://appkom.no/",
+  },
+  {
     id: 2,
     title: "Online Events",
     description:
       "A mobile app, designed for students, where they can sign up for events, get notified about events, and play games",
-    languages: "Flutter / Firebase / Google Cloud Platform",
+    languages: "Auth0 / Flutter / Firebase / Go / Google Cloud Platform",
     imageUri: "/app-picture.png",
     githubLink: "https://github.com/appKom/online_events",
     websiteLink: "https://apps.apple.com/no/app/online/id6476830274",
@@ -74,8 +84,8 @@ const ProjectDescriptions: projectType[] = [
     id: 4,
     title: "The Online Fond",
     description:
-      "A web app showcasing the student organizations's fond, how it's used and it's performance. It also showcases the fond's members and the projects they have funded.",
-    languages: "Next.js / Prisma/ PostgreSQL / Tailwind",
+      "A web app showcasing the student organizations's fond, how it's used and it's performance. It also showcases the fond's members and the projects they have funded. The website is built with Next.js and has a custom admin panel built with Prisma and PostgreSQL, allowing the fond members to manage the website, portfolio and applications.",
+    languages: "Next.js / OAuth 2.0 / Prisma / PostgreSQL / Tailwind",
     imageUri: "/onlinefondet.png",
     githubLink: "https://github.com/appkom/onlinefondet",
     websiteLink: "https://onlinefondet.no",
