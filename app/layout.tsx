@@ -10,9 +10,9 @@ import { AnimatedBackground } from "@/components/AnimatedLinesBackground";
 import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
-  title: "Fredrik Hansteen",
-  description: "Fredrik Hansteen's personal website",
-  keywords: ["Fredrik Hansteen", "Hansteen"],
+  title: "Fredrik Carsten Hansteen",
+  description: "Fredrik Carsten Hansteen's personal website",
+  keywords: ["Fredrik Carsten Hansteen", "Hansteen"],
 };
 
 const roboto = Roboto({

@@ -49,7 +49,7 @@ const Footer = () => {
       </div>
       <div className="text-center pt-8 border-t border-gray-700 mt-8">
         <p>
-          &copy; {new Date().getFullYear()} Fredrik Hansteen. All rights
+          &copy; {new Date().getFullYear()} Fredrik Carsten Hansteen. All rights
           reserved.
         </p>
         <p>Licensed under the MIT License.</p>

@@ -149,8 +149,8 @@ export default function Navbar() {
                       />
                     </div>
                   </div>
-                  <h2 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-teal-300">
-                    Fredrik Hansteen
+                  <h2 className="text-base sm:text-xl lg:text-2xl px-4 font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-teal-300">
+                    Fredrik Carsten Hansteen
                   </h2>
                 </div>
               </Link>

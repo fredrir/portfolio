@@ -11,7 +11,7 @@ const LandingComponent = () => {
       <div className="rounded-full overflow-hidden w-60 h-60">
         <Image
           src={"/Fredrik_Carsten_Hansteen.png"}
-          alt={"Portret of Fredrik Hansteen"}
+          alt={"Portrett of Fredrik Carsten Hansteen"}
           priority
           width={400}
           height={400}
