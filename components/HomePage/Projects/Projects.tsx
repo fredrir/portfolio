@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useEffect } from "react";
-import { motion, useInView, useAnimation } from "framer-motion";
+import { useRef } from "react";
+import { useInView } from "framer-motion";
 import type { projectType } from "@/lib/types/types";
 import ProjectDescriptions from "../../../lib/descriptions/ProjectDescription";
 import HeaderText from "@/components/HeaderText";
@@ -37,33 +37,24 @@ interface ProjectSectionProps {
 
 function ProjectSection({ project, index }: ProjectSectionProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, amount: 0.3 });
-  const controls = useAnimation();
+  const isInView = useInView(ref, {
+    once: true,
+    amount: 0.5,
+  });
   const { theme } = useTheme();
   const githubSrc = theme === "dark" ? "/github-dark.svg" : "/github.svg";
-
-  useEffect(() => {
-    if (isInView) {
-      controls.start("visible");
-    }
-  }, [isInView, controls]);
-
   const isEven = index % 2 === 0;
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial="hidden"
-      animate={controls}
-      variants={{
-        hidden: { opacity: 0, y: 50 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.8, ease: "easeOut" },
-        },
+      className={`relative transition-opacity duration-700 ease-out ${
+        isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+      }`}
+      style={{
+        transitionDelay: "100ms",
+        transitionProperty: "opacity, transform",
       }}
-      className="relative"
     >
       <div
         className={`flex flex-col ${
@@ -76,6 +67,8 @@ function ProjectSection({ project, index }: ProjectSectionProps) {
               src={project.imageUri || "/placeholder.svg"}
               alt={project.title}
               fill
+              sizes="(max-width: 768px) 100vw, 40vw"
+              priority={index < 2} // Only prioritize loading for first two projects
               style={{ objectFit: "cover" }}
               className="transition-transform duration-700 hover:scale-105"
             />
@@ -147,6 +140,6 @@ function ProjectSection({ project, index }: ProjectSectionProps) {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

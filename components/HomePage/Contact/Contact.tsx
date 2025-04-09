@@ -153,6 +153,7 @@ const Contact = () => {
           layout="responsive"
           width={500}
           height={500}
+          loading="lazy"
           className="object-contain transform scale-x-[-1]"
         />
       </div>

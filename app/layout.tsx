@@ -35,7 +35,12 @@ export default function RootLayout({
         />
       </head>
       <body className="flex flex-col min-h-screen dark:text-white font-mono">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
           <AnimatedBackground />
           <Toaster />
           <Navbar />

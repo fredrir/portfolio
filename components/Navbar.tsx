@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Bars3Icon } from "@heroicons/react/24/solid";
+import { Bars3Icon, ComputerDesktopIcon } from "@heroicons/react/24/solid";
+import Image from "next/image";
 
 const DropdownMenu = ({ toggleDropdown }: { toggleDropdown: () => void }) => {
   const { theme, setTheme } = useTheme();
@@ -157,7 +158,13 @@ export default function Navbar() {
                     <div className="relative">
                       <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 opacity-70 blur-md group-hover:opacity-100 transition-all duration-300"></div>
                       <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-gray-900">
-                        <SparklesIcon className="h-6 w-6 text-emerald-500 group-hover:animate-pulse" />
+                        <Image
+                          src="/Fredrik_Carsten_Hansteen.png"
+                          alt="Fredrik Carsten Hansteen"
+                          width={75}
+                          height={75}
+                          className="h-10 w-10 group-hover:animate-pulse rounded-full"
+                        />
                       </div>
                     </div>
                     <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-teal-300">
