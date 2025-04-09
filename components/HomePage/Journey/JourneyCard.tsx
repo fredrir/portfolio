@@ -9,7 +9,7 @@ const JourneyCard = memo(({ journey }: Props) => {
   return (
     <div className="group flex flex-col w-full rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-inherit border border-border">
       <div className="bg-primary/10 p-4">
-        <h1 className="text-start md:text-center font-bold text-xl text-primary">
+        <h1 className="text-start md:text-center font-bold text-xl text-green-800 dark:text-primary">
           {journey.jobTitle}
         </h1>
         <p className="text-muted-foreground text-start md:text-center text-sm mt-1">
