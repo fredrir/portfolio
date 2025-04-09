@@ -87,7 +87,7 @@ const TerminalComponent = () => {
                 alt={"minus icon"}
                 width={12}
                 height={12}
-                className="relative top-1"
+                className="relative top-1 h-1"
               />
             </div>
           </button>
@@ -104,6 +104,7 @@ const TerminalComponent = () => {
                   alt={"square icon expanded"}
                   width={10}
                   height={10}
+                  className="relative top-1 h-1"
                 />
               </div>
             ) : (
