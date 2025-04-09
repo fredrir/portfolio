@@ -62,24 +62,46 @@ function ProjectSection({ project, index }: ProjectSectionProps) {
         } gap-8 items-center`}
       >
         <div className="w-full lg:w-2/5 relative">
-          <div className="relative aspect-video overflow-hidden rounded-xl border-2 dark:border-gray-800 border-gray-200 shadow-2xl">
-            <Image
-              src={project.imageUri || "/placeholder.svg"}
-              alt={project.title}
-              fill
-              sizes="(max-width: 768px) 100vw, 40vw"
-              priority={index < 2} // Only prioritize loading for first two projects
-              style={{ objectFit: "cover" }}
-              className="transition-transform duration-700 hover:scale-105"
-            />
-          </div>
-          <div className="hidden lg:block">
-            <div className="absolute -z-10 -bottom-6 -right-6 w-full h-full rounded-xl bg-gradient-to-br from-gray-400/20 to-gray-400/5 dark:from-gray-600/10 dark:to-gray-600/5"></div>
-            {!isEven && (
-              <div className="absolute -z-10 -top-6 -left-6 w-32 h-32 rounded-full bg-gray-400/10 dark:bg-gray-600/10 blur-2xl"></div>
+          <div className="relative">
+            {project.desktopImage && (
+              <div className="relative aspect-video overflow-hidden rounded-xl border-2 dark:border-gray-800 border-gray-200 shadow-2xl">
+                <Image
+                  src={project.desktopImage || "/placeholder.svg"}
+                  alt={`${project.title} desktop view`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  priority={index < 2}
+                  style={{ objectFit: "cover" }}
+                  className="transition-transform duration-700 hover:scale-105"
+                />
+              </div>
             )}
-            {isEven && (
-              <div className="absolute -z-10 -bottom-10 -right-10 w-40 h-40 rounded-full bg-gray-400/10 dark:bg-gray-600/10 blur-3xl"></div>
+
+            {project.mobileImages && project.mobileImages.length > 0 && (
+              <div className="flex justify-between ">
+                {project.mobileImages.map((mobileImg, imgIndex) => (
+                  <div
+                    key={imgIndex}
+                    className={`relative h-40 w-20  md:h-80 md:w-40 overflow-hidden rounded-xl border-2 dark:border-gray-800 border-gray-200 shadow-xl transform ${
+                      imgIndex % 2 === 0 ? "translate-y-4" : ""
+                    }`}
+                    style={{
+                      transform: `rotate(${
+                        imgIndex % 2 === 0 ? "3" : "-3"
+                      }deg)`,
+                    }}
+                  >
+                    <Image
+                      src={mobileImg || "/placeholder.svg"}
+                      alt={`${project.title} mobile view ${imgIndex + 1}`}
+                      fill
+                      sizes="20vw"
+                      style={{ objectFit: "cover" }}
+                      className="transition-transform duration-700 hover:scale-105"
+                    />
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>

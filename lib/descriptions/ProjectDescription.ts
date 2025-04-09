@@ -7,7 +7,7 @@ const ProjectDescriptions: projectType[] = [
     description:
       "I've developed and designed the main website (rif.no) with Next.js, integrating Sanity as CMS, allowing the staff to dynamically create and update pages and content through custom, pre-designed components. I also built a separate, but integrated survey and event registration dashboard with Next.js and PostgreSQL for administrating the website.",
     languages: "Next.js / PostgreSQL / Tailwind / Sanity",
-    imageUri: "/rif.png",
+    desktopImage: "/rif.png",
     websiteLink: "https://rif.no/",
   },
   {
@@ -16,7 +16,7 @@ const ProjectDescriptions: projectType[] = [
     description:
       "A page for students to apply for admission for roles in the student organization.",
     languages: "Auth0 / Next.js / MongoDB / Tailwind",
-    imageUri: "/online-opptak.png",
+    desktopImage: "/online-opptak.png",
     githubLink: "https://github.com/appKom/online-opptak/",
     websiteLink: "https://opptak.online.ntnu.no/",
   },
@@ -26,7 +26,7 @@ const ProjectDescriptions: projectType[] = [
     description:
       "A web app for a charity auction, where users can view auctions, bid on items, donate to the charity and view the results of the auction. A total of 66 796 NOK was raised for the charity.",
     languages: "Auth0 / Next.js / PostgreSQL / Prisma / Tailwind",
-    imageUri: "/onlove.webp",
+    desktopImage: "/onlove.webp",
     githubLink: "https://github.com/appKom/maccaroni",
     websiteLink: "https://onlove.no/",
   },
@@ -36,7 +36,7 @@ const ProjectDescriptions: projectType[] = [
     description:
       "A campaign website for the report Norges tilstand. The report is produced by RIF and is a summary of the state of the Norwegian economy. The website is built with Next.js and has a custom CMS built with Prisma and PostgreSQL.",
     languages: "Next.js / PostgreSQL / Prisma / Tailwind",
-    imageUri: "/norges-tilstand.png",
+    desktopImage: "/norges-tilstand.png",
     websiteLink: "https://norgestilstand.no/",
   },
   {
@@ -45,7 +45,7 @@ const ProjectDescriptions: projectType[] = [
     description:
       "A social media platform where you can share posts, like posts, and follow other users. The platform is built with Vite, MongoDB and Express. The platform is built with a focus on performance and scalability, allowing it to handle a large number of users and posts. The project is hosted on a linux server with Apache2 and PM2.",
     languages: "Vite / MongoDB / Express / Apache2 / Tailwind",
-    imageUri: "/y.png",
+    desktopImage: "/y.png",
     githubLink: "https://github.com/fredrir/Y",
     websiteLink: "https://yeeter.no/",
   },
@@ -55,7 +55,7 @@ const ProjectDescriptions: projectType[] = [
     description:
       "A website for the student committee AppKom, where you can find information about the committee, news, members and projects. The website is built with Next.js and has a custom CMS built with Prisma and PostgreSQL.",
     languages: "Next.js / PostgreSQL / Prisma / Tailwind",
-    imageUri: "/appkom.png",
+    desktopImage: "/appkom.png",
     githubLink: "https://github.com/appkom/home",
     websiteLink: "https://appkom.no/",
   },
@@ -65,7 +65,11 @@ const ProjectDescriptions: projectType[] = [
     description:
       "A mobile app, designed for students, where they can sign up for events, get notified about events, and play games",
     languages: "Auth0 / Flutter / Firebase / Go / Google Cloud Platform",
-    imageUri: "/app-picture.png",
+    mobileImages: [
+      "/app-picture.png",
+      "/app-picture-2.jpg",
+      "/app-picture-3.jpg",
+    ],
     githubLink: "https://github.com/appKom/online_events",
     websiteLink: "https://apps.apple.com/no/app/online/id6476830274",
     websiteAlias: "App Store",
@@ -76,7 +80,7 @@ const ProjectDescriptions: projectType[] = [
     description:
       "A web app where you can track the movies you have watched and want to watch. Created as a project for a course in web development, in collaboration with 5 other students.",
     languages: "Next.js / PostgreSQL / Tailwind",
-    imageUri: "/movie-tracker.png",
+    desktopImage: "/movie-tracker.png",
     githubLink: "https://github.com/fredrir/MovieTracker",
     websiteLink: "https://film-bice.vercel.app/",
   },
@@ -86,7 +90,7 @@ const ProjectDescriptions: projectType[] = [
     description:
       "A web app showcasing the student organizations's fond, how it's used and it's performance. It also showcases the fond's members and the projects they have funded. The website is built with Next.js and has a custom admin panel built with Prisma and PostgreSQL, allowing the fond members to manage the website, portfolio and applications.",
     languages: "Next.js / OAuth 2.0 / Prisma / PostgreSQL / Tailwind",
-    imageUri: "/onlinefondet.png",
+    desktopImage: "/onlinefondet.png",
     githubLink: "https://github.com/appkom/onlinefondet",
     websiteLink: "https://onlinefondet.no",
   },

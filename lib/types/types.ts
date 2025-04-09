@@ -3,7 +3,8 @@ export type projectType = {
   title: string;
   description: string;
   languages: string;
-  imageUri: string;
+  desktopImage?: string;
+  mobileImages?: string[];
   githubLink?: string;
   websiteLink?: string;
   websiteAlias?: string;
