@@ -86,7 +86,6 @@ const DropdownMenu = ({ toggleDropdown }: { toggleDropdown: () => void }) => {
         <button
           onClick={() => {
             setTheme(theme === "dark" ? "light" : "dark");
-            toggleDropdown();
           }}
           className="group flex items-center gap-2 rounded-lg px-3 py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
         >
@@ -200,8 +199,8 @@ export default function Navbar() {
                   className={cn(
                     "relative flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300",
                     isScrolled
-                      ? "bg-white/90 shadow-md dark:bg-gray-800/90"
-                      : "bg-gray-100 dark:bg-gray-800"
+                      ? "bg-white/90 shadow-md dark:bg-gray-800/90 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
                   )}
                   aria-label={isDropdownOpen ? "Close menu" : "Open menu"}
                   animate={{ rotate: isDropdownOpen ? 180 : 0 }}

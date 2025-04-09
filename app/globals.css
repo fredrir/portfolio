@@ -27,6 +27,10 @@
   --chart-3: 47.9 95.8% 53.1%;
   --chart-4: 280.6 83.2% 52.7%;
   --chart-5: 0 84.2% 60.2%;
+
+  --scrollbar-track: #f0f0f0;
+  --scrollbar-thumb: #8bc34a;
+  --scrollbar-thumb-hover: #6a9739;
 }
 
 .dark {
@@ -54,6 +58,10 @@
   --chart-3: 47.9 95.8% 53.1%;
   --chart-4: 280.6 83.2% 52.7%;
   --chart-5: 0 84.2% 60.2%;
+
+  --scrollbar-track: #000000;
+  --scrollbar-thumb: #8bc34a;
+  --scrollbar-thumb-hover: #b8e6a9;
 }
 
 ::-moz-selection {
@@ -99,21 +107,21 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #000030;
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1ffc2;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b8e6a9;
+  background: var(--scrollbar-thumb-hover);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d1ffc2 #000030;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 html,
@@ -121,4 +129,3 @@ body {
   overflow-y: auto;
   scroll-behavior: smooth;
 }
-
