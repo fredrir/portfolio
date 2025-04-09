@@ -73,14 +73,15 @@ function ProjectSection({ project, index }: ProjectSectionProps) {
               className="transition-transform duration-700 hover:scale-105"
             />
           </div>
-
-          <div className="absolute -z-10 -bottom-6 -right-6 w-full h-full rounded-xl bg-gradient-to-br from-gray-400/20 to-gray-400/5 dark:from-gray-600/10 dark:to-gray-600/5"></div>
-          {!isEven && (
-            <div className="absolute -z-10 -top-6 -left-6 w-32 h-32 rounded-full bg-gray-400/10 dark:bg-gray-600/10 blur-2xl"></div>
-          )}
-          {isEven && (
-            <div className="absolute -z-10 -bottom-10 -right-10 w-40 h-40 rounded-full bg-gray-400/10 dark:bg-gray-600/10 blur-3xl"></div>
-          )}
+          <div className="hidden lg:block">
+            <div className="absolute -z-10 -bottom-6 -right-6 w-full h-full rounded-xl bg-gradient-to-br from-gray-400/20 to-gray-400/5 dark:from-gray-600/10 dark:to-gray-600/5"></div>
+            {!isEven && (
+              <div className="absolute -z-10 -top-6 -left-6 w-32 h-32 rounded-full bg-gray-400/10 dark:bg-gray-600/10 blur-2xl"></div>
+            )}
+            {isEven && (
+              <div className="absolute -z-10 -bottom-10 -right-10 w-40 h-40 rounded-full bg-gray-400/10 dark:bg-gray-600/10 blur-3xl"></div>
+            )}
+          </div>
         </div>
 
         <div className="w-full lg:w-3/5 space-y-6">
