@@ -43,7 +43,7 @@ const DropdownMenu = ({ toggleDropdown }: { toggleDropdown: () => void }) => {
     >
       <div className="container mx-auto flex flex-col gap-2">
         <Link
-          href="/"
+          href="#start"
           onClick={toggleDropdown}
           className="group flex items-center gap-2 rounded-lg px-3 py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
         >
@@ -135,7 +135,7 @@ export default function Navbar() {
         >
           <div className="mx-auto container px-4">
             <div className="flex items-center justify-between">
-              <Link href="/" className="group">
+              <Link href="#start" className="group">
                 <div className="flex items-center gap-2">
                   <div className="relative">
                     <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 opacity-70 blur-md group-hover:opacity-100 transition-all duration-300"></div>

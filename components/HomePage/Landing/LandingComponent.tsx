@@ -5,7 +5,7 @@ import TerminalComponent from "@/components/Terminal/Terminal";
 const LandingComponent = () => {
   return (
     <div
-      id="landing-component"
+      id="start"
       className="flex flex-col items-center justify-center pt-32 px-4 min-h-[700px]"
     >
       <div className="rounded-full overflow-hidden w-60 h-60">
