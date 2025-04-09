@@ -1,55 +1,34 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import type React from "react";
+import { useMemo } from "react";
 import { useTheme } from "next-themes";
-
-type Line = {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-  opacity: number;
-};
-
-type Star = {
-  x: number;
-  y: number;
-  radius: number;
-};
 
 export const AnimatedBackground: React.FC = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const [lines, setLines] = useState<Line[]>([]);
-  const [stars, setStars] = useState<Star[]>([]);
+  const lines = useMemo(() => {
+    const lineCount = 10;
+    return Array.from({ length: lineCount }, () => ({
+      x1: Math.random() * 100,
+      y1: Math.random() * 100,
+      x2: Math.random() * 100,
+      y2: Math.random() * 100,
+      opacity: Math.random() * 0.5 + 0.1,
+      duration: Math.random() * 4 + 6,
+      delay: Math.random() * 5,
+    }));
+  }, []);
 
-  useEffect(() => {
-    const generateLines = () => {
-      const lineCount = 15;
-      const newLines: Line[] = Array.from({ length: lineCount }, () => ({
-        x1: Math.random() * 100,
-        y1: Math.random() * 100,
-        x2: Math.random() * 100,
-        y2: Math.random() * 100,
-        opacity: Math.random() * 0.5 + 0.1,
-      }));
-      setLines(newLines);
-    };
-
-    const generateStars = () => {
-      const starCount = 30;
-      const newStars: Star[] = Array.from({ length: starCount }, () => ({
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        radius: Math.random() * 3 + 1,
-      }));
-      setStars(newStars);
-    };
-
-    generateLines();
-    generateStars();
+  const stars = useMemo(() => {
+    const starCount = 20;
+    return Array.from({ length: starCount }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      radius: Math.random() * 3 + 1,
+      delay: Math.random() * 5,
+    }));
   }, []);
 
   return (
@@ -76,7 +55,7 @@ export const AnimatedBackground: React.FC = () => {
             />
           </radialGradient>
           <filter id="glow">
-            <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
             <feMerge>
               <feMergeNode in="coloredBlur" />
               <feMergeNode in="SourceGraphic" />
@@ -84,52 +63,69 @@ export const AnimatedBackground: React.FC = () => {
           </filter>
         </defs>
         {lines.map((line, index) => (
-          <motion.line
+          <line
             key={`line-${index}`}
             x1={`${line.x1}%`}
             y1={`${line.y1}%`}
             x2={`${line.x2}%`}
             y2={`${line.y2}%`}
-            initial={{ opacity: 0, pathLength: 0 }}
-            animate={{
-              opacity: [0, line.opacity, 0],
-              pathLength: [0, 1, 0],
-            }}
-            transition={{
-              duration: 8,
-              ease: "easeInOut",
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
             stroke={isDark ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.2)"}
             strokeWidth="1.5"
-            filter="url(#glow)"
+            opacity="0"
+            className="animate-pulse"
+            style={{
+              animation: `lineAnimation ${line.duration}s ${line.delay}s infinite alternate ease-in-out`,
+            }}
           />
         ))}
         {stars.map((star, index) => (
-          <motion.circle
+          <circle
             key={`star-${index}`}
             cx={`${star.x}%`}
             cy={`${star.y}%`}
             r={star.radius}
             fill="url(#star-gradient)"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{
-              opacity: [0, 1, 0],
-              scale: [0, 1, 0],
+            opacity="0"
+            className="animate-pulse"
+            style={{
+              animation: `starAnimation 5s ${star.delay}s infinite alternate ease-in-out`,
             }}
-            transition={{
-              duration: 5,
-              ease: "easeInOut",
-              repeat: Infinity,
-              repeatType: "reverse",
-              delay: Math.random() * 5,
-            }}
-            filter="url(#glow)"
           />
         ))}
       </svg>
       <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-white/10 dark:to-white/5" />
+
+      <style jsx>{`
+        @keyframes lineAnimation {
+          0% {
+            opacity: 0;
+            stroke-dasharray: 0 100%;
+          }
+          50% {
+            opacity: 0.5;
+            stroke-dasharray: 100% 0;
+          }
+          100% {
+            opacity: 0;
+            stroke-dasharray: 0 100%;
+          }
+        }
+
+        @keyframes starAnimation {
+          0% {
+            opacity: 0;
+            transform: scale(0);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };
