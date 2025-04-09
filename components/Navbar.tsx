@@ -183,10 +183,10 @@ export default function Navbar() {
                 </Link>
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                  className="rounded-full p-2 group text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
                 >
                   {theme === "dark" ? (
-                    <SunIcon className="h-5 w-5 text-amber-500" />
+                    <SunIcon className="h-5 w-5 text-amber-500 group-hover:animate-[spin_2s_linear_infinite] transition-transform" />
                   ) : (
                     <MoonIcon className="h-5 w-5 text-emerald-400" />
                   )}
