@@ -1,7 +1,8 @@
 import dynamic from "next/dynamic";
-import JourneyDescriptions from "@/lib/descriptions/JourneyDescriptions";
 import HeaderText from "@/components/HeaderText";
 import JourneyCard from "./JourneyCard";
+import { Language } from "@/lib/types/types";
+import { getDictionary } from "@/app/[locale]/dictionaries";
 
 const JourneyImage = dynamic(() => import("./JourneyImage"), {
   ssr: true,
@@ -12,18 +13,21 @@ const JourneyImage = dynamic(() => import("./JourneyImage"), {
   ),
 });
 
-const Journey = () => {
+const Journey = async ({ lang }: Language) => {
+  const dict = await getDictionary(lang);
+  const { title, journeys } = dict.journey;
+
   return (
     <div
       id="journey"
       className="flex flex-col items-center justify-center mx-auto container py-16 md:py-24 px-4"
     >
-      <HeaderText title="My Journey" href="#journey" />
+      <HeaderText title={title} href="#journey" />
 
       <div className="hidden md:block w-full mt-12 relative">
         <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-white/40 to-white transform -translate-x-1/2 rounded-full"></div>
 
-        {JourneyDescriptions.map((journey, index) => (
+        {journeys.map((journey, index) => (
           <div
             key={journey.id}
             className={`flex items-center w-full my-24 ${
@@ -54,7 +58,7 @@ const Journey = () => {
       <div className="md:hidden flex flex-col w-full max-w-md mt-8 relative">
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-white/40 to-white rounded-full"></div>
 
-        {JourneyDescriptions.map((journey) => (
+        {journeys.map((journey) => (
           <div
             key={journey.id}
             className="flex flex-col mb-16 pl-12 md:pl-16 relative"

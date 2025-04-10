@@ -19,3 +19,9 @@ export type journeyType = {
   lightModeImageUri: string;
   darkModeImageUri: string;
 };
+
+export type Language = {
+  lang: "en" | "nb" | "nn";
+};
+
+export type localeParams = Promise<{ locale: "en" | "nb" | "nn" }>;

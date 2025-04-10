@@ -5,14 +5,38 @@ import ReCAPTCHA from "react-google-recaptcha";
 import toast from "react-hot-toast";
 import Image from "next/image";
 
-const Contact = () => {
+interface Props {
+  title: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  submit: string;
+  submitSuccess: string;
+  submitError: string;
+  submitLoading: string;
+  recaptchaError: string;
+}
+
+const Contact = ({
+  title,
+  name,
+  email,
+  phone,
+  message,
+  submit,
+  submitSuccess,
+  submitError,
+  submitLoading,
+  recaptchaError,
+}: Props) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     message: "",
   });
-  const [buttonText, setButtonText] = useState("Submit");
+  const [buttonText, setButtonText] = useState(submit);
   const [status, setStatus] = useState({ submitted: false, message: "" });
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
@@ -27,10 +51,10 @@ const Contact = () => {
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (!recaptchaToken) {
-      toast.error("Please complete the reCAPTCHA.");
+      toast.error(recaptchaError);
       return;
     }
-    setButtonText("Sending...");
+    setButtonText(submitLoading);
 
     try {
       const response = await fetch("/api/contact", {
@@ -42,8 +66,8 @@ const Contact = () => {
       });
 
       if (response.ok) {
-        setStatus({ submitted: true, message: "Message sent successfully" });
-        setButtonText("Submit");
+        setStatus({ submitted: true, message: submitSuccess });
+        setButtonText(submit);
         setFormData({
           name: "",
           email: "",
@@ -51,16 +75,16 @@ const Contact = () => {
           message: "",
         });
         setRecaptchaToken(null);
-        toast.success("Message sent successfully");
+        toast.success(submitSuccess);
       } else {
-        setStatus({ submitted: true, message: "Failed to send message" });
-        setButtonText("Submit");
-        toast.error("Failed to send message");
+        setStatus({ submitted: true, message: submitError });
+        setButtonText(submit);
+        toast.error(submitError);
       }
     } catch (error) {
-      console.error("Error sending email: ", error);
-      toast.error("Error sending message");
-      setButtonText("Submit");
+      console.error(submitError + ": ", error);
+      toast.error(submitError);
+      setButtonText(submit);
     }
   };
 
@@ -71,15 +95,13 @@ const Contact = () => {
         className="flex flex-col md:flex-row gap-4 justify-center items-stretch  py-10 mt-24 container mx-auto border-solid rounded-2xl border-2 border-gray-400 dark:border-gray-600"
       >
         <div className="flex flex-col w-full max-w-md p-4 mx-auto">
-          <h1 className="text-center font-semibold text-4xl mb-6">
-            Contact me
-          </h1>
+          <h1 className="text-center font-semibold text-4xl mb-6">{title}</h1>
           <form onSubmit={handleSubmit} className="w-full text-xl">
             <label
               className="text-shadow block text-xl font-medium"
               htmlFor="name"
             >
-              Name:
+              {name}:
             </label>
             <input
               type="text"
@@ -94,7 +116,7 @@ const Contact = () => {
               className="text-shadow block text-xl font-medium"
               htmlFor="email"
             >
-              Email:
+              {email}:
             </label>
             <input
               type="email"
@@ -109,7 +131,7 @@ const Contact = () => {
               className="text-shadow block text-xl font-medium"
               htmlFor="phone"
             >
-              Phone:
+              {phone}:
             </label>
             <input
               type="phone"
@@ -123,7 +145,7 @@ const Contact = () => {
               className="text-shadow block text-xl font-medium"
               htmlFor="message"
             >
-              Message:
+              {message}:
             </label>
             <textarea
               id="message"
@@ -155,7 +177,7 @@ const Contact = () => {
         <div className="items-center hidden md:flex justify-center w-full max-w-md mx-auto">
           <Image
             src={"/Fredrik_Hansteen_Pointing.png"}
-            alt={"Contact me"}
+            alt={"Fredrik Carsten Hansteen"}
             width={500}
             height={500}
             loading="lazy"

@@ -3,13 +3,15 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import TerminalTab from "./TerminalTab";
 
-const TerminalComponent = () => {
+interface Props {
+  mainText: string;
+  errorText: string;
+}
+
+const TerminalComponent = ({ mainText, errorText }: Props) => {
   const [text, setText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
   const [cursorIsFinished, setCursorIsFinished] = useState(false);
-  const mainText =
-    "II'm currently in my final year of a Bachelor's degree in Informatics at the Norwegian University of Science and Technology (NTNU) in Trondheim, Norway. Feel free to explore my CV or get in touch with me.";
-  const errorText = "\nCommand not found";
 
   const [isClosed, setIsClosed] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -100,7 +102,7 @@ const TerminalComponent = () => {
             {isExpanded ? (
               <div className="border-solid border-2 px-2 py-1 border-green-500">
                 <Image
-                  src={"square-icon-expanded.svg"}
+                  src={"/square-icon-expanded.svg"}
                   alt={"square icon expanded"}
                   width={10}
                   height={10}
@@ -109,7 +111,7 @@ const TerminalComponent = () => {
             ) : (
               <div className="border-solid border-2 px-2 py-1 border-green-500">
                 <Image
-                  src={"square-icon.svg"}
+                  src={"/square-icon.svg"}
                   alt={"square icon"}
                   width={11}
                   height={11}
