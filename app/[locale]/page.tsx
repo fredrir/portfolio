@@ -16,27 +16,14 @@ export default async function Home(props: { params: localeParams }) {
 
   const dict = await getDictionary(locale);
 
-  const { contact } = dict;
-
   return (
     <>
-      <Navbar navbar={dict.navbar} />
+      <Navbar navbar={dict.navbar} currentLocale={locale} />
       <main className="flex-grow bg-fixed z-20">
         <LandingComponent lang={locale} />
         <Journey lang={locale} />
         <Projects title={dict.project.title} projects={dict.project.projects} />
-        <Contact
-          name={contact.name}
-          email={contact.email}
-          phone={contact.phone}
-          message={contact.message}
-          submit={contact.submit}
-          title={contact.title}
-          submitSuccess={contact.submitSuccess}
-          submitError={contact.submitError}
-          submitLoading={contact.submitLoading}
-          recaptchaError={contact.recaptchaError}
-        />
+        <Contact contact={dict.contact} />
       </main>
       <Footer
         liscence1={dict.footer["liscence-1"]}

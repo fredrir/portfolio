@@ -6,37 +6,28 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 
 interface Props {
-  title: string;
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-  submit: string;
-  submitSuccess: string;
-  submitError: string;
-  submitLoading: string;
-  recaptchaError: string;
+  contact: {
+    title: string;
+    name: string;
+    email: string;
+    phone: string;
+    message: string;
+    submit: string;
+    submitSuccess: string;
+    submitError: string;
+    submitLoading: string;
+    recaptchaError: string;
+  };
 }
 
-const Contact = ({
-  title,
-  name,
-  email,
-  phone,
-  message,
-  submit,
-  submitSuccess,
-  submitError,
-  submitLoading,
-  recaptchaError,
-}: Props) => {
+const Contact = ({ contact }: Props) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     message: "",
   });
-  const [buttonText, setButtonText] = useState(submit);
+  const [buttonText, setButtonText] = useState(contact.submit);
   const [status, setStatus] = useState({ submitted: false, message: "" });
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
@@ -51,10 +42,10 @@ const Contact = ({
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (!recaptchaToken) {
-      toast.error(recaptchaError);
+      toast.error(contact.recaptchaError);
       return;
     }
-    setButtonText(submitLoading);
+    setButtonText(contact.submitLoading);
 
     try {
       const response = await fetch("/api/contact", {
@@ -66,8 +57,8 @@ const Contact = ({
       });
 
       if (response.ok) {
-        setStatus({ submitted: true, message: submitSuccess });
-        setButtonText(submit);
+        setStatus({ submitted: true, message: contact.submitSuccess });
+        setButtonText(contact.submit);
         setFormData({
           name: "",
           email: "",
@@ -75,16 +66,16 @@ const Contact = ({
           message: "",
         });
         setRecaptchaToken(null);
-        toast.success(submitSuccess);
+        toast.success(contact.submitSuccess);
       } else {
-        setStatus({ submitted: true, message: submitError });
-        setButtonText(submit);
-        toast.error(submitError);
+        setStatus({ submitted: true, message: contact.submitError });
+        setButtonText(contact.submit);
+        toast.error(contact.submitError);
       }
     } catch (error) {
-      console.error(submitError + ": ", error);
-      toast.error(submitError);
-      setButtonText(submit);
+      console.error(contact.submitError + ": ", error);
+      toast.error(contact.submitError);
+      setButtonText(contact.submit);
     }
   };
 
@@ -95,13 +86,15 @@ const Contact = ({
         className="flex flex-col md:flex-row gap-4 justify-center items-stretch  py-10 mt-24 container mx-auto border-solid rounded-2xl border-2 border-gray-400 dark:border-gray-600"
       >
         <div className="flex flex-col w-full max-w-md p-4 mx-auto">
-          <h1 className="text-center font-semibold text-4xl mb-6">{title}</h1>
+          <h1 className="text-center font-semibold text-4xl mb-6">
+            {contact.title}
+          </h1>
           <form onSubmit={handleSubmit} className="w-full text-xl">
             <label
               className="text-shadow block text-xl font-medium"
               htmlFor="name"
             >
-              {name}:
+              {contact.name}:
             </label>
             <input
               type="text"
@@ -116,7 +109,7 @@ const Contact = ({
               className="text-shadow block text-xl font-medium"
               htmlFor="email"
             >
-              {email}:
+              {contact.email}:
             </label>
             <input
               type="email"
@@ -131,7 +124,7 @@ const Contact = ({
               className="text-shadow block text-xl font-medium"
               htmlFor="phone"
             >
-              {phone}:
+              {contact.phone}:
             </label>
             <input
               type="phone"
@@ -145,7 +138,7 @@ const Contact = ({
               className="text-shadow block text-xl font-medium"
               htmlFor="message"
             >
-              {message}:
+              {contact.message}:
             </label>
             <textarea
               id="message"

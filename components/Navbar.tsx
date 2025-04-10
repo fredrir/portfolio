@@ -34,6 +34,7 @@ type Navbar = {
 
 interface Props {
   navbar: Navbar;
+  currentLocale: "en" | "nb" | "nn";
 }
 
 interface DropdownMenuProps {
@@ -128,7 +129,7 @@ const DropdownMenu = ({ toggleDropdown, navbar }: DropdownMenuProps) => {
   );
 };
 
-export default function Navbar({ navbar }: Props) {
+export default function Navbar({ navbar, currentLocale }: Props) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -143,6 +144,8 @@ export default function Navbar({ navbar }: Props) {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const cvHref = currentLocale === "nn" ? "/cv/nb" : `/cv/${currentLocale}`;
 
   return (
     <nav className="w-full">
@@ -190,7 +193,7 @@ export default function Navbar({ navbar }: Props) {
                     {navbar.journey}
                   </Button>
                 </Link>
-                <Link href="/cv">
+                <Link href={cvHref}>
                   <Button variant="outline" className="gap-2 font-medium">
                     <DocumentTextIcon className="h-4 w-4" />
                     CV
