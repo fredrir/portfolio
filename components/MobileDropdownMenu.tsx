@@ -86,14 +86,11 @@ const MobileDropdownMenu = ({ toggleDropdown, navbar, cvHref }: Props) => {
         </Link>
         <div className="my-2 h-px bg-gray-200 dark:bg-gray-800" />
         <div className="px-3 py-2">
-          <p className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-            {navbar.language}
-          </p>
           <div className="flex flex-col gap-2">
             <Link
               href="/en"
               onClick={toggleDropdown}
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
+              className="flex items-center gap-2 rounded-lg py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
             >
               <span className="flex h-4 w-6 items-center justify-center overflow-hidden rounded-sm">
                 <Image
@@ -109,7 +106,7 @@ const MobileDropdownMenu = ({ toggleDropdown, navbar, cvHref }: Props) => {
             <Link
               href="/nb"
               onClick={toggleDropdown}
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
+              className="flex items-center gap-2 rounded-lg  py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
             >
               <span className="flex h-4 w-6 items-center justify-center overflow-hidden rounded-sm">
                 <Image
@@ -125,7 +122,7 @@ const MobileDropdownMenu = ({ toggleDropdown, navbar, cvHref }: Props) => {
             <Link
               href="/nn"
               onClick={toggleDropdown}
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
+              className="flex items-center gap-2 rounded-lg  py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
             >
               <span className="flex h-4 w-6 items-center justify-center overflow-hidden rounded-sm">
                 <Image
