@@ -1,0 +1,194 @@
+{
+  "navbar": {
+    "home": "Hjem",
+    "projects": "Prosjekter",
+    "journey": "Reise",
+    "contact": "Kontakt",
+    "lightMode": "Lyst Tema",
+    "darkMode": "Mørkt Tema",
+    "language": "Språk",
+    "toggleTheme": "Bytt Tema",
+    "openMenu": "Åpne Meny",
+    "closeMenu": "Lukk Meny"
+  },
+  "landing": {
+    "terminal": {
+      "title": "Hei, jeg er",
+      "mainText": "FFor tiden er jeg i mitt siste semester av en bachelorgrad i informatikk ved NTNU i Trondheim, Norge. Ta gjerne en titt på CV-en min eller ta kontakt.",
+      "errorText": "\nKommando ikke funnet"
+    }
+  },
+  "journey": {
+    "title": "Min Reise",
+    "journeys": [
+      {
+        "id": 7,
+        "jobTitle": "Studentassistent i KJ2095",
+        "company": "NTNU",
+        "description": "Studentassistent i emnet Eksperter i team – Miljøpåvirkning og vippepunkter. Tilrettela for tverrfaglig samarbeid og veiledet studenter i å løse virkelige utfordringer.",
+        "date": "Januar 2024 - Nåværende",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 5,
+        "jobTitle": "Webutvikler",
+        "company": "RIF - Rådgivende Ingeniørers Forening",
+        "description": "Designet og utviklet nettsiden (rif.no) med Next.js, og integrerte Sanity som CMS. Bygget et integrert dashbord for undersøkelser og arrangementregistrering med Next.js og PostgreSQL. Utviklet en kampanjeside for rapporten Norges tilstand (norgestilstand.no).",
+        "date": "August 2024 - Nåværende",
+        "lightModeImageUri": "/rif-logo.svg",
+        "darkModeImageUri": "/rif-logo-dark.svg"
+      },
+      {
+        "id": 6,
+        "jobTitle": "Studentassistent i IT1901",
+        "company": "NTNU",
+        "description": "Ga teknisk veiledning i emnet Informatikk prosjektarbeid I. Ledet tre ukentlige labsesjoner, og hjalp studentene med utvikling og problemløsning relatert til Java- og Maven-baserte prosjekter.",
+        "date": "August 2024 - Desember 2024",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 1,
+        "jobTitle": "Sommerintern",
+        "company": "Maritime Optima",
+        "description": "Arbeidet med testing av Maritime Optimas produkter. Deltok i utvikling av nye regresjonstester for selskapets produkter.",
+        "date": "Juni 2024 - Juli 2024",
+        "lightModeImageUri": "/maritime-optima.svg",
+        "darkModeImageUri": "/maritime-optima-dark.svg"
+      },
+      {
+        "id": 2,
+        "jobTitle": "Leder for Opptakskomiteen",
+        "company": "Online - Studentorganisasjon",
+        "description": "Ansvarlig for et team på 17 utviklere fordelt på ulike prosjekter. Overordnet ansvar for daglig drift og administrativt arbeid knyttet til utvikling og vedlikehold av våre egne IT-systemer.",
+        "date": "Februar 2024 - Mars 2025",
+        "lightModeImageUri": "/appkom.svg",
+        "darkModeImageUri": "/appkom-dark.svg"
+      },
+      {
+        "id": 3,
+        "jobTitle": "Studentassistent i MA0001",
+        "company": "NTNU",
+        "description": "Ga faglig veiledning i matematikk til studenter ved NTNU. Holdt ukentlige veiledningstimer. Retta og ga tilbakemelding på studentoppgaver.",
+        "date": "August 2023 - Desember 2023",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 4,
+        "jobTitle": "Sommerintern",
+        "company": "Nordic American Tankers",
+        "description": "Ble introdusert for rederiets flåte og forretningsstrategi. Bistod i befraktning av rederiets flåte. Lagde analyserapporter om globale utviklinger i tankmarkedet og nye muligheter i sektoren.",
+        "date": "Juni 2023 - Juli 2023",
+        "lightModeImageUri": "/nat-logo.png",
+        "darkModeImageUri": "/nat-logo.png"
+      }
+    ]
+  },
+  "project": {
+    "title": "Prosjekter",
+    "projects": [
+      {
+        "id": 6,
+        "title": "Rif.no",
+        "description": "Jeg har utviklet og designet hovedsiden (rif.no) med Next.js og integrert Sanity som CMS. Dette lar ansatte dynamisk opprette og oppdatere sider og innhold via egendefinerte komponenter. Jeg bygget også et eget, men integrert dashbord for undersøkelser og arrangementregistrering med Next.js og PostgreSQL.",
+        "languages": "Next.js / PostgreSQL / Tailwind / Sanity",
+        "desktopImage": "/rif.png",
+        "websiteLink": "https://rif.no/"
+      },
+      {
+        "id": 1,
+        "title": "Opptaksside",
+        "description": "En side for studenter til å søke på roller i studentorganisasjonen.",
+        "languages": "Auth0 / Next.js / MongoDB / Tailwind",
+        "desktopImage": "/online-opptak.png",
+        "githubLink": "https://github.com/appKom/online-opptak/",
+        "websiteLink": "https://opptak.online.ntnu.no/"
+      },
+      {
+        "id": 7,
+        "title": "Veldedighetsauksjon - Onlove",
+        "description": "En webapp for en veldedighetsauksjon, hvor brukere kan se auksjoner, by på objekter, donere til veldedighet og se resultater. Totalt ble 66 796 NOK samlet inn.",
+        "languages": "Auth0 / Next.js / PostgreSQL / Prisma / Tailwind",
+        "desktopImage": "/onlove.webp",
+        "githubLink": "https://github.com/appKom/maccaroni",
+        "websiteLink": "https://onlove.no/"
+      },
+      {
+        "id": 8,
+        "title": "Norges tilstand",
+        "description": "En kampanjeside for rapporten Norges tilstand. Rapporten er laget av RIF og oppsummerer tilstanden i norsk økonomi. Siden er bygget med Next.js og har et egendefinert CMS med Prisma og PostgreSQL.",
+        "languages": "Next.js / PostgreSQL / Prisma / Tailwind",
+        "desktopImage": "/norges-tilstand.png",
+        "websiteLink": "https://norgestilstand.no/"
+      },
+      {
+        "id": 5,
+        "title": "Y - Sosiale Medier",
+        "description": "En sosial plattform der du kan dele innlegg, like innlegg og følge andre brukere. Plattformen er bygget med Vite, MongoDB og Express, med fokus på ytelse og skalerbarhet. Driftet på Linux-server med Apache2 og PM2.",
+        "languages": "Vite / MongoDB / Express / Apache2 / Tailwind",
+        "desktopImage": "/y.png",
+        "githubLink": "https://github.com/fredrir/Y",
+        "websiteLink": "https://yeeter.no/"
+      },
+      {
+        "id": 9,
+        "title": "Appkom - Nettside",
+        "description": "En nettside for studentkomiteen AppKom, med informasjon om komiteen, nyheter, medlemmer og prosjekter. Bygget med Next.js og har et egendefinert CMS med Prisma og PostgreSQL.",
+        "languages": "Next.js / PostgreSQL / Prisma / Tailwind",
+        "desktopImage": "/appkom.png",
+        "githubLink": "https://github.com/appkom/home",
+        "websiteLink": "https://appkom.no/"
+      },
+      {
+        "id": 2,
+        "title": "Online Events",
+        "description": "En mobilapp laget for studenter hvor de kan melde seg på arrangementer, få varslinger og spille spill.",
+        "languages": "Auth0 / Flutter / Firebase / Go / Google Cloud Platform",
+        "mobileImages": [
+          "/app-picture.png",
+          "/app-picture-2.jpg",
+          "/app-picture-3.jpg"
+        ],
+        "githubLink": "https://github.com/appKom/online_events",
+        "websiteLink": "https://apps.apple.com/no/app/online/id6476830274",
+        "websiteAlias": "App Store"
+      },
+      {
+        "id": 3,
+        "title": "Filmsporer",
+        "description": "En webapp hvor du kan holde oversikt over filmer du har sett og vil se. Laget som et prosjekt i webutvikling i samarbeid med 5 andre studenter.",
+        "languages": "Next.js / PostgreSQL / Tailwind",
+        "desktopImage": "/movie-tracker.png",
+        "githubLink": "https://github.com/fredrir/MovieTracker",
+        "websiteLink": "https://film-bice.vercel.app/"
+      },
+      {
+        "id": 4,
+        "title": "Onlinefondet",
+        "description": "En webapp som viser fondet til studentorganisasjonen, hvordan det brukes og dets resultater. Viser også fondets medlemmer og prosjektene som har fått støtte. Nettsiden har et adminpanel bygget med Prisma og PostgreSQL, som lar fondets medlemmer administrere siden, porteføljen og søknader.",
+        "languages": "Next.js / OAuth 2.0 / Prisma / PostgreSQL / Tailwind",
+        "desktopImage": "/onlinefondet.png",
+        "githubLink": "https://github.com/appkom/onlinefondet",
+        "websiteLink": "https://onlinefondet.no"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Kontakt Meg",
+    "name": "Navn",
+    "email": "E-post",
+    "phone": "Telefon",
+    "message": "Melding",
+    "submit": "Send inn",
+    "submitSuccess": "Meldingen din har blitt sendt. Jeg vil svare deg så snart som mulig.",
+    "submitError": "Noe gikk galt. Vennligst prøv igjen senere.",
+    "submitLoading": "Sender melding...",
+    "recaptchaError": "Vennligst fullfør reCAPTCHA."
+  },
+  "footer": {
+    "license1": "Alle rettigheter forbeholdt.",
+    "license2": "Lisensiert under MIT-lisensen."
+  }
+}

@@ -2,33 +2,38 @@
 
 import { useRef } from "react";
 import { useInView } from "framer-motion";
-import type { projectType } from "@/lib/types/types";
-import ProjectDescriptions from "../../../lib/descriptions/ProjectDescription";
+import type { Language, projectType } from "@/lib/types/types";
 import HeaderText from "@/components/HeaderText";
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { useTheme } from "next-themes";
+import { getDictionary } from "@/app/[locale]/dictionaries";
 
-export default function Projects() {
+interface Props {
+  title: string;
+  projects: projectType[];
+}
+
+const Projects = ({ title, projects }: Props) => {
   return (
     <div className="relative min-h-screen w-full py-20" id="projects">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#2a2a2a_1px,transparent_1px)] [background-size:20px_20px] opacity-50"></div>
 
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center mb-16">
-          <HeaderText title="Projects" href="#projects" className="mb-4" />
+          <HeaderText title={title} href="#projects" className="mb-4" />
         </div>
 
         <div className="space-y-40">
-          {ProjectDescriptions.map((project, index) => (
+          {projects.map((project, index) => (
             <ProjectSection key={project.id} project={project} index={index} />
           ))}
         </div>
       </div>
     </div>
   );
-}
+};
 
 interface ProjectSectionProps {
   project: projectType;
@@ -166,3 +171,5 @@ function ProjectSection({ project, index }: ProjectSectionProps) {
     </div>
   );
 }
+
+export default Projects;
