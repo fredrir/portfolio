@@ -8,7 +8,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export async function generateStaticParams() {
-  return [{ lang: "en" }, { lang: "nb" }, { lang: "nn" }];
+  return [{ locale: "en" }, { locale: "nb" }, { locale: "nn" }];
 }
 
 export default async function Home(props: { params: localeParams }) {
