@@ -1,4 +1,6 @@
-import { NavbarType } from "@/lib/types/types";
+"use client";
+
+import type { NavbarType } from "@/lib/types/types";
 import { EnvelopeIcon, DocumentTextIcon } from "@heroicons/react/24/solid";
 import {
   SparklesIcon,
@@ -38,7 +40,7 @@ const MobileDropdownMenu = ({ toggleDropdown, navbar, cvHref }: Props) => {
   return (
     <div
       ref={menuRef}
-      className="absolute left-0 right-0 top-full w-full border-t border-gray-200 bg-white/90 backdrop-blur-md p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900/90 transition-all duration-300"
+      className="absolute left-0 right-0 top-full w-full border-t border-gray-200 bg-white/90 backdrop-blur-md p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900/90 transition-all duration-300 max-h-[80vh] overflow-y-auto"
     >
       <div className="container mx-auto flex flex-col gap-2">
         <Link
