@@ -44,10 +44,9 @@ export default function RootLayout({
         >
           <AnimatedBackground />
           <Toaster />
-          <Navbar />
-          <main className="flex-grow bg-fixed z-20">{children}</main>
+
+          {children}
           <SpeedInsights />
-          <Footer />
         </ThemeProvider>
       </body>
     </html>

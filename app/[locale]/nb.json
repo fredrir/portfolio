@@ -1,4 +1,16 @@
 {
+  "navbar": {
+    "home": "Hjem",
+    "projects": "Prosjekter",
+    "journey": "Reise",
+    "contact": "Kontakt",
+    "lightMode": "Lyst Tema",
+    "darkMode": "Mørkt Tema",
+    "language": "Språk",
+    "toggleTheme": "Bytt Tema",
+    "openMenu": "Åpne Meny",
+    "closeMenu": "Lukk Meny"
+  },
   "landing": {
     "terminal": {
       "title": "Hei, jeg er",
@@ -174,5 +186,9 @@
     "submitError": "Noe gikk galt. Vennligst prøv igjen senere.",
     "submitLoading": "Sender melding...",
     "recaptchaError": "Vennligst fullfør reCAPTCHA."
+  },
+  "footer": {
+    "liscence-1": "Alle rettigheter forbeholdt.",
+    "liscence-2": "Lisensiert under MIT-lisensen."
   }
 }

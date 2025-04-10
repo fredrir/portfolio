@@ -1,4 +1,16 @@
 {
+  "navbar": {
+    "home": "Home",
+    "projects": "Projects",
+    "journey": "Journey",
+    "contact": "Contact",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode",
+    "language": "Language",
+    "toggleTheme": "Toggle Theme",
+    "openMenu": "Open Menu",
+    "closeMenu": "Close Menu"
+  },
   "landing": {
     "terminal": {
       "title": "Hi, I'm",
@@ -174,5 +186,9 @@
     "submitError": "An error occurred while sending your message. Please try again later.",
     "submitLoading": "Sending...",
     "recaptchaError": "Please complete the reCAPTCHA."
+  },
+  "footer": {
+    "liscence-1": "All rights reserved.",
+    "liscence-2": "Licensed under the MIT License."
   }
 }

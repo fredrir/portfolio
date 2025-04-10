@@ -1,8 +1,20 @@
 {
+  "navbar": {
+    "home": "Heim",
+    "projects": "Prosjekt",
+    "journey": "Reise",
+    "contact": "Kontakt",
+    "lightMode": "Lysmodus",
+    "darkMode": "Mørkmodus",
+    "language": "Språk",
+    "toggleTheme": "Bytt Tema",
+    "openMenu": "Opne Meny",
+    "closeMenu": "Lukk Meny"
+  },
   "landing": {
     "terminal": {
       "title": "Hei, eg er",
-      "mainText": "EEg er for tida i mitt siste år av ein bachelorgrad i informatikk ved NTNU i Trondheim. Ta gjerne ein kikk på CV-en min eller ta kontakt.",
+      "mainText": "FFor tida er eg i mitt siste semester av ein bachelorgrad i informatikk ved NTNU i Trondheim, Noreg. Ta gjerne ein titt på CV-en min eller ta kontakt.",
       "errorText": "\nKommando ikkje funnen"
     }
   },
@@ -174,5 +186,9 @@
     "submitError": "Det oppstod ein feil under sending av meldinga di. Vennligst prøv igjen seinare.",
     "submitLoading": "Sender...",
     "recaptchaError": "Vennligst fullfør reCAPTCHA."
+  },
+  "footer": {
+    "liscence-1": "Alle rettar forbehalde.",
+    "liscence-2": "Lisensiert under MIT-lisensen."
   }
 }

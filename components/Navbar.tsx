@@ -19,7 +19,29 @@ import Image from "next/image";
 import { Bars3Icon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 
-const DropdownMenu = ({ toggleDropdown }: { toggleDropdown: () => void }) => {
+type Navbar = {
+  home: string;
+  projects: string;
+  journey: string;
+  contact: string;
+  lightMode: string;
+  darkMode: string;
+  language: string;
+  toggleTheme: string;
+  openMenu: string;
+  closeMenu: string;
+};
+
+interface Props {
+  navbar: Navbar;
+}
+
+interface DropdownMenuProps {
+  toggleDropdown: () => void;
+  navbar: Navbar;
+}
+
+const DropdownMenu = ({ toggleDropdown, navbar }: DropdownMenuProps) => {
   const { theme, setTheme } = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +70,7 @@ const DropdownMenu = ({ toggleDropdown }: { toggleDropdown: () => void }) => {
           className="group flex items-center gap-2 rounded-lg px-3 py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
         >
           <SparklesIcon className="h-5 w-5 text-emerald-500 transition-transform duration-300 group-hover:scale-110" />
-          <span>Home</span>
+          <span>{navbar.home}</span>
         </Link>
         <Link
           href="#projects"
@@ -56,7 +78,7 @@ const DropdownMenu = ({ toggleDropdown }: { toggleDropdown: () => void }) => {
           className="group flex items-center gap-2 rounded-lg px-3 py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
         >
           <LayoutGridIcon className="h-5 w-5 text-emerald-500 transition-transform duration-300 group-hover:scale-110" />
-          <span>Projects</span>
+          <span>{navbar.projects}</span>
         </Link>
         <Link
           href="#journey"
@@ -64,7 +86,7 @@ const DropdownMenu = ({ toggleDropdown }: { toggleDropdown: () => void }) => {
           className="group flex items-center gap-2 rounded-lg px-3 py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
         >
           <MapIcon className="h-5 w-5 text-emerald-500 transition-transform duration-300 group-hover:scale-110" />
-          <span>Journey</span>
+          <span>{navbar.journey}</span>
         </Link>
         <Link
           href="/cv"
@@ -80,7 +102,7 @@ const DropdownMenu = ({ toggleDropdown }: { toggleDropdown: () => void }) => {
           className="group flex items-center gap-2 rounded-lg px-3 py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
         >
           <EnvelopeIcon className="h-5 w-5 text-emerald-500 transition-transform duration-300 group-hover:scale-110" />
-          <span>Contact</span>
+          <span>{navbar.contact}</span>
         </Link>
         <div className="my-2 h-px bg-gray-200 dark:bg-gray-800" />
         <button
@@ -92,12 +114,12 @@ const DropdownMenu = ({ toggleDropdown }: { toggleDropdown: () => void }) => {
           {theme === "dark" ? (
             <>
               <SunIcon className="h-5 w-5 text-amber-500 transition-transform duration-300 group-hover:rotate-45" />
-              <span>Light Mode</span>
+              <span>{navbar.lightMode}</span>
             </>
           ) : (
             <>
               <MoonIcon className="h-5 w-5 text-emerald-400 transition-transform duration-300 group-hover:rotate-12" />
-              <span>Dark Mode</span>
+              <span>{navbar.darkMode}</span>
             </>
           )}
         </button>
@@ -106,7 +128,7 @@ const DropdownMenu = ({ toggleDropdown }: { toggleDropdown: () => void }) => {
   );
 };
 
-export default function Navbar() {
+export default function Navbar({ navbar }: Props) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -159,13 +181,13 @@ export default function Navbar() {
                 <Link href="#projects">
                   <Button variant="outline" className="gap-2 font-medium">
                     <LayoutGridIcon className="h-4 w-4" />
-                    Projects
+                    {navbar.projects}
                   </Button>
                 </Link>
                 <Link href="#journey">
                   <Button variant="outline" className="gap-2 font-medium">
                     <MapIcon className="h-4 w-4" />
-                    Journey
+                    {navbar.journey}
                   </Button>
                 </Link>
                 <Link href="/cv">
@@ -177,19 +199,22 @@ export default function Navbar() {
                 <Link href="#contact">
                   <Button className="gap-2 font-medium bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400">
                     <EnvelopeIcon className="h-4 w-4" />
-                    Contact
+                    {navbar.contact}
                   </Button>
                 </Link>
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                   className="rounded-full p-2 group text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                  aria-label={
+                    theme === "dark" ? navbar.lightMode : navbar.darkMode
+                  }
                 >
                   {theme === "dark" ? (
                     <SunIcon className="h-5 w-5 text-amber-500 group-hover:animate-[spin_2s_linear_infinite] transition-transform" />
                   ) : (
                     <MoonIcon className="h-5 w-5 text-emerald-400" />
                   )}
-                  <span className="sr-only">Toggle theme</span>
+                  <span className="sr-only">{navbar.toggleTheme}</span>
                 </button>
               </div>
 
@@ -202,7 +227,9 @@ export default function Navbar() {
                       ? "bg-white/90 shadow-md dark:bg-gray-800/90 hover:bg-gray-100 dark:hover:bg-gray-700"
                       : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
                   )}
-                  aria-label={isDropdownOpen ? "Close menu" : "Open menu"}
+                  aria-label={
+                    isDropdownOpen ? navbar.closeMenu : navbar.openMenu
+                  }
                   animate={{ rotate: isDropdownOpen ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
                 >
@@ -213,7 +240,10 @@ export default function Navbar() {
                   )}
                 </motion.button>
                 {isDropdownOpen && (
-                  <DropdownMenu toggleDropdown={toggleDropdown} />
+                  <DropdownMenu
+                    toggleDropdown={toggleDropdown}
+                    navbar={navbar}
+                  />
                 )}
               </div>
             </div>

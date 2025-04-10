@@ -5,7 +5,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 
-const Footer = () => {
+interface Props {
+  liscence1: string;
+  liscence2: string;
+}
+
+const Footer = ({ liscence1, liscence2 }: Props) => {
   const [hearts, setHearts] = useState<{ id: number }[]>([]);
   const { theme } = useTheme();
   const githubSrc = theme === "dark" ? "/github-dark.svg" : "/github.svg";
@@ -49,10 +54,10 @@ const Footer = () => {
       </div>
       <div className="text-center pt-8 border-t border-gray-700 mt-8">
         <p>
-          &copy; {new Date().getFullYear()} Fredrik Carsten Hansteen. All rights
-          reserved.
+          &copy; {new Date().getFullYear()} Fredrik Carsten Hansteen.{" "}
+          {liscence1}
         </p>
-        <p>Licensed under the MIT License.</p>
+        <p>{liscence2}</p>
       </div>
       {hearts.map((heart) => (
         <div
