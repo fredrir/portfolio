@@ -1,7 +1,7 @@
 {
   "navbar": {
     "home": "Heim",
-    "projects": "Prosjekt",
+    "projects": "Prosjektar",
     "journey": "Reise",
     "contact": "Kontakt",
     "lightMode": "Lysmodus",
@@ -87,7 +87,7 @@
     ]
   },
   "project": {
-    "title": "Prosjekt",
+    "title": "Prosjektar",
     "projects": [
       {
         "id": 6,

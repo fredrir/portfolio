@@ -1,7 +1,6 @@
 import { NavbarType } from "@/lib/types/types";
 import { EnvelopeIcon, DocumentTextIcon } from "@heroicons/react/24/solid";
 import {
-  Link,
   SparklesIcon,
   MapIcon,
   LayoutGridIcon,
@@ -11,6 +10,7 @@ import {
 import { useTheme } from "next-themes";
 import { useRef, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Props {
   toggleDropdown: () => void;
