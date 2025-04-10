@@ -169,8 +169,8 @@ const Contact = ({ contact }: Props) => {
         </div>
         <div className="items-center hidden md:flex justify-center w-full max-w-md mx-auto">
           <Image
-            src={"/Fredrik_Hansteen_Pointing.png"}
-            alt={"Fredrik Carsten Hansteen"}
+            src={"/Contact_Fredrik_Carsten_Hansteen.png"}
+            alt={"Contact Fredrik Carsten Hansteen"}
             width={500}
             height={500}
             loading="lazy"
