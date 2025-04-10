@@ -2,7 +2,7 @@
   "navbar": {
     "home": "Heim",
     "projects": "Prosjektar",
-    "journey": "Reise",
+    "journey": "Ferd",
     "contact": "Kontakt",
     "lightMode": "Lysmodus",
     "darkMode": "Mørkmodus",
@@ -19,49 +19,49 @@
     }
   },
   "journey": {
-    "title": "Mi Reise",
+    "title": "Min ferd",
     "journeys": [
       {
         "id": 7,
-        "jobTitle": "Studentassistent i KJ2095",
+        "jobTitle": "Læringsassistent i KJ2095",
         "company": "NTNU",
-        "description": "Studentassistent i emnet Ekspertar i team – Miljøpåverknad og vippepunkt. Tilrettela for tverrfagleg samarbeid og rettleia studentar i å løyse verkelege utfordringar.",
-        "date": "Januar 2024 - Nåverande",
+        "description": "Læringsassistent i faget “Eksperter i team - Miljøpåverknad og tålegrenser”. Tilrettelaga for tverrfagleg samarbeid og rettleidde studentar i problemløysing basert på verkelege utfordringar.",
+        "date": "Januar 2024 - Nuvanande",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
       {
         "id": 5,
-        "jobTitle": "Nettsideutviklar",
-        "company": "RIF - Rådgivande Ingeniørars Forening",
-        "description": "Designa og utvikla nettsida (rif.no) med Next.js, og integrerte Sanity som CMS. Bygde eit integrert dashbord for undersøkingar og arrangementregistrering med Next.js og PostgreSQL. Utvikla ein kampanjeside for rapporten Noregs tilstand (norgestilstand.no).",
-        "date": "August 2024 - Nåverande",
+        "jobTitle": "Utviklar",
+        "company": "RIF - Rådgjevande Ingeniørar Forening",
+        "description": "Designa og utvikla heimesida (rif.no) med Next.js, og integrerte Sanity som CMS. Utvikla eit integrert dashbord for spørjeundersøkingar og arrangementpåmelding med Next.js og PostgreSQL. Utvikla ei kampanjeside for rapporten Norges tilstand (norgestilstand.no).",
+        "date": "August 2024 - Nuvanande",
         "lightModeImageUri": "/rif-logo.svg",
         "darkModeImageUri": "/rif-logo-dark.svg"
       },
       {
         "id": 6,
-        "jobTitle": "Studentassistent i IT1901",
+        "jobTitle": "Teknisk læringsassistent i IT1901",
         "company": "NTNU",
-        "description": "Gav teknisk rettleiing i emnet Informatikk prosjektarbeid I. Leidde tre vekentlege labsesjonar, og hjelpte studentane med utvikling og problemløysing knytt til Java- og Maven-baserte prosjekt.",
+        "description": "Tilboda teknisk rettleiing i faget Informatikk prosjektarbeid I. Heldt tre ukentlege øvingstimar der eg rettleidde studentane i utvikling og problemløysing knytt til Java- og Maven-baserte prosjekt.",
         "date": "August 2024 - Desember 2024",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
       {
         "id": 1,
-        "jobTitle": "Sommarintern",
+        "jobTitle": "Testutviklar",
         "company": "Maritime Optima",
-        "description": "Arbeidde med testing av Maritime Optima sine produkt. Deltok i utviklinga av nye regresjonstestar for selskapa sine produkt.",
+        "description": "Utvikla ende-til-ende testar, som auka testdekninga til programvara. Oppretta regresjonstestdokumentasjon og gjennomførte manuell regresjonstesting. Deltok i daglege standups og sprintplanlegging i eit SCRUM-team,",
         "date": "Juni 2024 - Juli 2024",
         "lightModeImageUri": "/maritime-optima.svg",
         "darkModeImageUri": "/maritime-optima-dark.svg"
       },
       {
         "id": 2,
-        "jobTitle": "Leiar for Opptakskomiteen",
-        "company": "Online - Studentorganisasjon",
-        "description": "Ansvarleg for eit team på 17 utviklarar fordelt på ulike prosjekt. Overordna ansvar for dagleg drift og administrativt arbeid knytt til utvikling og vedlikehald av våre eigne IT-system.",
+        "jobTitle": "Leiar av Applikasjonskomiteen",
+        "company": "Online - Linjeforening",
+        "description": "Ansvarleg for å leie eit team på 19 utviklarar, som var delt inn i ulike prosjekt. Hovudansvarleg for administrativt arbeid og for å leie ukentlege møte. Ansvarleg for å arrangere ukentlege arbeidsdagar på skulen og for opplæring av nye medlemmar.",
         "date": "Februar 2024 - Mars 2025",
         "lightModeImageUri": "/appkom.svg",
         "darkModeImageUri": "/appkom-dark.svg"
@@ -70,16 +70,16 @@
         "id": 3,
         "jobTitle": "Studentassistent i MA0001",
         "company": "NTNU",
-        "description": "Gav fagleg rettleiing i matematikk til studentar ved NTNU. Halde vekentlege rettleiingstimar. Rette og gav tilbakemelding på studentoppgåver.",
+        "description": "Lei ut ukentlege øvingstimar, retta innleveringar og gav tilbakemeldingar til studentane.",
         "date": "August 2023 - Desember 2023",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
       {
         "id": 4,
-        "jobTitle": "Sommarintern",
+        "jobTitle": "Chartering Agent-praktikant",
         "company": "Nordic American Tankers",
-        "description": "Fekk innføring i reiarlaget sin flåte og forretningsstrategi. Bistod i befrakting av reiarlaget sin flåte. Lagde analyserapportar om globale utviklingar i tankmarknaden og nye moglegheiter i sektoren.",
+        "description": "Oppretta detaljerte rapportar om verknaden av krigen i Ukraina og samla ei oversikt over skip mista ved ulovleg transport av russisk olje. Analyserte den globale utviklinga og identifiserte nye moglegheiter i tankfartsektoren. Assisterte med befraktninga av selskapet si flåte.",
         "date": "Juni 2023 - Juli 2023",
         "lightModeImageUri": "/nat-logo.png",
         "darkModeImageUri": "/nat-logo.png"
@@ -87,12 +87,12 @@
     ]
   },
   "project": {
-    "title": "Prosjektar",
+    "title": "Prosjekt",
     "projects": [
       {
         "id": 6,
         "title": "Rif.no",
-        "description": "Eg har utvikla og designa hovudsida (rif.no) med Next.js og integrert Sanity som CMS. Dette let tilsette dynamisk opprette og oppdatere sider og innhald via eigendefinerte komponentar. Eg bygde òg eit eige, men integrert dashbord for undersøkingar og arrangementregistrering med Next.js og PostgreSQL.",
+        "description": "Eg har utvikla og designa hovudsida (rif.no) med Next.js og integrert Sanity som CMS. Dette lar tilsette dynamisk opprette og oppdatere sider og innhald via eigendefinerte komponentar. Eg bygde òg eit integrert dashbord for undersøkingar og arrangementregistrering med Next.js og PostgreSQL.",
         "languages": "Next.js / PostgreSQL / Tailwind / Sanity",
         "desktopImage": "/rif.png",
         "websiteLink": "https://rif.no/"
@@ -100,7 +100,7 @@
       {
         "id": 1,
         "title": "Opptaksside",
-        "description": "Ei side for studentar til å søkje på roller i studentorganisasjonen.",
+        "description": "Utvikla ein nettapplikasjon saman med fire medutviklarar for å gjere prosessen med å søkje til komitear i Online enklare for både søkjande og komiteane. Plattformen hjelper med å organisere søknader og automatisere val av intervjustid, samt gjer prosessen enklare og meir oversiktleg for alle.",
         "languages": "Auth0 / Next.js / MongoDB / Tailwind",
         "desktopImage": "/online-opptak.png",
         "githubLink": "https://github.com/appKom/online-opptak/",
@@ -109,7 +109,7 @@
       {
         "id": 7,
         "title": "Veldedigheitsauksjon - Onlove",
-        "description": "Ein webapp for ein veldedigheitsauksjon, der brukarar kan sjå auksjonar, by på objekt, donere til veldedighet og sjå resultat. Totalt vart 66 796 NOK samla inn.",
+        "description": "Ein nettapp for ein veldedigheitsauksjon, der brukarar kan sjå auksjonar, by på objekt, donere til veldedigheit og sjå resultat. Totalt vart 66 796 NOK samla inn.",
         "languages": "Auth0 / Next.js / PostgreSQL / Prisma / Tailwind",
         "desktopImage": "/onlove.webp",
         "githubLink": "https://github.com/appKom/maccaroni",
@@ -117,16 +117,16 @@
       },
       {
         "id": 8,
-        "title": "Noregs tilstand",
-        "description": "Ein kampanjeside for rapporten Noregs tilstand. Rapporten er laga av RIF og oppsummerer tilstanden i norsk økonomi. Sida er bygd med Next.js og har eit eigendefinert CMS med Prisma og PostgreSQL.",
+        "title": "Norges tilstand",
+        "description": "Ei kampanjeside for rapporten Norges tilstand. Rapporten er laga av RIF og oppsummerer tilstanden i norsk økonomi. Sida er bygd med Next.js og har eit eigendefinert CMS med Prisma og PostgreSQL.",
         "languages": "Next.js / PostgreSQL / Prisma / Tailwind",
         "desktopImage": "/norges-tilstand.png",
         "websiteLink": "https://norgestilstand.no/"
       },
       {
         "id": 5,
-        "title": "Y - Sosiale Medium",
-        "description": "Ein sosial plattform der du kan dele innlegg, like innlegg og følgje andre brukarar. Plattformen er bygd med Vite, MongoDB og Express, med fokus på ytelse og skalerbarheit. Driftar på Linux-server med Apache2 og PM2.",
+        "title": "Y - Sosiale Medier",
+        "description": "Ein sosial plattform der du kan dele innlegg, like innlegg og følgje andre brukarar. Plattformen er bygd med Vite, MongoDB og Express, med fokus på ytelse og skalerbarheit. Driftet på Linux-tenar med Apache2 og PM2.",
         "languages": "Vite / MongoDB / Express / Apache2 / Tailwind",
         "desktopImage": "/y.png",
         "githubLink": "https://github.com/fredrir/Y",
@@ -134,8 +134,8 @@
       },
       {
         "id": 9,
-        "title": "Appkom - Nettside",
-        "description": "Ein nettside for studentkomiteen AppKom, med informasjon om komiteen, nyheiter, medlemmar og prosjekt. Bygd med Next.js og har eit eigendefinert CMS med Prisma og PostgreSQL.",
+        "title": "Appkom - Nettstad",
+        "description": "Ei nettstad for studentkomiteen AppKom, med informasjon om komiteen, nyheiter, medlemmar og prosjekt. Bygd med Next.js og har eit eigendefinert CMS med Prisma og PostgreSQL.",
         "languages": "Next.js / PostgreSQL / Prisma / Tailwind",
         "desktopImage": "/appkom.png",
         "githubLink": "https://github.com/appkom/home",
@@ -144,7 +144,7 @@
       {
         "id": 2,
         "title": "Online Events",
-        "description": "Ein mobilapp laga for studentar der dei kan melde seg på arrangement, få varslingar og spele spel.",
+        "description": "Ei mobilapp laga for studentar der dei kan melde seg på arrangement, få varseilingar og spele spel.",
         "languages": "Auth0 / Flutter / Firebase / Go / Google Cloud Platform",
         "mobileImages": [
           "/app-picture.png",
@@ -158,7 +158,7 @@
       {
         "id": 3,
         "title": "Filmsporar",
-        "description": "Ein webapp der du kan halde oversikt over filmar du har sett og vil sjå. Laga som eit prosjekt i webutvikling i samarbeid med 5 andre studentar.",
+        "description": "Ei nettapp der du kan halde oversikt over filmar du har sett og vil sjå. Laga som eit prosjekt i webutvikling i samarbeid med fem andre studentar.",
         "languages": "Next.js / PostgreSQL / Tailwind",
         "desktopImage": "/movie-tracker.png",
         "githubLink": "https://github.com/fredrir/MovieTracker",
@@ -167,7 +167,7 @@
       {
         "id": 4,
         "title": "Onlinefondet",
-        "description": "Ein webapp som viser fondet til studentorganisasjonen, korleis det blir brukt og resultata. Viser òg fondet sine medlemmar og prosjekta som har fått støtte. Nettsida har eit adminpanel bygd med Prisma og PostgreSQL, som let fondet sine medlemmar administrere sida, porteføljen og søknadar.",
+        "description": "Ei nettapp som viser fondet til studentorganisasjonen, korleis det vert nytta og kva resultat det har. Visar òg fondets medlemmar og prosjekta som har fått støtte. Nettstaden har eit adminpanel bygd med Prisma og PostgreSQL, som lar fondets medlemmar administrere sida, porteføljen og søknadar.",
         "languages": "Next.js / OAuth 2.0 / Prisma / PostgreSQL / Tailwind",
         "desktopImage": "/onlinefondet.png",
         "githubLink": "https://github.com/appkom/onlinefondet",
@@ -176,16 +176,16 @@
     ]
   },
   "contact": {
-    "title": "Kontakt Meg",
-    "name": "Namn",
+    "title": "Kontakt meg",
+    "name": "Navn",
     "email": "E-post",
     "phone": "Telefon",
     "message": "Melding",
     "submit": "Send inn",
-    "submitSuccess": "Meldinga di har blitt sendt inn. Eg vil svare så snart som mogleg.",
-    "submitError": "Det oppstod ein feil under sending av meldinga di. Vennligst prøv igjen seinare.",
-    "submitLoading": "Sender...",
-    "recaptchaError": "Vennligst fullfør reCAPTCHA."
+    "submitSuccess": "Meldinga di har blitt sendt. Eg vil svare deg så snart som mogleg.",
+    "submitError": "Noko gjekk gale. Ver venleg å prøv igjen seinare.",
+    "submitLoading": "Sender melding...",
+    "recaptchaError": "Ver venleg og fullfør reCAPTCHA."
   },
   "footer": {
     "license1": "Alle rettar forbehalde.",

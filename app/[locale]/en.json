@@ -61,7 +61,7 @@
         "id": 2,
         "jobTitle": "Head of the Application Committee",
         "company": "Online - Student Organization",
-        "description": "Responsible for a team of 17 developers, who are divided into various projects. Overall responsibility for daily operations and administrative work related to the development and maintenance of our own IT systems.",
+        "description": "Responsible for a team of 19 developers, who are divided into various projects. Overall responsibility for daily operations and administrative work related to the development and maintenance of our own IT systems.",
         "date": "February 2024 - March 2025",
         "lightModeImageUri": "/appkom.svg",
         "darkModeImageUri": "/appkom-dark.svg"
@@ -100,7 +100,7 @@
       {
         "id": 1,
         "title": "Admission Page",
-        "description": "A page for students to apply for admission for roles in the student organization.",
+        "description": "Co-developed a web application with 4 fellow students to make the process of applying to committees at Online easier for both the applicants and the committees. This platform helps organize and manage applications, automate interview-time selection, making the process simpler and more straightforward for everyone.",
         "languages": "Auth0 / Next.js / MongoDB / Tailwind",
         "desktopImage": "/online-opptak.png",
         "githubLink": "https://github.com/appKom/online-opptak/",

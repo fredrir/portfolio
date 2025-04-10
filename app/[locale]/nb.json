@@ -23,45 +23,45 @@
     "journeys": [
       {
         "id": 7,
-        "jobTitle": "Studentassistent i KJ2095",
+        "jobTitle": "Læringsassistent i KJ2095",
         "company": "NTNU",
-        "description": "Studentassistent i emnet Eksperter i team – Miljøpåvirkning og vippepunkter. Tilrettela for tverrfaglig samarbeid og veiledet studenter i å løse virkelige utfordringer.",
+        "description": "Læringsassistent i faget “Eksperter i team - Miljøpåvirkning og tålegrenser”. Tilrettelagte for tverrfaglig samarbeid og veiledet studenter i problemløsning basert på virkelige utfordringer.",
         "date": "Januar 2024 - Nåværende",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
       {
         "id": 5,
-        "jobTitle": "Webutvikler",
+        "jobTitle": "Utvikler",
         "company": "RIF - Rådgivende Ingeniørers Forening",
-        "description": "Designet og utviklet nettsiden (rif.no) med Next.js, og integrerte Sanity som CMS. Bygget et integrert dashbord for undersøkelser og arrangementregistrering med Next.js og PostgreSQL. Utviklet en kampanjeside for rapporten Norges tilstand (norgestilstand.no).",
+        "description": "Designet og utviklet hjemmesiden (rif.no) med Next.js, og integrerte Sanity som CMS. Utviklet et integrert dashbord for spørreundersøkelser og arrangementspåmelding med Next.js og PostgreSQL. Utviklet en kampanjeside for rapporten Norges tilstand (norgestilstand.no).",
         "date": "August 2024 - Nåværende",
         "lightModeImageUri": "/rif-logo.svg",
         "darkModeImageUri": "/rif-logo-dark.svg"
       },
       {
         "id": 6,
-        "jobTitle": "Studentassistent i IT1901",
+        "jobTitle": "Teknisk Læringsassistent i IT1901",
         "company": "NTNU",
-        "description": "Ga teknisk veiledning i emnet Informatikk prosjektarbeid I. Ledet tre ukentlige labsesjoner, og hjalp studentene med utvikling og problemløsning relatert til Java- og Maven-baserte prosjekter.",
+        "description": "Tilbydde teknisk veiledning i faget Informatikk prosjektarbeid I. Holdt tre ukentlige øvingstimer hvor jeg veiledet studentene i utvikling og problemløsning relatert til Java- og Maven-baserte prosjekter.",
         "date": "August 2024 - Desember 2024",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
       {
         "id": 1,
-        "jobTitle": "Sommerintern",
+        "jobTitle": "Testutvikler",
         "company": "Maritime Optima",
-        "description": "Arbeidet med testing av Maritime Optimas produkter. Deltok i utvikling av nye regresjonstester for selskapets produkter.",
+        "description": "Utviklet ende-tll-ende tester, som økte test dekningen av programvaren. Opprettet regresjonstest-dokumenter og utførte manuell regresjonstesting. Deltok i daglige standups og sprintplanlegging i et SCRUM-team,",
         "date": "Juni 2024 - Juli 2024",
         "lightModeImageUri": "/maritime-optima.svg",
         "darkModeImageUri": "/maritime-optima-dark.svg"
       },
       {
         "id": 2,
-        "jobTitle": "Leder for Opptakskomiteen",
-        "company": "Online - Studentorganisasjon",
-        "description": "Ansvarlig for et team på 17 utviklere fordelt på ulike prosjekter. Overordnet ansvar for daglig drift og administrativt arbeid knyttet til utvikling og vedlikehold av våre egne IT-systemer.",
+        "jobTitle": "Leder av Applikasjonskomiteen",
+        "company": "Online - Linjeforening",
+        "description": "Ansvarlig for å lede et team på 19 utviklere, som var delt inn i forskjellige prosjekter. Hovedansvarlig for administrativt arbeid og å lede ukentlige møter. Ansvarlig for å arrangere ukentlige arbeidsdager på skolen og for opplæring av nye medlemmer.",
         "date": "Februar 2024 - Mars 2025",
         "lightModeImageUri": "/appkom.svg",
         "darkModeImageUri": "/appkom-dark.svg"
@@ -70,16 +70,16 @@
         "id": 3,
         "jobTitle": "Studentassistent i MA0001",
         "company": "NTNU",
-        "description": "Ga faglig veiledning i matematikk til studenter ved NTNU. Holdt ukentlige veiledningstimer. Retta og ga tilbakemelding på studentoppgaver.",
+        "description": "Ledet ukentlige øvingstimer, rettet innleveringer og ga tilbakemeldinger til studentene.",
         "date": "August 2023 - Desember 2023",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
       {
         "id": 4,
-        "jobTitle": "Sommerintern",
+        "jobTitle": "Chartering Agent Intern",
         "company": "Nordic American Tankers",
-        "description": "Ble introdusert for rederiets flåte og forretningsstrategi. Bistod i befraktning av rederiets flåte. Lagde analyserapporter om globale utviklinger i tankmarkedet og nye muligheter i sektoren.",
+        "description": "Opprettet detaljerte rapporter om effekten av krigen i Ukraina og samlet en oversikt over skip mistenkt for ulovlig transport av russisk olje. Analyserte den globale utviklingen og identifiserte nye muligheter i tankfartsektoren. Assisterte i befraktningen av selskapets flåte.",
         "date": "Juni 2023 - Juli 2023",
         "lightModeImageUri": "/nat-logo.png",
         "darkModeImageUri": "/nat-logo.png"
@@ -92,7 +92,7 @@
       {
         "id": 6,
         "title": "Rif.no",
-        "description": "Jeg har utviklet og designet hovedsiden (rif.no) med Next.js og integrert Sanity som CMS. Dette lar ansatte dynamisk opprette og oppdatere sider og innhold via egendefinerte komponenter. Jeg bygget også et eget, men integrert dashbord for undersøkelser og arrangementregistrering med Next.js og PostgreSQL.",
+        "description": "Jeg har utviklet og designet hovedsiden (rif.no) med Next.js og integrert Sanity som CMS. Dette lar ansatte dynamisk opprette og oppdatere sider og innhold via egendefinerte komponenter. Jeg bygget også et eget integrert dashbord for undersøkelser og arrangementregistrering med Next.js og PostgreSQL.",
         "languages": "Next.js / PostgreSQL / Tailwind / Sanity",
         "desktopImage": "/rif.png",
         "websiteLink": "https://rif.no/"
@@ -100,7 +100,7 @@
       {
         "id": 1,
         "title": "Opptaksside",
-        "description": "En side for studenter til å søke på roller i studentorganisasjonen.",
+        "description": "Utviklet en webapplikasjon sammen med 4 med- utviklere for å gjøre prosessen med å søke til komiteer i Online enklere for både søkerne og komiteene. Plattformen hjelper med å organisere søknader og automatisere valg av intervjutid, samt gjør prosessen enklere og mer oversiktlig for alle.",
         "languages": "Auth0 / Next.js / MongoDB / Tailwind",
         "desktopImage": "/online-opptak.png",
         "githubLink": "https://github.com/appKom/online-opptak/",
