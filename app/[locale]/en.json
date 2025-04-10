@@ -188,7 +188,7 @@
     "recaptchaError": "Please complete the reCAPTCHA."
   },
   "footer": {
-    "liscence-1": "All rights reserved.",
-    "liscence-2": "Licensed under the MIT License."
+    "license1": "All rights reserved.",
+    "license2": "Licensed under the MIT License."
   }
 }

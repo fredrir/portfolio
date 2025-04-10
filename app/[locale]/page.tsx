@@ -25,10 +25,7 @@ export default async function Home(props: { params: localeParams }) {
         <Projects title={dict.project.title} projects={dict.project.projects} />
         <Contact contact={dict.contact} />
       </main>
-      <Footer
-        liscence1={dict.footer["liscence-1"]}
-        liscence2={dict.footer["liscence-2"]}
-      />
+      <Footer license1={dict.footer.license1} license2={dict.footer.license2} />
     </>
   );
 }

@@ -188,7 +188,7 @@
     "recaptchaError": "Vennligst fullfør reCAPTCHA."
   },
   "footer": {
-    "liscence-1": "Alle rettar forbehalde.",
-    "liscence-2": "Lisensiert under MIT-lisensen."
+    "license1": "Alle rettar forbehalde.",
+    "license2": "Lisensiert under MIT-lisensen."
   }
 }
