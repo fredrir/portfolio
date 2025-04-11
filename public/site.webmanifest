@@ -1,0 +1,19 @@
+{
+  "name": "Fredrik Carsten Hansteen",
+  "short_name": "Fredrik Carsten Hansteen",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "display": "standalone",
+  "lang": "nb, nn, en, fr",
+  "direction": "ltr"
+}
