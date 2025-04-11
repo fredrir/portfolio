@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import {
   XIcon as XMarkIcon,
@@ -17,20 +17,13 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Bars3Icon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { GlobeIcon } from "lucide-react";
 import { NavbarType } from "@/lib/types/types";
 import MobileDropdownMenu from "./MobileDropdownMenu";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 interface Props {
   navbar: NavbarType;
-  currentLocale: "en" | "nb" | "nn";
+  currentLocale: "en" | "nb" | "nn" | "fr";
 }
 
 export default function Navbar({ navbar, currentLocale }: Props) {
@@ -49,7 +42,8 @@ export default function Navbar({ navbar, currentLocale }: Props) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const cvHref = currentLocale === "nn" ? "/cv/nb" : `/cv/${currentLocale}`;
+  const cvHref =
+    currentLocale === "nn" || currentLocale === "nb" ? "/cv/nb" : `/cv/en`;
 
   return (
     <nav className="w-full">

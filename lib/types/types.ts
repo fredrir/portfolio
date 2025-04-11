@@ -33,8 +33,4 @@ export type NavbarType = {
   closeMenu: string;
 };
 
-export type Language = {
-  lang: "en" | "nb" | "nn";
-};
-
-export type localeParams = Promise<{ locale: "en" | "nb" | "nn" }>;
+export type localeParams = Promise<{ locale: "en" | "nb" | "nn" | "fr" }>;

@@ -8,13 +8,14 @@ import type { NavbarType } from "@/lib/types/types";
 
 interface LanguageSwitcherProps {
   navbar: NavbarType;
-  currentLocale: "en" | "nb" | "nn";
+  currentLocale: "en" | "nb" | "nn" | "fr";
 }
 
 const languages = [
   { code: "en", name: "English", flag: "🇬🇧" },
   { code: "nb", name: "Norsk (Bokmål)", flag: "🇳🇴" },
   { code: "nn", name: "Norsk (Nynorsk)", flag: "🇳🇴" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
 ];
 
 export default function LanguageSwitcher({

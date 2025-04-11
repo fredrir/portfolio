@@ -1,0 +1,195 @@
+{
+  "navbar": {
+    "home": "Accueil",
+    "projects": "Projets",
+    "journey": "Parcours",
+    "contact": "Contact",
+    "lightMode": "Mode Clair",
+    "darkMode": "Mode Sombre",
+    "language": "Langue",
+    "toggleTheme": "Basculer le Thème",
+    "openMenu": "Ouvrir le Menu",
+    "closeMenu": "Fermer le Menu"
+  },
+  "landing": {
+    "title": "Salut, je suis",
+    "terminal": {
+      "mainText": "JJe suis actuellement en dernière année de licence en informatique à la Norwegian University of Science and Technology (NTNU) à Trondheim, Norvège. N'hésitez pas à consulter mon CV ou à me contacter.",
+      "errorText": "\nCommande non trouvée"
+    }
+  },
+  "journey": {
+    "title": "Mon Parcours",
+    "journeys": [
+      {
+        "id": 7,
+        "jobTitle": "Assistant étudiant en KJ2095",
+        "company": "NTNU",
+        "description": "Assistant pédagogique dans le cours Experts en travail d'équipe – Impact environnemental et points de bascule. A facilité la collaboration interdisciplinaire et guidé les étudiants dans la résolution de défis concrets",
+        "date": "Janvier 2024 - Présent",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 5,
+        "jobTitle": "Développeur Web",
+        "company": "RIF - Association des ingénieurs-conseils",
+        "description": "Conçu et développé le site web (rif.no) avec Next.js, en intégrant Sanity comme CMS. Réalisé un tableau de bord intégré pour les sondages et l'inscription aux événements avec Next.js et PostgreSQL. Développé un site de campagne pour le rapport Norges tilstand (norgestilstand.no)",
+        "date": "Août 2024 - Présent",
+        "lightModeImageUri": "/rif-logo.svg",
+        "darkModeImageUri": "/rif-logo-dark.svg"
+      },
+      {
+        "id": 6,
+        "jobTitle": "Assistant étudiant en IT1901",
+        "company": "NTNU",
+        "description": "Fournit un accompagnement technique dans le cadre du cours Projet Informatique I. A dirigé trois séances de laboratoire hebdomadaires, aidant les étudiants dans le développement et la résolution de problèmes liés à des projets basés sur Java et Maven.",
+        "date": "Août 2024 - Décembre 2024",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 1,
+        "jobTitle": "Stagiaire d'été",
+        "company": "Maritime Optima",
+        "description": "A travaillé sur les tests des produits de Maritime Optima. A participé au développement de nouveaux tests de régression pour les produits de l'entreprise.",
+        "date": "Juin 2024 - Juillet 2024",
+        "lightModeImageUri": "/maritime-optima.svg",
+        "darkModeImageUri": "/maritime-optima-dark.svg"
+      },
+      {
+        "id": 2,
+        "jobTitle": "Responsable du comité d'application",
+        "company": "Online - Organisation étudiante",
+        "description": "Responsable d'une équipe de 19 développeurs, répartis sur divers projets. Responsable global des opérations quotidiennes et du travail administratif liés au développement et à la maintenance de nos systèmes informatiques.",
+        "date": "Février 2024 - Mars 2025",
+        "lightModeImageUri": "/appkom.svg",
+        "darkModeImageUri": "/appkom-dark.svg"
+      },
+      {
+        "id": 3,
+        "jobTitle": "Assistant étudiant en MA0001",
+        "company": "NTNU",
+        "description": "A apporté un soutien académique en mathématiques aux étudiants de NTNU. A animé des séances de tutorat hebdomadaires, a noté et fourni des commentaires sur les devoirs des étudiants.",
+        "date": "Août 2023 - Décembre 2023",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 4,
+        "jobTitle": "Stagiaire d'été",
+        "company": "Nordic American Tankers",
+        "description": "Initié à la flotte et à la stratégie commerciale de la compagnie maritime. A aidé à l'affrètement de la flotte de l'entreprise. A créé des rapports d'analyse sur les évolutions mondiales du marché des pétroliers et sur les nouvelles opportunités dans ce secteur.",
+        "date": "Juin 2023 - Juillet 2023",
+        "lightModeImageUri": "/nat-logo.png",
+        "darkModeImageUri": "/nat-logo.png"
+      }
+    ]
+  },
+  "project": {
+    "title": "Projets",
+    "viewCode": "Voir le code",
+    "projects": [
+      {
+        "id": 6,
+        "title": "Rif.no",
+        "description": "J'ai développé et conçu le site principal (rif.no) avec Next.js, en intégrant Sanity comme CMS, permettant au personnel de créer et de mettre à jour dynamiquement les pages et le contenu via des composants personnalisés pré-conçus. J'ai également réalisé un tableau de bord distinct, mais intégré, pour les sondages et l'inscription aux événements avec Next.js et PostgreSQL pour l'administration du site.",
+        "languages": "Next.js / PostgreSQL / Tailwind / Sanity",
+        "desktopImage": "/rif.png",
+        "websiteLink": "https://rif.no/"
+      },
+      {
+        "id": 1,
+        "title": "Page d'admission",
+        "description": "Co-développé une application web avec 4 camarades pour faciliter le processus de candidature aux comités d'Online, tant pour les candidats que pour les comités. Cette plateforme aide à organiser et gérer les candidatures, à automatiser la sélection des créneaux d'entretien, simplifiant ainsi le processus pour tous.",
+        "languages": "Auth0 / Next.js / MongoDB / Tailwind",
+        "desktopImage": "/online-opptak.png",
+        "githubLink": "https://github.com/appKom/online-opptak/",
+        "websiteLink": "https://opptak.online.ntnu.no/"
+      },
+      {
+        "id": 7,
+        "title": "Enchère caritative - Onlove",
+        "description": "Une application web pour une enchère caritative, où les utilisateurs peuvent consulter les enchères, enchérir sur des articles, faire un don à l'association caritative et voir les résultats de l'enchère. Un total de 66 796 NOK a été recueilli pour l'association.",
+        "languages": "Auth0 / Next.js / PostgreSQL / Prisma / Tailwind",
+        "desktopImage": "/onlove.webp",
+        "githubLink": "https://github.com/appKom/maccaroni",
+        "websiteLink": "https://onlove.no/"
+      },
+      {
+        "id": 8,
+        "title": "Norges tilstand",
+        "description": "Un site de campagne pour le rapport Norges tilstand. Le rapport est produit par RIF et constitue un résumé de l'état de l'économie norvégienne. Le site est développé avec Next.js et dispose d'un CMS personnalisé construit avec Prisma et PostgreSQL.",
+        "languages": "Next.js / PostgreSQL / Prisma / Tailwind",
+        "desktopImage": "/norges-tilstand.png",
+        "websiteLink": "https://norgestilstand.no/"
+      },
+      {
+        "id": 5,
+        "title": "Y - Réseaux Sociaux",
+        "description": "Une plateforme de médias sociaux où vous pouvez partager des publications, aimer des publications et suivre d'autres utilisateurs. La plateforme est développée avec Vite, MongoDB et Express, avec un accent sur la performance et la scalabilité, lui permettant de gérer un grand nombre d'utilisateurs et de publications. Le projet est hébergé sur un serveur Linux avec Apache2 et PM2.",
+        "languages": "Vite / MongoDB / Express / Apache2 / Tailwind",
+        "desktopImage": "/y.png",
+        "githubLink": "https://github.com/fredrir/Y",
+        "websiteLink": "https://yeeter.no/"
+      },
+      {
+        "id": 9,
+        "title": "Site Web Appkom",
+        "description": "Un site web pour le comité étudiant AppKom, où vous pouvez trouver des informations sur le comité, des actualités, les membres et les projets. Le site est développé avec Next.js et dispose d'un CMS personnalisé construit avec Prisma et PostgreSQL.",
+        "languages": "Next.js / PostgreSQL / Prisma / Tailwind",
+        "desktopImage": "/appkom.png",
+        "githubLink": "https://github.com/appkom/home",
+        "websiteLink": "https://appkom.no/"
+      },
+      {
+        "id": 2,
+        "title": "Événements en ligne",
+        "description": "Une application mobile, conçue pour les étudiants, leur permettant de s'inscrire à des événements, de recevoir des notifications et de jouer à des jeux",
+        "languages": "Auth0 / Flutter / Firebase / Go / Google Cloud Platform",
+        "mobileImages": [
+          "/app-picture.png",
+          "/app-picture-2.jpg",
+          "/app-picture-3.jpg"
+        ],
+        "githubLink": "https://github.com/appKom/online_events",
+        "websiteLink": "https://apps.apple.com/no/app/online/id6476830274",
+        "websiteAlias": "App Store"
+      },
+      {
+        "id": 3,
+        "title": "Suivi de films",
+        "description": "Une application web où vous pouvez suivre les films que vous avez regardés et ceux que vous souhaitez regarder. Créée dans le cadre d'un projet pour un cours de développement web, en collaboration avec 5 autres étudiants.",
+        "languages": "Next.js / PostgreSQL / Tailwind",
+        "desktopImage": "/movie-tracker.png",
+        "githubLink": "https://github.com/fredrir/MovieTracker",
+        "websiteLink": "https://film-bice.vercel.app/"
+      },
+      {
+        "id": 4,
+        "title": "La Fondation en ligne",
+        "description": "Une application web présentant le fonds de l'organisation étudiante, son utilisation et ses performances. Elle présente également les membres du fonds et les projets qu'ils ont financés. Le site est développé avec Next.js et dispose d'un panneau d'administration personnalisé construit avec Prisma et PostgreSQL, permettant aux membres du fonds de gérer le site, le portfolio et les candidatures.",
+        "languages": "Next.js / OAuth 2.0 / Prisma / PostgreSQL / Tailwind",
+        "desktopImage": "/onlinefondet.png",
+        "githubLink": "https://github.com/appkom/onlinefondet",
+        "websiteLink": "https://onlinefondet.no"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contactez-moi",
+    "name": "Nom",
+    "email": "Email",
+    "phone": "Téléphone",
+    "message": "Message",
+    "submit": "Envoyer",
+    "submitSuccess": "Votre message a été envoyé avec succès. Je vous répondrai dès que possible.",
+    "submitError": "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard.",
+    "submitLoading": "Envoi en cours...",
+    "recaptchaError": "Veuillez compléter le reCAPTCHA."
+  },
+  "footer": {
+    "license1": "Tous droits réservés.",
+    "license2": "Sous licence MIT."
+  }
+}

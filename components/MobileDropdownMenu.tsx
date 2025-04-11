@@ -135,6 +135,22 @@ const MobileDropdownMenu = ({ toggleDropdown, navbar, cvHref }: Props) => {
               </span>
               <span>Nynorsk</span>
             </Link>
+            <Link
+              href="/fr"
+              onClick={toggleDropdown}
+              className="flex items-center gap-2 rounded-lg  py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
+            >
+              <span className="flex h-4 w-6 items-center justify-center overflow-hidden rounded-sm">
+                <Image
+                  src="/flags/fr.svg"
+                  alt="Français"
+                  width={24}
+                  height={18}
+                  className="h-full w-full object-cover"
+                />
+              </span>
+              <span>Français</span>
+            </Link>
           </div>
         </div>
         <div className="my-2 h-px bg-gray-200 dark:bg-gray-800" />
