@@ -1,3 +1,5 @@
+import { journeyType } from "./types";
+
 export type NavbarType = {
   home: string;
   projects: string;
@@ -9,6 +11,11 @@ export type NavbarType = {
   toggleTheme: string;
   openMenu: string;
   closeMenu: string;
+};
+
+export type Journey = {
+  title: string;
+  journeys: journeyType[];
 };
 
 export type localeParams = Promise<{ locale: "en" | "nb" | "nn" | "fr" }>;
