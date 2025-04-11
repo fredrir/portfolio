@@ -12,8 +12,8 @@
     "closeMenu": "Lukk Meny"
   },
   "landing": {
+    "title": "Hei, jeg er",
     "terminal": {
-      "title": "Hei, jeg er",
       "mainText": "FFor tiden er jeg i mitt siste semester av en bachelorgrad i informatikk ved NTNU i Trondheim, Norge. Ta gjerne en titt på CV-en min eller ta kontakt.",
       "errorText": "\nKommando ikke funnet"
     }
@@ -68,7 +68,7 @@
       },
       {
         "id": 3,
-        "jobTitle": "Studentassistent i MA0001",
+        "jobTitle": "Læringsassistent i MA0001",
         "company": "NTNU",
         "description": "Ledet ukentlige øvingstimer, rettet innleveringer og ga tilbakemeldinger til studentene.",
         "date": "August 2023 - Desember 2023",
@@ -88,6 +88,7 @@
   },
   "project": {
     "title": "Prosjekter",
+    "viewCode": "Vis Kildekode",
     "projects": [
       {
         "id": 6,

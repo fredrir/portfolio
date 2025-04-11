@@ -2,20 +2,20 @@
 
 import { useRef } from "react";
 import { useInView } from "framer-motion";
-import type { Language, projectType } from "@/lib/types/types";
+import type { projectType } from "@/lib/types/types";
 import HeaderText from "@/components/HeaderText";
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { useTheme } from "next-themes";
-import { getDictionary } from "@/app/[locale]/dictionaries";
 
 interface Props {
   title: string;
+  viewCode: string;
   projects: projectType[];
 }
 
-const Projects = ({ title, projects }: Props) => {
+const Projects = ({ title, projects, viewCode }: Props) => {
   return (
     <div className="relative min-h-screen w-full py-20" id="projects">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#2a2a2a_1px,transparent_1px)] [background-size:20px_20px] opacity-50"></div>
@@ -27,7 +27,12 @@ const Projects = ({ title, projects }: Props) => {
 
         <div className="space-y-40">
           {projects.map((project, index) => (
-            <ProjectSection key={project.id} project={project} index={index} />
+            <ProjectSection
+              key={project.id}
+              project={project}
+              index={index}
+              viewCode={viewCode}
+            />
           ))}
         </div>
       </div>
@@ -36,11 +41,12 @@ const Projects = ({ title, projects }: Props) => {
 };
 
 interface ProjectSectionProps {
+  viewCode: string;
   project: projectType;
   index: number;
 }
 
-function ProjectSection({ project, index }: ProjectSectionProps) {
+function ProjectSection({ project, index, viewCode }: ProjectSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, {
     once: true,
@@ -161,7 +167,7 @@ function ProjectSection({ project, index }: ProjectSectionProps) {
                     height={16}
                     className="h-4 w-4"
                   />
-                  View Code
+                  {viewCode}
                 </button>
               </Link>
             )}

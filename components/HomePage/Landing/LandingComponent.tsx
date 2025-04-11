@@ -1,14 +1,18 @@
 import React from "react";
 import Image from "next/image";
 import TerminalComponent from "@/components/Terminal/Terminal";
-import { Language } from "@/lib/types/types";
-import { getDictionary } from "@/app/[locale]/dictionaries";
 
-const LandingComponent = async ({ lang }: Language) => {
-  const dict = await getDictionary(lang);
+interface Props {
+  landing: {
+    title: string;
+    terminal: {
+      mainText: string;
+      errorText: string;
+    };
+  };
+}
 
-  const { title, mainText, errorText } = dict.landing.terminal;
-
+const LandingComponent = ({ landing }: Props) => {
   return (
     <div
       id="start"
@@ -26,14 +30,17 @@ const LandingComponent = async ({ lang }: Language) => {
       </div>
       <div className="dark:text-white rounded-3xl px-4 py-2 mt-4 border-solid border-2 border-gray-400 dark:border-gray-600">
         <h1 className="text-2xl font-bold text-center">
-          <span>{title}</span>
+          <span>{landing.title}</span>
           <span className="text-green-700 dark:text-green-500">
             {" <Fredrik/>"}
           </span>
         </h1>
       </div>
 
-      <TerminalComponent mainText={mainText} errorText={errorText} />
+      <TerminalComponent
+        mainText={landing.terminal.mainText}
+        errorText={landing.terminal.errorText}
+      />
     </div>
   );
 };
