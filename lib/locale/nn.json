@@ -14,7 +14,7 @@
   "landing": {
     "title": "Hei, eg er",
     "terminal": {
-      "mainText": "FFor tida er eg i mitt siste semester av ein bachelorgrad i informatikk ved NTNU i Trondheim, Noreg. Ta gjerne ein titt på CV-en min eller ta kontakt.",
+      "mainText": "FFor tida er eg i mitt siste semester av ein bachelorgrad i informatikk ved NTNU i Trondheim. Ta gjerne ein titt på CV-en min eller ta kontakt.",
       "errorText": "\nKommando ikkje funnen"
     }
   },

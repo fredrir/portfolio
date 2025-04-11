@@ -1,4 +1,4 @@
-import { journeyType } from "./types";
+import { journeyType } from "../types/types";
 
 export type NavbarType = {
   home: string;

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { GlobeIcon, CheckIcon } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import type { NavbarType } from "@/lib/types/languageTypes";
+import type { NavbarType } from "@/lib/locale/languageTypes";
 
 interface LanguageSwitcherProps {
   navbar: NavbarType;

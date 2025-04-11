@@ -2,19 +2,10 @@ import Contact from "@/components/HomePage/Contact/Contact";
 import Journey from "@/components/HomePage/Journey/Journey";
 import LandingComponent from "@/components/HomePage/Landing/LandingComponent";
 import Projects from "@/components/HomePage/Projects/Projects";
-import { getDictionary } from "./dictionaries";
-import { localeParams } from "@/lib/types/languageTypes";
+import { localeParams } from "@/lib/locale/languageTypes";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
-export async function generateStaticParams() {
-  return [
-    { locale: "en" },
-    { locale: "nb" },
-    { locale: "nn" },
-    { locale: "fr" },
-  ];
-}
+import { getDictionary } from "@/lib/locale/dictionaries";
 
 export default async function Home(props: { params: localeParams }) {
   const { locale } = await props.params;

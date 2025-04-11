@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import HeaderText from "@/components/HeaderText";
 import JourneyCard from "./JourneyCard";
-import type { Journey } from "@/lib/types/languageTypes";
+import type { Journey } from "@/lib/locale/languageTypes";
 
 const JourneyImage = dynamic(() => import("./JourneyImage"), {
   ssr: true,

@@ -19,7 +19,7 @@ import { Bars3Icon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import MobileDropdownMenu from "./MobileDropdownMenu";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { NavbarType } from "@/lib/types/languageTypes";
+import { NavbarType } from "@/lib/locale/languageTypes";
 
 interface Props {
   navbar: NavbarType;
