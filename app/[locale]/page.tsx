@@ -3,7 +3,7 @@ import Journey from "@/components/HomePage/Journey/Journey";
 import LandingComponent from "@/components/HomePage/Landing/LandingComponent";
 import Projects from "@/components/HomePage/Projects/Projects";
 import { getDictionary } from "./dictionaries";
-import { localeParams } from "@/lib/types/types";
+import { localeParams } from "@/lib/types/languageTypes";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 

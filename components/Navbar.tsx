@@ -17,9 +17,9 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Bars3Icon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
-import { NavbarType } from "@/lib/types/types";
 import MobileDropdownMenu from "./MobileDropdownMenu";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { NavbarType } from "@/lib/types/languageTypes";
 
 interface Props {
   navbar: NavbarType;

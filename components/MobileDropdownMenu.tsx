@@ -1,6 +1,6 @@
 "use client";
 
-import type { NavbarType } from "@/lib/types/types";
+import type { NavbarType } from "@/lib/types/languageTypes";
 import { EnvelopeIcon, DocumentTextIcon } from "@heroicons/react/24/solid";
 import {
   SparklesIcon,

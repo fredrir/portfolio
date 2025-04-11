@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { GlobeIcon, CheckIcon } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import type { NavbarType } from "@/lib/types/types";
+import type { NavbarType } from "@/lib/types/languageTypes";
 
 interface LanguageSwitcherProps {
   navbar: NavbarType;
@@ -82,7 +82,7 @@ export default function LanguageSwitcher({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-48 rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 z-50"
+            className="absolute right-0 mt-2 w-56 rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 z-50"
           >
             <div className="py-1">
               {languages.map((language) => {
