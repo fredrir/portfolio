@@ -13,9 +13,9 @@ interface LanguageSwitcherProps {
 
 const languages = [
   { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
   { code: "nb", name: "Norsk (Bokmål)", flag: "🇳🇴" },
   { code: "nn", name: "Norsk (Nynorsk)", flag: "🇳🇴" },
-  { code: "fr", name: "Français", flag: "🇫🇷" },
 ];
 
 export default function LanguageSwitcher({
