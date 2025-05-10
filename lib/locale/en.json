@@ -99,6 +99,15 @@
         "websiteLink": "https://rif.no/"
       },
       {
+        "id": 10,
+        "title": "Seniorbank",
+        "description": "SeniorBank is a prototype designed to enhance digital banking security for elderly users and vulnerable groups who are increasingly targeted by online fraud. The project focused on designing a conceptual banking prototype from scratch that combines user-friendly design with fraud prevention concepts, serving as a foundation for more secure digital banking experiences tailored to elderly users. This initiative was developed in collaboration with SpareBank 1 Utvikling which provides digital banking solutions for multiple Norwegian banks.",
+        "languages": "Auth0 / Docker / Prisma / PostgreSQL / React / ShadCN / Tailwind",
+        "desktopImage": "/seniorbank.png",
+        "githubLink": "https://github.com/fredrir/seniorbank",
+        "websiteLink": "https://seniorbank.vercel.app/"
+      },
+      {
         "id": 1,
         "title": "Admission Page",
         "description": "Co-developed a web application with 4 fellow students to make the process of applying to committees at Online easier for both the applicants and the committees. This platform helps organize and manage applications, automate interview-time selection, making the process simpler and more straightforward for everyone.",
