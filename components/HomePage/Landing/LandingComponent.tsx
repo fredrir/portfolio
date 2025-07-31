@@ -7,7 +7,6 @@ interface Props {
     title: string;
     terminal: {
       mainText: string;
-      errorText: string;
     };
   };
 }
@@ -37,10 +36,7 @@ const LandingComponent = ({ landing }: Props) => {
         </h1>
       </div>
 
-      <TerminalComponent
-        mainText={landing.terminal.mainText}
-        errorText={landing.terminal.errorText}
-      />
+      <TerminalComponent mainText={landing.terminal.mainText} />
     </div>
   );
 };
