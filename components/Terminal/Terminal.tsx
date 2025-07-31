@@ -1,17 +1,11 @@
 "use client";
-import type React from "react";
 import Image from "next/image";
-import { useState, useRef, useCallback, useEffect } from "react";
 import TerminalTab from "./TerminalTab";
-import { useTerminal } from "./useTerminal";
+import { useTerminal } from "./hooks/useTerminal";
+import { useTerminalResize } from "./hooks/useTerminalResize";
 
 interface Props {
   mainText: string;
-}
-
-interface TerminalSize {
-  width: number;
-  height: number;
 }
 
 const Terminal = ({ mainText }: Props) => {
@@ -19,6 +13,7 @@ const Terminal = ({ mainText }: Props) => {
     text,
     cursorVisible,
     cursorIsFinished,
+    showInitialAnimation,
     isClosed,
     isExpanded,
     isSmall,
@@ -34,167 +29,8 @@ const Terminal = ({ mainText }: Props) => {
     handleInputSubmit,
   } = useTerminal({ mainText });
 
-  const [terminalSize, setTerminalSize] = useState<TerminalSize>({
-    width: 640,
-    height: 360,
-  });
-  const [isResizing, setIsResizing] = useState(false);
-  const [resizeDirection, setResizeDirection] = useState<string>("");
-  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-  const [startSize, setStartSize] = useState<TerminalSize>({
-    width: 0,
-    height: 0,
-  });
-  const [isMobile, setIsMobile] = useState(false);
-
-  const terminalRef = useRef<HTMLDivElement>(null);
-
-  const MIN_WIDTH = 320;
-  const MIN_HEIGHT = 200;
-  const MAX_WIDTH = 1200;
-  const MAX_HEIGHT = 800;
-
-  const mainTextLength = mainText.length;
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  useEffect(() => {
-    const updateSize = () => {
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-
-      if (viewportWidth < 640) {
-        // Mobile: Use most of the screen
-        setTerminalSize({
-          width: Math.min(viewportWidth - 20, 600),
-          height: Math.min(viewportHeight * 0.6, 400),
-        });
-      } else if (viewportWidth < 1024) {
-        // Tablet: Moderate sizing
-        setTerminalSize({
-          width: Math.min(viewportWidth - 40, 700),
-          height: Math.min(viewportHeight * 0.5, 450),
-        });
-      } else if (isExpanded) {
-        // Desktop expanded
-        setTerminalSize({ width: 896, height: 600 });
-      } else {
-        // Desktop normal
-        setTerminalSize({ width: 640, height: 360 });
-      }
-    };
-
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, [isExpanded]);
-
-  const handleResizeStart = useCallback(
-    (e: React.MouseEvent | React.TouchEvent, direction: string) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      // Don't allow resizing on mobile
-      if (isMobile) return;
-
-      setIsResizing(true);
-      setResizeDirection(direction);
-
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-
-      setStartPos({ x: clientX, y: clientY });
-      setStartSize({ ...terminalSize });
-
-      document.body.style.cursor =
-        direction.includes("e") &&
-        direction.includes("s") &&
-        direction.includes("w")
-          ? "nwse-resize"
-          : direction.includes("n") && direction.includes("w")
-          ? "nw-resize"
-          : direction.includes("e")
-          ? "ew-resize"
-          : "ns-resize";
-    },
-    [terminalSize, isMobile]
-  );
-
-  const handleResizeMove = useCallback(
-    (e: MouseEvent | TouchEvent) => {
-      if (!isResizing || isMobile) return;
-
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-
-      const deltaX = clientX - startPos.x;
-      const deltaY = clientY - startPos.y;
-
-      let newWidth = startSize.width;
-      let newHeight = startSize.height;
-
-      if (resizeDirection.includes("e")) {
-        newWidth = Math.max(
-          MIN_WIDTH,
-          Math.min(MAX_WIDTH, startSize.width + deltaX)
-        );
-      }
-      if (resizeDirection.includes("w")) {
-        newWidth = Math.max(
-          MIN_WIDTH,
-          Math.min(MAX_WIDTH, startSize.width - deltaX)
-        );
-      }
-      if (resizeDirection.includes("s")) {
-        newHeight = Math.max(
-          MIN_HEIGHT,
-          Math.min(MAX_HEIGHT, startSize.height + deltaY)
-        );
-      }
-      if (resizeDirection.includes("n")) {
-        newHeight = Math.max(
-          MIN_HEIGHT,
-          Math.min(MAX_HEIGHT, startSize.height - deltaY)
-        );
-      }
-
-      setTerminalSize({ width: newWidth, height: newHeight });
-    },
-    [isResizing, startPos, startSize, resizeDirection, isMobile]
-  );
-
-  const handleResizeEnd = useCallback(() => {
-    setIsResizing(false);
-    setResizeDirection("");
-    document.body.style.cursor = "default";
-  }, []);
-
-  useEffect(() => {
-    if (isResizing && !isMobile) {
-      const handleMouseMove = (e: MouseEvent) => handleResizeMove(e);
-      const handleTouchMove = (e: TouchEvent) => handleResizeMove(e);
-
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleResizeEnd);
-      document.addEventListener("touchmove", handleTouchMove);
-      document.addEventListener("touchend", handleResizeEnd);
-
-      return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleResizeEnd);
-        document.removeEventListener("touchmove", handleTouchMove);
-        document.removeEventListener("touchend", handleResizeEnd);
-      };
-    }
-  }, [isResizing, handleResizeMove, handleResizeEnd, isMobile]);
+  const { terminalSize, isResizing, isMobile, terminalRef, handleResizeStart } =
+    useTerminalResize({ isExpanded });
 
   if (isSmall) {
     return <TerminalTab setIsSmall={setIsSmall} setIsClosed={setIsClosed} />;
@@ -225,7 +61,6 @@ const Terminal = ({ mainText }: Props) => {
           <p className="mx-auto text-center truncate flex-1 px-2">
             Terminal - {currentPath}
           </p>
-
           <div className="hidden md:flex flex-row text-end gap-2">
             <button
               className="hover:scale-110 transition-transform"
@@ -288,16 +123,21 @@ const Terminal = ({ mainText }: Props) => {
           onClick={() => inputRef.current?.focus()}
         >
           <div className="flex-1">
-            <article className="whitespace-pre-wrap break-words">
-              <span className="text-white">Fredrik:~$ </span>
-              <span>{text.slice(0, mainTextLength)}</span>
-              <span className="text-red-500">{text.slice(mainTextLength)}</span>
-              {cursorVisible && (
-                <span className="border-white bg-white border border-1 text-white">
-                  |
+            {showInitialAnimation && (
+              <article className="whitespace-pre-wrap break-words">
+                <span className="text-white">Fredrik:~$ </span>
+                <span>{text.slice(0, mainText.length)}</span>
+                <span className="text-red-500">
+                  {text.slice(mainText.length)}
                 </span>
-              )}
-            </article>
+                {cursorVisible && (
+                  <span className="border-white bg-white border border-1 text-white">
+                    |
+                  </span>
+                )}
+              </article>
+            )}
+
             {commandHistory.map((entry, index) => (
               <div key={index} className="mt-1 md:mt-2">
                 <div className="flex items-start flex-wrap">
@@ -320,6 +160,7 @@ const Terminal = ({ mainText }: Props) => {
               </div>
             ))}
           </div>
+
           {cursorIsFinished && (
             <div className="flex items-center mt-1 md:mt-2 border-t border-gray-700 pt-2 pb-2 sticky bottom-0 bg-black">
               <span className="text-white mr-1 md:mr-2 flex-shrink-0 text-xs md:text-sm">

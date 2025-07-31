@@ -1,5 +1,5 @@
 import { FileSystemManager } from "./fileSystem";
-import { CommandOutput } from "./types";
+import type { CommandOutput } from "./types";
 
 export class CommandProcessor {
   private fileSystemManager: FileSystemManager;
@@ -58,7 +58,7 @@ export class CommandProcessor {
 
       case "whoami":
         return {
-          output: { command, output: "fredrik" },
+          output: { command, output: "fredrir" },
         };
 
       case "date":
@@ -81,7 +81,6 @@ export class CommandProcessor {
             output: `🖥️  FredrikOS v1.0
 Built with  Next.js 
 Type 'help' for available commands
-
 Repository: https://github.com/fredrir/portfolio
 Author: Fredrik Carsten Hansteen`,
           },
@@ -97,8 +96,7 @@ Author: Fredrik Carsten Hansteen`,
 
       case "uname":
         const unameFlag = args[0];
-        let unameOutput = "FredrikOS";
-
+        let unameOutput = "FredrikOS 1.0.0";
         if (unameFlag === "-a") {
           unameOutput =
             "FredrikOS fredrik-terminal 1.0.0 #1 SMP Web Browser x86_64 GNU/Linux";
@@ -107,7 +105,6 @@ Author: Fredrik Carsten Hansteen`,
         } else if (unameFlag === "-m") {
           unameOutput = "x86_64";
         }
-
         return {
           output: { command, output: unameOutput },
         };
@@ -116,7 +113,6 @@ Author: Fredrik Carsten Hansteen`,
         const uptime = Math.floor(Math.random() * 86400);
         const hours = Math.floor(uptime / 3600);
         const minutes = Math.floor((uptime % 3600) / 60);
-
         return {
           output: {
             command,
@@ -151,7 +147,6 @@ Author: Fredrik Carsten Hansteen`,
         ? this.fileSystemManager.resolvePath(args[0], currentPath)
         : currentPath;
       const output = this.fileSystemManager.listDirectory(lsPath);
-
       return {
         output: { command, output },
       };
@@ -182,7 +177,6 @@ Author: Fredrik Carsten Hansteen`,
 
     try {
       const newPath = this.fileSystemManager.resolvePath(args[0], currentPath);
-
       if (!this.fileSystemManager.exists(newPath)) {
         return {
           output: {
@@ -238,7 +232,6 @@ Author: Fredrik Carsten Hansteen`,
     try {
       const catPath = this.fileSystemManager.resolvePath(args[0], currentPath);
       const content = this.fileSystemManager.readFile(catPath);
-
       return {
         output: { command, output: content },
       };
@@ -261,7 +254,6 @@ Author: Fredrik Carsten Hansteen`,
   ): { output: CommandOutput } {
     try {
       const currentNode = this.fileSystemManager.getNodeAtPath(currentPath);
-
       if (currentNode) {
         const treeOutput = this.fileSystemManager
           .buildDirectoryTree(currentNode)
