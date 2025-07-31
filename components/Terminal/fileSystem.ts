@@ -75,7 +75,8 @@ export const createFileSystem = (): FileSystemNode => ({
               name: "profile.txt",
               type: "file",
               content:
-                "Fredrik - Full Stack Developer\nPassionate about React, Next.js, and terminal interfaces!",
+                "Fredrik Carsten Hansteen - Developer of FredrikOS\n" +
+                "Contact: fhansteen@gmail.com",
             },
             ".bashrc": {
               name: ".bashrc",
