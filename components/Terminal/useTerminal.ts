@@ -40,7 +40,7 @@ export const useTerminal = ({ mainText }: UseTerminalProps) => {
             setText((prev) => prev + "\n \nbash: command not found");
           }, 700);
         }
-      }, 50);
+      }, 30);
     };
 
     const timer = setTimeout(startTyping, 1000);
