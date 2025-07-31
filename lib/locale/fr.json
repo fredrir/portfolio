@@ -14,8 +14,7 @@
   "landing": {
     "title": "Salut, je suis",
     "terminal": {
-      "mainText": "JJe suis actuellement en dernière année de licence en informatique à la Norwegian University of Science and Technology (NTNU) à Trondheim, Norvège. N'hésitez pas à consulter mon CV ou à me contacter.",
-      "errorText": "\nCommande non trouvée"
+      "mainText": "JJe suis actuellement en dernière année de licence en informatique à la Norwegian University of Science and Technology (NTNU) à Trondheim, Norvège. N'hésitez pas à consulter mon CV ou à me contacter."
     }
   },
   "journey": {

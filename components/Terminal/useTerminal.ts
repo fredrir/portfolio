@@ -7,10 +7,9 @@ import { CommandProcessor } from "./commandProcessor";
 
 interface UseTerminalProps {
   mainText: string;
-  errorText: string;
 }
 
-export const useTerminal = ({ mainText, errorText }: UseTerminalProps) => {
+export const useTerminal = ({ mainText }: UseTerminalProps) => {
   const [text, setText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
   const [cursorIsFinished, setCursorIsFinished] = useState(false);
@@ -38,7 +37,7 @@ export const useTerminal = ({ mainText, errorText }: UseTerminalProps) => {
           clearInterval(interval);
           setTimeout(() => {
             setCursorIsFinished(true);
-            setText((prev) => prev + errorText);
+            setText((prev) => prev + "\n \nbash: command not found");
           }, 700);
         }
       }, 50);
@@ -50,7 +49,7 @@ export const useTerminal = ({ mainText, errorText }: UseTerminalProps) => {
       clearTimeout(timer);
       if (interval) clearInterval(interval);
     };
-  }, [mainText, errorText]);
+  }, [mainText]);
 
   useEffect(() => {
     if (cursorIsFinished) {

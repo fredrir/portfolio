@@ -78,9 +78,8 @@ export class CommandProcessor {
         return {
           output: {
             command,
-            output: `🖥️  Fredrik's Interactive Terminal v1.0
-Built with  Next.js and Tailwind
-Features a simulated file system with navigation commands
+            output: `🖥️  FredrikOS v1.0
+Built with  Next.js 
 Type 'help' for available commands
 
 Repository: https://github.com/fredrir/portfolio

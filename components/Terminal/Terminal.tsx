@@ -5,10 +5,9 @@ import { useTerminal } from "./useTerminal";
 
 interface Props {
   mainText: string;
-  errorText: string;
 }
 
-const TerminalComponent = ({ mainText, errorText }: Props) => {
+const TerminalComponent = ({ mainText }: Props) => {
   const {
     text,
     cursorVisible,
@@ -26,7 +25,7 @@ const TerminalComponent = ({ mainText, errorText }: Props) => {
     setIsSmall,
     setInputValue,
     handleInputSubmit,
-  } = useTerminal({ mainText, errorText });
+  } = useTerminal({ mainText });
 
   const mainTextLength = mainText.length;
 

@@ -19,9 +19,26 @@ export const createFileSystem = (): FileSystemNode => ({
                 "readme.txt": {
                   name: "readme.txt",
                   type: "file",
-                  content:
-                    "Welcome to Fredrik's terminal!\nThis is a simulated file system.",
+                  content: "Welcome to FredrikOS!\n",
                 },
+                secret: {
+                  name: "secret",
+                  type: "directory",
+                  children: {
+                    "super-secret": {
+                      name: "super-secret",
+                      type: "directory",
+                      children: {
+                        "flag.txt": {
+                          name: "flag.txt",
+                          type: "file",
+                          content: "FLAG{congrats_you_found_me}",
+                        },
+                      },
+                    },
+                  },
+                },
+
                 projects: {
                   name: "projects",
                   type: "directory",
