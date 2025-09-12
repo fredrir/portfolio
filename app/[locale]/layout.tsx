@@ -7,6 +7,10 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AnimatedBackground } from "@/components/AnimatedLinesBackground";
 import { ThemeProvider } from "next-themes";
 import type { localeParams } from "@/lib/locale/languageTypes";
+import { Suspense } from "react";
+import { AnalyticsConsentProvider } from "@/components/Analytics/AnalyticsConsentProvider";
+import { CookieConsentBanner } from "@/components/Analytics/CookieConsent";
+import { ConditionalAnalytics } from "@/components/Analytics/ConditionalAnalytics";
 
 const localeContent = {
   en: {
@@ -125,12 +129,10 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: localeParams;
 }>) {
+  const locale = (await params).locale;
+
   return (
-    <html
-      lang={(await params).locale}
-      className={roboto.variable}
-      suppressHydrationWarning
-    >
+    <html lang={locale} className={roboto.variable} suppressHydrationWarning>
       <head>
         <meta
           name="google-site-verification"
@@ -144,11 +146,19 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AnimatedBackground />
-          <Toaster />
+          <AnalyticsConsentProvider>
+            <Suspense fallback={null}>
+              <AnimatedBackground />
+              <Toaster />
 
-          {children}
-          <SpeedInsights />
+              {children}
+
+              <CookieConsentBanner locale={locale} />
+
+              <SpeedInsights />
+            </Suspense>
+            <ConditionalAnalytics />
+          </AnalyticsConsentProvider>
         </ThemeProvider>
       </body>
     </html>
