@@ -14,18 +14,27 @@
   "landing": {
     "title": "Hi, I'm",
     "terminal": {
-      "mainText": "II'm currently in my final year of a Bachelor's degree in Informatics at the Norwegian University of Science and Technology (NTNU) in Trondheim, Norway. Feel free to explore my CV or get in touch with me."
+      "mainText": "II'm currently pursuing a master's degree in Computer Science at the Norwegian University of Science and Technology (NTNU) in Trondheim, Norway. Feel free to explore my CV or get in touch with me."
     }
   },
   "journey": {
     "title": "My Journey",
     "journeys": [
       {
-        "id": 7,
-        "jobTitle": "Student Assistant in KJ2095",
+        "id": 9,
+        "jobTitle": "Teaching Assistant in IT3212",
         "company": "NTNU",
-        "description": "Teaching assistant in the course Experts in Teamwork – Environmental Impact and Tipping Points. Facilitated interdisciplinary collaboration and guided students in solving real-world challenges",
-        "date": "January 2024 - Present",
+        "description": "Teaching assistant in the course Data-Driven Software. Tasks related to guidance, group leadership (including exercises, study groups, and seminars), and evaluation.",
+        "date": "August 2025 - December 2025",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 8,
+        "jobTitle": "Technical Teaching Assistant in IT1901",
+        "company": "NTNU",
+        "description": "Provided technical guidance in the course Informatics Project Work I. Conducted three weekly exercise sessions where I assisted students with development and problem-solving related to Java- and Maven-based projects.",
+        "date": "August 2025 - December 2025",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
@@ -38,6 +47,16 @@
         "lightModeImageUri": "/rif-logo.svg",
         "darkModeImageUri": "/rif-logo-dark.svg"
       },
+      {
+        "id": 7,
+        "jobTitle": "Student Assistant in KJ2095",
+        "company": "NTNU",
+        "description": "Teaching assistant in the course Experts in Teamwork – Environmental Impact and Tipping Points. Facilitated interdisciplinary collaboration and guided students in solving real-world challenges",
+        "date": "January 2024 - Present",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+
       {
         "id": 6,
         "jobTitle": "Student Assistant in IT1901",

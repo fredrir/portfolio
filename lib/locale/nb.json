@@ -14,18 +14,27 @@
   "landing": {
     "title": "Hei, jeg er",
     "terminal": {
-      "mainText": "FFor tiden er jeg i mitt siste semester av en bachelorgrad i informatikk ved NTNU i Trondheim. Ta gjerne en titt på CV-en min eller ta kontakt."
+      "mainText": "FFor tiden tar jeg en mastergrad i datateknologi ved NTNU i Trondheim. Ta gjerne en titt på CV-en min eller ta kontakt."
     }
   },
   "journey": {
     "title": "Min Reise",
     "journeys": [
       {
-        "id": 7,
-        "jobTitle": "Læringsassistent i KJ2095",
+        "id": 9,
+        "jobTitle": "Læringsassistent i IT3212",
         "company": "NTNU",
-        "description": "Læringsassistent i faget “Eksperter i team - Miljøpåvirkning og tålegrenser”. Tilrettelagte for tverrfaglig samarbeid og veiledet studenter i problemløsning basert på virkelige utfordringer.",
-        "date": "Januar 2024 - Nåværende",
+        "description": "Læringsassistent i faget Datadrevet programvare. Oppgaver knyttet til veiledning, gruppeledelse (inkludert øvinger, kollokviegrupper og seminarer) og evaluering.",
+        "date": "August 2025 - Desember 2025",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 8,
+        "jobTitle": "Teknisk Læringsassistent i IT1901",
+        "company": "NTNU",
+        "description": "Tilbydde teknisk veiledning i faget Informatikk prosjektarbeid I. Holdt tre ukentlige øvingstimer hvor jeg veiledet studentene i utvikling og problemløsning relatert til Java- og Maven-baserte prosjekter.",
+        "date": "August 2025 - Desember 2025",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
@@ -38,6 +47,16 @@
         "lightModeImageUri": "/rif-logo.svg",
         "darkModeImageUri": "/rif-logo-dark.svg"
       },
+      {
+        "id": 7,
+        "jobTitle": "Læringsassistent i KJ2095",
+        "company": "NTNU",
+        "description": "Læringsassistent i faget “Eksperter i team - Miljøpåvirkning og tålegrenser”. Tilrettelagte for tverrfaglig samarbeid og veiledet studenter i problemløsning basert på virkelige utfordringer.",
+        "date": "Januar 2024 - Nåværende",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+
       {
         "id": 6,
         "jobTitle": "Teknisk Læringsassistent i IT1901",

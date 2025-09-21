@@ -14,18 +14,27 @@
   "landing": {
     "title": "Salut, je suis",
     "terminal": {
-      "mainText": "JJe suis actuellement en dernière année de licence en informatique à la Norwegian University of Science and Technology (NTNU) à Trondheim, Norvège. N'hésitez pas à consulter mon CV ou à me contacter."
+      "mainText": "JJe poursuis actuellement un master en informatique à la Norwegian University of Science and Technology (NTNU) à Trondheim, Norvège. N'hésitez pas à consulter mon CV ou à me contacter."
     }
   },
   "journey": {
     "title": "Mon Parcours",
     "journeys": [
       {
-        "id": 7,
-        "jobTitle": "Assistant étudiant en KJ2095",
+        "id": 9,
+        "jobTitle": "Assistant pédagogique en IT3212",
         "company": "NTNU",
-        "description": "Assistant pédagogique dans le cours Experts en travail d'équipe – Impact environnemental et points de bascule. A facilité la collaboration interdisciplinaire et guidé les étudiants dans la résolution de défis concrets",
-        "date": "Janvier 2024 - Présent",
+        "description": "Assistant pédagogique dans le cours Logiciel piloté par les données. Tâches liées à l’encadrement, à l’animation de groupes (y compris exercices, groupes de travail et séminaires) et à l’évaluation.",
+        "date": "Août 2025 - Décembre 2025",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 8,
+        "jobTitle": "Assistant pédagogique technique en IT1901",
+        "company": "NTNU",
+        "description": "A offert un encadrement technique dans le cours Informatique projet I. Animait trois séances hebdomadaires d’exercices où j’accompagnais les étudiants dans le développement et la résolution de problèmes liés à des projets basés sur Java et Maven.",
+        "date": "Août 2025 - Décembre 2025",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
@@ -38,6 +47,16 @@
         "lightModeImageUri": "/rif-logo.svg",
         "darkModeImageUri": "/rif-logo-dark.svg"
       },
+      {
+        "id": 7,
+        "jobTitle": "Assistant étudiant en KJ2095",
+        "company": "NTNU",
+        "description": "Assistant pédagogique dans le cours Experts en travail d'équipe – Impact environnemental et points de bascule. A facilité la collaboration interdisciplinaire et guidé les étudiants dans la résolution de défis concrets",
+        "date": "Janvier 2024 - Présent",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+
       {
         "id": 6,
         "jobTitle": "Assistant étudiant en IT1901",

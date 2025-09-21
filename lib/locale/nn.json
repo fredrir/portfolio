@@ -14,18 +14,27 @@
   "landing": {
     "title": "Hei, eg er",
     "terminal": {
-      "mainText": "FFor tida er eg i mitt siste semester av ein bachelorgrad i informatikk ved NTNU i Trondheim. Ta gjerne ein titt på CV-en min eller ta kontakt."
+      "mainText": "For tida tek eg ein mastergrad i datateknologi ved NTNU i Trondheim. Ta gjerne ein titt på CV-en min eller ta kontakt."
     }
   },
   "journey": {
     "title": "Min ferd",
     "journeys": [
       {
-        "id": 7,
-        "jobTitle": "Læringsassistent i KJ2095",
+        "id": 9,
+        "jobTitle": "Læringsassistent i IT3212",
         "company": "NTNU",
-        "description": "Læringsassistent i faget “Eksperter i team - Miljøpåverknad og tålegrenser”. Tilrettelaga for tverrfagleg samarbeid og rettleidde studentar i problemløysing basert på verkelege utfordringar.",
-        "date": "Januar 2024 - Nuvanande",
+        "description": "Læringsassistent i emnet Datadriven programvare. Arbeidsoppgåver knytt til rettleiing, gruppeleiing (inkludert øvingar, kollokviegrupper og seminar) og evaluering.",
+        "date": "August 2025 - Desember 2025",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 8,
+        "jobTitle": "Teknisk læringsassistent i IT1901",
+        "company": "NTNU",
+        "description": "Tilbaud teknisk rettleiing i emnet Informatikk prosjektarbeid I. Halde tre vekentlege øvingstimar der eg rettleia studentane i utvikling og problemløysing knytt til Java- og Maven-baserte prosjekt.",
+        "date": "August 2025 - Desember 2025",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
@@ -38,6 +47,16 @@
         "lightModeImageUri": "/rif-logo.svg",
         "darkModeImageUri": "/rif-logo-dark.svg"
       },
+      {
+        "id": 7,
+        "jobTitle": "Læringsassistent i KJ2095",
+        "company": "NTNU",
+        "description": "Læringsassistent i faget “Eksperter i team - Miljøpåverknad og tålegrenser”. Tilrettelaga for tverrfagleg samarbeid og rettleidde studentar i problemløysing basert på verkelege utfordringar.",
+        "date": "Januar 2024 - Nuvanande",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+
       {
         "id": 6,
         "jobTitle": "Teknisk læringsassistent i IT1901",
