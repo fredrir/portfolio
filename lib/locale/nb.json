@@ -22,7 +22,7 @@
     "journeys": [
       {
         "id": 10,
-        "jobTitle": "Studentassistent i IT2901",
+        "jobTitle": "Læringsassistent i IT2901",
         "company": "NTNU",
         "description": "Ansvarlig for veiledning av bachelorgrupper, faglig oppfølging og evaluering av midtveisprogresjon gjennom semesteret.",
         "date": "Januar 2026 - Juni 2026",
@@ -31,16 +31,16 @@
       },
       {
         "id": 11,
-        "jobTitle": "Studentassistent i KJ2095",
+        "jobTitle": "Læringsassistent i KJ2095",
         "company": "NTNU",
-        "description": "Studentassistent i emnet Eksperter i team – Miljøpåvirkning og vippepunkter. Fasiliterte tverrfaglig samarbeid og veiledet studenter i å løse reelle problemstillinger.",
+        "description": "Læringsassistent i emnet Eksperter i team – Miljøpåvirkning og vippepunkter. Fasiliterte tverrfaglig samarbeid og veiledet studenter i å løse reelle problemstillinger.",
         "date": "Januar 2026 - Juni 2026",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg"
       },
       {
         "id": 10,
-        "jobTitle": "Studentassistent i TDT4140",
+        "jobTitle": "Læringsassistent i TDT4140",
         "company": "NTNU",
         "description": "Oppgaver knyttet til veiledning, gruppeledelse (inkludert øvinger, kollokvier og seminarer), samt evaluering.",
         "date": "Januar 2026 - Juni 2026",
