@@ -21,6 +21,34 @@
     "title": "Mon Parcours",
     "journeys": [
       {
+        "id": 10,
+        "jobTitle": "Assistant d’enseignement en IT2901",
+        "company": "NTNU",
+        "description": "Responsable de l’encadrement des groupes de mémoire de bachelor, du suivi académique et de l’évaluation des progrès à mi-parcours tout au long du semestre.",
+        "date": "Janvier 2026 - Juin 2026",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 11,
+        "jobTitle": "Assistant d’enseignement en KJ2095",
+        "company": "NTNU",
+        "description": "Assistant d’enseignement dans le cours Experts en travail d’équipe – Impact environnemental et points de bascule. Animation de la collaboration interdisciplinaire et accompagnement des étudiants dans la résolution de défis concrets.",
+        "date": "Janvier 2026 - Juin 2026",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 10,
+        "jobTitle": "Assistant d’enseignement en TDT4140",
+        "company": "NTNU",
+        "description": "Tâches liées à l’encadrement, à la direction de groupes (y compris exercices, groupes d’étude et séminaires), ainsi qu’à l’évaluation.",
+        "date": "Janvier 2026 - Juin 2026",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+
+      {
         "id": 9,
         "jobTitle": "Assistant pédagogique en IT3212",
         "company": "NTNU",

@@ -21,6 +21,33 @@
     "title": "Min ferd",
     "journeys": [
       {
+        "id": 10,
+        "jobTitle": "Studentassistent i IT2901",
+        "company": "NTNU",
+        "description": "Ansvarleg for rettleiing av bachelorgrupper, fagleg oppfølging og evaluering av midtvegsprogresjon gjennom semesteret.",
+        "date": "Januar 2026 - Juni 2026",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 11,
+        "jobTitle": "Studentassistent i KJ2095",
+        "company": "NTNU",
+        "description": "Studentassistent i emnet Ekspertar i team – Miljøpåverknad og vippepunkt. Fasiliterte tverrfagleg samarbeid og rettleidde studentar i å løyse verkelege problemstillingar.",
+        "date": "Januar 2026 - Juni 2026",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
+        "id": 10,
+        "jobTitle": "Studentassistent i TDT4140",
+        "company": "NTNU",
+        "description": "Oppgåver knytte til rettleiing, gruppeleiing (inkludert øvingar, kollokviegrupper og seminar), samt evaluering.",
+        "date": "Januar 2026 - Juni 2026",
+        "lightModeImageUri": "/ntnu-logo.svg",
+        "darkModeImageUri": "/ntnu-logo-dark.svg"
+      },
+      {
         "id": 9,
         "jobTitle": "Læringsassistent i IT3212",
         "company": "NTNU",
