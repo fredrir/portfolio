@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { X, Shield, Zap, BarChart3 } from "lucide-react";
 import { useAnalyticsConsent } from "./AnalyticsConsentProvider";
 
 interface CookieConsentBannerProps {
@@ -11,34 +9,68 @@ interface CookieConsentBannerProps {
 
 const content = {
   en: {
-    title: "🍪 Cookies",
-    description: "We use Vercel Analytics to optimize your experience.",
-    accept: "Accept",
-    decline: "Essential Only",
-    learnMore: "Learn More",
+    prompt: "Fredrik Carsten Hansteen requires cookie permissions",
+    accept: "[Y] accept",
+    decline: "[n] decline",
+    info: "[i] info",
+    gdprTitle: "GDPR / Privacy Information",
+    gdprLines: [
+      "Data collected: page views, web vitals, referrers",
+      "Provider: Vercel Inc. (San Francisco, CA)",
+      "No personal identifiers or IP addresses are stored",
+      "Data is aggregated and anonymized",
+      "You may withdraw consent at any time by clearing cookies",
+      "Legal basis: Art. 6(1)(a) GDPR — your consent",
+    ],
+    gdprBack: "[q] back",
   },
   nb: {
-    title: "🍪 Informasjonskapsler",
-    description:
-      "Denne nettsiden bruker Vercel Analytics for å optimalisere opplevelsen din.",
-    accept: "Godta",
-    decline: "Kun Nødvendig",
-    learnMore: "Lær Mer",
+    prompt: "Fredrik Carsten Hansteen trenger tilgang til informasjonskapsler",
+    accept: "[Y] godta",
+    decline: "[n] avslå",
+    info: "[i] info",
+    gdprTitle: "GDPR / Personvern",
+    gdprLines: [
+      "Data som samles inn: sidevisninger, web vitals, referanser",
+      "Leverandør: Vercel Inc. (San Francisco, CA)",
+      "Ingen personlige identifikatorer eller IP-adresser lagres",
+      "Data er aggregert og anonymisert",
+      "Du kan trekke samtykket tilbake ved å slette cookies",
+      "Rettslig grunnlag: Art. 6(1)(a) GDPR — ditt samtykke",
+    ],
+    gdprBack: "[q] tilbake",
   },
   nn: {
-    title: "🍪 Informasjonskapslar",
-    description: "Vi brukar Vercel Analytics for å optimalisere opplevinga di.",
-    accept: "Godta",
-    decline: "Berre Nødvendig",
-    learnMore: "Lær Meir",
+    prompt: "Fredrik Carsten Hansteen treng tilgang til informasjonskapslar",
+    accept: "[Y] godta",
+    decline: "[n] avslå",
+    info: "[i] info",
+    gdprTitle: "GDPR / Personvern",
+    gdprLines: [
+      "Data som vert samla inn: sidevisingar, web vitals, referansar",
+      "Leverandør: Vercel Inc. (San Francisco, CA)",
+      "Ingen personlege identifikatorar eller IP-adresser vert lagra",
+      "Data er aggregert og anonymisert",
+      "Du kan trekkje samtykket tilbake ved å slette cookies",
+      "Rettsleg grunnlag: Art. 6(1)(a) GDPR — ditt samtykke",
+    ],
+    gdprBack: "[q] tilbake",
   },
   fr: {
-    title: "🍪 Cookies",
-    description:
-      "Nous utilisons Vercel Analytics pour optimiser votre expérience.",
-    accept: "Accepter",
-    decline: "Essentiel Seulement",
-    learnMore: "En Savoir Plus",
+    prompt: "Fredrik Carsten Hansteen nécessite des cookies",
+    accept: "[Y] accepter",
+    decline: "[n] refuser",
+    info: "[i] info",
+    gdprTitle: "RGPD / Confidentialité",
+    gdprLines: [
+      "Données collectées : pages vues, web vitals, référents",
+      "Fournisseur : Vercel Inc. (San Francisco, CA)",
+      "Aucun identifiant personnel ni adresse IP n'est stocké",
+      "Les données sont agrégées et anonymisées",
+      "Vous pouvez retirer votre consentement en supprimant les cookies",
+      "Base juridique : Art. 6(1)(a) RGPD — votre consentement",
+    ],
+    gdprBack: "[q] retour",
   },
 };
 
@@ -47,135 +79,145 @@ export function CookieConsentBanner({
 }: CookieConsentBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [typed, setTyped] = useState("");
+  const [showGdpr, setShowGdpr] = useState(false);
   const { setConsent } = useAnalyticsConsent();
 
   const text = content[locale as keyof typeof content] || content.en;
+  const fullPrompt = text.prompt;
 
   useEffect(() => {
     const consent = localStorage.getItem("vercel-analytics-consent");
     if (!consent) {
-      setTimeout(() => setIsVisible(true), 1000);
+      setTimeout(() => setIsVisible(true), 800);
     }
   }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    let i = 0;
+    const interval = setInterval(() => {
+      setTyped(fullPrompt.slice(0, i + 1));
+      i++;
+      if (i >= fullPrompt.length) clearInterval(interval);
+    }, 18);
+    return () => clearInterval(interval);
+  }, [isVisible, fullPrompt]);
+
+  const doneTyping = typed.length >= fullPrompt.length;
+
+  useEffect(() => {
+    if (!isVisible || !doneTyping) return;
+    const handler = (e: KeyboardEvent) => {
+      if (showGdpr) {
+        if (e.key === "q" || e.key === "Q" || e.key === "Escape") {
+          setShowGdpr(false);
+        }
+        return;
+      }
+      if (e.key === "y" || e.key === "Y" || e.key === "Enter") {
+        handleAccept();
+      } else if (e.key === "n" || e.key === "N" || e.key === "Escape") {
+        handleDecline();
+      } else if (e.key === "i" || e.key === "I") {
+        setShowGdpr(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible, doneTyping, showGdpr]);
 
   const handleAccept = () => {
     setConsent(true);
     setIsAnimating(true);
-    setTimeout(() => setIsVisible(false), 300);
+    setTimeout(() => setIsVisible(false), 250);
   };
 
   const handleDecline = () => {
     setConsent(false);
     setIsAnimating(true);
-    setTimeout(() => setIsVisible(false), 300);
+    setTimeout(() => setIsVisible(false), 250);
   };
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-md z-50">
       <div
         className={`
-         backdrop-blur-xl bg-background/90 border-cyan-500/30 
-        shadow-2xl shadow-cyan-500/20 transition-all duration-300 ease-out
-        ${
-          isAnimating
-            ? "translate-y-full opacity-0"
-            : "translate-y-0 opacity-100"
-        }
-      `}
+          font-mono text-sm transition-all duration-250 ease-out
+          ${isAnimating ? "translate-y-4 opacity-0" : "translate-y-0 opacity-100"}
+        `}
       >
-        <div className="relative overflow-hidden">
-          {/* Animated background grid */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-transparent to-purple-500/20" />
-            <div className="grid grid-cols-8 grid-rows-4 h-full w-full">
-              {Array.from({ length: 32 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="border border-cyan-500/10 animate-pulse"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                />
-              ))}
-            </div>
+        {/* Terminal window */}
+        <div className="rounded-md border border-primary/30 bg-background/95 backdrop-blur-sm shadow-lg shadow-primary/5 overflow-hidden">
+          {/* Title bar */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-primary/20 bg-primary/5">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
+            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
+            <span className="ml-2 text-xs text-muted-foreground">~/.cookies</span>
           </div>
 
-          {/* Glowing border effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-cyan-500/20 animate-pulse" />
-
-          <div className="relative py-6 px-4 mx-auto container">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center">
-                    <BarChart3 className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg blur opacity-30 animate-pulse" />
-                </div>
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-bold text-foreground font-mono">
-                    {text.title}
-                  </h3>
-                  <Zap className="w-4 h-4 text-cyan-400 animate-pulse" />
-                </div>
-
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4 font-mono">
-                  {text.description}
-                </p>
-
-                <div className="flex flex-wrap gap-3">
-                  <Button
-                    onClick={handleDecline}
-                    variant="outline"
-                    className="
-                      border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground
-                      font-mono px-6 py-2 rounded-lg transition-all duration-200
-                      hover:border-border/80
-                     bg-transparent"
-                  >
-                    {text.decline}
-                  </Button>
-                  <Button
-                    onClick={handleAccept}
-                    className="
-                      bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500
-                      text-white font-mono font-semibold px-6 py-2 rounded-lg
-                      shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40
-                      transition-all duration-200 transform hover:scale-105
-                      border border-cyan-400/30
-                    "
-                  >
-                    <Shield className="w-4 h-4 mr-2" />
-                    {text.accept}
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    className="text-cyan-400 hover:text-cyan-300 font-mono text-sm px-3"
-                    onClick={() =>
-                      window.open(
-                        "https://vercel.com/docs/analytics/privacy-policy",
-                        "_blank"
-                      )
-                    }
-                  >
-                    {text.learnMore} →
-                  </Button>
-                </div>
-              </div>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDecline}
-                className="text-muted-foreground hover:text-foreground p-2"
-              >
-                <X className="w-4 h-4" />
-              </Button>
+          {/* Terminal body */}
+          <div className="p-3 space-y-2">
+            {/* Prompt line with typewriter */}
+            <div className="flex gap-2">
+              <span className="text-primary shrink-0">$</span>
+              <span className="text-foreground">
+                {typed}
+                {!doneTyping && (
+                  <span className="inline-block w-1.5 h-4 bg-primary/80 align-middle animate-pulse ml-px" />
+                )}
+              </span>
             </div>
+
+            {/* GDPR info panel */}
+            {showGdpr && (
+              <div className="border border-primary/20 rounded px-3 py-2 space-y-1.5 bg-primary/5">
+                <div className="text-primary text-xs font-bold">{text.gdprTitle}</div>
+                {text.gdprLines.map((line, i) => (
+                  <div key={i} className="flex gap-2 text-xs text-muted-foreground">
+                    <span className="text-primary/60 shrink-0">·</span>
+                    <span>{line}</span>
+                  </div>
+                ))}
+                <div className="pt-1">
+                  <button
+                    onClick={() => setShowGdpr(false)}
+                    className="text-xs text-muted-foreground/60 hover:text-muted-foreground hover:underline underline-offset-2 transition-colors"
+                  >
+                    {text.gdprBack}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Action buttons - only show when typing is done */}
+            {doneTyping && (
+              <div className="flex items-center gap-3 pt-1">
+                <span className="text-primary shrink-0">$</span>
+                <button
+                  onClick={handleAccept}
+                  className="text-primary hover:text-primary/80 hover:underline underline-offset-2 transition-colors"
+                >
+                  {text.accept}
+                </button>
+                <button
+                  onClick={handleDecline}
+                  className="text-muted-foreground hover:text-foreground hover:underline underline-offset-2 transition-colors"
+                >
+                  {text.decline}
+                </button>
+                <button
+                  onClick={() => setShowGdpr((v) => !v)}
+                  className="text-muted-foreground/60 hover:text-muted-foreground hover:underline underline-offset-2 transition-colors ml-auto"
+                >
+                  {text.info}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
