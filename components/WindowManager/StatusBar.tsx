@@ -176,10 +176,10 @@ export function StatusBar({
 
         <button
           onClick={onOpenSettings}
-          className="text-muted-foreground/40 hover:text-primary transition-colors"
+          className="text-muted-foreground/40 hover:text-primary transition-colors text-xs"
           title="Settings"
         >
-
+          ⚙
         </button>
 
         <span className="text-primary/50">

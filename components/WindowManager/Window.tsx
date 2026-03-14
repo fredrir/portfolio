@@ -51,21 +51,30 @@ export function Window({
       >
         <div className="flex items-center gap-2.5">
           <button
-            onClick={(e) => { e.stopPropagation(); onClose(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
             onMouseDown={(e) => e.stopPropagation()}
             className="group"
           >
             <div className="w-3.5 h-3.5 rounded-full bg-destructive/60 group-hover:bg-destructive transition-colors" />
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); onClose(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
             onMouseDown={(e) => e.stopPropagation()}
             className="group"
           >
             <div className="w-3.5 h-3.5 rounded-full bg-accent-yellow/60 group-hover:bg-accent-yellow transition-colors" />
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); onMaximize(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onMaximize();
+            }}
             onMouseDown={(e) => e.stopPropagation()}
             className="group"
           >
@@ -79,8 +88,6 @@ export function Window({
           )}
           {config.title}
         </span>
-
-        <span className="font-mono text-3xs text-primary/30">fredrir@arch</span>
       </div>
 
       <div className="flex-1 overflow-auto min-h-0">{children}</div>

@@ -1,11 +1,13 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { WINDOW_CONFIGS } from "../constants";
 import {
-  WINDOW_CONFIGS,
-  DEFAULT_ROWS,
+  DEFAULT_LAYOUT,
   DEFAULT_ROW_HEIGHTS,
-  STACKED_PANES,
-} from "../constants";
-import type { WindowState, WindowStates } from "../types";
+  getCellPanes,
+  swapPanesInLayout,
+} from "../layout";
+import type { CellDef } from "../layout";
+import type { WindowStates } from "../types";
 
 function getInitialStates(): WindowStates {
   const states: WindowStates = {};
@@ -19,14 +21,12 @@ function getInitialStates(): WindowStates {
   return states;
 }
 
-function expandCell(cellId: string): string[] {
-  return STACKED_PANES[cellId] || [cellId];
-}
-
 export function useWindowManager() {
   const [states, setStates] = useState<WindowStates>(getInitialStates);
-  const [rows, setRows] = useState<string[][]>(
-    () => DEFAULT_ROWS.map((r) => [...r]),
+  const [layout, setLayout] = useState<CellDef[][]>(() =>
+    DEFAULT_LAYOUT.map((row) =>
+      row.map((cell) => (Array.isArray(cell) ? [...cell] : cell)),
+    ),
   );
   const [rowHeights, setRowHeights] = useState<number[]>(
     () => [...DEFAULT_ROW_HEIGHTS],
@@ -35,15 +35,18 @@ export function useWindowManager() {
   const [maximizedId, setMaximizedId] = useState<string | null>(null);
   const [swapTarget, setSwapTarget] = useState<string | null>(null);
   const [dragTarget, setDragTarget] = useState<string | null>(null);
-  const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
-  const [dragSize, setDragSize] = useState<{ w: number; h: number } | null>(null);
+  const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(
+    null,
+  );
+  const [dragSize, setDragSize] = useState<{ w: number; h: number } | null>(
+    null,
+  );
   const maxZRef = useRef(100);
   const swapTargetRef = useRef<string | null>(null);
 
   const isCellVisible = useCallback(
-    (cellId: string) => {
-      const panes = expandCell(cellId);
-      return panes.some((id) => states[id]?.isOpen);
+    (cell: CellDef) => {
+      return getCellPanes(cell).some((id) => states[id]?.isOpen);
     },
     [states],
   );
@@ -56,16 +59,18 @@ export function useWindowManager() {
         isOpen: true,
       },
     }));
-    setRows((prev) => {
-      const allCellPanes = prev.flat().flatMap((c) => expandCell(c));
-      if (allCellPanes.includes(id)) return prev;
-      const lastRow = prev[prev.length - 1];
+    setLayout((prev) => {
+      const allPanes = prev.flat().flatMap((c) => getCellPanes(c));
+      if (allPanes.includes(id)) return prev;
+      const next = prev.map((row) =>
+        row.map((cell) => (Array.isArray(cell) ? [...cell] : cell)),
+      );
+      const lastRow = next[next.length - 1];
       if (lastRow.length < 3) {
-        const next = prev.map((r) => [...r]);
         next[next.length - 1] = [...lastRow, id];
         return next;
       }
-      return [...prev, [id]];
+      return [...next, [id]];
     });
   }, []);
 
@@ -92,33 +97,6 @@ export function useWindowManager() {
     }));
   }, []);
 
-  const swapPanes = useCallback((a: string, b: string) => {
-    if (a === b) return;
-    setRows((prev) => {
-      const next = prev.map((row) => [...row]);
-      let aPos: [number, number] | null = null;
-      let bPos: [number, number] | null = null;
-
-      for (let r = 0; r < next.length; r++) {
-        for (let c = 0; c < next[r].length; c++) {
-          const cellPanes = expandCell(next[r][c]);
-          if (cellPanes.includes(a) || next[r][c] === a) aPos = [r, c];
-          if (cellPanes.includes(b) || next[r][c] === b) bPos = [r, c];
-        }
-      }
-
-      if (aPos && bPos && (aPos[0] !== bPos[0] || aPos[1] !== bPos[1])) {
-        const tmp = next[aPos[0]][aPos[1]];
-        next[aPos[0]][aPos[1]] = next[bPos[0]][bPos[1]];
-        next[bPos[0]][bPos[1]] = tmp;
-      }
-
-      return next;
-    });
-    setDragTarget(null);
-    setSwapTarget(null);
-  }, []);
-
   const startTitleDrag = useCallback(
     (paneId: string, e: React.MouseEvent) => {
       e.preventDefault();
@@ -130,7 +108,9 @@ export function useWindowManager() {
 
       setDragTarget(paneId);
       setDragPos({ x: e.clientX - offsetX, y: e.clientY - offsetY });
-      setDragSize(rect ? { w: rect.width, h: rect.height } : { w: 300, h: 200 });
+      setDragSize(
+        rect ? { w: rect.width, h: rect.height } : { w: 300, h: 200 },
+      );
 
       const onMouseMove = (ev: MouseEvent) => {
         setDragPos({ x: ev.clientX - offsetX, y: ev.clientY - offsetY });
@@ -156,29 +136,7 @@ export function useWindowManager() {
         const dropTarget = swapTargetRef.current;
 
         if (dropTarget && dropTarget !== paneId) {
-          setRows((prev) => {
-            const next = prev.map((row) => [...row]);
-            let aPos: [number, number] | null = null;
-            let bPos: [number, number] | null = null;
-
-            for (let r = 0; r < next.length; r++) {
-              for (let c = 0; c < next[r].length; c++) {
-                const cellPanes = expandCell(next[r][c]);
-                if (next[r][c] === paneId || cellPanes.includes(paneId))
-                  aPos = [r, c];
-                if (next[r][c] === dropTarget || cellPanes.includes(dropTarget))
-                  bPos = [r, c];
-              }
-            }
-
-            if (aPos && bPos && (aPos[0] !== bPos[0] || aPos[1] !== bPos[1])) {
-              const tmp = next[aPos[0]][aPos[1]];
-              next[aPos[0]][aPos[1]] = next[bPos[0]][bPos[1]];
-              next[bPos[0]][bPos[1]] = tmp;
-            }
-
-            return next;
-          });
+          setLayout((prev) => swapPanesInLayout(prev, paneId, dropTarget));
         }
 
         swapTargetRef.current = null;
@@ -205,7 +163,10 @@ export function useWindowManager() {
         const dy = ev.clientY - startY;
         const dyPercent = (dy / totalHeight) * 100;
         const newH = [...startHeights];
-        newH[dividerIndex] = Math.max(10, startHeights[dividerIndex] + dyPercent);
+        newH[dividerIndex] = Math.max(
+          10,
+          startHeights[dividerIndex] + dyPercent,
+        );
         newH[dividerIndex + 1] = Math.max(
           10,
           startHeights[dividerIndex + 1] - dyPercent,
@@ -235,13 +196,13 @@ export function useWindowManager() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const visibleRows = rows
-    .map((row) => row.filter((cellId) => isCellVisible(cellId)))
+  const visibleLayout = layout
+    .map((row) => row.filter((cell) => isCellVisible(cell)))
     .filter((row) => row.length > 0);
 
   return {
     states,
-    visibleRows,
+    visibleLayout,
     rowHeights,
     maximizedId,
     launcherOpen,
@@ -256,7 +217,6 @@ export function useWindowManager() {
     closeWindow,
     toggleMaximize,
     focusWindow,
-    swapPanes,
     startTitleDrag,
     startRowResize,
   };

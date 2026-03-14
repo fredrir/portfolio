@@ -3,18 +3,6 @@ import type { WindowConfig, BackgroundConfig } from "./types";
 export const GAP = 10;
 export const STATUS_BAR_HEIGHT = 28;
 
-export const DEFAULT_ROWS: string[][] = [
-  ["about", "github-spotify"],
-  ["journey", "projects"],
-  ["contact", "terminal"],
-];
-
-export const DEFAULT_ROW_HEIGHTS = [42, 30, 28];
-
-export const STACKED_PANES: Record<string, string[]> = {
-  "github-spotify": ["github", "spotify"],
-};
-
 export const WINDOW_CONFIGS: WindowConfig[] = [
   { id: "about", title: "whoami", icon: "~", defaultOpen: true, order: 0 },
   { id: "github", title: "cat /proc/github", icon: "", defaultOpen: true, order: 1 },
@@ -22,7 +10,7 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   { id: "journey", title: "cat ~/.career/log", icon: "", defaultOpen: true, order: 3 },
   { id: "projects", title: "ls ~/projects", icon: "", defaultOpen: true, order: 4 },
   { id: "contact", title: "vim mail.tmp", icon: "", defaultOpen: true, order: 5 },
-  { id: "settings", title: "settings", icon: "", defaultOpen: false, order: 7 },
+  { id: "settings", title: "settings", icon: "⚙", defaultOpen: true, order: 7 },
   { id: "terminal", title: "kitty", icon: ">_", defaultOpen: true, order: 8 },
 ];
 
