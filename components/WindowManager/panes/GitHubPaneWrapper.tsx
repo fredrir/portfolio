@@ -10,7 +10,7 @@ interface Props {
 export function GitHubPaneWrapper({ initialData }: Props) {
   return (
     <div className="h-full overflow-auto">
-      <GitHubPane initialData={initialData} />
+      <GitHubPane initialData={initialData} bare />
     </div>
   );
 }

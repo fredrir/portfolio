@@ -6,7 +6,7 @@ export const DEFAULT_LAYOUT: CellDef[][] = [
   ["contact", "terminal"],
 ];
 
-export const DEFAULT_ROW_HEIGHTS = [50, 24, 26];
+export const DEFAULT_ROW_HEIGHTS = [45, 24, 31];
 
 export const DEFAULT_COL_WIDTHS: number[][] = [
   [28, 30, 42],
@@ -28,10 +28,7 @@ export type PanePos = {
   sub: number | null;
 };
 
-export function findPane(
-  layout: CellDef[][],
-  paneId: string,
-): PanePos | null {
+export function findPane(layout: CellDef[][], paneId: string): PanePos | null {
   for (let r = 0; r < layout.length; r++) {
     for (let c = 0; c < layout[r].length; c++) {
       const cell = layout[r][c];
@@ -54,11 +51,7 @@ export function swapPanesInLayout(
   const posA = findPane(layout, a);
   const posB = findPane(layout, b);
   if (!posA || !posB) return layout;
-  if (
-    posA.row === posB.row &&
-    posA.col === posB.col &&
-    posA.sub === posB.sub
-  )
+  if (posA.row === posB.row && posA.col === posB.col && posA.sub === posB.sub)
     return layout;
 
   const next: CellDef[][] = layout.map((row) =>

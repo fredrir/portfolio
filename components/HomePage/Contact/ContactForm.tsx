@@ -10,7 +10,10 @@ import type { ContactProps } from "./types";
 type SendState = "idle" | "sending" | "success" | "error";
 type VimMode = "normal" | "insert";
 
-export function ContactForm({ contact }: ContactProps) {
+export function ContactForm({
+  contact,
+  bare = false,
+}: ContactProps & { bare?: boolean }) {
   const { executeRecaptcha } = useRecaptcha();
   const [formData, setFormData] = useState({
     name: "",
@@ -221,35 +224,8 @@ export function ContactForm({ contact }: ContactProps) {
     <div
       ref={containerRef}
       tabIndex={0}
-      className="flex-1 rounded-md border border-primary/20 bg-background/80 backdrop-blur-sm overflow-hidden flex flex-col outline-none"
+      className={`flex-1 overflow-hidden flex flex-col outline-none ${bare ? "h-full" : "rounded-md border border-primary/20 bg-background/80 backdrop-blur-sm"}`}
     >
-      <div className="flex items-center justify-between px-3 py-1 border-b border-primary/15 bg-primary/[0.03]">
-        <div className="flex items-center gap-3">
-          <span className="text-primary text-2xs">VIM</span>
-          <span className="text-muted-foreground/30 text-2xs">
-            mail.tmp [+]
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground/30 text-2xs">
-            {formData.message.length > 0
-              ? `${messageLines.length}L, ${formData.message.length}C`
-              : "0L, 0C"}
-          </span>
-          {sendState === "sending" && (
-            <span className="text-yellow-400/80 text-2xs animate-pulse">
-              SENDING
-            </span>
-          )}
-          {sendState === "success" && (
-            <span className="text-green-400/80 text-2xs">SENT</span>
-          )}
-          {sendState === "error" && (
-            <span className="text-red-400/80 text-2xs">ERROR</span>
-          )}
-        </div>
-      </div>
-
       <form
         ref={formRef}
         onSubmit={handleSubmit}

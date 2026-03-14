@@ -29,7 +29,9 @@ const WAVE_COLORS = [
 function AnimatedAscii() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
-  const glitchRef = useRef<{ row: number; col: number; char: string; ttl: number }[]>([]);
+  const glitchRef = useRef<
+    { row: number; col: number; char: string; ttl: number }[]
+  >([]);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -39,7 +41,7 @@ function AnimatedAscii() {
 
     const dpr = window.devicePixelRatio || 1;
     const charW = 7.2 * dpr;
-    const charH = 13 * dpr;
+    const charH = 11 * dpr;
     const maxCols = Math.max(...GITHUB_ASCII.map((l) => l.length));
     const rows = GITHUB_ASCII.length;
 
@@ -279,7 +281,13 @@ function ContributionGraph({
   );
 }
 
-export function GitHubPane({ initialData }: { initialData: GitHubData | null }) {
+export function GitHubPane({
+  initialData,
+  bare = false,
+}: {
+  initialData: GitHubData | null;
+  bare?: boolean;
+}) {
   const [selectedYear, setSelectedYear] = useState("last");
 
   const data = initialData;
@@ -292,7 +300,7 @@ export function GitHubPane({ initialData }: { initialData: GitHubData | null }) 
     : 1;
 
   return (
-    <TerminalPane title="cat /proc/github">
+    <TerminalPane title="cat /proc/github" bare={bare}>
       <div className="text-muted-foreground/50 mb-2">
         <span className="text-primary">$</span> cat /proc/github
       </div>

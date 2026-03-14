@@ -88,6 +88,8 @@ export function Window({
           )}
           {config.title}
         </span>
+
+        <span className="font-mono text-3xs text-primary/30"></span>
       </div>
 
       <div className="flex-1 overflow-auto min-h-0">{children}</div>

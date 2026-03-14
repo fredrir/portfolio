@@ -8,9 +8,5 @@ interface Props {
 }
 
 export function SpotifyPaneWrapper({ initialData }: Props) {
-  return (
-    <div className="h-full overflow-auto">
-      <SpotifyPane initialData={initialData} />
-    </div>
-  );
+  return <SpotifyPane initialData={initialData} bare />;
 }

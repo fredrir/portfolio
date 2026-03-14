@@ -3,7 +3,12 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { TerminalPane } from "./TerminalPane";
-import { SPOTIFY_ASCII, CAVA_CHARS, CAVA_BAR_COUNT, SPOTIFY_POLL_INTERVAL } from "./constants";
+import {
+  SPOTIFY_ASCII,
+  CAVA_CHARS,
+  CAVA_BAR_COUNT,
+  SPOTIFY_POLL_INTERVAL,
+} from "./constants";
 import { formatTime } from "./utils";
 import { getSpotifyData } from "@/app/actions/spotify";
 import type { SpotifyData } from "./types";
@@ -43,7 +48,7 @@ function CavaVisualizer({ isPlaying }: { isPlaying: boolean }) {
   );
 }
 
-export function SpotifyPane({ initialData }: { initialData: SpotifyData }) {
+export function SpotifyPane({ initialData, bare = false }: { initialData: SpotifyData; bare?: boolean }) {
   const [data, setData] = useState<SpotifyData>(initialData);
 
   const fetchSpotify = useCallback(async () => {
@@ -66,7 +71,7 @@ export function SpotifyPane({ initialData }: { initialData: SpotifyData }) {
       : 0;
 
   return (
-    <TerminalPane title="cat /proc/spotify">
+    <TerminalPane title="cat /proc/spotify" bare={bare}>
       <div className="text-muted-foreground/50 mb-2">
         <span className="text-primary">$</span> cat /proc/spotify
       </div>
@@ -104,7 +109,7 @@ export function SpotifyPane({ initialData }: { initialData: SpotifyData }) {
       ) : (
         <div className="space-y-2">
           <div className="flex gap-4 flex-col sm:flex-row items-start">
-            <div className="shrink-0 hidden sm:block">
+            <div className="shrink-0 block">
               {data.albumArt ? (
                 <Image
                   src={data.albumArt}
