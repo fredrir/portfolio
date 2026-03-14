@@ -21,7 +21,7 @@ export interface NeofetchInfoLine {
 
 const BIRTHDAY = new Date(2003, 9, 2); // October 2, 2003
 
-function computeUptime(): string {
+export function computeUptime(): string {
   const now = new Date();
   let years = now.getFullYear() - BIRTHDAY.getFullYear();
   let months = now.getMonth() - BIRTHDAY.getMonth();
@@ -61,10 +61,10 @@ export function getDefaultInfo(locale?: string): NeofetchInfoLine[] {
     },
     { label: "OS", value: "fredrir 2.0" },
     { label: "Kernel", value: "Next.js 15.2.8" },
+    { label: "Uptime", value: computeUptime() },
     { label: "Shell", value: "zsh 5.9" },
     { label: "WM", value: "Tailwind CSS" },
-    { label: "Theme", value: "Nord Dark" },
-    { label: "Uptime", value: computeUptime() },
+    { label: "Theme", value: "catppuccin-frappe-blue [Qt]" },
     { label: "Locale", value: LOCALE_NAMES[locale ?? "en"] ?? "en_US.UTF-8" },
   ];
 }
@@ -176,9 +176,6 @@ export default function Neofetch({
   );
 }
 
-/**
- * Returns a plain-text neofetch string for use in the command processor.
- */
 export function getNeofetchPlainText(
   extraLines?: NeofetchInfoLine[],
   locale?: string,

@@ -11,6 +11,7 @@ import { Suspense } from "react";
 import { AnalyticsConsentProvider } from "@/components/Analytics/AnalyticsConsentProvider";
 import { CookieConsentBanner } from "@/components/Analytics/CookieConsent";
 import { ConditionalAnalytics } from "@/components/Analytics/ConditionalAnalytics";
+import { RecaptchaProvider } from "@/components/RecaptchaProvider";
 
 const localeContent = {
   en: {
@@ -147,16 +148,18 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <AnalyticsConsentProvider>
-            <Suspense fallback={null}>
-              <AnimatedBackground />
-              <Toaster />
+            <RecaptchaProvider>
+              <Suspense fallback={null}>
+                <AnimatedBackground />
+                <Toaster />
 
-              {children}
+                {children}
 
-              <CookieConsentBanner locale={locale} />
+                <CookieConsentBanner locale={locale} />
 
-              <SpeedInsights />
-            </Suspense>
+                <SpeedInsights />
+              </Suspense>
+            </RecaptchaProvider>
             <ConditionalAnalytics />
           </AnalyticsConsentProvider>
         </ThemeProvider>

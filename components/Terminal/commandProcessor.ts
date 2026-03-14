@@ -1,5 +1,5 @@
 import { FileSystemManager } from "./fileSystem";
-import { getNeofetchPlainText } from "@/components/Neofetch";
+import { computeUptime, getNeofetchPlainText } from "@/components/Neofetch";
 import type { CommandOutput } from "./types";
 
 export class CommandProcessor {
@@ -11,7 +11,7 @@ export class CommandProcessor {
 
   processCommand(
     command: string,
-    currentPath: string
+    currentPath: string,
   ): { output: CommandOutput; newPath?: string } {
     const [cmd, ...args] = command.trim().split(" ");
 
@@ -33,7 +33,6 @@ export class CommandProcessor {
   echo <text>   - Display text
   tree          - Show directory tree
   about         - About this terminal
-  history       - Show command history
   uname         - System information
   uptime        - System uptime`,
           },
@@ -89,18 +88,10 @@ export class CommandProcessor {
           output: {
             command,
             output: `fredrir v2.0
-Built with Next.js + React + Tailwind
+Built with Next.js + Tailwind
 Type 'help' for available commands
 Repository: https://github.com/fredrir/portfolio
 Author: Fredrik Carsten Hansteen`,
-          },
-        };
-
-      case "history":
-        return {
-          output: {
-            command,
-            output: "Command history is managed by the terminal interface",
           },
         };
 
@@ -120,19 +111,10 @@ Author: Fredrik Carsten Hansteen`,
         };
 
       case "uptime":
-        const uptime = Math.floor(Math.random() * 86400);
-        const hours = Math.floor(uptime / 3600);
-        const minutes = Math.floor((uptime % 3600) / 60);
         return {
           output: {
             command,
-            output: `up ${hours}:${minutes
-              .toString()
-              .padStart(2, "0")}, 1 user, load average: 0.${Math.floor(
-              Math.random() * 99
-            )}, 0.${Math.floor(Math.random() * 99)}, 0.${Math.floor(
-              Math.random() * 99
-            )}`,
+            output: `up ${computeUptime()}`,
           },
         };
 
@@ -150,7 +132,7 @@ Author: Fredrik Carsten Hansteen`,
   private handleLsCommand(
     command: string,
     args: string[],
-    currentPath: string
+    currentPath: string,
   ): { output: CommandOutput } {
     try {
       const lsPath = args[0]
@@ -176,7 +158,7 @@ Author: Fredrik Carsten Hansteen`,
   private handleCdCommand(
     command: string,
     args: string[],
-    currentPath: string
+    currentPath: string,
   ): { output: CommandOutput; newPath?: string } {
     if (!args[0]) {
       return {
@@ -227,7 +209,7 @@ Author: Fredrik Carsten Hansteen`,
   private handleCatCommand(
     command: string,
     args: string[],
-    currentPath: string
+    currentPath: string,
   ): { output: CommandOutput } {
     if (!args[0]) {
       return {
@@ -260,7 +242,7 @@ Author: Fredrik Carsten Hansteen`,
 
   private handleTreeCommand(
     command: string,
-    currentPath: string
+    currentPath: string,
   ): { output: CommandOutput } {
     try {
       const currentNode = this.fileSystemManager.getNodeAtPath(currentPath);

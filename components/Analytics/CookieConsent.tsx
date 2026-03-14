@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useAnalyticsConsent } from "./AnalyticsConsentProvider";
-import Neofetch, { type NeofetchInfoLine, getDefaultInfo } from "@/components/Neofetch";
+import Neofetch, {
+  type NeofetchInfoLine,
+  getDefaultInfo,
+} from "@/components/Neofetch";
 
 interface CookieConsentBannerProps {
   locale?: string;
@@ -79,7 +82,10 @@ const content = {
   },
 };
 
-function getCookieInfo(locale: string, cookieValue: string): NeofetchInfoLine[] {
+function getCookieInfo(
+  locale: string,
+  cookieValue: string,
+): NeofetchInfoLine[] {
   return [...getDefaultInfo(locale), { label: "Cookies", value: cookieValue }];
 }
 

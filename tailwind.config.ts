@@ -9,6 +9,14 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        "2xs": ["0.625rem", { lineHeight: "1rem" }],
+        "3xs": ["0.5625rem", { lineHeight: "0.875rem" }],
+      },
+      lineHeight: {
+        tight: "1.2",
+        editor: "1.7",
+      },
       fontFamily: {
         monograph: ["var(--font-roboto)"],
       },

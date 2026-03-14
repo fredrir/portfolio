@@ -20,7 +20,7 @@ export const useCursor = ({ isTypingComplete, inputRef }: UseCursorProps) => {
       setCursorIsFinished(true);
 
       setTimeout(() => {
-        inputRef.current?.focus();
+        inputRef.current?.focus({ preventScroll: true });
       }, 100);
 
       return;
