@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { TerminalPane } from "./TerminalPane";
 import { TypedLine } from "./TypedLine";
 import {
@@ -64,9 +64,15 @@ function BarChart({
 function ContributionGraph({
   contributions,
   total,
+  selectedYear,
+  years,
+  onYearChange,
 }: {
   contributions: ContributionDay[];
   total: number;
+  selectedYear: string;
+  years: string[];
+  onYearChange: (year: string) => void;
 }) {
   const numWeeks = Math.ceil(contributions.length / 7);
   const weeks: (ContributionDay | null)[][] = Array.from(
@@ -89,11 +95,25 @@ function ContributionGraph({
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <span className="text-primary font-semibold text-2xs">
           {total.toLocaleString()} contributions
         </span>
-        <span className="text-muted-foreground/40 text-2xs">last year</span>
+        <div className="flex gap-1 flex-wrap justify-end">
+          {years.map((y) => (
+            <button
+              key={y}
+              onClick={() => onYearChange(y)}
+              className={`text-2xs px-1.5 py-0.5 rounded transition-colors ${
+                selectedYear === y
+                  ? "bg-primary/20 text-primary"
+                  : "text-muted-foreground/40 hover:text-muted-foreground/70"
+              }`}
+            >
+              {y === "last" ? "Last year" : y}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="w-full overflow-x-auto">
@@ -127,12 +147,34 @@ function ContributionGraph({
 export function GitHubPane() {
   const [data, setData] = useState<GitHubData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedYear, setSelectedYear] = useState("last");
+  const [years, setYears] = useState<string[]>([]);
+
+  const fetchContributions = useCallback((year: string) => {
+    const url =
+      year === "last" ? "/api/github" : `/api/github?year=${year}`;
+    fetch(url)
+      .then((r) => r.json())
+      .then((d) => {
+        if (!d.error) setData(d);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/github")
       .then((r) => r.json())
       .then((d) => {
-        if (!d.error) setData(d);
+        if (!d.error) {
+          setData(d);
+          const createdYear = new Date(d.createdAt).getFullYear();
+          const currentYear = new Date().getFullYear();
+          const yearList: string[] = ["last"];
+          for (let y = currentYear; y >= createdYear; y--) {
+            yearList.push(String(y));
+          }
+          setYears(yearList);
+        }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -237,6 +279,12 @@ export function GitHubPane() {
                   <ContributionGraph
                     contributions={data.contributions}
                     total={data.totalContributions}
+                    selectedYear={selectedYear}
+                    years={years}
+                    onYearChange={(y) => {
+                      setSelectedYear(y);
+                      fetchContributions(y);
+                    }}
                   />
                 </div>
               </TypedLine>

@@ -9,13 +9,15 @@ interface ContributionDay {
   level: number;
 }
 
-async function fetchContributions(): Promise<ContributionDay[]> {
+async function fetchContributions(
+  year?: string,
+): Promise<{ days: ContributionDay[]; total: number }> {
   try {
-    const res = await fetch(
-      `https://github.com/users/${GITHUB_USERNAME}/contributions`,
-      { next: { revalidate: CACHE_DURATION } },
-    );
-    if (!res.ok) return [];
+    const url = year
+      ? `https://github.com/users/${GITHUB_USERNAME}/contributions?from=${year}-01-01&to=${year}-12-31`
+      : `https://github.com/users/${GITHUB_USERNAME}/contributions`;
+    const res = await fetch(url, { next: { revalidate: CACHE_DURATION } });
+    if (!res.ok) return { days: [], total: 0 };
     const html = await res.text();
 
     const days: ContributionDay[] = [];
@@ -44,15 +46,26 @@ async function fetchContributions(): Promise<ContributionDay[]> {
       days.push({ count, date, level });
     }
 
-    return days;
+    let total = days.reduce((sum, d) => sum + d.count, 0);
+    const totalMatch = html.match(
+      /(\d[\d,]*)\s+contributions?\s+in\s+(?:the last year|\d{4})/,
+    );
+    if (totalMatch) {
+      total = parseInt(totalMatch[1].replace(/,/g, ""), 10);
+    }
+
+    return { days, total };
   } catch {
-    return [];
+    return { days: [], total: 0 };
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const [userRes, reposRes, contributions] = await Promise.all([
+    const { searchParams } = new URL(request.url);
+    const year = searchParams.get("year") ?? undefined;
+
+    const [userRes, reposRes, contributionData] = await Promise.all([
       fetch(`https://api.github.com/users/${GITHUB_USERNAME}`, {
         headers: { Accept: "application/vnd.github.v3+json" },
         next: { revalidate: CACHE_DURATION },
@@ -64,7 +77,7 @@ export async function GET() {
           next: { revalidate: CACHE_DURATION },
         },
       ),
-      fetchContributions(),
+      fetchContributions(year),
     ]);
 
     if (!userRes.ok || !reposRes.ok) {
@@ -95,11 +108,6 @@ export async function GET() {
       .slice(0, 5)
       .map(([lang, count]) => ({ lang, count }));
 
-    const totalContributions = contributions.reduce(
-      (sum, d) => sum + d.count,
-      0,
-    );
-
     return NextResponse.json({
       username: user.login,
       name: user.name,
@@ -112,8 +120,8 @@ export async function GET() {
       profileUrl: user.html_url,
       avatarUrl: user.avatar_url,
       createdAt: user.created_at,
-      contributions,
-      totalContributions,
+      contributions: contributionData.days,
+      totalContributions: contributionData.total,
     });
   } catch {
     return NextResponse.json(
