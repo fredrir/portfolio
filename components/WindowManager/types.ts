@@ -11,6 +11,7 @@ export interface WindowConfig {
   icon: string;
   defaultOpen: boolean;
   order: number;
+  isDynamic?: boolean;
 }
 
 export interface WindowState {

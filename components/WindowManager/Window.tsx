@@ -6,24 +6,24 @@ import type { WindowConfig, WindowState } from "./types";
 interface Props {
   config: WindowConfig;
   state: WindowState;
+  isFocused?: boolean;
+  isSwapTarget?: boolean;
   onClose: () => void;
   onMaximize: () => void;
-  onTile: () => void;
   onFocus: () => void;
   onDragStart: (id: string, e: React.MouseEvent) => void;
-  onResizeStart: (id: string, edge: string, e: React.MouseEvent) => void;
   children: React.ReactNode;
 }
 
 export function Window({
   config,
   state,
+  isFocused,
+  isSwapTarget,
   onClose,
   onMaximize,
-  onTile,
   onFocus,
   onDragStart,
-  onResizeStart,
   children,
 }: Props) {
   const handleDragStart = useCallback(
@@ -34,40 +34,33 @@ export function Window({
     [config.id, onDragStart],
   );
 
-  const handleDoubleClick = useCallback(() => {
-    if (state.isFloating) {
-      onTile();
-    } else {
-      onMaximize();
-    }
-  }, [state.isFloating, onTile, onMaximize]);
-
-  const handleResize = useCallback(
-    (edge: string) => (e: React.MouseEvent) => {
-      onResizeStart(config.id, edge, e);
-    },
-    [config.id, onResizeStart],
-  );
-
   return (
     <div
-      className="absolute flex flex-col rounded-lg border border-primary/20 bg-background/90 backdrop-blur-md shadow-lg shadow-primary/5 overflow-hidden transition-shadow duration-200"
+      className={`absolute flex flex-col rounded-lg border bg-background/80 backdrop-blur-md overflow-hidden transition-[border-color,box-shadow] duration-200 ${
+        isSwapTarget
+          ? "border-primary/60 ring-2 ring-primary/30 shadow-lg shadow-primary/10"
+          : isFocused
+            ? "border-primary/50 shadow-lg shadow-primary/10"
+            : "border-primary/15 shadow-md shadow-primary/5"
+      }`}
       style={{
         left: state.rect.x,
         top: state.rect.y,
         width: state.rect.w,
         height: state.rect.h,
         zIndex: state.zIndex,
-        transition: state.isFloating ? "none" : "left 0.3s, top 0.3s, width 0.3s, height 0.3s",
+        transition: state.isFloating
+          ? "none"
+          : "left 0.3s ease, top 0.3s ease, width 0.3s ease, height 0.3s ease",
       }}
       onMouseDown={onFocus}
     >
       <div
-        className="flex items-center justify-between px-3 py-1 border-b border-primary/15 bg-primary/[0.03] shrink-0 cursor-grab active:cursor-grabbing select-none"
+        className="flex items-center justify-between px-3 py-1.5 border-b border-primary/15 bg-primary/[0.03] shrink-0 cursor-grab active:cursor-grabbing select-none"
         onMouseDown={handleDragStart}
-        onDoubleClick={handleDoubleClick}
+        onDoubleClick={onMaximize}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -76,7 +69,17 @@ export function Window({
             onMouseDown={(e) => e.stopPropagation()}
             className="group"
           >
-            <div className="w-2.5 h-2.5 rounded-full bg-destructive/60 group-hover:bg-destructive transition-colors" />
+            <div className="w-3.5 h-3.5 rounded-full bg-destructive/60 group-hover:bg-destructive transition-colors" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            className="group"
+          >
+            <div className="w-3.5 h-3.5 rounded-full bg-accent-yellow/60 group-hover:bg-accent-yellow transition-colors" />
           </button>
           <button
             onClick={(e) => {
@@ -86,17 +89,7 @@ export function Window({
             onMouseDown={(e) => e.stopPropagation()}
             className="group"
           >
-            <div className="w-2.5 h-2.5 rounded-full bg-accent-yellow/60 group-hover:bg-accent-yellow transition-colors" />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onMaximize();
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-            className="group"
-          >
-            <div className="w-2.5 h-2.5 rounded-full bg-primary/60 group-hover:bg-primary transition-colors" />
+            <div className="w-3.5 h-3.5 rounded-full bg-primary/60 group-hover:bg-primary transition-colors" />
           </button>
         </div>
 
@@ -113,43 +106,6 @@ export function Window({
       </div>
 
       <div className="flex-1 overflow-auto min-h-0">{children}</div>
-
-      {(state.isFloating || state.isMaximized) && (
-        <>
-          <div
-            className="absolute top-0 right-0 w-1.5 h-full cursor-ew-resize"
-            onMouseDown={handleResize("e")}
-          />
-          <div
-            className="absolute top-0 left-0 w-1.5 h-full cursor-ew-resize"
-            onMouseDown={handleResize("w")}
-          />
-          <div
-            className="absolute bottom-0 left-0 w-full h-1.5 cursor-ns-resize"
-            onMouseDown={handleResize("s")}
-          />
-          <div
-            className="absolute top-0 left-0 w-full h-1.5 cursor-ns-resize"
-            onMouseDown={handleResize("n")}
-          />
-          <div
-            className="absolute bottom-0 right-0 w-3 h-3 cursor-nwse-resize"
-            onMouseDown={handleResize("se")}
-          />
-          <div
-            className="absolute bottom-0 left-0 w-3 h-3 cursor-nesw-resize"
-            onMouseDown={handleResize("sw")}
-          />
-          <div
-            className="absolute top-0 right-0 w-3 h-3 cursor-nesw-resize"
-            onMouseDown={handleResize("ne")}
-          />
-          <div
-            className="absolute top-0 left-0 w-3 h-3 cursor-nwse-resize"
-            onMouseDown={handleResize("nw")}
-          />
-        </>
-      )}
     </div>
   );
 }

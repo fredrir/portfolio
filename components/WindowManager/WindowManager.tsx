@@ -1,26 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useWindowManager } from "./hooks/useWindowManager";
 import { useBackground } from "./hooks/useBackground";
 import { Window } from "./Window";
 import { StatusBar } from "./StatusBar";
 import { AppLauncher } from "./AppLauncher";
-import { BackgroundPicker } from "./BackgroundPicker";
 import { Background } from "./Background";
 import { WINDOW_CONFIGS } from "./constants";
 
 import { NeofetchPane } from "./panes/NeofetchPane";
+import { AboutPane } from "./panes/AboutPane";
 import { JourneyPane } from "./panes/JourneyPane";
+import { JourneyDetailPane } from "./panes/JourneyDetailPane";
 import { ProjectsPane } from "./panes/ProjectsPane";
+import { ProjectDetailPane } from "./panes/ProjectDetailPane";
 import { ContactPane } from "./panes/ContactPane";
+import { SettingsPane } from "./panes/SettingsPane";
 import { SpotifyPaneWrapper } from "./panes/SpotifyPaneWrapper";
 import { GitHubPaneWrapper } from "./panes/GitHubPaneWrapper";
 import { TerminalPaneWrapper } from "./panes/TerminalPaneWrapper";
 
 import type { GitHubData, SpotifyData } from "@/components/HomePage/Contact/types";
 import type { Journey, NavbarType } from "@/lib/locale/languageTypes";
-import type { projectType } from "@/lib/types/types";
+import type { projectType, journeyType } from "@/lib/types/types";
+import type { WindowConfig } from "./types";
 
 interface Props {
   locale: string;
@@ -77,7 +81,7 @@ function TipBar() {
       <span className="text-primary">tip</span>
       <span className="text-muted-foreground/60">
         Press <span className="text-primary/70 font-bold">Ctrl+K</span> to open
-        the app launcher. Drag title bars to move windows.
+        the app launcher. Drag title bars to swap windows.
       </span>
       <button
         onClick={() => {
@@ -98,7 +102,7 @@ function MobileLayout({
 }: {
   paneContent: Record<string, React.ReactNode>;
 }) {
-  const paneOrder = ["neofetch", "github", "spotify", "journey", "projects", "contact"];
+  const paneOrder = ["neofetch", "about", "github", "spotify", "journey", "projects", "contact"];
 
   return (
     <div className="flex flex-col gap-3 p-3 pb-12">
@@ -108,13 +112,13 @@ function MobileLayout({
         return (
           <div
             key={id}
-            className="rounded-lg border border-primary/20 bg-background/90 backdrop-blur-md shadow-lg shadow-primary/5 overflow-hidden"
+            className="rounded-lg border border-primary/20 bg-background/80 backdrop-blur-md shadow-lg shadow-primary/5 overflow-hidden"
           >
-            <div className="flex items-center justify-between px-3 py-1 border-b border-primary/15 bg-primary/[0.03]">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-destructive/60" />
-                <div className="w-2 h-2 rounded-full bg-accent-yellow/60" />
-                <div className="w-2 h-2 rounded-full bg-primary/60" />
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-primary/15 bg-primary/[0.03]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-3.5 h-3.5 rounded-full bg-destructive/60" />
+                <div className="w-3.5 h-3.5 rounded-full bg-accent-yellow/60" />
+                <div className="w-3.5 h-3.5 rounded-full bg-primary/60" />
               </div>
               <span className="font-mono text-2xs text-muted-foreground/50">
                 {config.title}
@@ -123,7 +127,7 @@ function MobileLayout({
                 fredrir@arch
               </span>
             </div>
-            <div className="min-h-48 max-h-96 overflow-auto">
+            <div className="min-h-48 max-h-[500px] overflow-auto">
               {paneContent[id]}
             </div>
           </div>
@@ -147,6 +151,10 @@ export function WindowManager({
   const wm = useWindowManager();
   const bg = useBackground();
   const [isMobile, setIsMobile] = useState(false);
+  const [focusedId, setFocusedId] = useState<string | null>("neofetch");
+  const [dynamicContent, setDynamicContent] = useState<
+    Record<string, React.ReactNode>
+  >({});
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -155,19 +163,86 @@ export function WindowManager({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const paneContent: Record<string, React.ReactNode> = {
-    neofetch: <NeofetchPane locale={locale} landing={landing} />,
+  const handleFocus = useCallback(
+    (id: string) => {
+      setFocusedId(id);
+      wm.focusWindow(id);
+    },
+    [wm],
+  );
+
+  const handleOpenSettings = useCallback(() => {
+    wm.openWindow("settings");
+    setFocusedId("settings");
+  }, [wm]);
+
+  const handleOpenJourneyDetail = useCallback(
+    (j: journeyType) => {
+      const id = `journey-${j.id}`;
+      const config: WindowConfig = {
+        id,
+        title: `${j.company} — ${j.jobTitle}`,
+        icon: "",
+        defaultOpen: false,
+        order: 100 + j.id,
+        isDynamic: true,
+      };
+      setDynamicContent((prev) => ({
+        ...prev,
+        [id]: <JourneyDetailPane journey={j} />,
+      }));
+      wm.openDynamicWindow(config);
+      setFocusedId(id);
+    },
+    [wm],
+  );
+
+  const handleOpenProjectDetail = useCallback(
+    (p: projectType) => {
+      const id = `project-${p.id}`;
+      const config: WindowConfig = {
+        id,
+        title: `~/projects/${p.title}`,
+        icon: "",
+        defaultOpen: false,
+        order: 200 + p.id,
+        isDynamic: true,
+      };
+      setDynamicContent((prev) => ({
+        ...prev,
+        [id]: <ProjectDetailPane project={p} viewCode={project.viewCode} />,
+      }));
+      wm.openDynamicWindow(config);
+      setFocusedId(id);
+    },
+    [wm, project.viewCode],
+  );
+
+  const staticContent: Record<string, React.ReactNode> = {
+    neofetch: <NeofetchPane locale={locale} />,
+    about: <AboutPane landing={landing} />,
     github: <GitHubPaneWrapper initialData={githubData} />,
     spotify: <SpotifyPaneWrapper initialData={spotifyData} />,
-    journey: <JourneyPane journey={journey} />,
+    journey: (
+      <JourneyPane journey={journey} onOpenDetail={handleOpenJourneyDetail} />
+    ),
     projects: (
       <ProjectsPane
         title={project.title}
         projects={project.projects}
         viewCode={project.viewCode}
+        onOpenDetail={handleOpenProjectDetail}
       />
     ),
     contact: <ContactPane contact={contact} />,
+    settings: (
+      <SettingsPane
+        navbar={navbar}
+        currentLocale={currentLocale}
+        currentBackground={bg.current}
+        onSelectBackground={bg.setBackground}
+      />
+    ),
     terminal: (
       <TerminalPaneWrapper
         mainText={landing.terminal.mainText}
@@ -175,6 +250,8 @@ export function WindowManager({
       />
     ),
   };
+
+  const paneContent = { ...staticContent, ...dynamicContent };
 
   if (isMobile) {
     return (
@@ -185,12 +262,12 @@ export function WindowManager({
         </div>
         <StatusBar
           states={wm.states}
+          allConfigs={wm.allConfigs}
           locale={locale}
-          navbar={navbar}
-          currentLocale={currentLocale}
+          focusedWindowId={null}
           onOpenLauncher={() => wm.setLauncherOpen(true)}
-          onOpenBgPicker={() => bg.setPickerOpen(true)}
-          onFocusWindow={wm.focusWindow}
+          onOpenSettings={handleOpenSettings}
+          onFocusWindow={handleFocus}
         />
       </div>
     );
@@ -201,50 +278,45 @@ export function WindowManager({
       <Background config={bg.current} />
 
       <div className="relative w-full h-full">
-        {WINDOW_CONFIGS.filter((c) => wm.states[c.id]?.isOpen).map(
-          (config) => (
+        {wm.allConfigs
+          .filter((c) => wm.states[c.id]?.isOpen)
+          .map((config) => (
             <Window
               key={config.id}
               config={config}
               state={wm.states[config.id]}
+              isFocused={focusedId === config.id}
+              isSwapTarget={wm.swapTarget === config.id}
               onClose={() => wm.closeWindow(config.id)}
               onMaximize={() => wm.toggleMaximize(config.id)}
-              onTile={() => wm.tileWindow(config.id)}
-              onFocus={() => wm.focusWindow(config.id)}
+              onFocus={() => handleFocus(config.id)}
               onDragStart={wm.startDrag}
-              onResizeStart={wm.startResize}
             >
               {paneContent[config.id]}
             </Window>
-          ),
-        )}
+          ))}
       </div>
 
       <TipBar />
 
       <StatusBar
         states={wm.states}
+        allConfigs={wm.allConfigs}
         locale={locale}
-        navbar={navbar}
-        currentLocale={currentLocale}
+        focusedWindowId={focusedId}
         onOpenLauncher={() => wm.setLauncherOpen(true)}
-        onOpenBgPicker={() => bg.setPickerOpen(true)}
-        onFocusWindow={wm.focusWindow}
+        onOpenSettings={handleOpenSettings}
+        onFocusWindow={handleFocus}
       />
 
       {wm.launcherOpen && (
         <AppLauncher
           states={wm.states}
-          onOpen={wm.openWindow}
+          onOpen={(id) => {
+            wm.openWindow(id);
+            setFocusedId(id);
+          }}
           onClose={() => wm.setLauncherOpen(false)}
-        />
-      )}
-
-      {bg.pickerOpen && (
-        <BackgroundPicker
-          current={bg.current}
-          onSelect={bg.setBackground}
-          onClose={() => bg.setPickerOpen(false)}
         />
       )}
     </div>

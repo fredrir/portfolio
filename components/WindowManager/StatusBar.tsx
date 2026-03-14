@@ -1,23 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
-import { SunIcon, MoonIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { WINDOW_CONFIGS, STATUS_BAR_HEIGHT } from "./constants";
-import type { WindowStates } from "./types";
-import type { NavbarType } from "@/lib/locale/languageTypes";
+import { useTheme } from "next-themes";
+import { STATUS_BAR_HEIGHT } from "./constants";
+import type { WindowConfig, WindowStates } from "./types";
 import { computeUptime } from "@/components/Neofetch";
 
 interface Props {
   states: WindowStates;
+  allConfigs?: WindowConfig[];
   locale: string;
-  navbar: NavbarType;
-  currentLocale: "en" | "nb" | "nn" | "fr";
+  focusedWindowId: string | null;
   onOpenLauncher: () => void;
-  onOpenBgPicker: () => void;
+  onOpenSettings: () => void;
   onFocusWindow: (id: string) => void;
 }
 
@@ -64,7 +61,7 @@ function Weather() {
   }, []);
 
   if (!weather) return null;
-  return <span>Trondheim • {weather}</span>;
+  return <span>{weather}</span>;
 }
 
 function VisitorCount() {
@@ -87,14 +84,14 @@ function VisitorCount() {
 
 export function StatusBar({
   states,
+  allConfigs = [],
   locale,
-  navbar,
-  currentLocale,
+  focusedWindowId,
   onOpenLauncher,
-  onOpenBgPicker,
+  onOpenSettings,
   onFocusWindow,
 }: Props) {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -106,7 +103,7 @@ export function StatusBar({
   const linkedInSrc =
     mounted && theme === "dark" ? "/linkedin-dark.svg" : "/linkedin.svg";
 
-  const openWindows = WINDOW_CONFIGS.filter((c) => states[c.id]?.isOpen);
+  const openWindows = allConfigs.filter((c) => states[c.id]?.isOpen);
 
   return (
     <div
@@ -117,14 +114,20 @@ export function StatusBar({
         <button
           onClick={onOpenLauncher}
           className="px-2 py-0.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-bold"
-        ></button>
+        >
+
+        </button>
 
         <div className="flex items-center gap-0.5 ml-1">
           {openWindows.map((config) => (
             <button
               key={config.id}
               onClick={() => onFocusWindow(config.id)}
-              className="px-1.5 py-0.5 rounded text-muted-foreground/60 hover:text-primary hover:bg-primary/10 transition-colors truncate max-w-24"
+              className={`px-1.5 py-0.5 rounded transition-colors truncate max-w-24 ${
+                focusedWindowId === config.id
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground/60 hover:text-primary hover:bg-primary/10"
+              }`}
             >
               {config.icon && <span className="mr-0.5">{config.icon}</span>}
               {config.id}
@@ -171,22 +174,11 @@ export function StatusBar({
         </div>
 
         <button
-          onClick={onOpenBgPicker}
+          onClick={onOpenSettings}
           className="text-muted-foreground/40 hover:text-primary transition-colors"
-          title="Background"
-        ></button>
-
-        <LanguageSwitcher navbar={navbar} currentLocale={currentLocale} />
-
-        <button
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="text-muted-foreground/40 hover:text-primary transition-colors"
+          title="Settings"
         >
-          {mounted && theme === "dark" ? (
-            <SunIcon className="h-3 w-3" />
-          ) : (
-            <MoonIcon className="h-3 w-3" />
-          )}
+
         </button>
 
         <span className="text-primary/50">
