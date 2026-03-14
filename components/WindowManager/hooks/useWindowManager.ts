@@ -1,107 +1,11 @@
-import { useState, useCallback, useEffect, useRef, useMemo } from "react";
-import { WINDOW_CONFIGS, GAP, STATUS_BAR_HEIGHT } from "../constants";
-import type { WindowConfig, WindowState, WindowStates, Rect } from "../types";
-
-function getWeight(id: string, allConfigs: WindowConfig[]): number {
-  return allConfigs.find((c) => c.id === id)?.heightWeight ?? 1;
-}
-
-function computeTiledLayout(
-  openIds: string[],
-  vw: number,
-  vh: number,
-  allConfigs: WindowConfig[],
-): Record<string, Rect> {
-  const result: Record<string, Rect> = {};
-  const availH = vh - STATUS_BAR_HEIGHT;
-  const count = openIds.length;
-
-  if (count === 0) return result;
-
-  if (count === 1) {
-    result[openIds[0]] = {
-      x: GAP,
-      y: GAP,
-      w: vw - GAP * 2,
-      h: availH - GAP * 2,
-    };
-    return result;
-  }
-
-  if (count === 2) {
-    const halfW = (vw - GAP * 3) / 2;
-    result[openIds[0]] = { x: GAP, y: GAP, w: halfW, h: availH - GAP * 2 };
-    result[openIds[1]] = {
-      x: GAP * 2 + halfW,
-      y: GAP,
-      w: halfW,
-      h: availH - GAP * 2,
-    };
-    return result;
-  }
-
-  const masterW = Math.floor((vw - GAP * 3) * 0.38);
-  const stackW = vw - GAP * 3 - masterW;
-  const stackIds = openIds.slice(1);
-
-  result[openIds[0]] = {
-    x: GAP,
-    y: GAP,
-    w: masterW,
-    h: availH - GAP * 2,
-  };
-
-  const stackX = GAP * 2 + masterW;
-  const totalStackH = availH - GAP * 2;
-
-  if (stackIds.length <= 3) {
-    const totalWeight = stackIds.reduce(
-      (sum, id) => sum + getWeight(id, allConfigs),
-      0,
-    );
-    const gapSpace = GAP * (stackIds.length - 1);
-    const usableH = totalStackH - gapSpace;
-    let yOff = GAP;
-
-    stackIds.forEach((id) => {
-      const w = getWeight(id, allConfigs);
-      const h = Math.round((w / totalWeight) * usableH);
-      result[id] = { x: stackX, y: yOff, w: stackW, h };
-      yOff += h + GAP;
-    });
-  } else {
-    const cols = 2;
-    const rowIds: string[][] = [];
-    for (let i = 0; i < stackIds.length; i += cols) {
-      rowIds.push(stackIds.slice(i, i + cols));
-    }
-
-    const rowWeights = rowIds.map((row) =>
-      Math.max(...row.map((id) => getWeight(id, allConfigs))),
-    );
-    const totalWeight = rowWeights.reduce((a, b) => a + b, 0);
-    const gapSpace = GAP * (rowIds.length - 1);
-    const usableH = totalStackH - gapSpace;
-    const colW = (stackW - GAP * (cols - 1)) / cols;
-    let yOff = GAP;
-
-    rowIds.forEach((row, ri) => {
-      const rowH = Math.round((rowWeights[ri] / totalWeight) * usableH);
-      row.forEach((id, ci) => {
-        const isLastRow = ri === rowIds.length - 1;
-        const itemsInRow = row.length;
-        const itemW = itemsInRow === 1 ? stackW : colW;
-        const itemX =
-          itemsInRow === 1 ? stackX : stackX + ci * (colW + GAP);
-
-        result[id] = { x: itemX, y: yOff, w: itemW, h: rowH };
-      });
-      yOff += rowH + GAP;
-    });
-  }
-
-  return result;
-}
+import { useState, useCallback, useEffect, useRef } from "react";
+import {
+  WINDOW_CONFIGS,
+  DEFAULT_ROWS,
+  DEFAULT_ROW_HEIGHTS,
+  STACKED_PANES,
+} from "../constants";
+import type { WindowState, WindowStates } from "../types";
 
 function getInitialStates(): WindowStates {
   const states: WindowStates = {};
@@ -109,185 +13,76 @@ function getInitialStates(): WindowStates {
     states[config.id] = {
       isOpen: config.defaultOpen,
       isMaximized: false,
-      isFloating: false,
-      rect: { x: 0, y: 0, w: 400, h: 300 },
       zIndex: config.order,
     };
   });
   return states;
 }
 
+function expandCell(cellId: string): string[] {
+  return STACKED_PANES[cellId] || [cellId];
+}
+
 export function useWindowManager() {
   const [states, setStates] = useState<WindowStates>(getInitialStates);
-  const [dynamicConfigs, setDynamicConfigs] = useState<WindowConfig[]>([]);
-  const [tileOrder, setTileOrder] = useState<string[]>(
-    () =>
-      WINDOW_CONFIGS.filter((c) => c.defaultOpen)
-        .sort((a, b) => a.order - b.order)
-        .map((c) => c.id),
+  const [rows, setRows] = useState<string[][]>(
+    () => DEFAULT_ROWS.map((r) => [...r]),
+  );
+  const [rowHeights, setRowHeights] = useState<number[]>(
+    () => [...DEFAULT_ROW_HEIGHTS],
   );
   const [launcherOpen, setLauncherOpen] = useState(false);
-  const [viewport, setViewport] = useState({ w: 1920, h: 1080 });
-  const [dragTarget, setDragTarget] = useState<string | null>(null);
+  const [maximizedId, setMaximizedId] = useState<string | null>(null);
   const [swapTarget, setSwapTarget] = useState<string | null>(null);
-  const [retileKey, setRetileKey] = useState(0);
+  const [dragTarget, setDragTarget] = useState<string | null>(null);
+  const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
+  const [dragSize, setDragSize] = useState<{ w: number; h: number } | null>(null);
   const maxZRef = useRef(100);
-  const dragRef = useRef<{
-    windowId: string;
-    startMouse: { x: number; y: number };
-    startRect: Rect;
-    tiledRects: Record<string, Rect>;
-  } | null>(null);
+  const swapTargetRef = useRef<string | null>(null);
 
-  const allConfigs = useMemo(
-    () => [...WINDOW_CONFIGS, ...dynamicConfigs],
-    [dynamicConfigs],
-  );
-
-  useEffect(() => {
-    const update = () =>
-      setViewport({ w: window.innerWidth, h: window.innerHeight });
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  useEffect(() => {
-    setStates((prev) => {
-      const openIds = tileOrder.filter(
-        (id) => prev[id]?.isOpen && !prev[id]?.isMaximized,
-      );
-      const rects = computeTiledLayout(
-        openIds,
-        viewport.w,
-        viewport.h,
-        allConfigs,
-      );
-      const next = { ...prev };
-      for (const id of openIds) {
-        if (rects[id]) {
-          next[id] = { ...next[id], rect: rects[id], isFloating: false };
-        }
-      }
-      return next;
-    });
-  }, [viewport, tileOrder, retileKey, allConfigs]);
-
-  const triggerRetile = useCallback(() => {
-    setRetileKey((k) => k + 1);
-  }, []);
-
-  const openWindow = useCallback(
-    (id: string) => {
-      setStates((prev) => ({
-        ...prev,
-        [id]: {
-          ...(prev[id] || {
-            isOpen: false,
-            isMaximized: false,
-            isFloating: false,
-            rect: { x: 0, y: 0, w: 400, h: 300 },
-            zIndex: 0,
-          }),
-          isOpen: true,
-          isFloating: false,
-          isMaximized: false,
-        },
-      }));
-      setTileOrder((prev) => (prev.includes(id) ? prev : [...prev, id]));
-      triggerRetile();
+  const isCellVisible = useCallback(
+    (cellId: string) => {
+      const panes = expandCell(cellId);
+      return panes.some((id) => states[id]?.isOpen);
     },
-    [triggerRetile],
+    [states],
   );
+
+  const openWindow = useCallback((id: string) => {
+    setStates((prev) => ({
+      ...prev,
+      [id]: {
+        ...(prev[id] || { isOpen: false, isMaximized: false, zIndex: 0 }),
+        isOpen: true,
+      },
+    }));
+    setRows((prev) => {
+      const allCellPanes = prev.flat().flatMap((c) => expandCell(c));
+      if (allCellPanes.includes(id)) return prev;
+      const lastRow = prev[prev.length - 1];
+      if (lastRow.length < 3) {
+        const next = prev.map((r) => [...r]);
+        next[next.length - 1] = [...lastRow, id];
+        return next;
+      }
+      return [...prev, [id]];
+    });
+  }, []);
 
   const closeWindow = useCallback(
     (id: string) => {
-      const config = allConfigs.find((c) => c.id === id);
       setStates((prev) => ({
         ...prev,
         [id]: { ...prev[id], isOpen: false },
       }));
-      if (config?.isDynamic) {
-        setTileOrder((prev) => prev.filter((tid) => tid !== id));
-        setDynamicConfigs((prev) => prev.filter((c) => c.id !== id));
-      }
-      triggerRetile();
+      if (maximizedId === id) setMaximizedId(null);
     },
-    [allConfigs, triggerRetile],
+    [maximizedId],
   );
 
-  const openDynamicWindow = useCallback(
-    (config: WindowConfig) => {
-      const existing = dynamicConfigs.find((c) => c.id === config.id);
-      if (existing) {
-        maxZRef.current++;
-        setStates((prev) => ({
-          ...prev,
-          [config.id]: {
-            ...prev[config.id],
-            isOpen: true,
-            zIndex: maxZRef.current,
-          },
-        }));
-        return;
-      }
-
-      setDynamicConfigs((prev) => [...prev, { ...config, isDynamic: true }]);
-      maxZRef.current++;
-      setStates((prev) => ({
-        ...prev,
-        [config.id]: {
-          isOpen: true,
-          isMaximized: false,
-          isFloating: false,
-          rect: { x: 0, y: 0, w: 400, h: 300 },
-          zIndex: maxZRef.current,
-        },
-      }));
-    },
-    [dynamicConfigs],
-  );
-
-  const closeDynamicWindow = useCallback(
-    (id: string) => {
-      setStates((prev) => ({
-        ...prev,
-        [id]: { ...prev[id], isOpen: false },
-      }));
-      setDynamicConfigs((prev) => prev.filter((c) => c.id !== id));
-    },
-    [],
-  );
-
-  const toggleMaximize = useCallback(
-    (id: string) => {
-      setStates((prev) => {
-        const ws = prev[id];
-        if (!ws) return prev;
-        const newMax = !ws.isMaximized;
-        maxZRef.current++;
-        return {
-          ...prev,
-          [id]: {
-            ...ws,
-            isMaximized: newMax,
-            isFloating: false,
-            zIndex: maxZRef.current,
-            rect: newMax
-              ? {
-                  x: GAP,
-                  y: GAP,
-                  w: viewport.w - GAP * 2,
-                  h: viewport.h - STATUS_BAR_HEIGHT - GAP * 2,
-                }
-              : ws.rect,
-          },
-        };
-      });
-      triggerRetile();
-    },
-    [viewport, triggerRetile],
-  );
+  const toggleMaximize = useCallback((id: string) => {
+    setMaximizedId((prev) => (prev === id ? null : id));
+  }, []);
 
   const focusWindow = useCallback((id: string) => {
     maxZRef.current++;
@@ -297,167 +92,137 @@ export function useWindowManager() {
     }));
   }, []);
 
-  const startDrag = useCallback(
-    (id: string, e: React.MouseEvent) => {
-      e.preventDefault();
-      maxZRef.current++;
-      focusWindow(id);
+  const swapPanes = useCallback((a: string, b: string) => {
+    if (a === b) return;
+    setRows((prev) => {
+      const next = prev.map((row) => [...row]);
+      let aPos: [number, number] | null = null;
+      let bPos: [number, number] | null = null;
 
-      setStates((prev) => {
-        const ws = prev[id];
-        if (!ws) return prev;
-
-        const openIds = tileOrder.filter(
-          (tid) => prev[tid]?.isOpen && !prev[tid]?.isMaximized,
-        );
-        const tiledRects = computeTiledLayout(
-          openIds,
-          viewport.w,
-          viewport.h,
-          allConfigs,
-        );
-
-        dragRef.current = {
-          windowId: id,
-          startMouse: { x: e.clientX, y: e.clientY },
-          startRect: { ...ws.rect },
-          tiledRects,
-        };
-
-        return {
-          ...prev,
-          [id]: { ...ws, isFloating: true, zIndex: maxZRef.current },
-        };
-      });
-
-      setDragTarget(id);
-    },
-    [focusWindow, tileOrder, viewport, allConfigs],
-  );
-
-  const startResize = useCallback(
-    (id: string, edge: string, e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      focusWindow(id);
-
-      setStates((prev) => {
-        const ws = prev[id];
-        if (!ws) return prev;
-        dragRef.current = {
-          windowId: id,
-          startMouse: { x: e.clientX, y: e.clientY },
-          startRect: { ...ws.rect },
-          tiledRects: {},
-        };
-        return {
-          ...prev,
-          [id]: { ...ws, isFloating: true, zIndex: maxZRef.current },
-        };
-      });
-
-      setDragTarget(`resize-${id}`);
-    },
-    [focusWindow],
-  );
-
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      const d = dragRef.current;
-      if (!d) return;
-
-      const dx = e.clientX - d.startMouse.x;
-      const dy = e.clientY - d.startMouse.y;
-      const isResize = dragTarget?.startsWith("resize-");
-
-      if (isResize) {
-        setStates((prev) => {
-          const ws = prev[d.windowId];
-          if (!ws) return prev;
-          return {
-            ...prev,
-            [d.windowId]: {
-              ...ws,
-              rect: {
-                ...d.startRect,
-                w: Math.max(200, d.startRect.w + dx),
-                h: Math.max(120, d.startRect.h + dy),
-              },
-            },
-          };
-        });
-        return;
-      }
-
-      setStates((prev) => ({
-        ...prev,
-        [d.windowId]: {
-          ...prev[d.windowId],
-          rect: {
-            ...d.startRect,
-            x: d.startRect.x + dx,
-            y: d.startRect.y + dy,
-          },
-        },
-      }));
-
-      let hoveredId: string | null = null;
-      for (const [id, rect] of Object.entries(d.tiledRects)) {
-        if (id === d.windowId) continue;
-        if (
-          e.clientX >= rect.x &&
-          e.clientX <= rect.x + rect.w &&
-          e.clientY >= rect.y &&
-          e.clientY <= rect.y + rect.h
-        ) {
-          hoveredId = id;
-          break;
+      for (let r = 0; r < next.length; r++) {
+        for (let c = 0; c < next[r].length; c++) {
+          const cellPanes = expandCell(next[r][c]);
+          if (cellPanes.includes(a) || next[r][c] === a) aPos = [r, c];
+          if (cellPanes.includes(b) || next[r][c] === b) bPos = [r, c];
         }
       }
-      setSwapTarget(hoveredId);
-    };
 
-    const onMouseUp = () => {
-      const d = dragRef.current;
-      const isResize = dragTarget?.startsWith("resize-");
-
-      if (d && !isResize && swapTarget) {
-        setTileOrder((prev) => {
-          const next = [...prev];
-          const fromIdx = next.indexOf(d.windowId);
-          const toIdx = next.indexOf(swapTarget);
-          if (fromIdx !== -1 && toIdx !== -1) {
-            [next[fromIdx], next[toIdx]] = [next[toIdx], next[fromIdx]];
-          }
-          return next;
-        });
+      if (aPos && bPos && (aPos[0] !== bPos[0] || aPos[1] !== bPos[1])) {
+        const tmp = next[aPos[0]][aPos[1]];
+        next[aPos[0]][aPos[1]] = next[bPos[0]][bPos[1]];
+        next[bPos[0]][bPos[1]] = tmp;
       }
 
-      dragRef.current = null;
-      setDragTarget(null);
-      setSwapTarget(null);
+      return next;
+    });
+    setDragTarget(null);
+    setSwapTarget(null);
+  }, []);
 
-      if (!isResize) {
-        setStates((prev) => {
-          const next = { ...prev };
-          for (const id of Object.keys(next)) {
-            if (next[id].isFloating) {
-              next[id] = { ...next[id], isFloating: false };
+  const startTitleDrag = useCallback(
+    (paneId: string, e: React.MouseEvent) => {
+      e.preventDefault();
+
+      const paneEl = (e.target as HTMLElement).closest("[data-pane-id]");
+      const rect = paneEl?.getBoundingClientRect();
+      const offsetX = rect ? e.clientX - rect.left : 0;
+      const offsetY = rect ? e.clientY - rect.top : 0;
+
+      setDragTarget(paneId);
+      setDragPos({ x: e.clientX - offsetX, y: e.clientY - offsetY });
+      setDragSize(rect ? { w: rect.width, h: rect.height } : { w: 300, h: 200 });
+
+      const onMouseMove = (ev: MouseEvent) => {
+        setDragPos({ x: ev.clientX - offsetX, y: ev.clientY - offsetY });
+
+        const els = document.elementsFromPoint(ev.clientX, ev.clientY);
+        let targetId: string | null = null;
+        for (const el of els) {
+          const pane = el.closest("[data-pane-id]");
+          const id = pane?.getAttribute("data-pane-id");
+          if (id && id !== paneId) {
+            targetId = id;
+            break;
+          }
+        }
+        swapTargetRef.current = targetId;
+        setSwapTarget(targetId);
+      };
+
+      const onMouseUp = () => {
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseup", onMouseUp);
+
+        const dropTarget = swapTargetRef.current;
+
+        if (dropTarget && dropTarget !== paneId) {
+          setRows((prev) => {
+            const next = prev.map((row) => [...row]);
+            let aPos: [number, number] | null = null;
+            let bPos: [number, number] | null = null;
+
+            for (let r = 0; r < next.length; r++) {
+              for (let c = 0; c < next[r].length; c++) {
+                const cellPanes = expandCell(next[r][c]);
+                if (next[r][c] === paneId || cellPanes.includes(paneId))
+                  aPos = [r, c];
+                if (next[r][c] === dropTarget || cellPanes.includes(dropTarget))
+                  bPos = [r, c];
+              }
             }
-          }
-          return next;
-        });
-      }
-      triggerRetile();
-    };
 
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-  }, [swapTarget, triggerRetile, dragTarget]);
+            if (aPos && bPos && (aPos[0] !== bPos[0] || aPos[1] !== bPos[1])) {
+              const tmp = next[aPos[0]][aPos[1]];
+              next[aPos[0]][aPos[1]] = next[bPos[0]][bPos[1]];
+              next[bPos[0]][bPos[1]] = tmp;
+            }
+
+            return next;
+          });
+        }
+
+        swapTargetRef.current = null;
+        setSwapTarget(null);
+        setDragTarget(null);
+        setDragPos(null);
+        setDragSize(null);
+      };
+
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+    [],
+  );
+
+  const startRowResize = useCallback(
+    (dividerIndex: number, e: React.MouseEvent) => {
+      e.preventDefault();
+      const startY = e.clientY;
+      const startHeights = [...rowHeights];
+      const totalHeight = window.innerHeight - 28;
+
+      const onMouseMove = (ev: MouseEvent) => {
+        const dy = ev.clientY - startY;
+        const dyPercent = (dy / totalHeight) * 100;
+        const newH = [...startHeights];
+        newH[dividerIndex] = Math.max(10, startHeights[dividerIndex] + dyPercent);
+        newH[dividerIndex + 1] = Math.max(
+          10,
+          startHeights[dividerIndex + 1] - dyPercent,
+        );
+        setRowHeights(newH);
+      };
+
+      const onMouseUp = () => {
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseup", onMouseUp);
+      };
+
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+    [rowHeights],
+  );
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -470,21 +235,29 @@ export function useWindowManager() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  const visibleRows = rows
+    .map((row) => row.filter((cellId) => isCellVisible(cellId)))
+    .filter((row) => row.length > 0);
+
   return {
     states,
-    viewport,
-    allConfigs,
+    visibleRows,
+    rowHeights,
+    maximizedId,
     launcherOpen,
+    swapTarget,
+    dragTarget,
+    dragPos,
+    dragSize,
+    setSwapTarget,
+    setDragTarget,
     setLauncherOpen,
     openWindow,
     closeWindow,
-    openDynamicWindow,
-    closeDynamicWindow,
     toggleMaximize,
     focusWindow,
-    startDrag,
-    startResize,
-    dragTarget,
-    swapTarget,
+    swapPanes,
+    startTitleDrag,
+    startRowResize,
   };
 }

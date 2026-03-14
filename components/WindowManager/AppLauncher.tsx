@@ -12,35 +12,58 @@ interface Props {
 
 export function AppLauncher({ states, onOpen, onClose }: Props) {
   const [query, setQuery] = useState("");
+  const [selectedIdx, setSelectedIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
-
-  const filtered = WINDOW_CONFIGS.filter((c) =>
-    c.title.toLowerCase().includes(query.toLowerCase()) ||
-    c.id.toLowerCase().includes(query.toLowerCase()),
+  const filtered = WINDOW_CONFIGS.filter(
+    (c) =>
+      c.title.toLowerCase().includes(query.toLowerCase()) ||
+      c.id.toLowerCase().includes(query.toLowerCase()),
   );
+
+  useEffect(() => {
+    setSelectedIdx(0);
+  }, [query]);
 
   const handleSelect = (id: string) => {
     onOpen(id);
     onClose();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedIdx((i) => Math.min(i + 1, filtered.length - 1));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedIdx((i) => Math.max(i - 1, 0));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (filtered[selectedIdx]) handleSelect(filtered[selectedIdx].id);
+        break;
+      case "Escape":
+        e.preventDefault();
+        onClose();
+        break;
+    }
+  };
+
+  useEffect(() => {
+    const el = listRef.current?.children[selectedIdx] as HTMLElement | undefined;
+    el?.scrollIntoView({ block: "nearest" });
+  }, [selectedIdx]);
+
   return (
     <div
-      className="fixed inset-0 z-[10000] flex items-start justify-center pt-[20vh] bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[10000] flex items-start justify-center pt-[18vh] bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -54,40 +77,42 @@ export function AppLauncher({ states, onOpen, onClose }: Props) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && filtered.length > 0) {
-                handleSelect(filtered[0].id);
-              }
-            }}
+            onKeyDown={handleKeyDown}
             className="flex-1 bg-transparent text-foreground text-sm outline-none placeholder:text-muted-foreground/30"
             placeholder="Search applications..."
             autoComplete="off"
           />
-          <span className="text-muted-foreground/30 text-2xs">
-            ctrl+k
-          </span>
+          <span className="text-muted-foreground/30 text-2xs">ctrl+k</span>
         </div>
 
-        <div className="max-h-80 overflow-y-auto">
+        <div ref={listRef} className="max-h-80 overflow-y-auto">
           {filtered.length === 0 ? (
             <div className="px-4 py-6 text-center text-muted-foreground/40 text-sm">
               No matching windows
             </div>
           ) : (
-            filtered.map((config) => {
+            filtered.map((config, i) => {
               const isOpen = states[config.id]?.isOpen;
+              const isSelected = i === selectedIdx;
               return (
                 <button
                   key={config.id}
                   onClick={() => handleSelect(config.id)}
-                  className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-primary/10 transition-colors group"
+                  onMouseEnter={() => setSelectedIdx(i)}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors group ${
+                    isSelected ? "bg-primary/10" : "hover:bg-primary/5"
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-primary/60 w-5 text-center text-sm">
                       {config.icon || "·"}
                     </span>
                     <div>
-                      <span className="text-sm text-foreground group-hover:text-primary transition-colors">
+                      <span
+                        className={`text-sm transition-colors ${
+                          isSelected ? "text-primary" : "text-foreground"
+                        }`}
+                      >
                         {config.title}
                       </span>
                       <span className="text-2xs text-muted-foreground/30 ml-2">
@@ -112,8 +137,9 @@ export function AppLauncher({ states, onOpen, onClose }: Props) {
 
         <div className="px-4 py-2 border-t border-primary/10 text-2xs text-muted-foreground/30 flex items-center justify-between">
           <span>
-            <span className="text-primary/40">Enter</span> to open
-            <span className="text-primary/40 ml-3">Esc</span> to close
+            <span className="text-primary/40">↑↓</span> navigate
+            <span className="text-primary/40 ml-3">Enter</span> open
+            <span className="text-primary/40 ml-3">Esc</span> close
           </span>
           <span>{filtered.length} apps</span>
         </div>

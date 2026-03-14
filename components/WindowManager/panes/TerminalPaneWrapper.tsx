@@ -1,29 +1,78 @@
 "use client";
 
+import { useState, useRef, useCallback, useEffect } from "react";
 import Neofetch from "@/components/Neofetch";
-import { useTerminal } from "@/components/Terminal/hooks/useTerminal";
+import { CommandProcessor } from "@/components/Terminal/commandProcessor";
+import type { CommandOutput } from "@/components/Terminal/types";
 
 interface Props {
-  mainText: string;
   locale?: string;
 }
 
-export function TerminalPaneWrapper({ mainText, locale }: Props) {
-  const {
-    cursorIsFinished,
-    inputValue,
-    commandHistory,
-    currentPath,
-    inputRef,
-    terminalContentRef,
-    setInputValue,
-    handleInputSubmit,
-  } = useTerminal({ mainText });
+export function TerminalPaneWrapper({ locale }: Props) {
+  const [inputValue, setInputValue] = useState("");
+  const [commandHistory, setCommandHistory] = useState<CommandOutput[]>([]);
+  const [currentPath, setCurrentPath] = useState("/home/fredrik");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const processorRef = useRef(new CommandProcessor());
+  const [historyIdx, setHistoryIdx] = useState(-1);
+
+  const scrollToBottom = useCallback(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+    }
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [commandHistory, scrollToBottom]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const cmd = inputValue.trim();
+      if (!cmd) return;
+
+      if (cmd === "clear") {
+        setCommandHistory([]);
+        setInputValue("");
+        return;
+      }
+
+      const result = processorRef.current.processCommand(cmd, currentPath);
+      if (result.newPath) setCurrentPath(result.newPath);
+
+      setCommandHistory((prev) => [
+        ...prev,
+        result.output,
+      ]);
+      setInputValue("");
+      setHistoryIdx(-1);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const cmds = commandHistory.map((h) => h.command);
+      if (cmds.length === 0) return;
+      const newIdx = historyIdx < cmds.length - 1 ? historyIdx + 1 : historyIdx;
+      setHistoryIdx(newIdx);
+      setInputValue(cmds[cmds.length - 1 - newIdx] || "");
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (historyIdx <= 0) {
+        setHistoryIdx(-1);
+        setInputValue("");
+      } else {
+        const newIdx = historyIdx - 1;
+        setHistoryIdx(newIdx);
+        const cmds = commandHistory.map((h) => h.command);
+        setInputValue(cmds[cmds.length - 1 - newIdx] || "");
+      }
+    }
+  };
 
   return (
     <div
-      ref={terminalContentRef}
-      className="flex-1 font-mono px-3 pt-3 overflow-y-auto scroll-smooth cursor-text text-xs h-full bg-background/50"
+      ref={contentRef}
+      className="font-mono px-3 pt-3 pb-1 overflow-y-auto scroll-smooth cursor-text text-xs h-full"
       onClick={() => inputRef.current?.focus()}
     >
       <div className="mb-2">
@@ -57,24 +106,22 @@ export function TerminalPaneWrapper({ mainText, locale }: Props) {
         </div>
       ))}
 
-      {cursorIsFinished && (
-        <div className="flex items-center mt-1 border-t border-primary/20 pt-2 pb-2 sticky bottom-0 bg-background/95 backdrop-blur-sm">
-          <span className="text-primary mr-1 flex-shrink-0 text-xs">
-            [{currentPath}]${" "}
-          </span>
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleInputSubmit}
-            className="flex-1 bg-transparent text-foreground outline-none font-mono caret-primary min-w-0 text-xs"
-            placeholder="Type 'help' for commands..."
-            autoComplete="off"
-          />
-          <span className="inline-block w-1.5 h-4 bg-primary/80 animate-pulse flex-shrink-0" />
-        </div>
-      )}
+      <div className="flex items-center mt-1 pt-2 pb-1 sticky bottom-0 bg-background/95 backdrop-blur-sm">
+        <span className="text-primary mr-1 flex-shrink-0 text-xs">
+          [{currentPath}]${" "}
+        </span>
+        <input
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="flex-1 bg-transparent text-foreground outline-none font-mono caret-primary min-w-0 text-xs"
+          placeholder="Type 'help' for commands..."
+          autoComplete="off"
+        />
+        <span className="inline-block w-1.5 h-4 bg-primary/80 animate-pulse flex-shrink-0" />
+      </div>
     </div>
   );
 }

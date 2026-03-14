@@ -12,14 +12,11 @@ export interface WindowConfig {
   defaultOpen: boolean;
   order: number;
   isDynamic?: boolean;
-  heightWeight?: number;
 }
 
 export interface WindowState {
   isOpen: boolean;
   isMaximized: boolean;
-  isFloating: boolean;
-  rect: Rect;
   zIndex: number;
 }
 

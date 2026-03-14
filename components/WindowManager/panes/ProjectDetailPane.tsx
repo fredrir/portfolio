@@ -13,67 +13,114 @@ export function ProjectDetailPane({ project, viewCode }: Props) {
   const thumb =
     project.desktopImage ||
     (project.mobileImages && project.mobileImages[0]);
+  const slug = project.title.toLowerCase().replace(/\s+/g, "-");
 
   return (
-    <div className="p-4 font-mono text-xs h-full flex flex-col overflow-auto">
-      <div className="text-muted-foreground/50 mb-3">
-        <span className="text-primary">$</span> cat ~/projects/{project.title.toLowerCase().replace(/\s+/g, "-")}/README.md
+    <div className="p-4 font-mono text-xs h-full flex flex-col overflow-auto gap-3">
+      <div className="text-muted-foreground/50">
+        <span className="text-primary">$</span> cat ~/projects/{slug}/README.md
       </div>
 
-      {thumb && (
-        <div className="rounded-lg overflow-hidden border border-primary/15 aspect-video mb-4 max-h-48">
-          <Image
-            src={thumb}
-            alt={project.title}
-            width={600}
-            height={340}
-            className="object-cover w-full h-full"
-          />
+      <div className="border border-primary/15 rounded-lg overflow-hidden">
+        <div className="px-3 py-1.5 bg-primary/[0.03] border-b border-primary/10 flex items-center gap-2">
+          <span className="text-primary/40 text-2xs">README.md</span>
+          <span className="text-muted-foreground/20 text-2xs">—</span>
+          <span className="text-muted-foreground/30 text-2xs">{slug}</span>
         </div>
-      )}
 
-      <h2 className="text-sm font-bold text-primary mb-1">{project.title}</h2>
+        <div className="p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-primary/40 text-lg">#</span>
+            <h2 className="text-base font-bold text-foreground">
+              {project.title}
+            </h2>
+          </div>
 
-      <div className="flex flex-wrap gap-1.5 mb-3">
-        {project.languages.split(",").map((lang, i) => (
-          <span
-            key={i}
-            className="px-1.5 py-0.5 rounded text-2xs bg-primary/10 text-primary/70"
-          >
-            {lang.trim()}
-          </span>
-        ))}
-      </div>
+          {thumb && (
+            <div className="rounded-lg overflow-hidden border border-primary/10 bg-background">
+              <Image
+                src={thumb}
+                alt={project.title}
+                width={600}
+                height={340}
+                className="w-full h-auto"
+              />
+            </div>
+          )}
 
-      <p className="text-muted-foreground leading-relaxed text-xs mb-3">
-        {project.description}
-      </p>
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-primary/40 text-sm">##</span>
+              <span className="text-sm font-semibold text-foreground/80">
+                About
+              </span>
+            </div>
+            <p className="text-muted-foreground leading-relaxed pl-5">
+              {project.description}
+            </p>
+          </div>
 
-      <div className="flex gap-4 pt-2 border-t border-primary/10">
-        {project.websiteLink && (
-          <Link
-            href={project.websiteLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:text-primary/80 transition-colors text-xs font-semibold"
-          >
-            {project.websiteAlias ||
-              project.websiteLink
-                .replace(/https?:\/\//, "")
-                .replace(/\/$/, "")}{" "}
-            ↗
-          </Link>
-        )}
-        {project.githubLink && (
-          <Link
-            href={project.githubLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground/60 hover:text-primary transition-colors text-xs"
-          >
-            {viewCode} ↗
-          </Link>
-        )}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-primary/40 text-sm">##</span>
+              <span className="text-sm font-semibold text-foreground/80">
+                Tech Stack
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2 pl-5">
+              {project.languages.split(",").map((lang, i) => (
+                <span
+                  key={i}
+                  className="px-2 py-1 rounded-md text-2xs border border-primary/15 bg-primary/5 text-primary/80"
+                >
+                  {lang.trim()}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {(project.websiteLink || project.githubLink) && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-primary/40 text-sm">##</span>
+                <span className="text-sm font-semibold text-foreground/80">
+                  Links
+                </span>
+              </div>
+              <div className="space-y-1.5 pl-5">
+                {project.websiteLink && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-primary/30">→</span>
+                    <Link
+                      href={project.websiteLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      {project.websiteAlias ||
+                        project.websiteLink
+                          .replace(/https?:\/\//, "")
+                          .replace(/\/$/, "")}
+                    </Link>
+                  </div>
+                )}
+                {project.githubLink && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-primary/30">→</span>
+                    <Link
+                      href={project.githubLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground/60 hover:text-primary hover:underline transition-colors"
+                    >
+                      {viewCode}
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

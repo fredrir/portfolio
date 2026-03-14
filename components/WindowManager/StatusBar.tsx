@@ -113,10 +113,10 @@ export function StatusBar({
       <div className="flex items-center gap-2">
         <button
           onClick={onOpenLauncher}
-          className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-bold"
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/15 text-primary hover:bg-primary/25 active:bg-primary/35 transition-all font-bold border border-primary/20 hover:border-primary/40 hover:shadow-sm hover:shadow-primary/10"
         >
-
-          <span className="text-3xs text-primary/60 hidden sm:inline">Apps</span>
+          <span className="text-2xs font-extrabold tracking-tight">F</span>
+          <span className="text-3xs text-primary/70 hidden sm:inline">FredOS</span>
         </button>
 
         <div className="flex items-center gap-0.5 ml-1">
