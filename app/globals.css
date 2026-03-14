@@ -28,6 +28,10 @@
   --chart-4: 280.6 83.2% 52.7%;
   --chart-5: 0 84.2% 60.2%;
 
+  --accent-yellow: 47.9 95.8% 53.1%;
+  --accent-blue: 217.2 91.2% 59.8%;
+  --accent-red: 0 84.2% 60.2%;
+
   --scrollbar-track: #f0f0f0;
   --scrollbar-thumb: #8bc34a;
   --scrollbar-thumb-hover: #6a9739;
@@ -58,6 +62,10 @@
   --chart-3: 47.9 95.8% 53.1%;
   --chart-4: 280.6 83.2% 52.7%;
   --chart-5: 0 84.2% 60.2%;
+
+  --accent-yellow: 47.9 95.8% 53.1%;
+  --accent-blue: 217.2 91.2% 59.8%;
+  --accent-red: 0 62.8% 30.6%;
 
   --scrollbar-track: #000000;
   --scrollbar-thumb: #8bc34a;
@@ -126,8 +134,48 @@
 
 html,
 body {
-  overflow-y: auto;
-  scroll-behavior: smooth;
+  overflow: hidden;
+  height: 100vh;
+  height: 100dvh;
+}
+
+@keyframes dotPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes lineFade {
+  0%,
+  100% {
+    opacity: 0;
+    stroke-dasharray: 0 200%;
+  }
+  30%,
+  70% {
+    opacity: 1;
+    stroke-dasharray: 200% 0;
+  }
+}
+
+.animate-dot-pulse {
+  animation: dotPulse 6s infinite ease-in-out;
+}
+
+.animate-line-fade {
+  animation: lineFade 8s infinite ease-in-out;
+}
+
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow-y: auto;
+    height: auto;
+  }
 }
 
 .grecaptcha-badge {
