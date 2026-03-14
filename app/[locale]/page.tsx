@@ -6,11 +6,17 @@ import { localeParams } from "@/lib/locale/languageTypes";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getDictionary } from "@/lib/locale/dictionaries";
+import { fetchGitHubData } from "@/lib/github";
+import { fetchSpotifyData } from "@/lib/spotify";
 
 export default async function Home(props: { params: localeParams }) {
   const { locale } = await props.params;
 
-  const dict = await getDictionary(locale);
+  const [dict, githubData, spotifyData] = await Promise.all([
+    getDictionary(locale),
+    fetchGitHubData(),
+    fetchSpotifyData(),
+  ]);
 
   return (
     <>
@@ -23,7 +29,11 @@ export default async function Home(props: { params: localeParams }) {
           projects={dict.project.projects}
           viewCode={dict.project.viewCode}
         />
-        <Contact contact={dict.contact} />
+        <Contact
+          contact={dict.contact}
+          githubData={githubData}
+          spotifyData={spotifyData}
+        />
       </main>
       <Footer license1={dict.footer.license1} license2={dict.footer.license2} />
     </>

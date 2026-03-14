@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { TerminalPane } from "./TerminalPane";
 import { TypedLine } from "./TypedLine";
 import {
@@ -144,42 +144,14 @@ function ContributionGraph({
   );
 }
 
-export function GitHubPane() {
-  const [data, setData] = useState<GitHubData | null>(null);
-  const [loading, setLoading] = useState(true);
+export function GitHubPane({ initialData }: { initialData: GitHubData | null }) {
   const [selectedYear, setSelectedYear] = useState("last");
-  const [years, setYears] = useState<string[]>([]);
 
-  const fetchContributions = useCallback((year: string) => {
-    const url =
-      year === "last" ? "/api/github" : `/api/github?year=${year}`;
-    fetch(url)
-      .then((r) => r.json())
-      .then((d) => {
-        if (!d.error) setData(d);
-      })
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/github")
-      .then((r) => r.json())
-      .then((d) => {
-        if (!d.error) {
-          setData(d);
-          const createdYear = new Date(d.createdAt).getFullYear();
-          const currentYear = new Date().getFullYear();
-          const yearList: string[] = ["last"];
-          for (let y = currentYear; y >= createdYear; y--) {
-            yearList.push(String(y));
-          }
-          setYears(yearList);
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
+  const data = initialData;
+  const currentContributions = data?.contributionsByYear.find(
+    (c) => c.year === selectedYear,
+  );
+  const years = data?.contributionsByYear.map((c) => c.year) ?? [];
   const maxLangCount = data
     ? Math.max(...data.topLanguages.map((l) => l.count))
     : 1;
@@ -190,13 +162,7 @@ export function GitHubPane() {
         <span className="text-primary">$</span> cat /proc/github
       </div>
       <div className="flex flex-col gap-4">
-        {loading ? (
-          <div className="space-y-1">
-            <span className="text-muted-foreground animate-pulse">
-              Fetching from api.github.com...
-            </span>
-          </div>
-        ) : !data ? (
+        {!data ? (
           <span className="text-red-400">
             error: could not reach github api
           </span>
@@ -273,18 +239,15 @@ export function GitHubPane() {
                 </div>
               </TypedLine>
             )}
-            {data.contributions.length > 0 && (
+            {currentContributions && currentContributions.days.length > 0 && (
               <TypedLine delay={600} className="w-full">
                 <div className="mt-2 pt-2 w-full border-t border-primary/10">
                   <ContributionGraph
-                    contributions={data.contributions}
-                    total={data.totalContributions}
+                    contributions={currentContributions.days}
+                    total={currentContributions.total}
                     selectedYear={selectedYear}
                     years={years}
-                    onYearChange={(y) => {
-                      setSelectedYear(y);
-                      fetchContributions(y);
-                    }}
+                    onYearChange={setSelectedYear}
                   />
                 </div>
               </TypedLine>

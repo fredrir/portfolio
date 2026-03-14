@@ -5,6 +5,7 @@ import Image from "next/image";
 import { TerminalPane } from "./TerminalPane";
 import { SPOTIFY_ASCII, CAVA_CHARS, CAVA_BAR_COUNT, SPOTIFY_POLL_INTERVAL } from "./constants";
 import { formatTime } from "./utils";
+import { getSpotifyData } from "@/app/actions/spotify";
 import type { SpotifyData } from "./types";
 
 function CavaVisualizer({ isPlaying }: { isPlaying: boolean }) {
@@ -42,20 +43,19 @@ function CavaVisualizer({ isPlaying }: { isPlaying: boolean }) {
   );
 }
 
-export function SpotifyPane() {
-  const [data, setData] = useState<SpotifyData | null>(null);
-  const [loading, setLoading] = useState(true);
+export function SpotifyPane({ initialData }: { initialData: SpotifyData }) {
+  const [data, setData] = useState<SpotifyData>(initialData);
 
-  const fetchSpotify = useCallback(() => {
-    fetch("/api/spotify")
-      .then((r) => r.json())
-      .then((d) => setData(d))
-      .catch(() => setData({ isPlaying: false }))
-      .finally(() => setLoading(false));
+  const fetchSpotify = useCallback(async () => {
+    try {
+      const d = await getSpotifyData();
+      setData(d);
+    } catch {
+      setData({ isPlaying: false });
+    }
   }, []);
 
   useEffect(() => {
-    fetchSpotify();
     const interval = setInterval(fetchSpotify, SPOTIFY_POLL_INTERVAL);
     return () => clearInterval(interval);
   }, [fetchSpotify]);
@@ -71,11 +71,7 @@ export function SpotifyPane() {
         <span className="text-primary">$</span> cat /proc/spotify
       </div>
 
-      {loading ? (
-        <span className="text-muted-foreground animate-pulse">
-          Connecting to spotify daemon...
-        </span>
-      ) : !data?.title ? (
+      {!data?.title ? (
         <div className="flex gap-4 flex-col sm:flex-row items-start">
           <div className="shrink-0 hidden sm:block">
             {SPOTIFY_ASCII.map((line, i) => (

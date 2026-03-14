@@ -1,7 +1,5 @@
-import { NextResponse } from "next/server";
-
+"use server";
 const GITHUB_USERNAME = "fredrir";
-const CACHE_DURATION = 3600;
 
 interface ContributionDay {
   count: number;
@@ -16,7 +14,7 @@ async function fetchContributions(
     const url = year
       ? `https://github.com/users/${GITHUB_USERNAME}/contributions?from=${year}-01-01&to=${year}-12-31`
       : `https://github.com/users/${GITHUB_USERNAME}/contributions`;
-    const res = await fetch(url, { next: { revalidate: CACHE_DURATION } });
+    const res = await fetch(url, { next: { revalidate: 3600 } });
     if (!res.ok) return { days: [], total: 0 };
     const html = await res.text();
 
@@ -30,9 +28,7 @@ async function fetchContributions(
       const level = parseInt(match[3], 10);
 
       let count = 0;
-      const tooltipRegex = new RegExp(
-        `<tool-tip[^>]*for="${id}"[^>]*>([^<]*)`,
-      );
+      const tooltipRegex = new RegExp(`<tool-tip[^>]*for="${id}"[^>]*>([^<]*)`);
       const tooltipMatch = html.match(tooltipRegex);
       if (tooltipMatch) {
         const numMatch = tooltipMatch[1].match(/(\d+)/);
@@ -60,32 +56,23 @@ async function fetchContributions(
   }
 }
 
-export async function GET(request: Request) {
+export async function fetchGitHubData() {
   try {
-    const { searchParams } = new URL(request.url);
-    const year = searchParams.get("year") ?? undefined;
-
-    const [userRes, reposRes, contributionData] = await Promise.all([
+    const [userRes, reposRes] = await Promise.all([
       fetch(`https://api.github.com/users/${GITHUB_USERNAME}`, {
         headers: { Accept: "application/vnd.github.v3+json" },
-        next: { revalidate: CACHE_DURATION },
+        next: { revalidate: 3600 },
       }),
       fetch(
         `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`,
         {
           headers: { Accept: "application/vnd.github.v3+json" },
-          next: { revalidate: CACHE_DURATION },
+          next: { revalidate: 3600 },
         },
       ),
-      fetchContributions(year),
     ]);
 
-    if (!userRes.ok || !reposRes.ok) {
-      return NextResponse.json(
-        { error: "GitHub API error" },
-        { status: 502 },
-      );
-    }
+    if (!userRes.ok || !reposRes.ok) return null;
 
     const user = await userRes.json();
     const repos = await reposRes.json();
@@ -108,25 +95,35 @@ export async function GET(request: Request) {
       .slice(0, 5)
       .map(([lang, count]) => ({ lang, count }));
 
-    return NextResponse.json({
-      username: user.login,
-      name: user.name,
-      bio: user.bio,
-      publicRepos: user.public_repos,
-      followers: user.followers,
-      following: user.following,
+    const createdYear = new Date(user.created_at).getFullYear();
+    const currentYear = new Date().getFullYear();
+
+    const yearKeys = ["last"];
+    for (let y = currentYear; y >= createdYear; y--) {
+      yearKeys.push(String(y));
+    }
+
+    const allContributions = await Promise.all(
+      yearKeys.map(async (y) => {
+        const data = await fetchContributions(y === "last" ? undefined : y);
+        return { year: y, ...data };
+      }),
+    );
+
+    return {
+      username: user.login as string,
+      name: user.name as string,
+      bio: user.bio as string,
+      publicRepos: user.public_repos as number,
+      followers: user.followers as number,
+      following: user.following as number,
       totalStars,
       topLanguages,
-      profileUrl: user.html_url,
-      avatarUrl: user.avatar_url,
-      createdAt: user.created_at,
-      contributions: contributionData.days,
-      totalContributions: contributionData.total,
-    });
+      profileUrl: user.html_url as string,
+      createdAt: user.created_at as string,
+      contributionsByYear: allContributions,
+    };
   } catch {
-    return NextResponse.json(
-      { error: "Failed to fetch GitHub data" },
-      { status: 500 },
-    );
+    return null;
   }
 }

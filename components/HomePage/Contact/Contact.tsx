@@ -3,9 +3,14 @@
 import { GitHubPane } from "./GitHubPane";
 import { SpotifyPane } from "./SpotifyPane";
 import { ContactForm } from "./ContactForm";
-import type { ContactProps } from "./types";
+import type { ContactProps, GitHubData, SpotifyData } from "./types";
 
-const Contact = ({ contact }: ContactProps) => {
+interface Props extends ContactProps {
+  githubData: GitHubData | null;
+  spotifyData: SpotifyData;
+}
+
+const Contact = ({ contact, githubData, spotifyData }: Props) => {
   return (
     <div className="flex flex-col px-4" id="contact">
       <div className="py-10 mt-24 container mx-auto">
@@ -26,8 +31,8 @@ const Contact = ({ contact }: ContactProps) => {
 
           <div className="p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
             <div className="flex flex-col gap-3 sm:gap-4">
-              <GitHubPane />
-              <SpotifyPane />
+              <GitHubPane initialData={githubData} />
+              <SpotifyPane initialData={spotifyData} />
             </div>
 
             <ContactForm contact={contact} />

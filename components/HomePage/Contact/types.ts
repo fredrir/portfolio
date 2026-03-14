@@ -19,6 +19,12 @@ export interface ContributionDay {
   level: number;
 }
 
+export interface ContributionYear {
+  year: string;
+  days: ContributionDay[];
+  total: number;
+}
+
 export interface GitHubData {
   username: string;
   name: string;
@@ -30,8 +36,7 @@ export interface GitHubData {
   topLanguages: { lang: string; count: number }[];
   profileUrl: string;
   createdAt: string;
-  contributions: ContributionDay[];
-  totalContributions: number;
+  contributionsByYear: ContributionYear[];
 }
 
 export interface SpotifyData {

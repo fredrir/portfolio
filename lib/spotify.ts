@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-
+"use server";
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN;
@@ -11,9 +10,7 @@ const RECENTLY_PLAYED_ENDPOINT =
   "https://api.spotify.com/v1/me/player/recently-played?limit=1";
 
 async function getAccessToken() {
-  const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
-    "base64",
-  );
+  const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64");
 
   const response = await fetch(TOKEN_ENDPOINT, {
     method: "POST",
@@ -30,9 +27,9 @@ async function getAccessToken() {
   return response.json();
 }
 
-export async function GET() {
+export async function fetchSpotifyData() {
   if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
-    return NextResponse.json({ isPlaying: false, notConfigured: true });
+    return { isPlaying: false, notConfigured: true };
   }
 
   try {
@@ -46,18 +43,18 @@ export async function GET() {
       const data = await nowPlayingRes.json();
 
       if (data.is_playing && data.item) {
-        return NextResponse.json({
+        return {
           isPlaying: true,
-          title: data.item.name,
+          title: data.item.name as string,
           artist: data.item.artists
             .map((a: { name: string }) => a.name)
-            .join(", "),
-          album: data.item.album.name,
-          albumArt: data.item.album.images?.[0]?.url,
-          songUrl: data.item.external_urls.spotify,
-          progressMs: data.progress_ms,
-          durationMs: data.item.duration_ms,
-        });
+            .join(", ") as string,
+          album: data.item.album.name as string,
+          albumArt: data.item.album.images?.[0]?.url as string | undefined,
+          songUrl: data.item.external_urls.spotify as string,
+          progressMs: data.progress_ms as number,
+          durationMs: data.item.duration_ms as number,
+        };
       }
     }
 
@@ -70,21 +67,21 @@ export async function GET() {
       const track = data.items?.[0]?.track;
 
       if (track) {
-        return NextResponse.json({
+        return {
           isPlaying: false,
-          title: track.name,
+          title: track.name as string,
           artist: track.artists
             .map((a: { name: string }) => a.name)
-            .join(", "),
-          album: track.album.name,
-          albumArt: track.album.images?.[0]?.url,
-          songUrl: track.external_urls.spotify,
-        });
+            .join(", ") as string,
+          album: track.album.name as string,
+          albumArt: track.album.images?.[0]?.url as string | undefined,
+          songUrl: track.external_urls.spotify as string,
+        };
       }
     }
 
-    return NextResponse.json({ isPlaying: false });
+    return { isPlaying: false };
   } catch {
-    return NextResponse.json({ isPlaying: false });
+    return { isPlaying: false };
   }
 }
