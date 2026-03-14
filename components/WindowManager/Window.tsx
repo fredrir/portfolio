@@ -12,6 +12,7 @@ interface Props {
   onMaximize: () => void;
   onFocus: () => void;
   onDragStart: (id: string, e: React.MouseEvent) => void;
+  onResizeStart: (id: string, edge: string, e: React.MouseEvent) => void;
   children: React.ReactNode;
 }
 
@@ -24,6 +25,7 @@ export function Window({
   onMaximize,
   onFocus,
   onDragStart,
+  onResizeStart,
   children,
 }: Props) {
   const handleDragStart = useCallback(
@@ -34,9 +36,16 @@ export function Window({
     [config.id, onDragStart],
   );
 
+  const handleResize = useCallback(
+    (edge: string) => (e: React.MouseEvent) => {
+      onResizeStart(config.id, edge, e);
+    },
+    [config.id, onResizeStart],
+  );
+
   return (
     <div
-      className={`absolute flex flex-col rounded-lg border bg-background/80 backdrop-blur-md overflow-hidden transition-[border-color,box-shadow] duration-200 ${
+      className={`absolute flex flex-col rounded-xl border bg-background/80 backdrop-blur-md overflow-hidden transition-[border-color,box-shadow] duration-200 ${
         isSwapTarget
           ? "border-primary/60 ring-2 ring-primary/30 shadow-lg shadow-primary/10"
           : isFocused
@@ -106,6 +115,19 @@ export function Window({
       </div>
 
       <div className="flex-1 overflow-auto min-h-0">{children}</div>
+
+      <div
+        className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize group"
+        onMouseDown={handleResize("se")}
+      >
+        <svg
+          className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 text-primary/20 group-hover:text-primary/50 transition-colors"
+          viewBox="0 0 10 10"
+        >
+          <path d="M10 0L10 10L0 10" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M10 4L10 10L4 10" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+      </div>
     </div>
   );
 }

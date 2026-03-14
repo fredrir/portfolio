@@ -113,9 +113,10 @@ export function StatusBar({
       <div className="flex items-center gap-2">
         <button
           onClick={onOpenLauncher}
-          className="px-2 py-0.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-bold"
+          className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-bold"
         >
 
+          <span className="text-3xs text-primary/60 hidden sm:inline">Apps</span>
         </button>
 
         <div className="flex items-center gap-0.5 ml-1">

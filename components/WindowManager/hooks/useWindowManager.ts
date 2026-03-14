@@ -2,10 +2,15 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { WINDOW_CONFIGS, GAP, STATUS_BAR_HEIGHT } from "../constants";
 import type { WindowConfig, WindowState, WindowStates, Rect } from "../types";
 
+function getWeight(id: string, allConfigs: WindowConfig[]): number {
+  return allConfigs.find((c) => c.id === id)?.heightWeight ?? 1;
+}
+
 function computeTiledLayout(
   openIds: string[],
   vw: number,
   vh: number,
+  allConfigs: WindowConfig[],
 ): Record<string, Rect> {
   const result: Record<string, Rect> = {};
   const availH = vh - STATUS_BAR_HEIGHT;
@@ -47,42 +52,51 @@ function computeTiledLayout(
   };
 
   const stackX = GAP * 2 + masterW;
+  const totalStackH = availH - GAP * 2;
 
   if (stackIds.length <= 3) {
-    const rowH =
-      (availH - GAP * 2 - GAP * (stackIds.length - 1)) / stackIds.length;
-    stackIds.forEach((id, i) => {
-      result[id] = {
-        x: stackX,
-        y: GAP + i * (rowH + GAP),
-        w: stackW,
-        h: rowH,
-      };
+    const totalWeight = stackIds.reduce(
+      (sum, id) => sum + getWeight(id, allConfigs),
+      0,
+    );
+    const gapSpace = GAP * (stackIds.length - 1);
+    const usableH = totalStackH - gapSpace;
+    let yOff = GAP;
+
+    stackIds.forEach((id) => {
+      const w = getWeight(id, allConfigs);
+      const h = Math.round((w / totalWeight) * usableH);
+      result[id] = { x: stackX, y: yOff, w: stackW, h };
+      yOff += h + GAP;
     });
   } else {
     const cols = 2;
-    const rows = Math.ceil(stackIds.length / cols);
+    const rowIds: string[][] = [];
+    for (let i = 0; i < stackIds.length; i += cols) {
+      rowIds.push(stackIds.slice(i, i + cols));
+    }
+
+    const rowWeights = rowIds.map((row) =>
+      Math.max(...row.map((id) => getWeight(id, allConfigs))),
+    );
+    const totalWeight = rowWeights.reduce((a, b) => a + b, 0);
+    const gapSpace = GAP * (rowIds.length - 1);
+    const usableH = totalStackH - gapSpace;
     const colW = (stackW - GAP * (cols - 1)) / cols;
-    const rowH = (availH - GAP * 2 - GAP * (rows - 1)) / rows;
+    let yOff = GAP;
 
-    stackIds.forEach((id, i) => {
-      const row = Math.floor(i / cols);
-      const col = i % cols;
-      const isLastRow = row === rows - 1;
-      const itemsInRow =
-        isLastRow && stackIds.length % cols !== 0
-          ? stackIds.length % cols
-          : cols;
-      const itemW = itemsInRow === 1 ? stackW : colW;
-      const itemX =
-        itemsInRow === 1 ? stackX : stackX + col * (colW + GAP);
+    rowIds.forEach((row, ri) => {
+      const rowH = Math.round((rowWeights[ri] / totalWeight) * usableH);
+      row.forEach((id, ci) => {
+        const isLastRow = ri === rowIds.length - 1;
+        const itemsInRow = row.length;
+        const itemW = itemsInRow === 1 ? stackW : colW;
+        const itemX =
+          itemsInRow === 1 ? stackX : stackX + ci * (colW + GAP);
 
-      result[id] = {
-        x: itemX,
-        y: GAP + row * (rowH + GAP),
-        w: itemW,
-        h: rowH,
-      };
+        result[id] = { x: itemX, y: yOff, w: itemW, h: rowH };
+      });
+      yOff += rowH + GAP;
     });
   }
 
@@ -143,7 +157,12 @@ export function useWindowManager() {
       const openIds = tileOrder.filter(
         (id) => prev[id]?.isOpen && !prev[id]?.isMaximized,
       );
-      const rects = computeTiledLayout(openIds, viewport.w, viewport.h);
+      const rects = computeTiledLayout(
+        openIds,
+        viewport.w,
+        viewport.h,
+        allConfigs,
+      );
       const next = { ...prev };
       for (const id of openIds) {
         if (rects[id]) {
@@ -152,7 +171,7 @@ export function useWindowManager() {
       }
       return next;
     });
-  }, [viewport, tileOrder, retileKey]);
+  }, [viewport, tileOrder, retileKey, allConfigs]);
 
   const triggerRetile = useCallback(() => {
     setRetileKey((k) => k + 1);
@@ -198,19 +217,18 @@ export function useWindowManager() {
   );
 
   const openDynamicWindow = useCallback(
-    (config: WindowConfig, content?: string) => {
+    (config: WindowConfig) => {
       const existing = dynamicConfigs.find((c) => c.id === config.id);
       if (existing) {
-        setStates((prev) => ({
-          ...prev,
-          [config.id]: { ...prev[config.id], isOpen: true },
-        }));
         maxZRef.current++;
         setStates((prev) => ({
           ...prev,
-          [config.id]: { ...prev[config.id], zIndex: maxZRef.current },
+          [config.id]: {
+            ...prev[config.id],
+            isOpen: true,
+            zIndex: maxZRef.current,
+          },
         }));
-        triggerRetile();
         return;
       }
 
@@ -226,10 +244,19 @@ export function useWindowManager() {
           zIndex: maxZRef.current,
         },
       }));
-      setTileOrder((prev) => [...prev, config.id]);
-      triggerRetile();
     },
-    [dynamicConfigs, triggerRetile],
+    [dynamicConfigs],
+  );
+
+  const closeDynamicWindow = useCallback(
+    (id: string) => {
+      setStates((prev) => ({
+        ...prev,
+        [id]: { ...prev[id], isOpen: false },
+      }));
+      setDynamicConfigs((prev) => prev.filter((c) => c.id !== id));
+    },
+    [],
   );
 
   const toggleMaximize = useCallback(
@@ -287,6 +314,7 @@ export function useWindowManager() {
           openIds,
           viewport.w,
           viewport.h,
+          allConfigs,
         );
 
         dragRef.current = {
@@ -304,7 +332,33 @@ export function useWindowManager() {
 
       setDragTarget(id);
     },
-    [focusWindow, tileOrder, viewport],
+    [focusWindow, tileOrder, viewport, allConfigs],
+  );
+
+  const startResize = useCallback(
+    (id: string, edge: string, e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      focusWindow(id);
+
+      setStates((prev) => {
+        const ws = prev[id];
+        if (!ws) return prev;
+        dragRef.current = {
+          windowId: id,
+          startMouse: { x: e.clientX, y: e.clientY },
+          startRect: { ...ws.rect },
+          tiledRects: {},
+        };
+        return {
+          ...prev,
+          [id]: { ...ws, isFloating: true, zIndex: maxZRef.current },
+        };
+      });
+
+      setDragTarget(`resize-${id}`);
+    },
+    [focusWindow],
   );
 
   useEffect(() => {
@@ -314,6 +368,26 @@ export function useWindowManager() {
 
       const dx = e.clientX - d.startMouse.x;
       const dy = e.clientY - d.startMouse.y;
+      const isResize = dragTarget?.startsWith("resize-");
+
+      if (isResize) {
+        setStates((prev) => {
+          const ws = prev[d.windowId];
+          if (!ws) return prev;
+          return {
+            ...prev,
+            [d.windowId]: {
+              ...ws,
+              rect: {
+                ...d.startRect,
+                w: Math.max(200, d.startRect.w + dx),
+                h: Math.max(120, d.startRect.h + dy),
+              },
+            },
+          };
+        });
+        return;
+      }
 
       setStates((prev) => ({
         ...prev,
@@ -345,7 +419,9 @@ export function useWindowManager() {
 
     const onMouseUp = () => {
       const d = dragRef.current;
-      if (d && swapTarget) {
+      const isResize = dragTarget?.startsWith("resize-");
+
+      if (d && !isResize && swapTarget) {
         setTileOrder((prev) => {
           const next = [...prev];
           const fromIdx = next.indexOf(d.windowId);
@@ -361,15 +437,17 @@ export function useWindowManager() {
       setDragTarget(null);
       setSwapTarget(null);
 
-      setStates((prev) => {
-        const next = { ...prev };
-        for (const id of Object.keys(next)) {
-          if (next[id].isFloating) {
-            next[id] = { ...next[id], isFloating: false };
+      if (!isResize) {
+        setStates((prev) => {
+          const next = { ...prev };
+          for (const id of Object.keys(next)) {
+            if (next[id].isFloating) {
+              next[id] = { ...next[id], isFloating: false };
+            }
           }
-        }
-        return next;
-      });
+          return next;
+        });
+      }
       triggerRetile();
     };
 
@@ -379,7 +457,7 @@ export function useWindowManager() {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [swapTarget, triggerRetile]);
+  }, [swapTarget, triggerRetile, dragTarget]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -401,9 +479,11 @@ export function useWindowManager() {
     openWindow,
     closeWindow,
     openDynamicWindow,
+    closeDynamicWindow,
     toggleMaximize,
     focusWindow,
     startDrag,
+    startResize,
     dragTarget,
     swapTarget,
   };

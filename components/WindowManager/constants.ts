@@ -1,57 +1,56 @@
 import type { WindowConfig, BackgroundConfig } from "./types";
 
-export const GAP = 6;
+export const GAP = 10;
 export const STATUS_BAR_HEIGHT = 28;
 
 export const WINDOW_CONFIGS: WindowConfig[] = [
-  {
-    id: "neofetch",
-    title: "neofetch",
-    icon: ">_",
-    defaultOpen: true,
-    order: 0,
-  },
   {
     id: "about",
     title: "whoami",
     icon: "~",
     defaultOpen: true,
-    order: 1,
+    order: 0,
+    heightWeight: 1,
   },
   {
     id: "github",
     title: "cat /proc/github",
     icon: "",
     defaultOpen: true,
-    order: 2,
+    order: 1,
+    heightWeight: 1.3,
   },
   {
     id: "spotify",
     title: "cat /proc/spotify",
     icon: "♪",
     defaultOpen: true,
-    order: 3,
+    order: 2,
+    heightWeight: 0.6,
   },
   {
     id: "journey",
     title: "cat ~/.career/log",
     icon: "",
     defaultOpen: true,
-    order: 4,
+    order: 3,
+    heightWeight: 1,
   },
   {
     id: "projects",
     title: "ls ~/projects",
     icon: "",
     defaultOpen: true,
-    order: 5,
+    order: 4,
+    heightWeight: 1,
   },
   {
     id: "contact",
     title: "vim mail.tmp",
     icon: "",
     defaultOpen: true,
-    order: 6,
+    order: 5,
+    heightWeight: 1.1,
   },
   {
     id: "settings",
@@ -59,6 +58,7 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
     icon: "",
     defaultOpen: false,
     order: 7,
+    heightWeight: 1,
   },
   {
     id: "terminal",
@@ -66,6 +66,7 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
     icon: ">_",
     defaultOpen: false,
     order: 8,
+    heightWeight: 1,
   },
 ];
 

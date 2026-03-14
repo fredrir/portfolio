@@ -12,6 +12,7 @@ export interface WindowConfig {
   defaultOpen: boolean;
   order: number;
   isDynamic?: boolean;
+  heightWeight?: number;
 }
 
 export interface WindowState {

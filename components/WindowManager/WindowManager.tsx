@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useWindowManager } from "./hooks/useWindowManager";
 import { useBackground } from "./hooks/useBackground";
 import { Window } from "./Window";
@@ -9,7 +9,6 @@ import { AppLauncher } from "./AppLauncher";
 import { Background } from "./Background";
 import { WINDOW_CONFIGS } from "./constants";
 
-import { NeofetchPane } from "./panes/NeofetchPane";
 import { AboutPane } from "./panes/AboutPane";
 import { JourneyPane } from "./panes/JourneyPane";
 import { JourneyDetailPane } from "./panes/JourneyDetailPane";
@@ -21,10 +20,12 @@ import { SpotifyPaneWrapper } from "./panes/SpotifyPaneWrapper";
 import { GitHubPaneWrapper } from "./panes/GitHubPaneWrapper";
 import { TerminalPaneWrapper } from "./panes/TerminalPaneWrapper";
 
-import type { GitHubData, SpotifyData } from "@/components/HomePage/Contact/types";
+import type {
+  GitHubData,
+  SpotifyData,
+} from "@/components/HomePage/Contact/types";
 import type { Journey, NavbarType } from "@/lib/locale/languageTypes";
 import type { projectType, journeyType } from "@/lib/types/types";
-import type { WindowConfig } from "./types";
 
 interface Props {
   locale: string;
@@ -77,11 +78,12 @@ function TipBar() {
   if (!visible || dismissed) return null;
 
   return (
-    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[9998] font-mono text-2xs bg-background/90 border border-primary/20 backdrop-blur-md rounded-lg px-4 py-2 flex items-center gap-3 shadow-lg shadow-primary/5">
+    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[9998] font-mono text-2xs bg-background/90 border border-primary/20 backdrop-blur-md rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg shadow-primary/5">
       <span className="text-primary">tip</span>
       <span className="text-muted-foreground/60">
-        Press <span className="text-primary/70 font-bold">Ctrl+K</span> to open
-        the app launcher. Drag title bars to swap windows.
+        Press{" "}
+        <span className="text-primary/70 font-bold">Ctrl+K</span> to
+        open the app launcher. Drag title bars to swap windows.
       </span>
       <button
         onClick={() => {
@@ -97,12 +99,64 @@ function TipBar() {
   );
 }
 
+function FloatingDetail({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg max-h-[80vh] rounded-xl border border-primary/30 bg-background/95 backdrop-blur-md shadow-2xl shadow-primary/10 overflow-hidden flex flex-col font-mono"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-4 py-2 border-b border-primary/15 bg-primary/[0.03] shrink-0">
+          <div className="flex items-center gap-2.5">
+            <button onClick={onClose} className="group">
+              <div className="w-3.5 h-3.5 rounded-full bg-destructive/60 group-hover:bg-destructive transition-colors" />
+            </button>
+            <div className="w-3.5 h-3.5 rounded-full bg-accent-yellow/60" />
+            <div className="w-3.5 h-3.5 rounded-full bg-primary/60" />
+          </div>
+          <span className="text-2xs text-muted-foreground/50 truncate mx-2">
+            {title}
+          </span>
+          <span className="text-3xs text-primary/30">fredrir@arch</span>
+        </div>
+        <div className="flex-1 overflow-auto">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 function MobileLayout({
   paneContent,
 }: {
   paneContent: Record<string, React.ReactNode>;
 }) {
-  const paneOrder = ["neofetch", "about", "github", "spotify", "journey", "projects", "contact"];
+  const paneOrder = [
+    "about",
+    "github",
+    "spotify",
+    "journey",
+    "projects",
+    "contact",
+  ];
 
   return (
     <div className="flex flex-col gap-3 p-3 pb-12">
@@ -112,7 +166,7 @@ function MobileLayout({
         return (
           <div
             key={id}
-            className="rounded-lg border border-primary/20 bg-background/80 backdrop-blur-md shadow-lg shadow-primary/5 overflow-hidden"
+            className="rounded-xl border border-primary/20 bg-background/80 backdrop-blur-md shadow-lg shadow-primary/5 overflow-hidden"
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-primary/15 bg-primary/[0.03]">
               <div className="flex items-center gap-2.5">
@@ -151,10 +205,11 @@ export function WindowManager({
   const wm = useWindowManager();
   const bg = useBackground();
   const [isMobile, setIsMobile] = useState(false);
-  const [focusedId, setFocusedId] = useState<string | null>("neofetch");
-  const [dynamicContent, setDynamicContent] = useState<
-    Record<string, React.ReactNode>
-  >({});
+  const [focusedId, setFocusedId] = useState<string | null>("about");
+  const [floatingDetail, setFloatingDetail] = useState<{
+    title: string;
+    content: React.ReactNode;
+  } | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -176,55 +231,34 @@ export function WindowManager({
     setFocusedId("settings");
   }, [wm]);
 
-  const handleOpenJourneyDetail = useCallback(
-    (j: journeyType) => {
-      const id = `journey-${j.id}`;
-      const config: WindowConfig = {
-        id,
-        title: `${j.company} — ${j.jobTitle}`,
-        icon: "",
-        defaultOpen: false,
-        order: 100 + j.id,
-        isDynamic: true,
-      };
-      setDynamicContent((prev) => ({
-        ...prev,
-        [id]: <JourneyDetailPane journey={j} />,
-      }));
-      wm.openDynamicWindow(config);
-      setFocusedId(id);
-    },
-    [wm],
-  );
+  const handleOpenJourneyDetail = useCallback((j: journeyType) => {
+    setFloatingDetail({
+      title: `${j.company} — ${j.jobTitle}`,
+      content: <JourneyDetailPane journey={j} />,
+    });
+  }, []);
 
   const handleOpenProjectDetail = useCallback(
     (p: projectType) => {
-      const id = `project-${p.id}`;
-      const config: WindowConfig = {
-        id,
+      setFloatingDetail({
         title: `~/projects/${p.title}`,
-        icon: "",
-        defaultOpen: false,
-        order: 200 + p.id,
-        isDynamic: true,
-      };
-      setDynamicContent((prev) => ({
-        ...prev,
-        [id]: <ProjectDetailPane project={p} viewCode={project.viewCode} />,
-      }));
-      wm.openDynamicWindow(config);
-      setFocusedId(id);
+        content: (
+          <ProjectDetailPane project={p} viewCode={project.viewCode} />
+        ),
+      });
     },
-    [wm, project.viewCode],
+    [project.viewCode],
   );
 
-  const staticContent: Record<string, React.ReactNode> = {
-    neofetch: <NeofetchPane locale={locale} />,
-    about: <AboutPane landing={landing} />,
+  const paneContent: Record<string, React.ReactNode> = {
+    about: <AboutPane locale={locale} landing={landing} />,
     github: <GitHubPaneWrapper initialData={githubData} />,
     spotify: <SpotifyPaneWrapper initialData={spotifyData} />,
     journey: (
-      <JourneyPane journey={journey} onOpenDetail={handleOpenJourneyDetail} />
+      <JourneyPane
+        journey={journey}
+        onOpenDetail={handleOpenJourneyDetail}
+      />
     ),
     projects: (
       <ProjectsPane
@@ -250,8 +284,6 @@ export function WindowManager({
       />
     ),
   };
-
-  const paneContent = { ...staticContent, ...dynamicContent };
 
   if (isMobile) {
     return (
@@ -291,6 +323,7 @@ export function WindowManager({
               onMaximize={() => wm.toggleMaximize(config.id)}
               onFocus={() => handleFocus(config.id)}
               onDragStart={wm.startDrag}
+              onResizeStart={wm.startResize}
             >
               {paneContent[config.id]}
             </Window>
@@ -318,6 +351,15 @@ export function WindowManager({
           }}
           onClose={() => wm.setLauncherOpen(false)}
         />
+      )}
+
+      {floatingDetail && (
+        <FloatingDetail
+          title={floatingDetail.title}
+          onClose={() => setFloatingDetail(null)}
+        >
+          {floatingDetail.content}
+        </FloatingDetail>
       )}
     </div>
   );
