@@ -65,7 +65,7 @@ export const useTerminalResize = ({ isExpanded }: UseTerminalResizeProps) => {
         setTerminalSize({ width: 896, height: 600 });
       } else {
         // Desktop normal
-        setTerminalSize({ width: 640, height: 360 });
+        setTerminalSize({ width: 640, height: 420 });
       }
     };
 
@@ -79,7 +79,6 @@ export const useTerminalResize = ({ isExpanded }: UseTerminalResizeProps) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // Don't allow resizing on mobile
       if (isMobile) return;
 
       setIsResizing(true);
@@ -97,12 +96,12 @@ export const useTerminalResize = ({ isExpanded }: UseTerminalResizeProps) => {
         direction.includes("w")
           ? "nwse-resize"
           : direction.includes("n") && direction.includes("w")
-          ? "nw-resize"
-          : direction.includes("e")
-          ? "ew-resize"
-          : "ns-resize";
+            ? "nw-resize"
+            : direction.includes("e")
+              ? "ew-resize"
+              : "ns-resize";
     },
-    [terminalSize, isMobile]
+    [terminalSize, isMobile],
   );
 
   const handleResizeMove = useCallback(
@@ -121,31 +120,31 @@ export const useTerminalResize = ({ isExpanded }: UseTerminalResizeProps) => {
       if (resizeDirection.includes("e")) {
         newWidth = Math.max(
           MIN_WIDTH,
-          Math.min(MAX_WIDTH, startSize.width + deltaX)
+          Math.min(MAX_WIDTH, startSize.width + deltaX),
         );
       }
       if (resizeDirection.includes("w")) {
         newWidth = Math.max(
           MIN_WIDTH,
-          Math.min(MAX_WIDTH, startSize.width - deltaX)
+          Math.min(MAX_WIDTH, startSize.width - deltaX),
         );
       }
       if (resizeDirection.includes("s")) {
         newHeight = Math.max(
           MIN_HEIGHT,
-          Math.min(MAX_HEIGHT, startSize.height + deltaY)
+          Math.min(MAX_HEIGHT, startSize.height + deltaY),
         );
       }
       if (resizeDirection.includes("n")) {
         newHeight = Math.max(
           MIN_HEIGHT,
-          Math.min(MAX_HEIGHT, startSize.height - deltaY)
+          Math.min(MAX_HEIGHT, startSize.height - deltaY),
         );
       }
 
       setTerminalSize({ width: newWidth, height: newHeight });
     },
-    [isResizing, startPos, startSize, resizeDirection, isMobile]
+    [isResizing, startPos, startSize, resizeDirection, isMobile],
   );
 
   const handleResizeEnd = useCallback(() => {

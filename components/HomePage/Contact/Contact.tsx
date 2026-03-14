@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { GitHubPane } from "./GitHubPane";
 import { SpotifyPane } from "./SpotifyPane";
 import { ContactForm } from "./ContactForm";
@@ -8,9 +9,32 @@ import type { ContactProps, GitHubData, SpotifyData } from "./types";
 interface Props extends ContactProps {
   githubData: GitHubData | null;
   spotifyData: SpotifyData;
+  locale: string;
 }
 
-const Contact = ({ contact, githubData, spotifyData }: Props) => {
+const Contact = ({ contact, githubData, spotifyData, locale }: Props) => {
+  const [timeStr, setTimeStr] = useState("");
+
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      const date = now.toLocaleDateString(locale, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      });
+      const time = now.toLocaleTimeString(locale, {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+      setTimeStr(`${date} ${time}`);
+    };
+    update();
+    const interval = setInterval(update, 60_000);
+    return () => clearInterval(interval);
+  }, [locale]);
+
   return (
     <div className="flex flex-col px-4" id="contact">
       <div className="py-10 mt-24 container mx-auto">
@@ -47,16 +71,7 @@ const Contact = ({ contact, githubData, spotifyData }: Props) => {
                 {contact.title}
               </span>
               <span className="font-mono text-3xs text-primary/40">
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                })}{" "}
-                {new Date().toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                })}
+                {timeStr}
               </span>
             </div>
           </div>

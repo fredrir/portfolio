@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HeartIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,18 +10,29 @@ interface Props {
   license2: string;
 }
 
+interface FallingHeart {
+  id: number;
+  left: number;
+}
+
 const Footer = ({ license1, license2 }: Props) => {
-  const [hearts, setHearts] = useState<{ id: number }[]>([]);
+  const [hearts, setHearts] = useState<FallingHeart[]>([]);
+  const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
-  const githubSrc = theme === "dark" ? "/github-dark.svg" : "/github.svg";
-  const linkedInSrc = theme === "dark" ? "/linkedin-dark.svg" : "/linkedin.svg";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const githubSrc = mounted && theme === "dark" ? "/github-dark.svg" : "/github.svg";
+  const linkedInSrc = mounted && theme === "dark" ? "/linkedin-dark.svg" : "/linkedin.svg";
 
   const handleHeartClick = () => {
-    const newHearts = [...hearts];
+    const newHearts: FallingHeart[] = [];
     for (let i = 0; i < 20; i++) {
-      newHearts.push({ id: Date.now() + i });
+      newHearts.push({ id: Date.now() + i, left: Math.random() * 100 });
     }
-    setHearts(newHearts);
+    setHearts((prev) => [...prev, ...newHearts]);
   };
 
   return (
@@ -64,7 +75,7 @@ const Footer = ({ license1, license2 }: Props) => {
           style={{
             position: "absolute",
             top: "0",
-            left: `${Math.random() * 100}%`,
+            left: `${heart.left}%`,
             animation: "fall 5s linear forwards",
             pointerEvents: "none",
           }}
