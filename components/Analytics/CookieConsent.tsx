@@ -23,6 +23,15 @@ const content = {
       "Legal basis: Art. 6(1)(a) GDPR — your consent",
     ],
     gdprBack: "[q] back",
+    neofetch: {
+      host: "visitor",
+      os: "fredrir 2.0",
+      kernel: "Next.js 15.2.8",
+      shell: "zsh 5.9",
+      wm: "Tailwind CSS",
+      theme: "Nord Dark",
+      cookies: "pending...",
+    },
   },
   nb: {
     prompt: "Fredrik Carsten Hansteen trenger tilgang til informasjonskapsler",
@@ -39,6 +48,15 @@ const content = {
       "Rettslig grunnlag: Art. 6(1)(a) GDPR — ditt samtykke",
     ],
     gdprBack: "[q] tilbake",
+    neofetch: {
+      host: "besøkende",
+      os: "fredrir 2.0",
+      kernel: "Next.js 15.2.8",
+      shell: "zsh 5.9",
+      wm: "Tailwind CSS",
+      theme: "Nord Dark",
+      cookies: "venter...",
+    },
   },
   nn: {
     prompt: "Fredrik Carsten Hansteen treng tilgang til informasjonskapslar",
@@ -55,6 +73,15 @@ const content = {
       "Rettsleg grunnlag: Art. 6(1)(a) GDPR — ditt samtykke",
     ],
     gdprBack: "[q] tilbake",
+    neofetch: {
+      host: "gjest",
+      os: "fredrir 2.0",
+      kernel: "Next.js 15.2.8",
+      shell: "zsh 5.9",
+      wm: "Tailwind CSS",
+      theme: "Nord Dark",
+      cookies: "ventar...",
+    },
   },
   fr: {
     prompt: "Fredrik Carsten Hansteen nécessite des cookies",
@@ -71,14 +98,105 @@ const content = {
       "Base juridique : Art. 6(1)(a) RGPD — votre consentement",
     ],
     gdprBack: "[q] retour",
+    neofetch: {
+      host: "visiteur",
+      os: "fredrir 2.0",
+      kernel: "Next.js 15.2.8",
+      shell: "zsh 5.9",
+      wm: "Tailwind CSS",
+      theme: "Nord Dark",
+      cookies: "en attente...",
+    },
   },
 };
+
+const LOGO_LINES = [
+  "  ╔══════════╗  ",
+  "  ║ ████████ ║  ",
+  "  ║ ██       ║  ",
+  "  ║ ██████   ║  ",
+  "  ║ ██       ║  ",
+  "  ║ ██       ║  ",
+  "  ╚══════════╝  ",
+  "   ┃  ┃  ┃  ┃   ",
+  "   ╹  ╹  ╹  ╹   ",
+];
+
+function Neofetch({
+  neofetch,
+}: {
+  neofetch: (typeof content)["en"]["neofetch"];
+}) {
+  const infoLines: [string, string][] = [
+    ["OS", neofetch.os],
+    ["Kernel", neofetch.kernel],
+    ["Shell", neofetch.shell],
+    ["WM", neofetch.wm],
+    ["Theme", neofetch.theme],
+    ["Cookies", neofetch.cookies],
+  ];
+
+  const colorBlocks = (
+    <div className="flex gap-[3px]">
+      {[
+        "bg-red-500",
+        "bg-yellow-500",
+        "bg-green-500",
+        "bg-cyan-500",
+        "bg-blue-500",
+        "bg-purple-500",
+        "bg-pink-500",
+        "bg-orange-500",
+      ].map((c) => (
+        <div key={c} className={`w-2.5 h-2.5 rounded-sm ${c}`} />
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="flex gap-3 items-start">
+      <div className="shrink-0 hidden sm:block">
+        {LOGO_LINES.map((line, i) => (
+          <div
+            key={i}
+            className="text-primary leading-[1.15] text-[11px] whitespace-pre"
+            style={{
+              opacity: i >= 7 ? 0.4 : 1,
+              textShadow: i < 7 ? "0 0 8px hsl(var(--primary) / 0.3)" : "none",
+            }}
+          >
+            {line}
+          </div>
+        ))}
+      </div>
+
+      <div className="min-w-0 space-y-0.5 text-xs">
+        <div className="text-primary font-bold">
+          {neofetch.host}
+          <span className="text-muted-foreground font-normal">@</span>
+          <span className="text-primary">fredrir</span>
+        </div>
+        <div className="text-primary/30 text-[10px] leading-none mb-1">
+          ─────────────────
+        </div>
+        {infoLines.map(([label, value]) => (
+          <div key={label} className="flex gap-1.5">
+            <span className="text-primary font-semibold shrink-0">{label}</span>
+            <span className="text-muted-foreground">{value}</span>
+          </div>
+        ))}
+        <div className="pt-1.5">{colorBlocks}</div>
+      </div>
+    </div>
+  );
+}
 
 export function CookieConsentBanner({
   locale = "en",
 }: CookieConsentBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showNeofetch, setShowNeofetch] = useState(false);
   const [typed, setTyped] = useState("");
   const [showGdpr, setShowGdpr] = useState(false);
   const { setConsent } = useAnalyticsConsent();
@@ -95,14 +213,23 @@ export function CookieConsentBanner({
 
   useEffect(() => {
     if (!isVisible) return;
-    let i = 0;
-    const interval = setInterval(() => {
-      setTyped(fullPrompt.slice(0, i + 1));
-      i++;
-      if (i >= fullPrompt.length) clearInterval(interval);
-    }, 18);
-    return () => clearInterval(interval);
-  }, [isVisible, fullPrompt]);
+    const t = setTimeout(() => setShowNeofetch(true), 200);
+    return () => clearTimeout(t);
+  }, [isVisible]);
+
+  useEffect(() => {
+    if (!showNeofetch) return;
+    const delay = setTimeout(() => {
+      let i = 0;
+      const interval = setInterval(() => {
+        setTyped(fullPrompt.slice(0, i + 1));
+        i++;
+        if (i >= fullPrompt.length) clearInterval(interval);
+      }, 18);
+      return () => clearInterval(interval);
+    }, 600);
+    return () => clearTimeout(delay);
+  }, [showNeofetch, fullPrompt]);
 
   const doneTyping = typed.length >= fullPrompt.length;
 
@@ -143,42 +270,52 @@ export function CookieConsentBanner({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-md z-50">
+    <div className="fixed bottom-4 right-4 sm:max-w-2xl z-50">
       <div
         className={`
           font-mono text-sm transition-all duration-250 ease-out
           ${isAnimating ? "translate-y-4 opacity-0" : "translate-y-0 opacity-100"}
         `}
       >
-        {/* Terminal window */}
         <div className="rounded-md border border-primary/30 bg-background/95 backdrop-blur-sm shadow-lg shadow-primary/5 overflow-hidden">
-          {/* Title bar */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-primary/20 bg-primary/5">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
             <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
-            <span className="ml-2 text-xs text-muted-foreground">~/.cookies</span>
+            <span className="ml-2 text-xs text-muted-foreground">
+              fredrir@fredrir:~ (zsh)
+            </span>
           </div>
 
-          {/* Terminal body */}
-          <div className="p-3 space-y-2">
-            {/* Prompt line with typewriter */}
-            <div className="flex gap-2">
-              <span className="text-primary shrink-0">$</span>
-              <span className="text-foreground">
-                {typed}
-                {!doneTyping && (
-                  <span className="inline-block w-1.5 h-4 bg-primary/80 align-middle animate-pulse ml-px" />
-                )}
-              </span>
-            </div>
+          <div className="p-3 space-y-3">
+            {showNeofetch && (
+              <div className="pb-1 border-b border-primary/10">
+                <Neofetch neofetch={text.neofetch} />
+              </div>
+            )}
 
-            {/* GDPR info panel */}
+            {showNeofetch && (
+              <div className="flex gap-2">
+                <span className="text-primary shrink-0">$</span>
+                <span className="text-foreground">
+                  {typed}
+                  {!doneTyping && (
+                    <span className="inline-block w-1.5 h-4 bg-primary/80 align-middle animate-pulse ml-px" />
+                  )}
+                </span>
+              </div>
+            )}
+
             {showGdpr && (
               <div className="border border-primary/20 rounded px-3 py-2 space-y-1.5 bg-primary/5">
-                <div className="text-primary text-xs font-bold">{text.gdprTitle}</div>
+                <div className="text-primary text-xs font-bold">
+                  {text.gdprTitle}
+                </div>
                 {text.gdprLines.map((line, i) => (
-                  <div key={i} className="flex gap-2 text-xs text-muted-foreground">
+                  <div
+                    key={i}
+                    className="flex gap-2 text-xs text-muted-foreground"
+                  >
                     <span className="text-primary/60 shrink-0">·</span>
                     <span>{line}</span>
                   </div>
@@ -194,7 +331,6 @@ export function CookieConsentBanner({
               </div>
             )}
 
-            {/* Action buttons - only show when typing is done */}
             {doneTyping && (
               <div className="flex items-center gap-3 pt-1">
                 <span className="text-primary shrink-0">$</span>
