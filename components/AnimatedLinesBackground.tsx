@@ -1,46 +1,66 @@
 "use client";
 
 import type React from "react";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useTheme } from "next-themes";
+
+interface Dot {
+  x: number;
+  y: number;
+  delay: number;
+  duration: number;
+}
+
+interface Connection {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  duration: number;
+  delay: number;
+}
+
+function generateDots(): Dot[] {
+  const cols = 24;
+  const rows = 16;
+  return Array.from({ length: cols * rows }, (_, i) => ({
+    x: ((i % cols) / (cols - 1)) * 100,
+    y: (Math.floor(i / cols) / (rows - 1)) * 100,
+    delay: Math.random() * 8,
+    duration: Math.random() * 4 + 6,
+  }));
+}
+
+function generateConnections(): Connection[] {
+  const count = 12;
+  return Array.from({ length: count }, () => {
+    const x1 = Math.random() * 100;
+    const y1 = Math.random() * 100;
+    const angle = Math.random() * Math.PI * 2;
+    const len = Math.random() * 15 + 5;
+    return {
+      x1,
+      y1,
+      x2: Math.min(100, Math.max(0, x1 + Math.cos(angle) * len)),
+      y2: Math.min(100, Math.max(0, y1 + Math.sin(angle) * len)),
+      duration: Math.random() * 6 + 8,
+      delay: Math.random() * 6,
+    };
+  });
+}
 
 export const AnimatedBackground: React.FC = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const [dots, setDots] = useState<Dot[]>([]);
+  const [connections, setConnections] = useState<Connection[]>([]);
 
-  //Grid dots
-  const dots = useMemo(() => {
-    const cols = 24;
-    const rows = 16;
-    return Array.from({ length: cols * rows }, (_, i) => ({
-      x: ((i % cols) / (cols - 1)) * 100,
-      y: (Math.floor(i / cols) / (rows - 1)) * 100,
-      delay: Math.random() * 8,
-      duration: Math.random() * 4 + 6,
-    }));
+  useEffect(() => {
+    setDots(generateDots());
+    setConnections(generateConnections());
   }, []);
 
-  //Connection lines between random dot pairs
-  const connections = useMemo(() => {
-    const count = 12;
-    return Array.from({ length: count }, () => {
-      const x1 = Math.random() * 100;
-      const y1 = Math.random() * 100;
-      // Keep lines short-ish
-      const angle = Math.random() * Math.PI * 2;
-      const len = Math.random() * 15 + 5;
-      return {
-        x1,
-        y1,
-        x2: Math.min(100, Math.max(0, x1 + Math.cos(angle) * len)),
-        y2: Math.min(100, Math.max(0, y1 + Math.sin(angle) * len)),
-        duration: Math.random() * 6 + 8,
-        delay: Math.random() * 6,
-      };
-    });
-  }, []);
-
-  const primary = isDark ? "74, 222, 128" : "22, 163, 74"; // green-400 / green-600
+  const primary = isDark ? "74, 222, 128" : "22, 163, 74";
 
   return (
     <div className="fixed inset-0 overflow-hidden transition-colors duration-500 bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:from-[#0a0e1a] dark:via-[#0d1117] dark:to-[#090c14]">

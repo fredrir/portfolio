@@ -5,12 +5,23 @@ import Projects from "@/components/HomePage/Projects/Projects";
 import { localeParams } from "@/lib/locale/languageTypes";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { getDictionary } from "@/lib/locale/dictionaries";
+import { getDictionary, locales } from "@/lib/locale/dictionaries";
 import { fetchGitHubData } from "@/lib/github";
 import { fetchSpotifyData } from "@/lib/spotify";
+import { notFound } from "next/navigation";
+
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }));
+}
+
+export const dynamicParams = false;
 
 export default async function Home(props: { params: localeParams }) {
   const { locale } = await props.params;
+
+  if (!locales.includes(locale)) {
+    notFound();
+  }
 
   const [dict, githubData, spotifyData] = await Promise.all([
     getDictionary(locale),

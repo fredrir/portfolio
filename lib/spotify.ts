@@ -1,4 +1,5 @@
-"use server";
+import "server-only";
+
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN;
@@ -81,7 +82,8 @@ export async function fetchSpotifyData() {
     }
 
     return { isPlaying: false };
-  } catch {
+  } catch (error) {
+    console.error("Spotify fetch error:", error);
     return { isPlaying: false };
   }
 }
