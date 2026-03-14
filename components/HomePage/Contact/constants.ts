@@ -1,11 +1,20 @@
 export const GITHUB_ASCII = [
-  "   ╭─────────╮   ",
-  "  ╭┤  ◉   ◉  ├╮  ",
-  "  │╰────┬────╯│  ",
-  "  │     ▽     │  ",
-  "  ╰─┬───────┬─╯  ",
-  "    │       │    ",
-  "    ╰───────╯    ",
+  "        ▄██████▄        ",
+  "      ▄████████████▄    ",
+  "    ██████████████████   ",
+  "   ████████████████████  ",
+  "  █████ ▀██████▀ ██████ ",
+  "  ██████          ██████ ",
+  "  █████            █████ ",
+  "  █████            █████ ",
+  "  █████            █████ ",
+  "  ██████          ██████ ",
+  "   ████████    █████████ ",
+  "   ███ ██████  ████████  ",
+  "    ███  ████  █████████ ",
+  "     ████      ████████  ",
+  "       █████  ███████    ",
+  "         ███  █████      ",
 ];
 
 export const SPOTIFY_ASCII = [
@@ -52,6 +61,13 @@ export const CONTRIBUTION_LEVEL_COLORS = [
 
 export const CAVA_CHARS = ["▁", "▂", "▃", "▅", "▆", "█"];
 
-export const MS_PER_DAY = 86400000;
+const ms = {
+  second: 1000,
+  minute: 60 * 1000,
+  hour: 60 * 60 * 1000,
+  day: 24 * 60 * 60 * 1000,
+};
+
+export const MS_PER_DAY = 1 * ms.day;
 export const CAVA_BAR_COUNT = 16;
-export const SPOTIFY_POLL_INTERVAL = 30000;
+export const SPOTIFY_POLL_INTERVAL = 30 * ms.second;
