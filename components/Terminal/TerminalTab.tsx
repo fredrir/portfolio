@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 interface TerminalTabProps {
   setIsSmall: (value: boolean) => void;
   setIsClosed: (value: boolean) => void;
@@ -13,39 +11,36 @@ const TerminalTab = ({
 }: TerminalTabProps) => {
   return (
     <div className="min-h-[216px] max-w-lg w-full mt-10 mb-32 flex flex-col justify-end items-start">
-      <button onClick={() => setIsClosed(false)}>
-        <div className="min-h-10 bg-gray-900 flex items-start justify-between rounded-lg border-solid border-2 border-gray-800 dark:border-white">
-          <p className="text-lg px-5 mt-1 text-white">Terminal</p>
-          {minimized ?? (
-            <div className="pr-1 pt-1 gap-2 flex flex-row items-end">
-              <button
-                className="hover:scale-110"
-                onClick={() => {
-                  setIsSmall(false);
-                }}
-              >
-                <div className="border-solid border-2 px-2 py-0.5 border-green-500 relative ">
-                  <Image
-                    src={"square-icon.svg"}
-                    alt={"square icon"}
-                    width={11}
-                    height={11}
-                    className=""
-                  />
-                </div>
-              </button>
-              <button
-                className="hover:scale-110"
-                onClick={() => {
-                  setIsClosed(true);
-                }}
-              >
-                <div className="border-solid border-2 px-2 border-red-400 text-red-400 text-xs">
-                  X
-                </div>
-              </button>
-            </div>
-          )}
+      <button onClick={() => setIsClosed(false)} className="group">
+        <div className="rounded-md border border-primary/30 bg-background/95 backdrop-blur-sm shadow-lg shadow-primary/5 overflow-hidden">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/5">
+            {minimized ?? (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsClosed(true);
+                  }}
+                  className="group/btn"
+                >
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/70 group-hover/btn:bg-red-500 transition-colors" />
+                </button>
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/40" />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsSmall(false);
+                  }}
+                  className="group/btn"
+                >
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/70 group-hover/btn:bg-green-500 transition-colors" />
+                </button>
+              </>
+            )}
+            <span className="ml-2 text-xs text-muted-foreground font-mono group-hover:text-foreground transition-colors">
+              fredrir@fredrir:~ (zsh)
+            </span>
+          </div>
         </div>
       </button>
     </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAnalyticsConsent } from "./AnalyticsConsentProvider";
+import Neofetch, { type NeofetchInfoLine, getDefaultInfo } from "@/components/Neofetch";
 
 interface CookieConsentBannerProps {
   locale?: string;
@@ -23,15 +24,7 @@ const content = {
       "Legal basis: Art. 6(1)(a) GDPR — your consent",
     ],
     gdprBack: "[q] back",
-    neofetch: {
-      host: "visitor",
-      os: "fredrir 2.0",
-      kernel: "Next.js 15.2.8",
-      shell: "zsh 5.9",
-      wm: "Tailwind CSS",
-      theme: "Nord Dark",
-      cookies: "pending...",
-    },
+    cookieLine: "pending...",
   },
   nb: {
     prompt: "Fredrik Carsten Hansteen trenger tilgang til informasjonskapsler",
@@ -48,15 +41,7 @@ const content = {
       "Rettslig grunnlag: Art. 6(1)(a) GDPR — ditt samtykke",
     ],
     gdprBack: "[q] tilbake",
-    neofetch: {
-      host: "besøkende",
-      os: "fredrir 2.0",
-      kernel: "Next.js 15.2.8",
-      shell: "zsh 5.9",
-      wm: "Tailwind CSS",
-      theme: "Nord Dark",
-      cookies: "venter...",
-    },
+    cookieLine: "venter...",
   },
   nn: {
     prompt: "Fredrik Carsten Hansteen treng tilgang til informasjonskapslar",
@@ -73,15 +58,7 @@ const content = {
       "Rettsleg grunnlag: Art. 6(1)(a) GDPR — ditt samtykke",
     ],
     gdprBack: "[q] tilbake",
-    neofetch: {
-      host: "gjest",
-      os: "fredrir 2.0",
-      kernel: "Next.js 15.2.8",
-      shell: "zsh 5.9",
-      wm: "Tailwind CSS",
-      theme: "Nord Dark",
-      cookies: "ventar...",
-    },
+    cookieLine: "ventar...",
   },
   fr: {
     prompt: "Fredrik Carsten Hansteen nécessite des cookies",
@@ -98,97 +75,12 @@ const content = {
       "Base juridique : Art. 6(1)(a) RGPD — votre consentement",
     ],
     gdprBack: "[q] retour",
-    neofetch: {
-      host: "visiteur",
-      os: "fredrir 2.0",
-      kernel: "Next.js 15.2.8",
-      shell: "zsh 5.9",
-      wm: "Tailwind CSS",
-      theme: "Nord Dark",
-      cookies: "en attente...",
-    },
+    cookieLine: "en attente...",
   },
 };
 
-const LOGO_LINES = [
-  "  ╔══════════╗  ",
-  "  ║ ████████ ║  ",
-  "  ║ ██       ║  ",
-  "  ║ ██████   ║  ",
-  "  ║ ██       ║  ",
-  "  ║ ██       ║  ",
-  "  ╚══════════╝  ",
-  "   ┃  ┃  ┃  ┃   ",
-  "   ╹  ╹  ╹  ╹   ",
-];
-
-function Neofetch({
-  neofetch,
-}: {
-  neofetch: (typeof content)["en"]["neofetch"];
-}) {
-  const infoLines: [string, string][] = [
-    ["OS", neofetch.os],
-    ["Kernel", neofetch.kernel],
-    ["Shell", neofetch.shell],
-    ["WM", neofetch.wm],
-    ["Theme", neofetch.theme],
-    ["Cookies", neofetch.cookies],
-  ];
-
-  const colorBlocks = (
-    <div className="flex gap-[3px]">
-      {[
-        "bg-red-500",
-        "bg-yellow-500",
-        "bg-green-500",
-        "bg-cyan-500",
-        "bg-blue-500",
-        "bg-purple-500",
-        "bg-pink-500",
-        "bg-orange-500",
-      ].map((c) => (
-        <div key={c} className={`w-2.5 h-2.5 rounded-sm ${c}`} />
-      ))}
-    </div>
-  );
-
-  return (
-    <div className="flex gap-3 items-start">
-      <div className="shrink-0 hidden sm:block">
-        {LOGO_LINES.map((line, i) => (
-          <div
-            key={i}
-            className="text-primary leading-[1.15] text-[11px] whitespace-pre"
-            style={{
-              opacity: i >= 7 ? 0.4 : 1,
-              textShadow: i < 7 ? "0 0 8px hsl(var(--primary) / 0.3)" : "none",
-            }}
-          >
-            {line}
-          </div>
-        ))}
-      </div>
-
-      <div className="min-w-0 space-y-0.5 text-xs">
-        <div className="text-primary font-bold">
-          {neofetch.host}
-          <span className="text-muted-foreground font-normal">@</span>
-          <span className="text-primary">fredrir</span>
-        </div>
-        <div className="text-primary/30 text-[10px] leading-none mb-1">
-          ─────────────────
-        </div>
-        {infoLines.map(([label, value]) => (
-          <div key={label} className="flex gap-1.5">
-            <span className="text-primary font-semibold shrink-0">{label}</span>
-            <span className="text-muted-foreground">{value}</span>
-          </div>
-        ))}
-        <div className="pt-1.5">{colorBlocks}</div>
-      </div>
-    </div>
-  );
+function getCookieInfo(locale: string, cookieValue: string): NeofetchInfoLine[] {
+  return [...getDefaultInfo(locale), { label: "Cookies", value: cookieValue }];
 }
 
 export function CookieConsentBanner({
@@ -290,7 +182,10 @@ export function CookieConsentBanner({
           <div className="p-3 space-y-3">
             {showNeofetch && (
               <div className="pb-1 border-b border-primary/10">
-                <Neofetch neofetch={text.neofetch} />
+                <Neofetch
+                  info={getCookieInfo(locale, text.cookieLine)}
+                  animate={true}
+                />
               </div>
             )}
 

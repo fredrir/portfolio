@@ -9,9 +9,10 @@ interface Props {
       mainText: string;
     };
   };
+  locale?: string;
 }
 
-const LandingComponent = ({ landing }: Props) => {
+const LandingComponent = ({ landing, locale }: Props) => {
   return (
     <div
       id="start"
@@ -36,7 +37,7 @@ const LandingComponent = ({ landing }: Props) => {
         </h1>
       </div>
 
-      <TerminalComponent mainText={landing.terminal.mainText} />
+      <TerminalComponent mainText={landing.terminal.mainText} locale={locale} />
     </div>
   );
 };

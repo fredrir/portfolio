@@ -1,4 +1,5 @@
 import { FileSystemManager } from "./fileSystem";
+import { getNeofetchPlainText } from "@/components/Neofetch";
 import type { CommandOutput } from "./types";
 
 export class CommandProcessor {
@@ -21,6 +22,7 @@ export class CommandProcessor {
             command,
             output: `Available commands:
   help          - Show this help message
+  neofetch      - System information display
   ls [path]     - List directory contents
   cd <path>     - Change directory
   pwd           - Print working directory
@@ -34,6 +36,14 @@ export class CommandProcessor {
   history       - Show command history
   uname         - System information
   uptime        - System uptime`,
+          },
+        };
+
+      case "neofetch":
+        return {
+          output: {
+            command,
+            output: getNeofetchPlainText(),
           },
         };
 
@@ -78,8 +88,8 @@ export class CommandProcessor {
         return {
           output: {
             command,
-            output: `🖥️  FredrikOS v1.0
-Built with  Next.js 
+            output: `fredrir v2.0
+Built with Next.js + React + Tailwind
 Type 'help' for available commands
 Repository: https://github.com/fredrir/portfolio
 Author: Fredrik Carsten Hansteen`,
@@ -96,10 +106,10 @@ Author: Fredrik Carsten Hansteen`,
 
       case "uname":
         const unameFlag = args[0];
-        let unameOutput = "FredrikOS 1.0.0";
+        let unameOutput = "fredrir 2.0.0";
         if (unameFlag === "-a") {
           unameOutput =
-            "FredrikOS fredrik-terminal 1.0.0 #1 SMP Web Browser x86_64 GNU/Linux";
+            "fredrir fredrir-terminal 2.0.0 #1 SMP Web Browser x86_64 GNU/Linux";
         } else if (unameFlag === "-r") {
           unameOutput = "1.0.0";
         } else if (unameFlag === "-m") {
@@ -130,7 +140,7 @@ Author: Fredrik Carsten Hansteen`,
         return {
           output: {
             command,
-            output: `bash: ${cmd}: command not found`,
+            output: `zsh: command not found: ${cmd}`,
             isError: true,
           },
         };

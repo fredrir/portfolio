@@ -47,7 +47,7 @@ export const useTypingAnimation = ({ mainText }: UseTypingAnimationProps) => {
 
           timeoutRef.current = setTimeout(() => {
             setIsTypingComplete(true);
-            setText((prev) => prev + "\n \nbash: command not found");
+            setText((prev) => prev + "\n \nzsh: command not found");
             timeoutRef.current = null;
           }, 700);
         }

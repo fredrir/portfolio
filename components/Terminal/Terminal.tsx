@@ -1,14 +1,15 @@
 "use client";
-import Image from "next/image";
+import Neofetch from "@/components/Neofetch";
 import TerminalTab from "./TerminalTab";
 import { useTerminal } from "./hooks/useTerminal";
 import { useTerminalResize } from "./hooks/useTerminalResize";
 
 interface Props {
   mainText: string;
+  locale?: string;
 }
 
-const Terminal = ({ mainText }: Props) => {
+const Terminal = ({ mainText, locale }: Props) => {
   const {
     text,
     cursorVisible,
@@ -57,169 +58,141 @@ const Terminal = ({ mainText }: Props) => {
           maxWidth: "100vw",
         }}
       >
-        <div className="bg-gray-800 flex flex-row px-2 md:px-3 font-mono text-xs md:text-sm p-1 pt-2 rounded-t-lg text-white h-8 md:h-10">
-          <p className="mx-auto text-center truncate flex-1 px-2">
-            Terminal - {currentPath}
-          </p>
-          <div className="hidden md:flex flex-row text-end gap-2">
+        <div className="rounded-md border border-primary/30 bg-background/95 backdrop-blur-sm shadow-lg shadow-primary/5 overflow-hidden h-full flex flex-col">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-primary/20 bg-primary/5 shrink-0">
             <button
-              className="hover:scale-110 transition-transform"
-              onClick={() => setIsSmall(true)}
-              title="Minimize"
-            >
-              <div className="border-solid border-2 px-2 py-2 border-yellow-500">
-                <Image
-                  src={"/minus-icon.svg"}
-                  alt={"minus icon"}
-                  width={12}
-                  height={12}
-                  className="relative top-1 h-1"
-                />
-              </div>
-            </button>
-            <button
-              className="hover:scale-110 transition-transform"
-              onClick={() => setIsExpanded(!isExpanded)}
-              title={isExpanded ? "Restore" : "Maximize"}
-            >
-              {isExpanded ? (
-                <div className="border-solid border-2 px-2 py-1 border-green-500">
-                  <Image
-                    src={"/square-icon-expanded.svg"}
-                    alt={"square icon expanded"}
-                    width={10}
-                    height={10}
-                  />
-                </div>
-              ) : (
-                <div className="border-solid border-2 px-2 py-1 border-green-500">
-                  <Image
-                    src={"/square-icon.svg"}
-                    alt={"square icon"}
-                    width={11}
-                    height={11}
-                  />
-                </div>
-              )}
-            </button>
-            <button
-              className="hover:scale-110 transition-transform"
               onClick={() => setIsClosed(true)}
               title="Close"
+              className="group"
             >
-              <div className="border-solid border-2 px-2 border-red-400 text-red-400">
-                X
-              </div>
+              <div className="w-2.5 h-2.5 rounded-full bg-red-500/70 group-hover:bg-red-500 transition-colors" />
             </button>
+            <button
+              onClick={() => setIsSmall(true)}
+              title="Minimize"
+              className="group"
+            >
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70 group-hover:bg-yellow-500 transition-colors" />
+            </button>
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              title={isExpanded ? "Restore" : "Maximize"}
+              className="group"
+            >
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500/70 group-hover:bg-green-500 transition-colors" />
+            </button>
+            <span className="ml-2 text-xs text-muted-foreground font-mono truncate">
+              fredrir@fredrir:{currentPath} (zsh)
+            </span>
           </div>
-        </div>
 
-        <div
-          ref={terminalContentRef}
-          className="bg-black text-green-500 font-mono px-2 md:px-4 pt-2 md:pt-4 rounded-b-lg shadow-lg flex flex-col overflow-y-auto scroll-smooth cursor-text text-xs md:text-sm"
-          style={{
-            height: `${terminalSize.height - (isMobile ? 32 : 40)}px`,
-          }}
-          onClick={() => inputRef.current?.focus()}
-        >
-          <div className="flex-1">
-            {showInitialAnimation && (
-              <article className="whitespace-pre-wrap break-words">
-                <span className="text-white">Fredrik:~$ </span>
-                <span>{text.slice(0, mainText.length)}</span>
-                <span className="text-red-500">
-                  {text.slice(mainText.length)}
-                </span>
-                {cursorVisible && (
-                  <span className="border-white bg-white border border-1 text-white">
-                    |
-                  </span>
-                )}
-              </article>
-            )}
-
-            {commandHistory.map((entry, index) => (
-              <div key={index} className="mt-1 md:mt-2">
-                <div className="flex items-start flex-wrap">
-                  <span className="text-white flex-shrink-0">
-                    [{currentPath}]${" "}
-                  </span>
-                  <span className="text-green-500 ml-1 break-all">
-                    {entry.command}
-                  </span>
+          <div
+            ref={terminalContentRef}
+            className="flex-1 font-mono px-3 pt-3 overflow-y-auto scroll-smooth cursor-text text-xs md:text-sm bg-background/50"
+            onClick={() => inputRef.current?.focus()}
+          >
+            <div className="flex-1">
+              <div className="mb-2">
+                <div className="text-muted-foreground/40 mb-1">
+                  <span className="text-primary">$</span> neofetch
                 </div>
-                {entry.output && (
-                  <div
-                    className={`mt-1 whitespace-pre-wrap break-words ${
-                      entry.isError ? "text-red-500" : "text-gray-300"
-                    }`}
-                  >
-                    {entry.output}
-                  </div>
-                )}
+                <Neofetch animate={true} locale={locale} />
               </div>
-            ))}
-          </div>
 
-          {cursorIsFinished && (
-            <div className="flex items-center mt-1 md:mt-2 border-t border-gray-700 pt-2 pb-2 sticky bottom-0 bg-black">
-              <span className="text-white mr-1 md:mr-2 flex-shrink-0 text-xs md:text-sm">
-                [{currentPath}]${" "}
-              </span>
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleInputSubmit}
-                className="flex-1 bg-transparent text-green-500 outline-none font-mono caret-green-500 min-w-0 text-xs md:text-sm"
-                placeholder="Type 'help' for available commands..."
-                autoComplete="off"
-              />
-              <span className="text-green-500 animate-pulse flex-shrink-0">
-                |
-              </span>
+              <div className="border-t border-primary/10 my-2" />
+
+              {showInitialAnimation && (
+                <article className="whitespace-pre-wrap break-words">
+                  <span className="text-primary">$</span>{" "}
+                  <span className="text-foreground">
+                    {text.slice(0, mainText.length)}
+                  </span>
+                  <span className="text-red-500">
+                    {text.slice(mainText.length)}
+                  </span>
+                  {cursorVisible && (
+                    <span className="inline-block w-1.5 h-4 bg-primary/80 align-middle animate-pulse ml-px" />
+                  )}
+                </article>
+              )}
+
+              {commandHistory.map((entry, index) => (
+                <div key={index} className="mt-1 md:mt-2">
+                  <div className="flex items-start flex-wrap">
+                    <span className="text-primary flex-shrink-0">
+                      [{currentPath}]${" "}
+                    </span>
+                    <span className="text-foreground ml-1 break-all">
+                      {entry.command}
+                    </span>
+                  </div>
+                  {entry.output && (
+                    <div
+                      className={`mt-1 whitespace-pre-wrap break-words ${
+                        entry.isError ? "text-red-500" : "text-muted-foreground"
+                      }`}
+                    >
+                      {entry.output}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
+
+            {cursorIsFinished && (
+              <div className="flex items-center mt-1 md:mt-2 border-t border-primary/20 pt-2 pb-2 sticky bottom-0 bg-background/95 backdrop-blur-sm">
+                <span className="text-primary mr-1 md:mr-2 flex-shrink-0 text-xs md:text-sm">
+                  [{currentPath}]${" "}
+                </span>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleInputSubmit}
+                  className="flex-1 bg-transparent text-foreground outline-none font-mono caret-primary min-w-0 text-xs md:text-sm"
+                  placeholder="Type 'help' for available commands..."
+                  autoComplete="off"
+                />
+                <span className="inline-block w-1.5 h-4 bg-primary/80 animate-pulse flex-shrink-0" />
+              </div>
+            )}
+          </div>
         </div>
 
         {!isMobile && (
           <>
             <div
-              className="absolute top-0 right-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-blue-500/20 transition-colors"
+              className="absolute top-0 right-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-primary/20 transition-colors"
               onMouseDown={(e) => handleResizeStart(e, "e")}
               onTouchStart={(e) => handleResizeStart(e, "e")}
-              title="Resize horizontally"
             />
             <div
-              className="absolute top-0 left-0 w-1 h-full cursor-w-resize bg-transparent hover:bg-blue-500/20 transition-colors"
+              className="absolute top-0 left-0 w-1 h-full cursor-w-resize bg-transparent hover:bg-primary/20 transition-colors"
               onMouseDown={(e) => handleResizeStart(e, "w")}
               onTouchStart={(e) => handleResizeStart(e, "w")}
-              title="Resize horizontally"
             />
             <div
-              className="absolute bottom-0 left-0 w-full h-1 cursor-ns-resize bg-transparent hover:bg-blue-500/20 transition-colors"
+              className="absolute bottom-0 left-0 w-full h-1 cursor-ns-resize bg-transparent hover:bg-primary/20 transition-colors"
               onMouseDown={(e) => handleResizeStart(e, "s")}
               onTouchStart={(e) => handleResizeStart(e, "s")}
-              title="Resize vertically"
             />
             <div
-              className="absolute bottom-0 right-0 w-3 h-3 cursor-nw-resize bg-transparent hover:bg-blue-500/40 transition-colors"
+              className="absolute bottom-0 right-0 w-3 h-3 cursor-nw-resize bg-transparent hover:bg-primary/30 transition-colors"
               onMouseDown={(e) => handleResizeStart(e, "es")}
               onTouchStart={(e) => handleResizeStart(e, "es")}
-              title="Resize diagonally"
             >
               <div className="absolute bottom-0 right-0 w-3 h-3">
-                <div className="absolute bottom-0 right-0 w-2 h-0.5 bg-gray-600 opacity-50" />
-                <div className="absolute bottom-0.5 right-0 w-0.5 h-2 bg-gray-600 opacity-50" />
+                <div className="absolute bottom-0 right-0 w-2 h-0.5 bg-primary/30" />
+                <div className="absolute bottom-0.5 right-0 w-0.5 h-2 bg-primary/30" />
               </div>
             </div>
           </>
         )}
 
         {isResizing && !isMobile && (
-          <div className="absolute top-2 left-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-mono">
-            {terminalSize.width} × {terminalSize.height}
+          <div className="absolute top-8 left-2 bg-background/90 text-muted-foreground text-xs px-2 py-1 rounded font-mono border border-primary/20">
+            {terminalSize.width} x {terminalSize.height}
           </div>
         )}
       </div>
