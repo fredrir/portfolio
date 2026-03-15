@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTheme } from "next-themes";
+import { THEMES } from "@/lib/themes";
 
 export const LOGO_LINES = [
   "  \u256D\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256E",
@@ -19,7 +21,7 @@ export interface NeofetchInfoLine {
   value: string;
 }
 
-const BIRTHDAY = new Date(2003, 9, 2); // October 2, 2003
+const BIRTHDAY = new Date(2003, 9, 2);
 
 export function computeUptime(): string {
   const now = new Date();
@@ -51,34 +53,36 @@ const LOCALE_NAMES: Record<string, string> = {
   fr: "fr_FR.UTF-8",
 };
 
-export function getDefaultInfo(locale?: string): NeofetchInfoLine[] {
+export function getDefaultInfo(locale?: string, themeName?: string): NeofetchInfoLine[] {
   return [
     { label: null, value: "fredrir@fredrir" },
     {
       label: null,
-      value:
-        "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+      value: "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
     },
     { label: "OS", value: "fredrir 2.0" },
     { label: "Kernel", value: "Next.js 15.2.8" },
     { label: "Uptime", value: computeUptime() },
     { label: "Shell", value: "zsh 5.9" },
     { label: "WM", value: "Tailwind CSS" },
-    { label: "Theme", value: "catppuccin-frappe-blue [Qt]" },
+    { label: "Theme", value: themeName ?? "fredrir" },
     { label: "Locale", value: LOCALE_NAMES[locale ?? "en"] ?? "en_US.UTF-8" },
   ];
 }
 
-const COLOR_BLOCKS = [
-  "bg-red-500",
-  "bg-orange-500",
-  "bg-yellow-500",
-  "bg-green-500",
-  "bg-cyan-500",
-  "bg-blue-500",
-  "bg-purple-500",
-  "bg-pink-500",
-];
+const THEME_COLOR_MAP: Record<string, string[]> = {
+  fredrir: ["#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4", "#3b82f6", "#a855f7", "#ec4899"],
+  nord: ["#bf616a", "#d08770", "#ebcb8b", "#a3be8c", "#88c0d0", "#5e81ac", "#b48ead", "#d8dee9"],
+  "catppuccin-mocha": ["#f38ba8", "#fab387", "#f9e2af", "#a6e3a1", "#94e2d5", "#89b4fa", "#cba6f7", "#f5c2e7"],
+  rosepine: ["#eb6f92", "#ebbcba", "#f6c177", "#31748f", "#9ccfd8", "#c4a7e7", "#e0def4", "#908caa"],
+  "tokyo-night": ["#f7768e", "#ff9e64", "#e0af68", "#9ece6a", "#7dcfff", "#7aa2f7", "#bb9af7", "#c0caf5"],
+  gruvbox: ["#fb4934", "#fe8019", "#fabd2f", "#b8bb26", "#8ec07c", "#83a598", "#d3869b", "#ebdbb2"],
+  "solarized-light": ["#dc322f", "#cb4b16", "#b58900", "#859900", "#2aa198", "#268bd2", "#6c71c4", "#d33682"],
+  "catppuccin-latte": ["#d20f39", "#fe640b", "#df8e1d", "#40a02b", "#179299", "#1e66f5", "#8839ef", "#ea76cb"],
+  "rose-pine-dawn": ["#b4637a", "#ea9d34", "#d7827e", "#286983", "#56949f", "#907aa9", "#c4a7e7", "#9893a5"],
+};
+
+const DEFAULT_COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4", "#3b82f6", "#a855f7", "#ec4899"];
 
 interface NeofetchProps {
   info?: NeofetchInfoLine[];
@@ -93,9 +97,14 @@ export default function Neofetch({
   animate = true,
   hideLogo = false,
 }: NeofetchProps) {
+  const { resolvedTheme } = useTheme();
+  const themeDef = THEMES.find((t) => t.id === resolvedTheme);
+  const themeName = themeDef?.name ?? resolvedTheme ?? "fredrir";
+  const themeColors = THEME_COLOR_MAP[resolvedTheme ?? ""] ?? DEFAULT_COLORS;
+
   const resolvedInfo = useMemo(
-    () => info ?? getDefaultInfo(locale),
-    [info, locale],
+    () => info ?? getDefaultInfo(locale, themeName),
+    [info, locale, themeName],
   );
   const totalLines = Math.max(LOGO_LINES.length, resolvedInfo.length + 2);
   const [visibleLines, setVisibleLines] = useState(animate ? 0 : totalLines);
@@ -112,13 +121,13 @@ export default function Neofetch({
   }, [animate, totalLines]);
 
   return (
-    <div className="flex gap-12 items-start">
+    <div className="flex gap-4 @xs:gap-8 @sm:gap-12 items-start @container">
       {!hideLogo && (
         <div className="shrink-0">
           {LOGO_LINES.map((line, i) => (
             <div
               key={i}
-              className="text-primary leading-[1.2] text-[11px] whitespace-pre transition-opacity duration-150"
+              className="text-primary leading-[1.2] text-[13px] @xs:text-[14px] @sm:text-[15px] whitespace-pre transition-opacity duration-150"
               style={{
                 opacity: i < visibleLines ? (i >= 7 ? 0.4 : 1) : 0,
                 textShadow:
@@ -156,19 +165,16 @@ export default function Neofetch({
           className="flex gap-[3px] pt-2 transition-opacity duration-150"
           style={{ opacity: visibleLines >= resolvedInfo.length ? 1 : 0 }}
         >
-          {COLOR_BLOCKS.map((c) => (
-            <div key={c} className={`w-2.5 h-2.5 rounded-sm ${c}`} />
+          {themeColors.map((c, i) => (
+            <div key={i} className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: c }} />
           ))}
         </div>
         <div
           className="flex gap-[3px] pt-[3px] transition-opacity duration-150"
           style={{ opacity: visibleLines >= resolvedInfo.length + 1 ? 1 : 0 }}
         >
-          {COLOR_BLOCKS.map((c) => (
-            <div
-              key={c}
-              className={`w-2.5 h-2.5 rounded-sm ${c} brightness-50`}
-            />
+          {themeColors.map((c, i) => (
+            <div key={i} className="w-2.5 h-2.5 rounded-sm brightness-50" style={{ backgroundColor: c }} />
           ))}
         </div>
       </div>

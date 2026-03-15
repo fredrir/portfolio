@@ -223,11 +223,6 @@ function MobileLayout({
                   ‹
                 </button>
                 <span className="font-mono text-2xs text-muted-foreground/50 flex-1 text-center">
-                  {activeConfig?.icon && (
-                    <span className="text-primary/60 mr-1">
-                      {activeConfig.icon}
-                    </span>
-                  )}
                   {activeConfig?.shortTitle}
                 </span>
                 <span className="font-mono text-3xs text-primary/30">

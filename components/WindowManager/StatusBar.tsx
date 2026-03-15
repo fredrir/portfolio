@@ -9,6 +9,8 @@ import { STATUS_BAR_HEIGHT } from "./constants";
 import type { WindowConfig, WindowStates } from "./types";
 import type { UiStrings } from "./WindowManager";
 import { computeUptime } from "@/components/Neofetch";
+import { useRecaptcha } from "@/components/RecaptchaProvider";
+import { recordVisit, getVisitorCount } from "@/app/actions/visitor";
 
 interface Props {
   states: WindowStates;
@@ -68,20 +70,35 @@ function Weather() {
 }
 
 function VisitorCount({ label }: { label: string }) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState<number | null>(null);
+  const { executeRecaptcha } = useRecaptcha();
 
   useEffect(() => {
-    const key = "wm-visitor-count";
     const visited = sessionStorage.getItem("wm-visited");
-    let current = parseInt(localStorage.getItem(key) || "0", 10);
-    if (!visited) {
-      current++;
-      localStorage.setItem(key, String(current));
-      sessionStorage.setItem("wm-visited", "1");
-    }
-    setCount(current);
-  }, []);
 
+    if (visited) {
+      getVisitorCount().then(setCount).catch(() => setCount(null));
+      return;
+    }
+
+    if (!executeRecaptcha) return;
+
+    executeRecaptcha("page_visit")
+      .then((token) => recordVisit(token))
+      .then((result) => {
+        if (result.success) {
+          sessionStorage.setItem("wm-visited", "1");
+          setCount(result.count ?? 0);
+        } else {
+          getVisitorCount().then(setCount).catch(() => setCount(null));
+        }
+      })
+      .catch(() => {
+        getVisitorCount().then(setCount).catch(() => setCount(null));
+      });
+  }, [executeRecaptcha]);
+
+  if (count === null) return null;
   return <span>{label}: {count}</span>;
 }
 

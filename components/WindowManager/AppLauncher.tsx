@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { WINDOW_CONFIGS } from "./constants";
 import type { WindowStates } from "./types";
 import type { UiStrings } from "./WindowManager";
@@ -22,41 +22,48 @@ export function AppLauncher({ states, ui, onOpen, onClose }: Props) {
     inputRef.current?.focus();
   }, []);
 
-  const filtered = WINDOW_CONFIGS.filter(
-    (c) =>
-      c.title.toLowerCase().includes(query.toLowerCase()) ||
-      c.id.toLowerCase().includes(query.toLowerCase()),
-  );
+  const filtered = useMemo(() => {
+    const q = query.toLowerCase();
+    return WINDOW_CONFIGS.filter(
+      (c) => c.title.toLowerCase().includes(q) || c.id.toLowerCase().includes(q),
+    );
+  }, [query]);
 
   useEffect(() => {
     setSelectedIdx(0);
   }, [query]);
 
-  const handleSelect = (id: string) => {
-    onOpen(id);
-    onClose();
-  };
+  const handleSelect = useCallback(
+    (id: string) => {
+      onOpen(id);
+      onClose();
+    },
+    [onOpen, onClose],
+  );
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setSelectedIdx((i) => Math.min(i + 1, filtered.length - 1));
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setSelectedIdx((i) => Math.max(i - 1, 0));
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (filtered[selectedIdx]) handleSelect(filtered[selectedIdx].id);
-        break;
-      case "Escape":
-        e.preventDefault();
-        onClose();
-        break;
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          setSelectedIdx((i) => Math.min(i + 1, filtered.length - 1));
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setSelectedIdx((i) => Math.max(i - 1, 0));
+          break;
+        case "Enter":
+          e.preventDefault();
+          if (filtered[selectedIdx]) handleSelect(filtered[selectedIdx].id);
+          break;
+        case "Escape":
+          e.preventDefault();
+          onClose();
+          break;
+      }
+    },
+    [filtered, selectedIdx, handleSelect, onClose],
+  );
 
   useEffect(() => {
     const el = listRef.current?.children[selectedIdx] as HTMLElement | undefined;

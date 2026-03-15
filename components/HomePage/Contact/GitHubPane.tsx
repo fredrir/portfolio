@@ -28,7 +28,9 @@ const WAVE_COLORS = [
 
 function AnimatedAscii() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef(0);
+  const scaleRef = useRef(1);
   const glitchRef = useRef<
     { row: number; col: number; char: string; ttl: number }[]
   >([]);
@@ -124,6 +126,27 @@ function AnimatedAscii() {
   }, []);
 
   useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        const dpr = window.devicePixelRatio || 1;
+        const baseW = Math.ceil(Math.max(...GITHUB_ASCII.map((l) => l.length)) * 7.2);
+        const baseH = Math.ceil(GITHUB_ASCII.length * 11);
+        const scaleW = width / baseW;
+        const scaleH = height / baseH;
+        scaleRef.current = Math.min(scaleW, scaleH, 1.5);
+        if (canvasRef.current) {
+          canvasRef.current.style.transform = `scale(${scaleRef.current})`;
+        }
+      }
+    });
+    ro.observe(wrapper);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
     let raf: number;
     let lastTime = 0;
     const fps = 24;
@@ -141,11 +164,13 @@ function AnimatedAscii() {
   }, [draw]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="text-primary"
-      style={{ imageRendering: "pixelated" }}
-    />
+    <div ref={wrapperRef} className="flex items-center justify-center overflow-hidden">
+      <canvas
+        ref={canvasRef}
+        className="text-primary origin-center"
+        style={{ imageRendering: "pixelated" }}
+      />
+    </div>
   );
 }
 
@@ -299,7 +324,7 @@ export function GitHubPane({
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        setCompact(entry.contentRect.height < 250);
+        setCompact(entry.contentRect.height < 250 || entry.contentRect.width < 300);
       }
     });
     ro.observe(el);
@@ -331,7 +356,7 @@ export function GitHubPane({
           ) : (
             <>
               <div className={`flex ${compact ? "gap-3" : "gap-4 @sm:gap-6"} flex-col @sm:flex-row`}>
-                <div className="shrink-0 hidden @sm:block">
+                <div className="shrink-0">
                   <AnimatedAscii />
                 </div>
 
