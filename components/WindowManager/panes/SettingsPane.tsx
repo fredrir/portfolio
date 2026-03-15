@@ -165,8 +165,19 @@ export function SettingsPane({
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full px-3 py-2 rounded-md border border-dashed border-primary/20 text-xs text-muted-foreground/50 hover:border-primary/40 hover:text-primary/70 hover:bg-primary/5 transition-all text-center"
+                className={`w-full px-3 py-2 rounded-md border text-xs transition-all flex items-center justify-center gap-2 ${
+                  currentBackground.type === "custom-image"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-dashed border-primary/20 text-muted-foreground/50 hover:border-primary/40 hover:text-primary/70 hover:bg-primary/5"
+                }`}
               >
+                {currentBackground.type === "custom-image" && currentBackground.value && (
+                  <img
+                    src={currentBackground.value}
+                    alt=""
+                    className="w-5 h-5 rounded object-cover border border-primary/20"
+                  />
+                )}
                 {ui.customImage}
               </button>
             </div>
