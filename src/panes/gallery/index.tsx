@@ -9,6 +9,7 @@ import {
 } from "@/app/actions/gallery";
 import { isSvg } from "./utils";
 import { useExifData } from "./use-exif";
+import type { UiStrings } from "@/shared/types";
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -72,9 +73,10 @@ function ImageDetail({ image }: { image: GalleryImage }) {
         )}
       </div>
 
-      <div className="shrink-0 flex flex-wrap gap-x-3 gap-y-0.5 text-2xs text-muted-foreground/50 px-0.5">
+      <div className="shrink-0 flex pt-2 flex-wrap gap-x-3 gap-y-0.5 text-2xs text-muted-foreground/50 px-0.5">
         {exifLoading && <span className="animate-pulse">reading exif...</span>}
         {displayDate && <span>{formatDate(displayDate)}</span>}
+        {image.filename && <span> {image.filename} </span>}
         {exif?.camera && <span>{exif.camera}</span>}
         {exif?.focalLength && (
           <span>
@@ -150,7 +152,7 @@ function CategoryBrowser({
   );
 }
 
-export function ImagePane() {
+export function ImagePane({ ui }: { ui: UiStrings }) {
   const [categories, setCategories] = useState<GalleryCategory[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
@@ -197,13 +199,13 @@ export function ImagePane() {
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
           <span className="text-muted-foreground/40 animate-pulse">
-            scanning directories...
+            {ui.searchingGallery}
           </span>
         </div>
       ) : categories.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-2 text-muted-foreground/40">
           <span className="text-2xl">📂</span>
-          <span>~/gallery/ is empty</span>
+          <span>{ui.emptyGallery}</span>
         </div>
       ) : showBrowser ? (
         <CategoryBrowser
@@ -243,11 +245,8 @@ export function ImagePane() {
                   onClick={() => setSelectedImage(null)}
                   className={`text-primary/50 hover:text-primary active:text-primary transition-colors ${narrow ? "text-sm py-1" : "text-2xs"}`}
                 >
-                  ← back
+                  ← {activeCategory}
                 </button>
-                <span className="text-muted-foreground/40 text-2xs truncate">
-                  {selectedImage.filename}
-                </span>
               </div>
               <ImageDetail image={selectedImage} />
             </div>

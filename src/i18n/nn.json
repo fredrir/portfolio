@@ -291,6 +291,8 @@
     "stop": "stopp",
     "start": "start",
     "lastYear": "Siste år",
+    "searchingGallery": "søkjer i galleri...",
+    "emptyGallery": "~/gallery/ er tomt",
     "shortTitles": {
       "about": "whoami",
       "github": "github",

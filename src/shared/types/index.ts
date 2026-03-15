@@ -55,6 +55,8 @@ export interface UiStrings {
   stop: string;
   start: string;
   lastYear: string;
+  searchingGallery: string;
+  emptyGallery: string;
   shortTitles: Record<string, string>;
 }
 

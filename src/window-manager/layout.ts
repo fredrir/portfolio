@@ -9,12 +9,15 @@ export const DEFAULT_LAYOUT: CellDef[][] = [
 ];
 
 export const MEDIUM_LAYOUT: CellDef[][] = [
-  ["about", "projects", "github"],
+  [["about", "spotify"], "projects", "github"],
   ["journey", "contact"],
 ];
 
 export const SMALL_LAYOUT: CellDef[][] = [
-  ["about", "projects"],
+  [
+    ["about", "spotify"],
+    ["projects", "settings"],
+  ],
   ["journey", "contact"],
 ];
 
@@ -29,7 +32,7 @@ export const DEFAULT_COL_WIDTHS: number[][] = [
 ];
 
 export const MEDIUM_COL_WIDTHS: number[][] = [
-  [25, 35, 40],
+  [30, 30, 40],
   [55, 45],
 ];
 
@@ -40,6 +43,7 @@ export const SMALL_COL_WIDTHS: number[][] = [
 
 export const STACK_HEIGHTS: Record<string, number[]> = {
   "about,spotify": [50, 50],
+  "projects,settings": [45, 55],
 };
 
 export const LAYOUT_TIERS: Record<

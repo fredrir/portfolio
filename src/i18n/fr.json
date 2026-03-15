@@ -291,6 +291,8 @@
     "stop": "arrêter",
     "start": "démarrer",
     "lastYear": "Dernière année",
+    "searchingGallery": "recherche dans la galerie...",
+    "emptyGallery": "~/gallery/ est vide",
     "shortTitles": {
       "about": "whoami",
       "github": "github",

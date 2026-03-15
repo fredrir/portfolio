@@ -154,7 +154,7 @@ export function WindowManager({
       />
     ),
     terminal: <TerminalPane locale={locale} />,
-    gallery: <ImagePane />,
+    gallery: <ImagePane ui={ui} />,
   };
 
   const configMap = Object.fromEntries(WINDOW_CONFIGS.map((c) => [c.id, c]));
