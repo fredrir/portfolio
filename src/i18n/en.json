@@ -288,8 +288,8 @@
     "images": "images",
     "clickToOpen": "click to open",
     "active": "active",
-    "running": "running",
-    "stopped": "stopped",
+    "stop": "stop",
+    "start": "start",
     "lastYear": "Last year"
   }
 }

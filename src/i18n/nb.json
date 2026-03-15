@@ -288,8 +288,8 @@
     "images": "bilder",
     "clickToOpen": "klikk for å åpne",
     "active": "aktiv",
-    "running": "kjører",
-    "stopped": "stoppet",
+    "stop": "stopp",
+    "start": "start",
     "lastYear": "Siste år"
   }
 }

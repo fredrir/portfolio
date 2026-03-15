@@ -122,7 +122,9 @@ export function AnimatedAscii() {
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
-        const baseW = Math.ceil(Math.max(...GITHUB_ASCII.map((l) => l.length)) * 7.2);
+        const baseW = Math.ceil(
+          Math.max(...GITHUB_ASCII.map((l) => l.length)) * 7.2,
+        );
         const baseH = Math.ceil(GITHUB_ASCII.length * 11);
         const scaleW = width / baseW;
         const scaleH = height / baseH;
@@ -139,8 +141,8 @@ export function AnimatedAscii() {
   useEffect(() => {
     let raf: number;
     let lastTime = 0;
-    const fps = 24;
-    const interval = 1000 / fps;
+    const fps = 60;
+    const interval = 4000 / fps;
 
     const loop = (time: number) => {
       raf = requestAnimationFrame(loop);
@@ -154,7 +156,10 @@ export function AnimatedAscii() {
   }, [draw]);
 
   return (
-    <div ref={wrapperRef} className="flex items-center justify-center overflow-hidden">
+    <div
+      ref={wrapperRef}
+      className="flex items-center justify-center overflow-hidden"
+    >
       <canvas
         ref={canvasRef}
         className="text-primary origin-center"

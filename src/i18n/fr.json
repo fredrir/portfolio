@@ -288,8 +288,8 @@
     "images": "images",
     "clickToOpen": "cliquer pour ouvrir",
     "active": "actif",
-    "running": "en cours",
-    "stopped": "arrêté",
+    "stop": "arrêter",
+    "start": "démarrer",
     "lastYear": "Dernière année"
   }
 }

@@ -11,7 +11,13 @@ import { RecentTracks } from "./components/recent-tracks";
 import { getSpotifyData } from "@/app/actions/spotify";
 import type { SpotifyData, UiStrings } from "@/shared/types";
 
-export function SpotifyPane({ initialData, ui }: { initialData: SpotifyData; ui?: UiStrings }) {
+export function SpotifyPane({
+  initialData,
+  ui,
+}: {
+  initialData: SpotifyData;
+  ui?: UiStrings;
+}) {
   const [data, setData] = useState<SpotifyData>(initialData);
   const [showEmbed, setShowEmbed] = useState(false);
   const lastKnownRef = useRef<SpotifyData>(initialData);
@@ -75,17 +81,22 @@ export function SpotifyPane({ initialData, ui }: { initialData: SpotifyData; ui?
       ? Math.round((data.progressMs / data.durationMs) * 100)
       : 0;
 
-  const displayData = data?.title ? data : lastKnownRef.current?.title ? {
-    ...lastKnownRef.current,
-    isPlaying: false,
-    progressMs: undefined,
-    durationMs: undefined,
-  } : data;
+  const displayData = data?.title
+    ? data
+    : lastKnownRef.current?.title
+      ? {
+          ...lastKnownRef.current,
+          isPlaying: false,
+          progressMs: undefined,
+          durationMs: undefined,
+        }
+      : data;
 
   const lpLabel = ui?.lastPlayed ?? "LAST PLAYED";
-  const lastPlayedLabel = !displayData?.isPlaying && displayData?.lastPlayedAt
-    ? `${lpLabel} ${relativeTime(displayData.lastPlayedAt)}`
-    : lpLabel;
+  const lastPlayedLabel =
+    !displayData?.isPlaying && displayData?.lastPlayedAt
+      ? `${lpLabel} ${relativeTime(displayData.lastPlayedAt)}`
+      : lpLabel;
 
   return (
     <div className="h-full overflow-hidden">
@@ -94,7 +105,8 @@ export function SpotifyPane({ initialData, ui }: { initialData: SpotifyData; ui?
           <div className="flex-1 overflow-y-auto min-h-0">
             {!compact && (
               <div className="text-muted-foreground/50 mb-2">
-                <span className="text-primary">$</span> cat /proc/spotify
+                <span className="text-primary">$</span> cat
+                /proc/spotify/recently-played
               </div>
             )}
 
@@ -156,11 +168,15 @@ export function SpotifyPane({ initialData, ui }: { initialData: SpotifyData; ui?
                         {displayData.isPlaying ? "▶" : "⏸"}
                       </span>
                       <span className="text-muted-foreground/50">
-                        {displayData.isPlaying ? (ui?.nowPlaying ?? "NOW PLAYING") : lastPlayedLabel}
+                        {displayData.isPlaying
+                          ? (ui?.nowPlaying ?? "NOW PLAYING")
+                          : lastPlayedLabel}
                       </span>
                     </div>
                     <div>
-                      <span className="text-primary font-semibold">{ui?.track ?? "Track"}</span>
+                      <span className="text-primary font-semibold">
+                        {ui?.track ?? "Track"}
+                      </span>
                       <span className="text-muted-foreground"> </span>
                       {displayData.songUrl ? (
                         <a
@@ -172,40 +188,54 @@ export function SpotifyPane({ initialData, ui }: { initialData: SpotifyData; ui?
                           {displayData.title}
                         </a>
                       ) : (
-                        <span className="text-foreground">{displayData.title}</span>
+                        <span className="text-foreground">
+                          {displayData.title}
+                        </span>
                       )}
                     </div>
                     <div>
-                      <span className="text-primary font-semibold">{ui?.artist ?? "Artist"}</span>
-                      <span className="text-muted-foreground"> {displayData.artist}</span>
+                      <span className="text-primary font-semibold">
+                        {ui?.artist ?? "Artist"}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        {displayData.artist}
+                      </span>
                     </div>
                     {!compact && (
                       <div>
-                        <span className="text-primary font-semibold">{ui?.album ?? "Album"}</span>
-                        <span className="text-muted-foreground"> {displayData.album}</span>
+                        <span className="text-primary font-semibold">
+                          {ui?.album ?? "Album"}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {" "}
+                          {displayData.album}
+                        </span>
                       </div>
                     )}
 
-                    {displayData.isPlaying && displayData.progressMs && displayData.durationMs && (
-                      <div className="pt-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground/50 text-2xs w-8">
-                            {formatTime(displayData.progressMs)}
-                          </span>
-                          <div className="flex-1 flex items-center">
-                            <div className="w-full bg-primary/10 h-1 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-primary/60 rounded-full transition-all duration-1000"
-                                style={{ width: `${progressPct}%` }}
-                              />
+                    {displayData.isPlaying &&
+                      displayData.progressMs &&
+                      displayData.durationMs && (
+                        <div className="pt-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground/50 text-2xs w-8">
+                              {formatTime(displayData.progressMs)}
+                            </span>
+                            <div className="flex-1 flex items-center">
+                              <div className="w-full bg-primary/10 h-1 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-primary/60 rounded-full transition-all duration-1000"
+                                  style={{ width: `${progressPct}%` }}
+                                />
+                              </div>
                             </div>
+                            <span className="text-muted-foreground/50 text-2xs w-8 text-right">
+                              {formatTime(displayData.durationMs)}
+                            </span>
                           </div>
-                          <span className="text-muted-foreground/50 text-2xs w-8 text-right">
-                            {formatTime(displayData.durationMs)}
-                          </span>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {displayData.trackId && (
                       <div className="pt-1">
@@ -214,7 +244,11 @@ export function SpotifyPane({ initialData, ui }: { initialData: SpotifyData; ui?
                           className="text-2xs text-primary/60 hover:text-primary transition-colors flex items-center gap-1.5 px-2 py-1 rounded border border-primary/15 hover:border-primary/30 hover:bg-primary/5"
                         >
                           <span>{showEmbed ? "⏹" : "▶"}</span>
-                          <span>{showEmbed ? (ui?.hidePlayer ?? "hide player") : (ui?.playInBrowser ?? "play in browser")}</span>
+                          <span>
+                            {showEmbed
+                              ? (ui?.hidePlayer ?? "hide player")
+                              : (ui?.playInBrowser ?? "play in browser")}
+                          </span>
                         </button>
                       </div>
                     )}
@@ -227,17 +261,21 @@ export function SpotifyPane({ initialData, ui }: { initialData: SpotifyData; ui?
                   </div>
                 )}
 
-                {!compact && displayData.topArtists && displayData.topArtists.length > 0 && (
-                  <div className="border-t border-primary/10 pt-2">
-                    <TopArtists artists={displayData.topArtists} />
-                  </div>
-                )}
+                {!compact &&
+                  displayData.topArtists &&
+                  displayData.topArtists.length > 0 && (
+                    <div className="border-t border-primary/10 pt-2">
+                      <TopArtists artists={displayData.topArtists} />
+                    </div>
+                  )}
 
-                {!compact && displayData.recentTracks && displayData.recentTracks.length > 0 && (
-                  <div className="border-t border-primary/10 pt-2">
-                    <RecentTracks tracks={displayData.recentTracks} />
-                  </div>
-                )}
+                {!compact &&
+                  displayData.recentTracks &&
+                  displayData.recentTracks.length > 0 && (
+                    <div className="border-t border-primary/10 pt-2">
+                      <RecentTracks tracks={displayData.recentTracks} />
+                    </div>
+                  )}
               </div>
             )}
           </div>

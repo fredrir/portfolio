@@ -288,8 +288,8 @@
     "images": "bilete",
     "clickToOpen": "klikk for å opne",
     "active": "aktiv",
-    "running": "køyrer",
-    "stopped": "stoppa",
+    "stop": "stopp",
+    "start": "start",
     "lastYear": "Siste år"
   }
 }

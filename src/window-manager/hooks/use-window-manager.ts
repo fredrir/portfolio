@@ -56,13 +56,28 @@ export function useWindowManager() {
       setLayoutTier((prev) => {
         if (prev === tier) return prev;
         const tierConfig = LAYOUT_TIERS[tier];
+        const newLayout = tierConfig.layout;
         setLayout(
-          tierConfig.layout.map((row) =>
+          newLayout.map((row) =>
             row.map((cell) => (Array.isArray(cell) ? [...cell] : cell)),
           ),
         );
         setRowHeights([...tierConfig.rowHeights]);
         setColWidths(tierConfig.colWidths.map((r) => [...r]));
+
+        const layoutPanes = new Set(
+          newLayout.flat().flatMap((c) => getCellPanes(c)),
+        );
+        setStates((prevStates) => {
+          const next = { ...prevStates };
+          for (const id of Object.keys(next)) {
+            if (!layoutPanes.has(id) && next[id].isOpen) {
+              next[id] = { ...next[id], isOpen: false };
+            }
+          }
+          return next;
+        });
+
         return tier;
       });
     };

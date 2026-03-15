@@ -52,8 +52,8 @@ export interface UiStrings {
   images: string;
   clickToOpen: string;
   active: string;
-  running: string;
-  stopped: string;
+  stop: string;
+  start: string;
   lastYear: string;
 }
 

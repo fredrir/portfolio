@@ -36,7 +36,7 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   },
   {
     id: "spotify",
-    title: "cat /proc/spotify",
+    title: "./spotify.sh",
     shortTitle: "spotify",
     icon: <SpotifyLogo size={S} weight={W} />,
     defaultOpen: true,

@@ -296,6 +296,7 @@ export function WindowManager({
               wm.openWindow(id);
               setFocusedId(id);
             }}
+            onStop={(id) => wm.closeWindow(id)}
             onClose={() => wm.setLauncherOpen(false)}
           />
         )}
@@ -389,6 +390,7 @@ export function WindowManager({
             wm.openWindow(id);
             setFocusedId(id);
           }}
+          onStop={(id) => wm.closeWindow(id)}
           onClose={() => wm.setLauncherOpen(false)}
         />
       )}

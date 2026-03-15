@@ -9,10 +9,11 @@ interface Props {
   states: WindowStates;
   ui: UiStrings;
   onOpen: (id: string) => void;
+  onStop: (id: string) => void;
   onClose: () => void;
 }
 
-export function AppLauncher({ states, ui, onOpen, onClose }: Props) {
+export function AppLauncher({ states, ui, onOpen, onStop, onClose }: Props) {
   const [query, setQuery] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -104,15 +105,17 @@ export function AppLauncher({ states, ui, onOpen, onClose }: Props) {
               const isOpen = states[config.id]?.isOpen;
               const isSelected = i === selectedIdx;
               return (
-                <button
+                <div
                   key={config.id}
-                  onClick={() => handleSelect(config.id)}
                   onMouseEnter={() => setSelectedIdx(i)}
-                  className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors group ${
+                  className={`w-full flex items-center justify-between px-4 py-2.5 transition-colors group ${
                     isSelected ? "bg-primary/10" : "hover:bg-primary/5"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleSelect(config.id)}
+                    className="flex items-center gap-3 flex-1 text-left"
+                  >
                     <span className="text-primary/60 w-5 text-center text-sm">
                       {config.icon || "·"}
                     </span>
@@ -128,17 +131,21 @@ export function AppLauncher({ states, ui, onOpen, onClose }: Props) {
                         {config.id}
                       </span>
                     </div>
-                  </div>
-                  <span
-                    className={`text-2xs px-1.5 py-0.5 rounded ${
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      isOpen ? onStop(config.id) : handleSelect(config.id);
+                    }}
+                    className={`text-2xs px-1.5 py-0.5 rounded transition-colors ${
                       isOpen
-                        ? "bg-primary/15 text-primary"
-                        : "bg-muted text-muted-foreground/40"
+                        ? "bg-red-500/15 text-red-400 hover:bg-red-500/25"
+                        : "bg-primary/15 text-primary hover:bg-primary/25"
                     }`}
                   >
-                    {isOpen ? ui.running : ui.stopped}
-                  </span>
-                </button>
+                    {isOpen ? ui.stop : ui.start}
+                  </button>
+                </div>
               );
             })
           )}
