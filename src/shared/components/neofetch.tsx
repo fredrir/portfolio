@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
+import { USER_HOST } from "@/lib/constants";
 import { THEMES } from "@/lib/themes";
 import { PORTFOLIO_VERSION, NEXT_VERSION, TAILWIND_VERSION } from "@/lib/version";
 
@@ -59,7 +60,7 @@ export function getDefaultInfo(
   themeName?: string,
 ): NeofetchInfoLine[] {
   return [
-    { label: null, value: "fredrir@hansteen" },
+    { label: null, value: USER_HOST },
     {
       label: null,
       value:

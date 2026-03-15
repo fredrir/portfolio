@@ -19,38 +19,54 @@ interface Props {
   ui: UiStrings;
 }
 
-const DOCK_IDS = ["about", "contact", "terminal", "settings"] as const;
+const DOCK_IDS = ["about", "contact", "home", "terminal", "settings"] as const;
 
 const DOCK_ICONS: Record<string, React.ReactNode> = {
   about: <UserCircle size={20} weight="bold" />,
   contact: <EnvelopeSimple size={20} weight="bold" />,
+  home: <House size={22} weight="bold" />,
   terminal: <Terminal size={20} weight="bold" />,
   settings: <GearSix size={20} weight="bold" />,
 };
 
 const configMap = Object.fromEntries(WINDOW_CONFIGS.map((c) => [c.id, c]));
 
-const BLOB_KEYFRAMES = [
-  "60% 40% 55% 45% / 45% 60% 40% 55%",
-  "40% 60% 45% 55% / 55% 40% 60% 40%",
-  "55% 45% 60% 40% / 40% 55% 45% 60%",
-  "60% 40% 55% 45% / 45% 60% 40% 55%",
-];
+const DOCK_CENTERS: Record<string, number> = {
+  about: 10,
+  contact: 30,
+  home: 50,
+  terminal: 70,
+  settings: 90,
+};
 
-const BULGE_OUT =
-  "M 4.4,100 Q 0,100 0,78 L 0,44 Q 0,22 4.4,22 L 35,22 C 42,22 46,0 50,0 C 54,0 58,22 65,22 L 95.6,22 Q 100,22 100,44 L 100,78 Q 100,100 95.6,100 Z";
+function bulgePoints(center: number) {
+  const cl = (v: number) => Math.max(4.4, Math.min(95.6, v));
+  return {
+    left: cl(center - 15),
+    lcp1: cl(center - 8),
+    lcp2: cl(center - 4),
+    rcp1: cl(center + 4),
+    rcp2: cl(center + 8),
+    right: cl(center + 15),
+  };
+}
 
-const BULGE_IN =
-  "M 4.4,100 Q 0,100 0,78 L 0,44 Q 0,22 4.4,22 L 35,22 C 42,22 46,34 50,34 C 54,34 58,22 65,22 L 95.6,22 Q 100,22 100,44 L 100,78 Q 100,100 95.6,100 Z";
+function makeBulgePath(center: number): string {
+  const b = bulgePoints(center);
+  return `M 4.4,100 Q 0,100 0,78 L 0,44 Q 0,22 4.4,22 L ${b.left},22 C ${b.lcp1},22 ${b.lcp2},0 ${center},0 C ${b.rcp1},0 ${b.rcp2},22 ${b.right},22 L 95.6,22 Q 100,22 100,44 L 100,78 Q 100,100 95.6,100 Z`;
+}
 
-const CLIP_BULGE_OUT =
-  "M 0.044,1 Q 0,1 0,0.78 L 0,0.44 Q 0,0.22 0.044,0.22 L 0.35,0.22 C 0.42,0.22 0.46,0 0.5,0 C 0.54,0 0.58,0.22 0.65,0.22 L 0.956,0.22 Q 1,0.22 1,0.44 L 1,0.78 Q 1,1 0.956,1 Z";
-
-const CLIP_BULGE_IN =
-  "M 0.044,1 Q 0,1 0,0.78 L 0,0.44 Q 0,0.22 0.044,0.22 L 0.35,0.22 C 0.42,0.22 0.46,0.34 0.5,0.34 C 0.54,0.34 0.58,0.22 0.65,0.22 L 0.956,0.22 Q 1,0.22 1,0.44 L 1,0.78 Q 1,1 0.956,1 Z";
+function makeClipBulgePath(center: number): string {
+  const b = bulgePoints(center);
+  const n = (v: number) => (v / 100).toFixed(3);
+  return `M 0.044,1 Q 0,1 0,0.78 L 0,0.44 Q 0,0.22 0.044,0.22 L ${n(b.left)},0.22 C ${n(b.lcp1)},0.22 ${n(b.lcp2)},0 ${n(center)},0 C ${n(b.rcp1)},0 ${n(b.rcp2)},0.22 ${n(b.right)},0.22 L 0.956,0.22 Q 1,0.22 1,0.44 L 1,0.78 Q 1,1 0.956,1 Z`;
+}
 
 export function MobileDock({ activeApp, onOpenApp, onGoHome, ui }: Props) {
-  const isHome = activeApp === null;
+  const activeId = activeApp ?? "home";
+  const bulgeCenter = DOCK_CENTERS[activeId] ?? 50;
+  const svgPath = makeBulgePath(bulgeCenter);
+  const clipPath = makeClipBulgePath(bulgeCenter);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[9999] font-mono">
@@ -63,21 +79,18 @@ export function MobileDock({ activeApp, onOpenApp, onGoHome, ui }: Props) {
       >
         <svg className="absolute w-0 h-0" aria-hidden>
           <defs>
-            <clipPath id="dock-bulge-out" clipPathUnits="objectBoundingBox">
-              <path d={CLIP_BULGE_OUT} />
-            </clipPath>
-            <clipPath id="dock-bulge-in" clipPathUnits="objectBoundingBox">
-              <path d={CLIP_BULGE_IN} />
+            <clipPath id="dock-clip" clipPathUnits="objectBoundingBox">
+              <motion.path
+                animate={{ d: clipPath }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
+              />
             </clipPath>
           </defs>
         </svg>
 
-        <motion.div
+        <div
           className="absolute inset-0 bg-glass-faint backdrop-blur-xl"
-          animate={{
-            clipPath: isHome ? `url(#dock-bulge-out)` : `url(#dock-bulge-in)`,
-          }}
-          transition={{ duration: 0.4, ease: "easeInOut" }}
+          style={{ clipPath: "url(#dock-clip)" }}
         />
 
         <svg
@@ -87,7 +100,7 @@ export function MobileDock({ activeApp, onOpenApp, onGoHome, ui }: Props) {
           aria-hidden
         >
           <motion.path
-            animate={{ d: isHome ? BULGE_OUT : BULGE_IN }}
+            animate={{ d: svgPath }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
             fill="none"
             className="stroke-wm-border"
@@ -96,59 +109,24 @@ export function MobileDock({ activeApp, onOpenApp, onGoHome, ui }: Props) {
           />
         </svg>
 
-        <div className="relative z-20 flex items-end justify-around h-full px-2 pb-2">
-          {DOCK_IDS.slice(0, 2).map((id) => (
-            <DockIcon
-              key={id}
-              icon={DOCK_ICONS[id]}
-              label={ui.localeTitles[id] ?? configMap[id].shortTitle}
-              isActive={activeApp === id}
-              onTap={() => onOpenApp(id)}
-            />
-          ))}
+        <div className="relative z-20 flex items-end justify-around h-full pb-2">
+          {DOCK_IDS.map((id) => {
+            const isActive =
+              id === "home" ? activeApp === null : activeApp === id;
+            const label =
+              ui.localeTitles[id] ??
+              (id === "home" ? "Home" : configMap[id].shortTitle);
 
-          <motion.button
-            onClick={onGoHome}
-            whileTap={{ scale: 0.85 }}
-            className="flex flex-col items-center gap-0.5"
-            animate={{ marginBottom: isHome ? 16 : 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          >
-            <motion.div
-              animate={{
-                borderRadius: isHome ? BLOB_KEYFRAMES : "50%",
-                scale: isHome ? 1.15 : 0.85,
-              }}
-              transition={{
-                borderRadius: isHome
-                  ? { duration: 8, repeat: Infinity, ease: "easeInOut" }
-                  : { duration: 0.4, ease: "easeOut" },
-                scale: { type: "spring", stiffness: 300, damping: 20 },
-              }}
-              className={`flex items-center justify-center transition-colors duration-300 ${
-                isHome ? "text-primary" : "text-ghost opacity-70"
-              }`}
-            >
-              <House size={22} weight="bold" />
-            </motion.div>
-            <span
-              className={`text-xs truncate w-full text-center transition-colors ${
-                isHome ? "text-primary-bold" : "text-ghost"
-              }`}
-            >
-              {ui.localeTitles["home"] ?? "Home"}
-            </span>
-          </motion.button>
-
-          {DOCK_IDS.slice(2).map((id) => (
-            <DockIcon
-              key={id}
-              icon={DOCK_ICONS[id]}
-              label={ui.localeTitles[id] ?? configMap[id].shortTitle}
-              isActive={activeApp === id}
-              onTap={() => onOpenApp(id)}
-            />
-          ))}
+            return (
+              <DockIcon
+                key={id}
+                icon={DOCK_ICONS[id]}
+                label={label}
+                isActive={isActive}
+                onTap={id === "home" ? onGoHome : () => onOpenApp(id)}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

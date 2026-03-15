@@ -242,7 +242,7 @@ export function ContactPane({ contact }: ContactProps) {
             >
               From:
             </label>
-            <div className="flex-1 flex items-center gap-1 min-w-0">
+            <div className="flex-1 flex items-center ml-4 gap-1 min-w-0">
               <input
                 id="contact-name"
                 type="text"
@@ -254,7 +254,7 @@ export function ContactPane({ contact }: ContactProps) {
                 required
                 disabled={isSending}
                 className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-placeholder placeholder:pl-4 disabled:opacity-50"
+                  placeholder:text-placeholder disabled:opacity-50"
                 placeholder={contact.name}
                 autoComplete="off"
               />
@@ -270,7 +270,7 @@ export function ContactPane({ contact }: ContactProps) {
             >
               Mail:
             </label>
-            <div className="flex-1 flex items-center gap-1 min-w-0">
+            <div className="flex-1 flex items-center ml-4 gap-1 min-w-0">
               <input
                 id="contact-email"
                 type="email"
@@ -282,7 +282,7 @@ export function ContactPane({ contact }: ContactProps) {
                 required
                 disabled={isSending}
                 className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-placeholder placeholder:pl-4 disabled:opacity-50"
+                  placeholder:text-placeholder disabled:opacity-50"
                 placeholder={contact.email}
                 autoComplete="off"
               />
@@ -298,7 +298,7 @@ export function ContactPane({ contact }: ContactProps) {
             >
               Tel:
             </label>
-            <div className="flex-1 flex items-center gap-1 min-w-0">
+            <div className="flex-1 flex items-center ml-4 gap-1 min-w-0">
               <input
                 id="contact-phone"
                 type="tel"
@@ -309,7 +309,7 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 disabled={isSending}
                 className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-placeholder placeholder:pl-4 disabled:opacity-50"
+                  placeholder:text-placeholder disabled:opacity-50"
                 placeholder={`${contact.phone} (optional)`}
                 autoComplete="off"
               />

@@ -42,10 +42,7 @@ export function TerminalPane({ locale }: Props) {
       const result = processorRef.current.processCommand(cmd, currentPath);
       if (result.newPath) setCurrentPath(result.newPath);
 
-      setCommandHistory((prev) => [
-        ...prev,
-        result.output,
-      ]);
+      setCommandHistory((prev) => [...prev, result.output]);
       setInputValue("");
       setHistoryIdx(-1);
     } else if (e.key === "ArrowUp") {

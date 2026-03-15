@@ -154,7 +154,7 @@ export function SettingsPane({
             className="hidden"
           />
           <div
-            className={`grid gap-1 @xs:gap-1.5 ${compact ? "grid-cols-3 @xs:grid-cols-6" : "grid-cols-2 @xs:grid-cols-3 @sm:grid-cols-6"}`}
+            className={`grid gap-1 @xs:gap-1.5 ${compact ? "grid-cols-3 @xs:grid-cols-3" : "grid-cols-2 @xs:grid-cols-3 @sm:grid-cols-3"}`}
           >
             {BACKGROUND_PRESETS.map((preset) => (
               <button
@@ -193,7 +193,12 @@ export function SettingsPane({
                       d="M8 11l3-4 2.5 3 1.5-2 3 3H6z"
                       className="fill-surface-elevated"
                     />
-                    <circle cx="8" cy="6" r="1.5" className="fill-surface-selected" />
+                    <circle
+                      cx="8"
+                      cy="6"
+                      r="1.5"
+                      className="fill-surface-selected"
+                    />
                   </svg>
                 )}
               </div>

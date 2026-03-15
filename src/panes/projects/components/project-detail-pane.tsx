@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { USER_HOST } from "@/lib/constants";
 import Link from "next/link";
 import type { projectType, UiStrings } from "@/shared/types";
 import { GithubLogoIcon } from "@phosphor-icons/react/dist/ssr";
@@ -121,7 +122,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
 
       <div className="px-4 py-2 border-t border-border-faint bg-surface-faint text-ghost text-2xs shrink-0 flex justify-between">
         <span>{slug}(1)</span>
-        <span>fredrir@hansteen</span>
+        <span>{USER_HOST}</span>
       </div>
     </div>
   );

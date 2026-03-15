@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { USER_HOST } from "@/lib/constants";
 
 interface Props {
   title: string;
@@ -34,7 +35,7 @@ export function FloatingDetail({ title, onClose, children }: Props) {
           <span className="text-xs text-faded truncate mx-2">
             {title}
           </span>
-          <span className="text-xs text-primary-subtle">fredrir@hansteen</span>
+          <span className="text-xs text-primary-subtle">{USER_HOST}</span>
         </div>
         <div className="flex-1 overflow-auto">{children}</div>
       </div>

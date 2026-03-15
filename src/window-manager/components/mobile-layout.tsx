@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { USER_HOST } from "@/lib/constants";
 import { WINDOW_CONFIGS } from "../constants";
 import { MobileHomeScreen } from "./mobile-home-screen";
 import type { UiStrings } from "@/shared/types";
@@ -61,7 +62,7 @@ export function MobileLayout({
                       activeConfig.shortTitle)}
                 </span>
                 <span className="font-mono text-xs text-primary-subtle">
-                  fredrir@hansteen
+                  {USER_HOST}
                 </span>
               </div>
               <div className="flex-1 overflow-auto">
