@@ -13,13 +13,13 @@ interface Props {
 
 export function ProjectsPane({ projects, viewCode, onOpenDetail }: Props) {
   return (
-    <div className="p-3 font-mono text-xs h-full flex flex-col">
+    <div className="p-2 @sm:p-3 font-mono text-xs h-full flex flex-col">
       <div className="text-muted-foreground/50 mb-2">
         <span className="text-primary">$</span> ls ~/projects/
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0">
-        <div className="grid gap-1">
+        <div className="grid gap-0.5 @md:gap-1">
           {projects.map((project) => {
             const thumb =
               project.desktopImage ||
@@ -28,12 +28,12 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail }: Props) {
             return (
               <div
                 key={project.id}
-                className="flex items-center gap-3 py-1.5 px-2 rounded-md hover:bg-primary/5 transition-colors group"
+                className="flex items-center gap-2 @sm:gap-3 py-1 @sm:py-1.5 px-1.5 @sm:px-2 rounded-md hover:bg-primary/5 transition-colors group"
               >
                 {thumb && (
                   <button
                     onClick={() => onOpenDetail(project)}
-                    className="shrink-0 w-12 h-8 rounded-md overflow-hidden border border-primary/10 bg-background"
+                    className="shrink-0 w-10 h-7 @sm:w-12 @sm:h-8 @lg:w-16 @lg:h-11 rounded-md overflow-hidden border border-primary/10 bg-background transition-all"
                   >
                     <Image
                       src={thumb}
@@ -49,7 +49,7 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail }: Props) {
                   onClick={() => onOpenDetail(project)}
                   className="min-w-0 flex-1 text-left"
                 >
-                  <span className="text-primary font-semibold truncate block group-hover:underline">
+                  <span className="text-primary font-semibold truncate block group-hover:underline text-2xs @sm:text-xs">
                     {project.title}
                   </span>
                   <div className="flex flex-wrap gap-1 mt-0.5">
@@ -57,7 +57,7 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail }: Props) {
                       .split(",")
                       .slice(0, 3)
                       .map((lang, i) => (
-                        <span key={i} className="text-2xs text-muted-foreground/50">
+                        <span key={i} className="text-3xs @sm:text-2xs text-muted-foreground/50">
                           {lang.trim()}
                           {i < Math.min(2, project.languages.split(",").length - 1) && (
                             <span className="text-primary/20 ml-1">·</span>
@@ -84,7 +84,7 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail }: Props) {
                       href={project.githubLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-muted-foreground/30 hover:text-primary transition-colors text-2xs"
+                      className="text-muted-foreground/30 hover:text-primary transition-colors text-2xs hidden @sm:inline"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {viewCode}

@@ -311,8 +311,8 @@ export function GitHubPane({
           </span>
         ) : (
           <>
-            <div className="flex gap-6 flex-col sm:flex-row">
-              <div className="shrink-0 hidden sm:block">
+            <div className="flex gap-6 flex-col @sm:flex-row">
+              <div className="shrink-0 hidden @sm:block">
                 <AnimatedAscii />
               </div>
 

@@ -8,7 +8,7 @@ import { StatusBar } from "./StatusBar";
 import { AppLauncher } from "./AppLauncher";
 import { Background } from "./Background";
 import { WINDOW_CONFIGS, GAP, STATUS_BAR_HEIGHT } from "./constants";
-import { DEFAULT_COL_WIDTHS, STACK_HEIGHTS, getCellPanes } from "./layout";
+import { LAYOUT_TIERS, STACK_HEIGHTS, getCellPanes } from "./layout";
 import type { CellDef } from "./layout";
 import { MobileHomeScreen } from "./MobileHomeScreen";
 import { MobileDock } from "./MobileDock";
@@ -458,7 +458,8 @@ export function WindowManager({
                 style={{ flex: `${h} 0 0%`, gap: GAP, minHeight: 0 }}
               >
                 {row.map((cell, ci) => {
-                  const colWeights = DEFAULT_COL_WIDTHS[ri];
+                  const tierColWidths = LAYOUT_TIERS[wm.layoutTier].colWidths;
+                  const colWeights = tierColWidths[ri];
                   const w = colWeights?.[ci] ?? 1;
                   const key = Array.isArray(cell) ? cell.join(",") : cell;
                   return (

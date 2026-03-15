@@ -256,7 +256,7 @@ export function ContactForm({
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-base sm:text-xs
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-base @sm:text-xs
                   placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={contact.name}
                 autoComplete="off"
@@ -284,7 +284,7 @@ export function ContactForm({
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-base sm:text-xs
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-base @sm:text-xs
                   placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={contact.email}
                 autoComplete="off"
@@ -311,7 +311,7 @@ export function ContactForm({
                 onFocus={() => handleFocus("phone")}
                 onBlur={() => setFocusedField(null)}
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-base sm:text-xs
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-base @sm:text-xs
                   placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={`${contact.phone} (optional)`}
                 autoComplete="off"
@@ -368,7 +368,7 @@ export function ContactForm({
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="w-full h-full min-h-36 bg-transparent text-foreground outline-none font-mono text-base sm:text-xs
+                className="w-full h-full min-h-36 bg-transparent text-foreground outline-none font-mono text-base @sm:text-xs
                   resize-none p-2 leading-editor placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={
                   vimMode === "normal"
@@ -443,7 +443,7 @@ export function ContactForm({
             <button
               type="submit"
               disabled={isSending}
-              className="font-mono text-2xs sm:text-xs px-3 py-0.5 rounded border border-primary/30
+              className="font-mono text-2xs @sm:text-xs px-3 py-0.5 rounded border border-primary/30
                 text-primary hover:bg-primary/10 hover:border-primary/60
                 active:bg-primary/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >

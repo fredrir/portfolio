@@ -77,8 +77,8 @@ export function SpotifyPane({ initialData, bare = false }: { initialData: Spotif
       </div>
 
       {!data?.title ? (
-        <div className="flex gap-4 flex-col sm:flex-row items-start">
-          <div className="shrink-0 hidden sm:block">
+        <div className="flex gap-4 flex-col @sm:flex-row items-start">
+          <div className="shrink-0 hidden @sm:block">
             {SPOTIFY_ASCII.map((line, i) => (
               <span
                 key={i}
@@ -108,7 +108,7 @@ export function SpotifyPane({ initialData, bare = false }: { initialData: Spotif
         </div>
       ) : (
         <div className="space-y-2">
-          <div className="flex gap-4 flex-col sm:flex-row items-start">
+          <div className="flex gap-4 flex-col @sm:flex-row items-start">
             <div className="shrink-0 block">
               {data.albumArt ? (
                 <Image

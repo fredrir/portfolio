@@ -12,10 +12,10 @@ interface Props {
 
 export function AboutPane({ landing }: Props) {
   return (
-    <div className="p-4 font-mono text-xs h-full flex flex-col items-center justify-center gap-4 overflow-auto">
+    <div className="p-4 font-mono text-xs h-full flex flex-col items-center justify-center gap-3 @md:gap-5 overflow-auto">
       <div className="relative group">
         <div className="absolute -inset-1.5 rounded-2xl bg-primary/15 blur-lg group-hover:bg-primary/25 transition-all" />
-        <div className="relative rounded-2xl overflow-hidden w-32 h-32 border-2 border-primary/30 shadow-lg shadow-primary/10">
+        <div className="relative rounded-2xl overflow-hidden w-20 h-20 @xs:w-28 @xs:h-28 @md:w-36 @md:h-36 @lg:w-44 @lg:h-44 border-2 border-primary/30 shadow-lg shadow-primary/10 transition-all">
           <Image
             src="/Fredrik_Carsten_Hansteen.png"
             alt="Fredrik Carsten Hansteen"
@@ -27,13 +27,13 @@ export function AboutPane({ landing }: Props) {
         </div>
       </div>
 
-      <div className="text-center space-y-2 max-w-xs">
-        <h1 className="text-sm font-bold text-foreground">
+      <div className="text-center space-y-1.5 @md:space-y-3 max-w-xs @lg:max-w-sm">
+        <h1 className="text-xs @sm:text-sm @md:text-base font-bold text-foreground">
           {landing.title}
           <span className="text-primary">{" <Fredrik/>"}</span>
         </h1>
 
-        <p className="text-muted-foreground text-2xs leading-relaxed">
+        <p className="text-muted-foreground text-3xs @xs:text-2xs @md:text-xs leading-relaxed">
           {landing.terminal.mainText}
         </p>
       </div>

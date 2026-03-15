@@ -60,7 +60,7 @@ function CompanyLogo({ journey }: { journey: journeyType }) {
 
 export function JourneyPane({ journey, onOpenDetail }: Props) {
   return (
-    <div className="p-3 font-mono text-xs h-full flex flex-col">
+    <div className="p-2 @sm:p-3 font-mono text-xs h-full flex flex-col">
       <div className="text-muted-foreground/50 mb-2">
         <span className="text-primary">$</span> cat ~/.career/log
       </div>
@@ -70,29 +70,29 @@ export function JourneyPane({ journey, onOpenDetail }: Props) {
           <button
             key={j.id}
             onClick={() => onOpenDetail(j)}
-            className="w-full text-left flex items-center gap-2.5 py-1.5 px-2 rounded-md hover:bg-primary/5 transition-colors group"
+            className="w-full text-left flex items-center gap-2 @sm:gap-2.5 py-1 @sm:py-1.5 px-1.5 @sm:px-2 rounded-md hover:bg-primary/5 transition-colors group"
           >
             <CompanyLogo journey={j} />
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <span className="text-primary font-semibold truncate text-xs group-hover:underline">
+                <span className="text-primary font-semibold truncate text-2xs @sm:text-xs group-hover:underline">
                   {j.jobTitle}
                 </span>
               </div>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="text-foreground/80 text-2xs">
+                <span className="text-foreground/80 text-3xs @sm:text-2xs">
                   {j.company}
                 </span>
-                <span className="text-muted-foreground/30 text-2xs">•</span>
-                <span className="text-accent-yellow/60 text-2xs">
+                <span className="text-muted-foreground/30 text-3xs @sm:text-2xs">•</span>
+                <span className="text-accent-yellow/60 text-3xs @sm:text-2xs">
                   {j.date}
                 </span>
               </div>
             </div>
 
             {isActiveJob(j.date) && (
-              <span className="text-primary/50 text-2xs px-1.5 py-0.5 rounded bg-primary/8 shrink-0">
+              <span className="text-primary/50 text-3xs @sm:text-2xs px-1 @sm:px-1.5 py-0.5 rounded bg-primary/8 shrink-0">
                 active
               </span>
             )}

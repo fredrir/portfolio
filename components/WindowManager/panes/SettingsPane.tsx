@@ -47,7 +47,7 @@ export function SettingsPane({
   };
 
   return (
-    <div className="p-4 font-mono text-xs h-full flex flex-col overflow-y-auto">
+    <div className="p-2 @sm:p-4 font-mono text-xs h-full flex flex-col overflow-y-auto">
       <div className="text-muted-foreground/50 mb-3">
         <span className="text-primary">$</span> settings
       </div>
@@ -93,7 +93,7 @@ export function SettingsPane({
 
         <section>
           <h3 className="text-primary font-semibold text-xs mb-2">Language</h3>
-          <div className="grid grid-cols-2 gap-1.5">
+          <div className="grid grid-cols-1 @xs:grid-cols-2 gap-1.5">
             {languages.map((lang) => {
               const isActive = lang.code === currentLocale;
               return (
@@ -118,7 +118,7 @@ export function SettingsPane({
           <h3 className="text-primary font-semibold text-xs mb-2">
             Wallpaper
           </h3>
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="grid grid-cols-2 @xs:grid-cols-3 gap-1.5">
             {BACKGROUND_PRESETS.map((preset) => (
               <button
                 key={preset.id}

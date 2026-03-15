@@ -5,8 +5,10 @@ import {
   DEFAULT_ROW_HEIGHTS,
   getCellPanes,
   swapPanesInLayout,
+  getLayoutTier,
+  LAYOUT_TIERS,
 } from "../layout";
-import type { CellDef } from "../layout";
+import type { CellDef, LayoutTier } from "../layout";
 import type { WindowStates } from "../types";
 
 function getInitialStates(): WindowStates {
@@ -23,6 +25,7 @@ function getInitialStates(): WindowStates {
 
 export function useWindowManager() {
   const [states, setStates] = useState<WindowStates>(getInitialStates);
+  const [layoutTier, setLayoutTier] = useState<LayoutTier>("large");
   const [layout, setLayout] = useState<CellDef[][]>(() =>
     DEFAULT_LAYOUT.map((row) =>
       row.map((cell) => (Array.isArray(cell) ? [...cell] : cell)),
@@ -43,6 +46,26 @@ export function useWindowManager() {
   );
   const maxZRef = useRef(100);
   const swapTargetRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const check = () => {
+      const tier = getLayoutTier(window.innerWidth);
+      setLayoutTier((prev) => {
+        if (prev === tier) return prev;
+        const tierConfig = LAYOUT_TIERS[tier];
+        setLayout(
+          tierConfig.layout.map((row) =>
+            row.map((cell) => (Array.isArray(cell) ? [...cell] : cell)),
+          ),
+        );
+        setRowHeights([...tierConfig.rowHeights]);
+        return tier;
+      });
+    };
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const isCellVisible = useCallback(
     (cell: CellDef) => {
@@ -204,6 +227,7 @@ export function useWindowManager() {
     states,
     visibleLayout,
     rowHeights,
+    layoutTier,
     maximizedId,
     launcherOpen,
     swapTarget,
