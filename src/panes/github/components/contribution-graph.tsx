@@ -12,6 +12,7 @@ export function ContributionGraph({
   years,
   onYearChange,
   lastYearLabel = "Last year",
+  contributionsLabel = "contributions",
 }: {
   contributions: ContributionDay[];
   total: number;
@@ -19,6 +20,7 @@ export function ContributionGraph({
   years: string[];
   onYearChange: (year: string) => void;
   lastYearLabel?: string;
+  contributionsLabel?: string;
 }) {
   const numWeeks = Math.ceil(contributions.length / 7);
   const weeks: (ContributionDay | null)[][] = Array.from(
@@ -43,7 +45,7 @@ export function ContributionGraph({
     <div className="space-y-1">
       <div className="flex items-center justify-between gap-2">
         <span className="text-primary font-semibold text-2xs">
-          {total.toLocaleString()} contributions
+          {total.toLocaleString()} {contributionsLabel}
         </span>
         <div className="flex gap-1 flex-wrap justify-end">
           {years.map((y) => (
@@ -74,7 +76,7 @@ export function ContributionGraph({
                     className={`${CONTRIBUTION_LEVEL_COLORS[level]} text-3xs @lg:text-xs select-none text-center`}
                     title={
                       day
-                        ? `${day.count} contributions on ${day.date}`
+                        ? `${day.count} ${contributionsLabel} on ${day.date}`
                         : undefined
                     }
                   >

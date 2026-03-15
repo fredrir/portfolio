@@ -226,7 +226,7 @@ export function ContactPane({ contact }: ContactProps) {
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="flex flex-col flex-1 font-mono text-xs max-md:text-base"
+        className="flex flex-col flex-1 font-mono text-xs "
       >
         <div className="border-b border-border-faint px-3 py-2 space-y-1.5">
           <div className="flex items-center border-b border-border-faint pb-1.5">
@@ -242,7 +242,7 @@ export function ContactPane({ contact }: ContactProps) {
             >
               From:
             </label>
-            <div className="flex-1 flex items-center ml-4 gap-1 min-w-0">
+            <div className="flex-1 flex items-center gap-1 min-w-0">
               <input
                 id="contact-name"
                 type="text"
@@ -253,7 +253,7 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs 
                   placeholder:text-placeholder disabled:opacity-50"
                 placeholder={contact.name}
                 autoComplete="off"
@@ -270,7 +270,7 @@ export function ContactPane({ contact }: ContactProps) {
             >
               Mail:
             </label>
-            <div className="flex-1 flex items-center ml-4 gap-1 min-w-0">
+            <div className="flex-1 flex items-center gap-1 min-w-0">
               <input
                 id="contact-email"
                 type="email"
@@ -281,8 +281,7 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-placeholder disabled:opacity-50"
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs                   placeholder:text-placeholder disabled:opacity-50"
                 placeholder={contact.email}
                 autoComplete="off"
               />
@@ -298,7 +297,7 @@ export function ContactPane({ contact }: ContactProps) {
             >
               Tel:
             </label>
-            <div className="flex-1 flex items-center ml-4 gap-1 min-w-0">
+            <div className="flex-1 flex items-center gap-1 min-w-0">
               <input
                 id="contact-phone"
                 type="tel"
@@ -308,8 +307,7 @@ export function ContactPane({ contact }: ContactProps) {
                 onFocus={() => handleFocus("phone")}
                 onBlur={() => setFocusedField(null)}
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-placeholder disabled:opacity-50"
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs                   placeholder:text-placeholder disabled:opacity-50"
                 placeholder={`${contact.phone} (optional)`}
                 autoComplete="off"
               />
@@ -365,7 +363,7 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="w-full h-full min-h-36 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
+                className="w-full h-full min-h-36 bg-transparent text-foreground outline-hidden font-mono text-xs 
                   resize-none p-2 leading-editor placeholder:text-placeholder disabled:opacity-50"
                 placeholder={
                   vimMode === "normal"

@@ -13,28 +13,22 @@ export function VisitorCount({ label }: Props) {
   const { executeRecaptcha } = useRecaptcha();
 
   useEffect(() => {
+    getVisitorCount().then(setCount).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     const visited = sessionStorage.getItem("wm-visited");
-
-    if (visited) {
-      getVisitorCount().then(setCount).catch(() => setCount(null));
-      return;
-    }
-
-    if (!executeRecaptcha) return;
+    if (visited || !executeRecaptcha) return;
 
     executeRecaptcha("page_visit")
       .then((token) => recordVisit(token))
       .then((result) => {
         if (result.success) {
           sessionStorage.setItem("wm-visited", "1");
-          setCount(result.count ?? 0);
-        } else {
-          getVisitorCount().then(setCount).catch(() => setCount(null));
+          if (result.count) setCount(result.count);
         }
       })
-      .catch(() => {
-        getVisitorCount().then(setCount).catch(() => setCount(null));
-      });
+      .catch(() => {});
   }, [executeRecaptcha]);
 
   if (count === null) return null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import {
   getGalleryData,
@@ -10,6 +10,7 @@ import {
 import { isSvg } from "./utils";
 import { useExifData } from "./use-exif";
 import type { UiStrings } from "@/shared/types";
+import { TriangleIcon } from "@phosphor-icons/react";
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -48,13 +49,56 @@ function Thumbnail({
   );
 }
 
-function ImageDetail({ image }: { image: GalleryImage }) {
+function ImageDetail({
+  image,
+  onSwipe,
+  narrow,
+  currentIndex,
+  totalCount,
+}: {
+  image: GalleryImage;
+  onSwipe?: (dir: "left" | "right") => void;
+  narrow: boolean;
+  currentIndex: number;
+  totalCount: number;
+}) {
   const { data: exif, loading: exifLoading } = useExifData(image.originalSrc);
   const displayDate = exif?.dateTaken ?? image.date ?? null;
+  const touchRef = useRef<{ x: number; y: number } | null>(null);
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex < totalCount - 1;
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (!narrow || !onSwipe) return;
+      touchRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
+    },
+    [narrow, onSwipe],
+  );
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (!narrow || !onSwipe || !touchRef.current) return;
+      const dx = e.changedTouches[0].clientX - touchRef.current.x;
+      const dy = e.changedTouches[0].clientY - touchRef.current.y;
+      touchRef.current = null;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        onSwipe(dx > 0 ? "right" : "left");
+      }
+    },
+    [narrow, onSwipe],
+  );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 gap-1">
-      <div className="flex-1 flex items-center justify-center min-h-0 rounded-md overflow-hidden border border-control-border bg-black/20">
+    <div
+      className="flex-1 flex flex-col min-h-0 gap-1"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className="flex-1 flex items-center justify-center min-h-0 rounded-md overflow-hidden border border-control-border bg-black/20 relative">
         {isSvg(image.src) ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -70,6 +114,25 @@ function ImageDetail({ image }: { image: GalleryImage }) {
             height={900}
             className="max-w-full max-h-full object-contain"
           />
+        )}
+        {onSwipe && (
+          <>
+            <button
+              onClick={() => hasPrev && onSwipe("right")}
+              className={`absolute left-1.5 top-1/2 -translate-y-1/2 z-10 font-mono text-sm px-2 py-3 rounded bg-black/60 backdrop-blur-sm border border-white/10 transition-all ${hasPrev ? "text-primary hover:text-primary-bold hover:bg-black/80 active:scale-95" : "text-white/20 pointer-events-none"}`}
+            >
+              <TriangleIcon className="-rotate-90" />
+            </button>
+            <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-10 font-mono text-2xs tabular-nums px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm border border-white/10 text-white/50">
+              [{currentIndex + 1}/{totalCount}]
+            </span>
+            <button
+              onClick={() => hasNext && onSwipe("left")}
+              className={`absolute right-1.5 top-1/2 -translate-y-1/2 z-10 font-mono text-sm px-2 py-3 rounded bg-black/60 backdrop-blur-sm border border-white/10 transition-all ${hasNext ? "text-primary hover:text-primary-bold hover:bg-black/80 active:scale-95" : "text-white/20 pointer-events-none"}`}
+            >
+              <TriangleIcon className="rotate-90" />
+            </button>
+          </>
         )}
       </div>
 
@@ -184,6 +247,20 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
   const currentCategory = categories.find((c) => c.name === activeCategory);
   const showBrowser = narrow && !activeCategory;
 
+  const handleSwipe = useCallback(
+    (dir: "left" | "right") => {
+      if (!selectedImage || !currentCategory) return;
+      const images = currentCategory.images;
+      const idx = images.findIndex((img) => img.src === selectedImage.src);
+      if (idx === -1) return;
+      const next = dir === "left" ? idx + 1 : idx - 1;
+      if (next >= 0 && next < images.length) {
+        setSelectedImage(images[next]);
+      }
+    },
+    [selectedImage, currentCategory],
+  );
+
   return (
     <div
       ref={containerRef}
@@ -214,7 +291,20 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
         />
       ) : (
         <>
-          {narrow ? null : (
+          {narrow && !selectedImage ? (
+            <div className="flex items-center gap-2 mb-1.5 shrink-0">
+              <button
+                onClick={() => {
+                  setActiveCategory(null);
+                  setSelectedImage(null);
+                }}
+                className="text-primary-muted hover:text-primary active:text-primary transition-colors text-sm py-0.5"
+              >
+                ← ~/gallery
+              </button>
+              <span className="text-ghost text-2xs">{activeCategory}/</span>
+            </div>
+          ) : narrow ? null : (
             <div className="flex gap-1 mb-1.5 @sm:mb-2 overflow-x-auto shrink-0">
               {categories.map((cat) => (
                 <button
@@ -230,9 +320,7 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
                   }`}
                 >
                   {cat.name}/
-                  <span className="text-ghost ml-1">
-                    {cat.images.length}
-                  </span>
+                  <span className="text-ghost ml-1">{cat.images.length}</span>
                 </button>
               ))}
             </div>
@@ -248,7 +336,19 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
                   ← {activeCategory}
                 </button>
               </div>
-              <ImageDetail image={selectedImage} />
+              <ImageDetail
+                image={selectedImage}
+                onSwipe={handleSwipe}
+                narrow={narrow}
+                currentIndex={
+                  currentCategory
+                    ? currentCategory.images.findIndex(
+                        (img) => img.src === selectedImage.src,
+                      )
+                    : 0
+                }
+                totalCount={currentCategory?.images.length ?? 0}
+              />
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto min-h-0">

@@ -12,9 +12,50 @@ interface Props {
   ui: UiStrings;
 }
 
+function MobileScreensShowcase({ images }: { images: string[] }) {
+  return (
+    <div className="flex justify-center items-end gap-3 py-3 px-2">
+      {images.map((src, i) => {
+        const isCenter = i === Math.floor(images.length / 2);
+        return (
+          <div
+            key={src}
+            className={`relative transition-transform ${isCenter ? "z-10 scale-105" : "z-0 opacity-80"}`}
+            style={{
+              transform: isCenter
+                ? "scale(1.05)"
+                : i < Math.floor(images.length / 2)
+                  ? "rotate(-3deg) translateY(4px)"
+                  : "rotate(3deg) translateY(4px)",
+            }}
+          >
+            <div className="w-[100px] rounded-xl border-2 border-border-medium bg-black overflow-hidden shadow-lg">
+              <div className="w-full h-1.5 bg-black flex items-center justify-center">
+                <div className="w-6 h-0.5 rounded-full bg-border-medium" />
+              </div>
+              <Image
+                src={src}
+                alt=""
+                width={200}
+                height={400}
+                className="w-full h-auto"
+              />
+              <div className="w-full h-1 bg-black" />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ProjectDetailPane({ project, viewCode, ui }: Props) {
+  const isMobileApp =
+    project.mobileImages && project.mobileImages.length > 0;
   const thumb =
-    project.desktopImage || (project.mobileImages && project.mobileImages[0]);
+    !isMobileApp
+      ? project.desktopImage
+      : null;
   const slug = project.title.toLowerCase().replace(/\s+/g, "-");
   const langs = project.languages.split(",").map((l) => l.trim());
 
@@ -29,6 +70,10 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
             {project.title}
           </h2>
         </div>
+
+        {isMobileApp && (
+          <MobileScreensShowcase images={project.mobileImages!} />
+        )}
 
         {thumb && (
           <div className="rounded-lg overflow-hidden border border-wm-border bg-black/10">

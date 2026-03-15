@@ -5,12 +5,14 @@ import { AnimatedAscii } from "./components/animated-ascii";
 import { TypedLine } from "./components/typed-line";
 import { BarChart } from "./components/bar-chart";
 import { ContributionGraph } from "./components/contribution-graph";
-import type { GitHubData } from "@/shared/types";
+import type { GitHubData, UiStrings } from "@/shared/types";
 
 export function GitHubPane({
   initialData,
+  ui,
 }: {
   initialData: GitHubData | null;
+  ui: UiStrings;
 }) {
   const [selectedYear, setSelectedYear] = useState("last");
   const [compact, setCompact] = useState(false);
@@ -45,13 +47,13 @@ export function GitHubPane({
         <div ref={containerRef} className="h-full">
           {!compact && (
             <div className="text-faded mb-2">
-              <span className="text-primary">$</span> cat /proc/github
+              <span className="text-primary">$</span> {ui.githubCommand}
             </div>
           )}
           <div className={`flex flex-col ${compact ? "gap-2" : "gap-4"}`}>
             {!data ? (
               <span className="text-red-400">
-                error: could not reach github api
+                {ui.githubApiError}
               </span>
             ) : (
               <>
@@ -85,7 +87,7 @@ export function GitHubPane({
                     >
                       <TypedLine delay={200}>
                         <span className="text-primary font-semibold">
-                          Repos
+                          {ui.githubRepos}
                         </span>
                         <span className="text-muted-foreground">
                           {" "}
@@ -94,7 +96,7 @@ export function GitHubPane({
                       </TypedLine>
                       <TypedLine delay={260}>
                         <span className="text-primary font-semibold">
-                          Stars
+                          {ui.githubStars}
                         </span>
                         <span className="text-muted-foreground">
                           {" "}
@@ -103,7 +105,7 @@ export function GitHubPane({
                       </TypedLine>
                       <TypedLine delay={320}>
                         <span className="text-primary font-semibold">
-                          Followers
+                          {ui.githubFollowers}
                         </span>
                         <span className="text-muted-foreground">
                           {" "}
@@ -112,7 +114,7 @@ export function GitHubPane({
                       </TypedLine>
                       <TypedLine delay={380}>
                         <span className="text-primary font-semibold">
-                          Following
+                          {ui.githubFollowing}
                         </span>
                         <span className="text-muted-foreground">
                           {" "}
@@ -121,7 +123,7 @@ export function GitHubPane({
                       </TypedLine>
                       <TypedLine delay={440}>
                         <span className="text-primary font-semibold">
-                          Since
+                          {ui.githubSince}
                         </span>
                         <span className="text-muted-foreground">
                           {" "}
@@ -154,6 +156,8 @@ export function GitHubPane({
                           selectedYear={selectedYear}
                           years={years}
                           onYearChange={setSelectedYear}
+                          lastYearLabel={ui.lastYear}
+                          contributionsLabel={ui.githubContributions}
                         />
                       </div>
                     </TypedLine>

@@ -57,6 +57,14 @@ export interface UiStrings {
   lastYear: string;
   searchingGallery: string;
   emptyGallery: string;
+  githubRepos: string;
+  githubStars: string;
+  githubFollowers: string;
+  githubFollowing: string;
+  githubSince: string;
+  githubApiError: string;
+  githubContributions: string;
+  githubCommand: string;
   backgrounds: Record<string, string>;
   localeTitles: Record<string, string>;
   shortTitles: Record<string, string>;

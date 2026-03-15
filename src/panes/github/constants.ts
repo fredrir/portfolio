@@ -44,10 +44,10 @@ export const CONTRIBUTION_LEVEL_CHARS = ["·", "░", "▒", "▓", "█"];
 
 export const CONTRIBUTION_LEVEL_COLORS = [
   "text-contrib-0",
-  "text-contrib-1-light dark:text-contrib-1-dark",
-  "text-contrib-2-light dark:text-contrib-2-dark",
-  "text-contrib-3-light dark:text-contrib-3-dark",
-  "text-green-600 dark:text-green-400",
+  "text-contrib-1",
+  "text-contrib-2",
+  "text-contrib-3",
+  "text-contrib-4",
 ];
 
 export const MS_PER_DAY = 24 * 60 * 60 * 1000;
