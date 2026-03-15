@@ -301,6 +301,18 @@
       "plain": "Minimal",
       "custom": "Eigendefinert"
     },
+    "localeTitles": {
+      "about": "Om meg",
+      "github": "GitHub",
+      "spotify": "Spotify",
+      "journey": "Karriere",
+      "projects": "Prosjekt",
+      "contact": "Kontakt",
+      "settings": "Innstillingar",
+      "terminal": "Terminal",
+      "gallery": "Galleri",
+      "home": "Heim"
+    },
     "shortTitles": {
       "about": "whoami",
       "github": "github",

@@ -25,7 +25,7 @@ export function MobileLayout({
     : null;
 
   return (
-    <div className="fixed inset-0 flex flex-col" style={{ paddingBottom: 76 }}>
+    <div className="fixed inset-0 flex flex-col" style={{ paddingBottom: 84 }}>
       <AnimatePresence mode="wait">
         {activeApp === null ? (
           <motion.div
@@ -57,7 +57,7 @@ export function MobileLayout({
                 </button>
                 <span className="font-mono text-xs text-faded flex-1 text-center">
                   {activeConfig &&
-                    (ui.shortTitles[activeConfig.id] ??
+                    (ui.localeTitles[activeConfig.id] ??
                       activeConfig.shortTitle)}
                 </span>
                 <span className="font-mono text-xs text-primary-subtle">

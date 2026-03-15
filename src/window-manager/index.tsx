@@ -242,6 +242,7 @@ export function WindowManager({
           activeApp={mobileActiveApp}
           onOpenApp={setMobileActiveApp}
           onGoHome={() => setMobileActiveApp(null)}
+          ui={ui}
         />
         {floatingDetail && (
           <FloatingDetail

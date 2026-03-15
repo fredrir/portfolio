@@ -14,7 +14,7 @@ export function DockIcon({ icon, label, isActive, onTap }: Props) {
     <motion.button
       whileTap={{ scale: 0.9 }}
       onClick={onTap}
-      className="flex flex-col items-center justify-center gap-0.5 w-14"
+      className="flex flex-col items-center justify-center gap-0.5 w-14 overflow-hidden"
     >
       <span
         className={`transition-colors ${isActive ? "text-primary" : "text-faded"}`}
@@ -22,7 +22,7 @@ export function DockIcon({ icon, label, isActive, onTap }: Props) {
         {icon}
       </span>
       <span
-        className={`text-xs transition-colors ${isActive ? "text-primary-bold" : "text-ghost"}`}
+        className={`text-xs truncate w-full text-center transition-colors ${isActive ? "text-primary-bold" : "text-ghost"}`}
       >
         {label}
       </span>

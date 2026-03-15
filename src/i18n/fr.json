@@ -301,6 +301,18 @@
       "plain": "Minimal",
       "custom": "Personnalisé"
     },
+    "localeTitles": {
+      "about": "À propos",
+      "github": "GitHub",
+      "spotify": "Spotify",
+      "journey": "Parcours",
+      "projects": "Projets",
+      "contact": "Contact",
+      "settings": "Paramètres",
+      "terminal": "Terminal",
+      "gallery": "Galerie",
+      "home": "Accueil"
+    },
     "shortTitles": {
       "about": "whoami",
       "github": "github",

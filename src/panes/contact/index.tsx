@@ -10,9 +10,7 @@ import type { ContactProps } from "@/shared/types";
 type SendState = "idle" | "sending" | "success" | "error";
 type VimMode = "normal" | "insert";
 
-export function ContactPane({
-  contact,
-}: ContactProps) {
+export function ContactPane({ contact }: ContactProps) {
   const { executeRecaptcha } = useRecaptcha();
   const [formData, setFormData] = useState({
     name: "",
@@ -228,7 +226,7 @@ export function ContactPane({
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="flex flex-col flex-1 font-mono text-xs"
+        className="flex flex-col flex-1 font-mono text-xs max-md:text-base"
       >
         <div className="border-b border-border-faint px-3 py-2 space-y-1.5">
           <div className="flex items-center border-b border-border-faint pb-1.5">
@@ -256,7 +254,7 @@ export function ContactPane({
                 required
                 disabled={isSending}
                 className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-placeholder disabled:opacity-50"
+                  placeholder:text-placeholder placeholder:pl-4 disabled:opacity-50"
                 placeholder={contact.name}
                 autoComplete="off"
               />
@@ -284,7 +282,7 @@ export function ContactPane({
                 required
                 disabled={isSending}
                 className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-placeholder disabled:opacity-50"
+                  placeholder:text-placeholder placeholder:pl-4 disabled:opacity-50"
                 placeholder={contact.email}
                 autoComplete="off"
               />
@@ -311,7 +309,7 @@ export function ContactPane({
                 onBlur={() => setFocusedField(null)}
                 disabled={isSending}
                 className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-placeholder disabled:opacity-50"
+                  placeholder:text-placeholder placeholder:pl-4 disabled:opacity-50"
                 placeholder={`${contact.phone} (optional)`}
                 autoComplete="off"
               />

@@ -58,6 +58,7 @@ export interface UiStrings {
   searchingGallery: string;
   emptyGallery: string;
   backgrounds: Record<string, string>;
+  localeTitles: Record<string, string>;
   shortTitles: Record<string, string>;
 }
 
