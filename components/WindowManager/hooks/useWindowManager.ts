@@ -92,12 +92,15 @@ export function useWindowManager() {
       const next = prev.map((row) =>
         row.map((cell) => (Array.isArray(cell) ? [...cell] : cell)),
       );
-      const lastRow = next[next.length - 1];
-      if (lastRow.length < 3) {
-        next[next.length - 1] = [...lastRow, id];
-        return next;
-      }
-      return [...next, [id]];
+      const newRow = [id];
+      const updated = [...next, newRow];
+      setRowHeights((prevH) => {
+        const share = 25;
+        const scaled = prevH.map((h) => h * (100 - share) / 100);
+        return [...scaled, share];
+      });
+      setColWidths((prevW) => [...prevW, [100]]);
+      return updated;
     });
   }, []);
 

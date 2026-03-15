@@ -3,14 +3,16 @@
 import { useState, useEffect, useRef } from "react";
 import { WINDOW_CONFIGS } from "./constants";
 import type { WindowStates } from "./types";
+import type { UiStrings } from "./WindowManager";
 
 interface Props {
   states: WindowStates;
+  ui: UiStrings;
   onOpen: (id: string) => void;
   onClose: () => void;
 }
 
-export function AppLauncher({ states, onOpen, onClose }: Props) {
+export function AppLauncher({ states, ui, onOpen, onClose }: Props) {
   const [query, setQuery] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -79,7 +81,7 @@ export function AppLauncher({ states, onOpen, onClose }: Props) {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             className="flex-1 bg-transparent text-foreground text-sm outline-none placeholder:text-muted-foreground/30"
-            placeholder="Search applications..."
+            placeholder={ui.searchApps}
             autoComplete="off"
           />
           <span className="text-muted-foreground/30 text-2xs">ctrl+k</span>
@@ -88,7 +90,7 @@ export function AppLauncher({ states, onOpen, onClose }: Props) {
         <div ref={listRef} className="max-h-80 overflow-y-auto">
           {filtered.length === 0 ? (
             <div className="px-4 py-6 text-center text-muted-foreground/40 text-sm">
-              No matching windows
+              {ui.noMatching}
             </div>
           ) : (
             filtered.map((config, i) => {
@@ -127,7 +129,7 @@ export function AppLauncher({ states, onOpen, onClose }: Props) {
                         : "bg-muted text-muted-foreground/40"
                     }`}
                   >
-                    {isOpen ? "running" : "stopped"}
+                    {isOpen ? ui.running : ui.stopped}
                   </span>
                 </button>
               );
@@ -137,11 +139,11 @@ export function AppLauncher({ states, onOpen, onClose }: Props) {
 
         <div className="px-4 py-2 border-t border-primary/10 text-2xs text-muted-foreground/30 flex items-center justify-between">
           <span>
-            <span className="text-primary/40">↑↓</span> navigate
-            <span className="text-primary/40 ml-3">Enter</span> open
-            <span className="text-primary/40 ml-3">Esc</span> close
+            <span className="text-primary/40">↑↓</span> {ui.navigate}
+            <span className="text-primary/40 ml-3">Enter</span> {ui.open}
+            <span className="text-primary/40 ml-3">Esc</span> {ui.close}
           </span>
-          <span>{filtered.length} apps</span>
+          <span>{filtered.length} {ui.apps}</span>
         </div>
       </div>
     </div>

@@ -3,15 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { projectType } from "@/lib/types/types";
+import type { UiStrings } from "../WindowManager";
 
 interface Props {
   title: string;
   projects: projectType[];
   viewCode: string;
   onOpenDetail: (project: projectType) => void;
+  ui: UiStrings;
 }
 
-export function ProjectsPane({ projects, viewCode, onOpenDetail }: Props) {
+export function ProjectsPane({ projects, viewCode, onOpenDetail, ui }: Props) {
   return (
     <div className="p-2 @sm:p-3 font-mono text-xs h-full flex flex-col">
       <div className="text-muted-foreground/50 mb-2">
@@ -86,8 +88,8 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail }: Props) {
       </div>
 
       <div className="pt-1 border-t border-primary/10 text-muted-foreground/30 text-2xs mt-1 flex justify-between">
-        <span>{projects.length} projects</span>
-        <span className="text-primary/30">click to open</span>
+        <span>{projects.length} {ui.projects}</span>
+        <span className="text-primary/30">{ui.clickToOpen}</span>
       </div>
     </div>
   );

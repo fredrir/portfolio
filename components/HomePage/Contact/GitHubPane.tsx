@@ -179,7 +179,7 @@ function BarChart({
         return (
           <div key={lang} className="flex items-center gap-2 w-full">
             <LangIcon lang={lang} />
-            <span className="text-muted-foreground w-20 shrink-0 truncate">
+            <span className="text-muted-foreground w-14 @xs:w-20 shrink-0 truncate">
               {lang}
             </span>
             <div className="flex-1 h-3 bg-primary/5 rounded-sm overflow-hidden">
@@ -204,12 +204,14 @@ function ContributionGraph({
   selectedYear,
   years,
   onYearChange,
+  lastYearLabel = "Last year",
 }: {
   contributions: ContributionDay[];
   total: number;
   selectedYear: string;
   years: string[];
   onYearChange: (year: string) => void;
+  lastYearLabel?: string;
 }) {
   const numWeeks = Math.ceil(contributions.length / 7);
   const weeks: (ContributionDay | null)[][] = Array.from(
@@ -247,7 +249,7 @@ function ContributionGraph({
                   : "text-muted-foreground/40 hover:text-muted-foreground/70"
               }`}
             >
-              {y === "last" ? "Last year" : y}
+              {y === "last" ? lastYearLabel : y}
             </button>
           ))}
         </div>
@@ -311,12 +313,12 @@ export function GitHubPane({
           </span>
         ) : (
           <>
-            <div className="flex gap-6 flex-col @sm:flex-row">
-              <div className="shrink-0 hidden @sm:block">
+            <div className="flex gap-4 @sm:gap-6 flex-col @sm:flex-row">
+              <div className="shrink-0 hidden @md:block">
                 <AnimatedAscii />
               </div>
 
-              <div className="min-w-0 space-y-0.5">
+              <div className="min-w-0 space-y-0.5 flex-1">
                 <TypedLine delay={80}>
                   <a
                     href={data.profileUrl}
@@ -332,41 +334,43 @@ export function GitHubPane({
                     ─────────────────────
                   </span>
                 </TypedLine>
-                <TypedLine delay={200}>
-                  <span className="text-primary font-semibold">Repos</span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    {data.publicRepos}
-                  </span>
-                </TypedLine>
-                <TypedLine delay={260}>
-                  <span className="text-primary font-semibold">Stars</span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    {data.totalStars}
-                  </span>
-                </TypedLine>
-                <TypedLine delay={320}>
-                  <span className="text-primary font-semibold">Followers</span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    {data.followers}
-                  </span>
-                </TypedLine>
-                <TypedLine delay={380}>
-                  <span className="text-primary font-semibold">Following</span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    {data.following}
-                  </span>
-                </TypedLine>
-                <TypedLine delay={440}>
-                  <span className="text-primary font-semibold">Since</span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    {new Date(data.createdAt).getFullYear()}
-                  </span>
-                </TypedLine>
+                <div className="grid grid-cols-2 @sm:grid-cols-1 gap-x-4 gap-y-0.5">
+                  <TypedLine delay={200}>
+                    <span className="text-primary font-semibold">Repos</span>
+                    <span className="text-muted-foreground">
+                      {" "}
+                      {data.publicRepos}
+                    </span>
+                  </TypedLine>
+                  <TypedLine delay={260}>
+                    <span className="text-primary font-semibold">Stars</span>
+                    <span className="text-muted-foreground">
+                      {" "}
+                      {data.totalStars}
+                    </span>
+                  </TypedLine>
+                  <TypedLine delay={320}>
+                    <span className="text-primary font-semibold">Followers</span>
+                    <span className="text-muted-foreground">
+                      {" "}
+                      {data.followers}
+                    </span>
+                  </TypedLine>
+                  <TypedLine delay={380}>
+                    <span className="text-primary font-semibold">Following</span>
+                    <span className="text-muted-foreground">
+                      {" "}
+                      {data.following}
+                    </span>
+                  </TypedLine>
+                  <TypedLine delay={440}>
+                    <span className="text-primary font-semibold">Since</span>
+                    <span className="text-muted-foreground">
+                      {" "}
+                      {new Date(data.createdAt).getFullYear()}
+                    </span>
+                  </TypedLine>
+                </div>
               </div>
             </div>
             {data.topLanguages.length > 0 && (

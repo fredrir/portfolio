@@ -18,4 +18,5 @@ export type journeyType = {
   date: string;
   lightModeImageUri: string;
   darkModeImageUri: string;
+  isCurrent?: boolean;
 };

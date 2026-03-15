@@ -69,5 +69,5 @@ const ms = {
 };
 
 export const MS_PER_DAY = 1 * ms.day;
-export const CAVA_BAR_COUNT = 16;
+export const CAVA_BAR_COUNT = 32;
 export const SPOTIFY_POLL_INTERVAL = 30 * ms.second;

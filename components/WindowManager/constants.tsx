@@ -7,6 +7,7 @@ import {
   EnvelopeSimple,
   GearSix,
   Terminal,
+  Images,
 } from "@phosphor-icons/react";
 import type { WindowConfig, BackgroundConfig } from "./types";
 
@@ -80,6 +81,14 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
     icon: <Terminal size={S} weight={W} />,
     defaultOpen: true,
     order: 8,
+  },
+  {
+    id: "gallery",
+    title: "ls ~/gallery",
+    shortTitle: "gallery",
+    icon: <Images size={S} weight={W} />,
+    defaultOpen: false,
+    order: 9,
   },
 ];
 

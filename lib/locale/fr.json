@@ -14,7 +14,7 @@
   "landing": {
     "title": "Salut, je suis",
     "terminal": {
-      "mainText": "JJe poursuis actuellement un master en informatique à la Norwegian University of Science and Technology (NTNU) à Trondheim, Norvège. N'hésitez pas à consulter mon CV ou à me contacter."
+      "mainText": "Je poursuis actuellement un master en informatique à la Norwegian University of Science and Technology (NTNU) à Trondheim, Norvège. N'hésitez pas à consulter mon CV ou à me contacter."
     }
   },
   "journey": {
@@ -27,7 +27,8 @@
         "description": "Responsable de l’encadrement des groupes de mémoire de bachelor, du suivi académique et de l’évaluation des progrès à mi-parcours tout au long du semestre.",
         "date": "Janvier 2026 - Juin 2026",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": true
       },
       {
         "id": 11,
@@ -36,7 +37,8 @@
         "description": "Assistant d’enseignement dans le cours Experts en travail d’équipe – Impact environnemental et points de bascule. Animation de la collaboration interdisciplinaire et accompagnement des étudiants dans la résolution de défis concrets.",
         "date": "Janvier 2026 - Juin 2026",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": true
       },
       {
         "id": 12,
@@ -45,9 +47,9 @@
         "description": "Tâches liées à l’encadrement, à la direction de groupes (y compris exercices, groupes d’étude et séminaires), ainsi qu’à l’évaluation.",
         "date": "Janvier 2026 - Juin 2026",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": true
       },
-
       {
         "id": 9,
         "jobTitle": "Assistant pédagogique en IT3212",
@@ -55,7 +57,8 @@
         "description": "Assistant pédagogique dans le cours Logiciel piloté par les données. Tâches liées à l’encadrement, à l’animation de groupes (y compris exercices, groupes de travail et séminaires) et à l’évaluation.",
         "date": "Août 2025 - Décembre 2025",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 8,
@@ -64,7 +67,8 @@
         "description": "A offert un encadrement technique dans le cours Informatique projet I. Animait trois séances hebdomadaires d’exercices où j’accompagnais les étudiants dans le développement et la résolution de problèmes liés à des projets basés sur Java et Maven.",
         "date": "Août 2025 - Décembre 2025",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 5,
@@ -73,7 +77,8 @@
         "description": "Conçu et développé le site web (rif.no) avec Next.js, en intégrant Sanity comme CMS. Réalisé un tableau de bord intégré pour les sondages et l'inscription aux événements avec Next.js et PostgreSQL. Développé un site de campagne pour le rapport Norges tilstand (norgestilstand.no)",
         "date": "Août 2024 - Présent",
         "lightModeImageUri": "/rif-logo.svg",
-        "darkModeImageUri": "/rif-logo-dark.svg"
+        "darkModeImageUri": "/rif-logo-dark.svg",
+        "isCurrent": true
       },
       {
         "id": 7,
@@ -82,9 +87,9 @@
         "description": "Assistant pédagogique dans le cours Experts en travail d'équipe – Impact environnemental et points de bascule. A facilité la collaboration interdisciplinaire et guidé les étudiants dans la résolution de défis concrets",
         "date": "Janvier 2024 - Présent",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
-
       {
         "id": 6,
         "jobTitle": "Assistant étudiant en IT1901",
@@ -92,7 +97,8 @@
         "description": "Fournit un accompagnement technique dans le cadre du cours Projet Informatique I. A dirigé trois séances de laboratoire hebdomadaires, aidant les étudiants dans le développement et la résolution de problèmes liés à des projets basés sur Java et Maven.",
         "date": "Août 2024 - Décembre 2024",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 1,
@@ -101,7 +107,8 @@
         "description": "A travaillé sur les tests des produits de Maritime Optima. A participé au développement de nouveaux tests de régression pour les produits de l'entreprise.",
         "date": "Juin 2024 - Juillet 2024",
         "lightModeImageUri": "/maritime-optima.svg",
-        "darkModeImageUri": "/maritime-optima-dark.svg"
+        "darkModeImageUri": "/maritime-optima-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 2,
@@ -110,7 +117,8 @@
         "description": "Responsable d'une équipe de 19 développeurs, répartis sur divers projets. Responsable global des opérations quotidiennes et du travail administratif liés au développement et à la maintenance de nos systèmes informatiques.",
         "date": "Février 2024 - Mars 2025",
         "lightModeImageUri": "/appkom.svg",
-        "darkModeImageUri": "/appkom-dark.svg"
+        "darkModeImageUri": "/appkom-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 3,
@@ -119,7 +127,8 @@
         "description": "A apporté un soutien académique en mathématiques aux étudiants de NTNU. A animé des séances de tutorat hebdomadaires, a noté et fourni des commentaires sur les devoirs des étudiants.",
         "date": "Août 2023 - Décembre 2023",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 4,
@@ -128,7 +137,8 @@
         "description": "Initié à la flotte et à la stratégie commerciale de la compagnie maritime. A aidé à l'affrètement de la flotte de l'entreprise. A créé des rapports d'analyse sur les évolutions mondiales du marché des pétroliers et sur les nouvelles opportunités dans ce secteur.",
         "date": "Juin 2023 - Juillet 2023",
         "lightModeImageUri": "/nat-logo.png",
-        "darkModeImageUri": "/nat-logo.png"
+        "darkModeImageUri": "/nat-logo.png",
+        "isCurrent": false
       }
     ]
   },
@@ -246,5 +256,43 @@
   "footer": {
     "license1": "Tous droits réservés.",
     "license2": "Sous licence MIT."
+  },
+  "ui": {
+    "theme": "Thème",
+    "language": "Langue",
+    "wallpaper": "Fond d'écran",
+    "dark": "Sombre",
+    "light": "Clair",
+    "system": "Système",
+    "customImage": "Choisir une image...",
+    "nowPlaying": "EN COURS",
+    "lastPlayed": "DERNIÈRE ÉCOUTE",
+    "track": "Titre",
+    "artist": "Artiste",
+    "album": "Album",
+    "playInBrowser": "écouter dans le navigateur",
+    "hidePlayer": "masquer le lecteur",
+    "about": "Synopsis",
+    "techStack": "Dépendances",
+    "links": "Voir aussi",
+    "visitors": "visiteurs",
+    "uptime": "disponibilité",
+    "searchApps": "Rechercher des applications...",
+    "noMatching": "Aucun résultat",
+    "navigate": "naviguer",
+    "open": "ouvrir",
+    "close": "fermer",
+    "apps": "apps",
+    "tipLauncher": "lanceur d'apps",
+    "tipDrag": "Glissez les titres pour échanger",
+    "tipResize": "Glissez les bords pour redimensionner",
+    "entries": "entrées",
+    "projects": "projets",
+    "images": "images",
+    "clickToOpen": "cliquer pour ouvrir",
+    "active": "actif",
+    "running": "en cours",
+    "stopped": "arrêté",
+    "lastYear": "Dernière année"
   }
 }

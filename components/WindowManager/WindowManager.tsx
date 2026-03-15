@@ -24,6 +24,7 @@ import { SettingsPane } from "./panes/SettingsPane";
 import { SpotifyPaneWrapper } from "./panes/SpotifyPaneWrapper";
 import { GitHubPaneWrapper } from "./panes/GitHubPaneWrapper";
 import { TerminalPaneWrapper } from "./panes/TerminalPaneWrapper";
+import { ImagePane } from "./panes/ImagePane";
 
 import type {
   GitHubData,
@@ -31,6 +32,45 @@ import type {
 } from "@/components/HomePage/Contact/types";
 import type { Journey, NavbarType } from "@/lib/locale/languageTypes";
 import type { projectType, journeyType } from "@/lib/types/types";
+
+export interface UiStrings {
+  theme: string;
+  language: string;
+  wallpaper: string;
+  dark: string;
+  light: string;
+  system: string;
+  customImage: string;
+  nowPlaying: string;
+  lastPlayed: string;
+  track: string;
+  artist: string;
+  album: string;
+  playInBrowser: string;
+  hidePlayer: string;
+  about: string;
+  techStack: string;
+  links: string;
+  visitors: string;
+  uptime: string;
+  searchApps: string;
+  noMatching: string;
+  navigate: string;
+  open: string;
+  close: string;
+  apps: string;
+  tipLauncher: string;
+  tipDrag: string;
+  tipResize: string;
+  entries: string;
+  projects: string;
+  images: string;
+  clickToOpen: string;
+  active: string;
+  running: string;
+  stopped: string;
+  lastYear: string;
+}
 
 interface Props {
   locale: string;
@@ -51,11 +91,12 @@ interface Props {
     submitLoading: string;
     recaptchaError: string;
   };
+  ui: UiStrings;
   githubData: GitHubData | null;
   spotifyData: SpotifyData;
 }
 
-function TipBar() {
+function TipBar({ ui }: { ui: UiStrings }) {
   const [visible, setVisible] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   useEffect(() => {
@@ -74,11 +115,11 @@ function TipBar() {
     <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[9998] font-mono text-2xs bg-background/90 border border-primary/20 backdrop-blur-md rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg shadow-primary/5">
       <span className="text-primary">tip</span>
       <span className="text-muted-foreground/60">
-        <span className="text-primary/70 font-bold">Ctrl+K</span> app launcher
+        <span className="text-primary/70 font-bold">Ctrl+K</span> {ui.tipLauncher}
         <span className="text-primary/20 mx-2">|</span>
-        Drag titles to swap
+        {ui.tipDrag}
         <span className="text-primary/20 mx-2">|</span>
-        Drag borders to resize
+        {ui.tipResize}
       </span>
       <button
         onClick={() => {
@@ -215,6 +256,7 @@ export function WindowManager({
   journey,
   project,
   contact,
+  ui,
   githubData,
   spotifyData,
 }: Props) {
@@ -237,6 +279,9 @@ export function WindowManager({
 
   const handleFocus = useCallback(
     (id: string) => {
+      if (!wm.states[id]?.isOpen) {
+        wm.openWindow(id);
+      }
       setFocusedId(id);
       wm.focusWindow(id);
     },
@@ -258,18 +303,18 @@ export function WindowManager({
     (p: projectType) => {
       setFloatingDetail({
         title: `~/projects/${p.title}`,
-        content: <ProjectDetailPane project={p} viewCode={project.viewCode} />,
+        content: <ProjectDetailPane project={p} viewCode={project.viewCode} ui={ui} />,
       });
     },
-    [project.viewCode],
+    [project.viewCode, ui],
   );
 
   const paneContent: Record<string, React.ReactNode> = {
     about: <AboutPane locale={locale} landing={landing} />,
     github: <GitHubPaneWrapper initialData={githubData} />,
-    spotify: <SpotifyPaneWrapper initialData={spotifyData} />,
+    spotify: <SpotifyPaneWrapper initialData={spotifyData} ui={ui} />,
     journey: (
-      <JourneyPane journey={journey} onOpenDetail={handleOpenJourneyDetail} />
+      <JourneyPane journey={journey} onOpenDetail={handleOpenJourneyDetail} ui={ui} />
     ),
     projects: (
       <ProjectsPane
@@ -277,6 +322,7 @@ export function WindowManager({
         projects={project.projects}
         viewCode={project.viewCode}
         onOpenDetail={handleOpenProjectDetail}
+        ui={ui}
       />
     ),
     contact: <ContactPane contact={contact} />,
@@ -286,9 +332,11 @@ export function WindowManager({
         currentLocale={currentLocale}
         currentBackground={bg.current}
         onSelectBackground={bg.setBackground}
+        ui={ui}
       />
     ),
     terminal: <TerminalPaneWrapper locale={locale} />,
+    gallery: <ImagePane />,
   };
 
   const configMap = Object.fromEntries(WINDOW_CONFIGS.map((c) => [c.id, c]));
@@ -403,6 +451,7 @@ export function WindowManager({
           states={wm.states}
           allConfigs={WINDOW_CONFIGS}
           locale={locale}
+          ui={ui}
           focusedWindowId={wm.maximizedId}
           onOpenLauncher={() => wm.setLauncherOpen(true)}
           onOpenSettings={handleOpenSettings}
@@ -411,6 +460,7 @@ export function WindowManager({
         {wm.launcherOpen && (
           <AppLauncher
             states={wm.states}
+            ui={ui}
             onOpen={(id) => {
               wm.openWindow(id);
               setFocusedId(id);
@@ -487,12 +537,13 @@ export function WindowManager({
         })}
       </div>
 
-      <TipBar />
+      <TipBar ui={ui} />
 
       <StatusBar
         states={wm.states}
         allConfigs={WINDOW_CONFIGS}
         locale={locale}
+        ui={ui}
         focusedWindowId={focusedId}
         onOpenLauncher={() => wm.setLauncherOpen(true)}
         onOpenSettings={handleOpenSettings}
@@ -502,6 +553,7 @@ export function WindowManager({
       {wm.launcherOpen && (
         <AppLauncher
           states={wm.states}
+          ui={ui}
           onOpen={(id) => {
             wm.openWindow(id);
             setFocusedId(id);

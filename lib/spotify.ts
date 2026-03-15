@@ -90,20 +90,28 @@ async function fetchTopArtists(
   }
 }
 
+interface RecentTracksResult {
+  tracks: SpotifyTrack[];
+  lastPlayedAt?: string;
+}
+
 async function fetchRecentTracks(
   accessToken: string,
-): Promise<SpotifyTrack[]> {
+): Promise<RecentTracksResult> {
   try {
     const res = await fetch(RECENTLY_PLAYED_ENDPOINT, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (res.status !== 200) return [];
+    if (res.status !== 200) return { tracks: [] };
     const data = await res.json();
-    return (data.items ?? []).map((item: { track: SpotifyTrackRaw }) =>
+    const items = data.items ?? [];
+    const tracks = items.map((item: { track: SpotifyTrackRaw }) =>
       parseTrack(item.track),
     );
+    const lastPlayedAt = items[0]?.played_at as string | undefined;
+    return { tracks, lastPlayedAt };
   } catch {
-    return [];
+    return { tracks: [] };
   }
 }
 
@@ -130,11 +138,15 @@ async function loadFromSupabase(): Promise<SpotifyData | null> {
   try {
     const { data, error } = await sb
       .from("spotify_cache")
-      .select("data")
+      .select("data, updated_at")
       .eq("id", CACHE_KEY)
       .single();
     if (error || !data) return null;
-    return JSON.parse(data.data) as SpotifyData;
+    const parsed = JSON.parse(data.data) as SpotifyData;
+    if (data.updated_at) {
+      parsed.lastPlayedAt = data.updated_at;
+    }
+    return parsed;
   } catch {
     return null;
   }
@@ -148,13 +160,15 @@ export async function fetchSpotifyData(): Promise<SpotifyData> {
   try {
     const { access_token } = await getAccessToken();
 
-    const [nowPlayingRes, topArtists, recentTracks] = await Promise.all([
+    const [nowPlayingRes, topArtists, recentResult] = await Promise.all([
       fetch(NOW_PLAYING_ENDPOINT, {
         headers: { Authorization: `Bearer ${access_token}` },
       }),
       fetchTopArtists(access_token),
       fetchRecentTracks(access_token),
     ]);
+
+    const { tracks: recentTracks, lastPlayedAt } = recentResult;
 
     if (nowPlayingRes.status === 200) {
       const body = await nowPlayingRes.json();
@@ -179,6 +193,7 @@ export async function fetchSpotifyData(): Promise<SpotifyData> {
       const result: SpotifyData = {
         isPlaying: false,
         ...last,
+        lastPlayedAt,
         topArtists,
         recentTracks: recentTracks.slice(1),
       };

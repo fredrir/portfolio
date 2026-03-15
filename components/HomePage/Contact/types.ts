@@ -68,4 +68,5 @@ export interface SpotifyData {
   durationMs?: number;
   recentTracks?: SpotifyTrack[];
   topArtists?: SpotifyArtist[];
+  lastPlayedAt?: string;
 }

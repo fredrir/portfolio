@@ -5,32 +5,13 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import type { journeyType } from "@/lib/types/types";
 import type { Journey } from "@/lib/locale/languageTypes";
+import type { UiStrings } from "../WindowManager";
 
-const MONTHS: Record<string, number> = {
-  january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
-  july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
-};
-
-function isActiveJob(dateStr: string): boolean {
-  const lower = dateStr.toLowerCase();
-  if (lower.includes("present") || lower.includes("nå") || lower.includes("nåværende")) return true;
-
-  const endPart = dateStr.split("-").pop()?.trim().toLowerCase() || "";
-  const parts = endPart.split(/\s+/);
-  if (parts.length >= 2) {
-    const monthNum = MONTHS[parts[0]];
-    const year = parseInt(parts[1], 10);
-    if (monthNum !== undefined && !isNaN(year)) {
-      const endDate = new Date(year, monthNum + 1, 0);
-      return endDate >= new Date();
-    }
-  }
-  return false;
-}
 
 interface Props {
   journey: Journey;
   onOpenDetail: (journey: journeyType) => void;
+  ui: UiStrings;
 }
 
 function CompanyLogo({ journey }: { journey: journeyType }) {
@@ -46,19 +27,25 @@ function CompanyLogo({ journey }: { journey: journeyType }) {
   if (!src) return null;
 
   return (
-    <div className="shrink-0 w-8 h-8 rounded-md overflow-hidden bg-background border border-primary/10 flex items-center justify-center">
+    <div className="shrink-0 w-8 h-8 rounded-md overflow-hidden bg-background border border-primary/10 flex items-center justify-center p-1">
       <Image
         src={src}
         alt={journey.company}
         width={28}
         height={28}
-        className="object-contain p-0.5"
+        className="object-contain w-full h-full"
       />
     </div>
   );
 }
 
-export function JourneyPane({ journey, onOpenDetail }: Props) {
+export function JourneyPane({ journey, onOpenDetail, ui }: Props) {
+  const sorted = [...journey.journeys].sort((a, b) => {
+    if (a.isCurrent && !b.isCurrent) return -1;
+    if (!a.isCurrent && b.isCurrent) return 1;
+    return 0;
+  });
+
   return (
     <div className="p-2 @sm:p-3 font-mono text-xs h-full flex flex-col">
       <div className="text-muted-foreground/50 mb-2">
@@ -66,7 +53,7 @@ export function JourneyPane({ journey, onOpenDetail }: Props) {
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-0.5 min-h-0">
-        {journey.journeys.map((j: journeyType) => (
+        {sorted.map((j: journeyType) => (
           <button
             key={j.id}
             onClick={() => onOpenDetail(j)}
@@ -91,9 +78,9 @@ export function JourneyPane({ journey, onOpenDetail }: Props) {
               </div>
             </div>
 
-            {isActiveJob(j.date) && (
+            {j.isCurrent && (
               <span className="text-primary/50 text-3xs @sm:text-2xs px-1 @sm:px-1.5 py-0.5 rounded bg-primary/8 shrink-0">
-                active
+                {ui.active}
               </span>
             )}
 
@@ -105,8 +92,8 @@ export function JourneyPane({ journey, onOpenDetail }: Props) {
       </div>
 
       <div className="pt-1 border-t border-primary/10 text-muted-foreground/30 text-2xs mt-1 flex justify-between">
-        <span>{journey.journeys.length} entries</span>
-        <span className="text-primary/30">click to open</span>
+        <span>{journey.journeys.length} {ui.entries}</span>
+        <span className="text-primary/30">{ui.clickToOpen}</span>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import {
   EnvelopeSimple,
   GearSix,
   Terminal,
+  Images,
 } from "@phosphor-icons/react";
 import { WINDOW_CONFIGS } from "./constants";
 
@@ -22,6 +23,7 @@ const GRID_ICONS: Record<string, React.ReactNode> = {
   contact: <EnvelopeSimple size={28} weight="duotone" />,
   settings: <GearSix size={28} weight="duotone" />,
   terminal: <Terminal size={28} weight="duotone" />,
+  gallery: <Images size={28} weight="duotone" />,
 };
 
 interface Props {

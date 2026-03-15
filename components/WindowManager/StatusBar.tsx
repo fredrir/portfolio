@@ -6,12 +6,14 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { STATUS_BAR_HEIGHT } from "./constants";
 import type { WindowConfig, WindowStates } from "./types";
+import type { UiStrings } from "./WindowManager";
 import { computeUptime } from "@/components/Neofetch";
 
 interface Props {
   states: WindowStates;
   allConfigs?: WindowConfig[];
   locale: string;
+  ui: UiStrings;
   focusedWindowId: string | null;
   onOpenLauncher: () => void;
   onOpenSettings: () => void;
@@ -64,7 +66,7 @@ function Weather() {
   return <span>{weather}</span>;
 }
 
-function VisitorCount() {
+function VisitorCount({ label }: { label: string }) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -79,13 +81,14 @@ function VisitorCount() {
     setCount(current);
   }, []);
 
-  return <span>visitors: {count}</span>;
+  return <span>{label}: {count}</span>;
 }
 
 export function StatusBar({
   states,
   allConfigs = [],
   locale,
+  ui,
   focusedWindowId,
   onOpenLauncher,
   onOpenSettings,
@@ -103,17 +106,15 @@ export function StatusBar({
   const linkedInSrc =
     mounted && theme === "dark" ? "/linkedin-dark.svg" : "/linkedin.svg";
 
-  const openWindows = allConfigs.filter((c) => states[c.id]?.isOpen);
-
   return (
     <div
       className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-2 font-mono text-3xs border-t border-primary/15 bg-background/95 backdrop-blur-md select-none z-[9999]"
       style={{ height: STATUS_BAR_HEIGHT }}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
         <button
           onClick={onOpenLauncher}
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/15 text-primary hover:bg-primary/25 active:bg-primary/35 transition-all font-bold border border-primary/20 hover:border-primary/40 hover:shadow-sm hover:shadow-primary/10"
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/15 text-primary hover:bg-primary/25 active:bg-primary/35 transition-all font-bold border border-primary/20 hover:border-primary/40 hover:shadow-sm hover:shadow-primary/10 shrink-0"
         >
           <span className="text-2xs font-extrabold tracking-tight">F</span>
           <span className="text-3xs text-primary/70 hidden sm:inline">
@@ -121,31 +122,37 @@ export function StatusBar({
           </span>
         </button>
 
-        <div className="flex items-center gap-0.5 ml-1">
-          {openWindows.map((config) => (
-            <button
-              key={config.id}
-              onClick={() => onFocusWindow(config.id)}
-              className={`px-1.5 py-0.5 flex items-center rounded transition-colors truncate max-w-24 ${
-                focusedWindowId === config.id
-                  ? "text-primary bg-primary/10"
-                  : "text-muted-foreground/60 hover:text-primary hover:bg-primary/10"
-              }`}
-            >
-              {config.icon && <span className="mr-0.5">{config.icon}</span>}
-              {config.id}
-            </button>
-          ))}
+        <div className="flex items-center gap-0.5 ml-1 min-w-0 overflow-x-auto scrollbar-none">
+          {allConfigs.map((config) => {
+            const isOpen = states[config.id]?.isOpen;
+            const isFocused = focusedWindowId === config.id;
+            return (
+              <button
+                key={config.id}
+                onClick={() => onFocusWindow(config.id)}
+                className={`px-1.5 py-0.5 flex items-center rounded transition-colors shrink-0 ${
+                  isFocused
+                    ? "text-primary bg-primary/10"
+                    : isOpen
+                      ? "text-muted-foreground/60 hover:text-primary hover:bg-primary/10"
+                      : "text-muted-foreground/25 hover:text-muted-foreground/50 hover:bg-primary/5"
+                }`}
+              >
+                {config.icon && <span className="mr-0.5">{config.icon}</span>}
+                <span className="hidden sm:inline">{config.id}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className="flex items-center gap-3 text-muted-foreground/50">
         <span className="text-primary/40 hidden sm:inline">
-          uptime: {computeUptime()}
+          {ui.uptime}: {computeUptime()}
         </span>
 
         <Weather />
-        <VisitorCount />
+        <VisitorCount label={ui.visitors} />
 
         <div className="flex items-center gap-1.5">
           <Link

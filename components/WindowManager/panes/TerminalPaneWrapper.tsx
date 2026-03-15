@@ -71,42 +71,46 @@ export function TerminalPaneWrapper({ locale }: Props) {
 
   return (
     <div
-      ref={contentRef}
-      className="font-mono px-3 pt-3 pb-1 overflow-y-auto scroll-smooth cursor-text text-xs h-full"
+      className="font-mono text-xs h-full flex flex-col cursor-text"
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="mb-2">
-        <div className="text-muted-foreground/40 mb-1">
-          <span className="text-primary">$</span> neofetch
+      <div
+        ref={contentRef}
+        className="flex-1 overflow-y-auto scroll-smooth px-3 pt-3 pb-1"
+      >
+        <div className="mb-2">
+          <div className="text-muted-foreground/40 mb-1">
+            <span className="text-primary">$</span> neofetch
+          </div>
+          <Neofetch animate={false} locale={locale} />
         </div>
-        <Neofetch animate={false} locale={locale} />
+
+        <div className="my-2" />
+
+        {commandHistory.map((entry, index) => (
+          <div key={index} className="mt-1">
+            <div className="flex items-start flex-wrap">
+              <span className="text-primary flex-shrink-0">
+                [{currentPath}]${" "}
+              </span>
+              <span className="text-foreground ml-1 break-all">
+                {entry.command}
+              </span>
+            </div>
+            {entry.output && (
+              <div
+                className={`mt-1 whitespace-pre-wrap break-words ${
+                  entry.isError ? "text-destructive" : "text-muted-foreground"
+                }`}
+              >
+                {entry.output}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
-      <div className="border-t border-primary/10 my-2" />
-
-      {commandHistory.map((entry, index) => (
-        <div key={index} className="mt-1">
-          <div className="flex items-start flex-wrap">
-            <span className="text-primary flex-shrink-0">
-              [{currentPath}]${" "}
-            </span>
-            <span className="text-foreground ml-1 break-all">
-              {entry.command}
-            </span>
-          </div>
-          {entry.output && (
-            <div
-              className={`mt-1 whitespace-pre-wrap break-words ${
-                entry.isError ? "text-destructive" : "text-muted-foreground"
-              }`}
-            >
-              {entry.output}
-            </div>
-          )}
-        </div>
-      ))}
-
-      <div className="flex items-center mt-1 pt-2 pb-1 sticky bottom-0 bg-background/95 backdrop-blur-sm">
+      <div className="flex items-center px-3 py-2 shrink-0">
         <span className="text-primary mr-1 flex-shrink-0 text-xs">
           [{currentPath}]${" "}
         </span>
