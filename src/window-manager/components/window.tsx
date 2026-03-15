@@ -86,7 +86,7 @@ export function Window({
           </button>
         </div>
 
-        <span className="font-mono text-2xs text-muted-foreground/50 truncate mx-2">
+        <span className="font-mono text-xs text-muted-foreground/50 truncate mx-2">
           {config.title}
         </span>
 
@@ -107,9 +107,33 @@ export function Window({
               viewBox="0 0 16 16"
               className="w-full h-full text-primary/30 group-hover/grip:text-primary/60 transition-colors"
             >
-              <line x1="14" y1="6" x2="6" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="14" y1="10" x2="10" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="14" y1="14" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <line
+                x1="14"
+                y1="6"
+                x2="6"
+                y2="14"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              <line
+                x1="14"
+                y1="10"
+                x2="10"
+                y2="14"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              <line
+                x1="14"
+                y1="14"
+                x2="14"
+                y2="14"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           </div>
         )}

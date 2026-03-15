@@ -1,4 +1,8 @@
-import { CONTRIBUTION_LEVEL_CHARS, CONTRIBUTION_LEVEL_COLORS, MS_PER_DAY } from "../constants";
+import {
+  CONTRIBUTION_LEVEL_CHARS,
+  CONTRIBUTION_LEVEL_COLORS,
+  MS_PER_DAY,
+} from "../constants";
 import type { ContributionDay } from "@/shared/types";
 
 export function ContributionGraph({
@@ -58,7 +62,7 @@ export function ContributionGraph({
         </div>
       </div>
 
-      <div className="w-full overflow-x-auto">
+      <div className="w-full h-full overflow-y-hidden overflow-x-auto">
         <div className="flex w-full font-mono leading-none">
           {weeks.map((week, wi) => (
             <div key={wi} className="flex flex-col flex-1 min-w-0">
@@ -67,7 +71,7 @@ export function ContributionGraph({
                 return (
                   <span
                     key={di}
-                    className={`${CONTRIBUTION_LEVEL_COLORS[level]} text-3xs select-none text-center`}
+                    className={`${CONTRIBUTION_LEVEL_COLORS[level]} text-3xs @lg:text-xs select-none text-center`}
                     title={
                       day
                         ? `${day.count} contributions on ${day.date}`

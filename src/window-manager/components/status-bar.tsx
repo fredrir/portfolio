@@ -60,29 +60,6 @@ export function StatusBar({
             FredOS
           </span>
         </button>
-
-        <div className="flex items-center gap-0.5 ml-1 min-w-0 overflow-x-auto scrollbar-none">
-          {allConfigs.map((config) => {
-            const isOpen = states[config.id]?.isOpen;
-            const isFocused = focusedWindowId === config.id;
-            return (
-              <button
-                key={config.id}
-                onClick={() => onFocusWindow(config.id)}
-                className={`px-1.5 py-0.5 flex items-center rounded transition-colors shrink-0 ${
-                  isFocused
-                    ? "text-primary bg-primary/10"
-                    : isOpen
-                      ? "text-muted-foreground/60 hover:text-primary hover:bg-primary/10"
-                      : "text-muted-foreground/25 hover:text-muted-foreground/50 hover:bg-primary/5"
-                }`}
-              >
-                {config.icon && <span className="mr-0.5">{config.icon}</span>}
-                <span className="hidden sm:inline">{config.id}</span>
-              </button>
-            );
-          })}
-        </div>
       </div>
 
       <div className="flex items-center gap-3 text-muted-foreground/50">

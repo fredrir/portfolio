@@ -21,7 +21,9 @@ export function GitHubPane({
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        setCompact(entry.contentRect.height < 250 || entry.contentRect.width < 300);
+        setCompact(
+          entry.contentRect.height < 250 || entry.contentRect.width < 300,
+        );
       }
     });
     ro.observe(el);
@@ -39,7 +41,7 @@ export function GitHubPane({
 
   return (
     <div className="h-full overflow-auto">
-      <div className="p-2 @sm:p-3 font-mono text-xs leading-relaxed h-full overflow-hidden">
+      <div className="p-2 @sm:p-3 font-mono text-xs leading-relaxed h-full overflow-y-auto">
         <div ref={containerRef} className="h-full">
           {!compact && (
             <div className="text-muted-foreground/50 mb-2">
@@ -53,7 +55,9 @@ export function GitHubPane({
               </span>
             ) : (
               <>
-                <div className={`flex ${compact ? "gap-3" : "gap-4 @sm:gap-6"} flex-col @sm:flex-row`}>
+                <div
+                  className={`flex ${compact ? "gap-3" : "gap-4 @sm:gap-6"} flex-col @sm:flex-row`}
+                >
                   <div className="shrink-0">
                     <AnimatedAscii />
                   </div>
@@ -76,37 +80,49 @@ export function GitHubPane({
                         </span>
                       </TypedLine>
                     )}
-                    <div className={`grid gap-x-4 gap-y-0.5 ${compact ? "grid-cols-3 @xs:grid-cols-5" : "grid-cols-2 @sm:grid-cols-1"}`}>
+                    <div
+                      className={`grid gap-x-4 gap-y-0.5 ${compact ? "grid-cols-3 @xs:grid-cols-5" : "grid-cols-2 @sm:grid-cols-1"}`}
+                    >
                       <TypedLine delay={200}>
-                        <span className="text-primary font-semibold">Repos</span>
+                        <span className="text-primary font-semibold">
+                          Repos
+                        </span>
                         <span className="text-muted-foreground">
                           {" "}
                           {data.publicRepos}
                         </span>
                       </TypedLine>
                       <TypedLine delay={260}>
-                        <span className="text-primary font-semibold">Stars</span>
+                        <span className="text-primary font-semibold">
+                          Stars
+                        </span>
                         <span className="text-muted-foreground">
                           {" "}
                           {data.totalStars}
                         </span>
                       </TypedLine>
                       <TypedLine delay={320}>
-                        <span className="text-primary font-semibold">Followers</span>
+                        <span className="text-primary font-semibold">
+                          Followers
+                        </span>
                         <span className="text-muted-foreground">
                           {" "}
                           {data.followers}
                         </span>
                       </TypedLine>
                       <TypedLine delay={380}>
-                        <span className="text-primary font-semibold">Following</span>
+                        <span className="text-primary font-semibold">
+                          Following
+                        </span>
                         <span className="text-muted-foreground">
                           {" "}
                           {data.following}
                         </span>
                       </TypedLine>
                       <TypedLine delay={440}>
-                        <span className="text-primary font-semibold">Since</span>
+                        <span className="text-primary font-semibold">
+                          Since
+                        </span>
                         <span className="text-muted-foreground">
                           {" "}
                           {new Date(data.createdAt).getFullYear()}
@@ -117,24 +133,31 @@ export function GitHubPane({
                 </div>
                 {data.topLanguages.length > 0 && (
                   <TypedLine delay={500} className="w-full">
-                    <div className={`w-full ${compact ? "" : "mt-2 pt-1 border-t border-primary/10"}`}>
-                      <BarChart items={data.topLanguages} maxCount={maxLangCount} />
-                    </div>
-                  </TypedLine>
-                )}
-                {!compact && currentContributions && currentContributions.days.length > 0 && (
-                  <TypedLine delay={600} className="w-full">
-                    <div className="mt-2 pt-2 w-full border-t border-primary/10">
-                      <ContributionGraph
-                        contributions={currentContributions.days}
-                        total={currentContributions.total}
-                        selectedYear={selectedYear}
-                        years={years}
-                        onYearChange={setSelectedYear}
+                    <div
+                      className={`w-full ${compact ? "" : "mt-2 pt-1 border-t border-primary/10"}`}
+                    >
+                      <BarChart
+                        items={data.topLanguages}
+                        maxCount={maxLangCount}
                       />
                     </div>
                   </TypedLine>
                 )}
+                {!compact &&
+                  currentContributions &&
+                  currentContributions.days.length > 0 && (
+                    <TypedLine delay={600} className="w-full">
+                      <div className="mt-2 pt-2 w-full border-t border-primary/10">
+                        <ContributionGraph
+                          contributions={currentContributions.days}
+                          total={currentContributions.total}
+                          selectedYear={selectedYear}
+                          years={years}
+                          onYearChange={setSelectedYear}
+                        />
+                      </div>
+                    </TypedLine>
+                  )}
               </>
             )}
           </div>
