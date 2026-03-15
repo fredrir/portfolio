@@ -38,15 +38,18 @@ export function JourneyPane({ journey, onOpenDetail, ui }: Props) {
                   {j.jobTitle}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 mt-0.5">
+              <p className="mt-0.5">
                 <span className="text-foreground/80 text-3xs @sm:text-2xs">
                   {j.company}
                 </span>
-                <span className="text-muted-foreground/30 text-3xs @sm:text-2xs">•</span>
+                <span className="text-muted-foreground/30 text-3xs @sm:text-2xs">
+                  {" "}
+                  •{" "}
+                </span>
                 <span className="text-accent-yellow/60 text-3xs @sm:text-2xs">
                   {j.date}
                 </span>
-              </div>
+              </p>
             </div>
 
             {j.isCurrent && (
@@ -63,7 +66,9 @@ export function JourneyPane({ journey, onOpenDetail, ui }: Props) {
       </div>
 
       <div className="pt-1 border-t border-primary/10 text-muted-foreground/30 text-2xs mt-1 flex justify-between">
-        <span>{journey.journeys.length} {ui.entries}</span>
+        <span>
+          {journey.journeys.length} {ui.entries}
+        </span>
         <span className="text-primary/30">{ui.clickToOpen}</span>
       </div>
     </div>

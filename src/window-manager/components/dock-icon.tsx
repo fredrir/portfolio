@@ -22,7 +22,7 @@ export function DockIcon({ icon, label, isActive, onTap }: Props) {
         {icon}
       </span>
       <span
-        className={`text-3xs transition-colors ${isActive ? "text-primary/80" : "text-muted-foreground/30"}`}
+        className={`text-xs transition-colors ${isActive ? "text-primary/80" : "text-muted-foreground/30"}`}
       >
         {label}
       </span>

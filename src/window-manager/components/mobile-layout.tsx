@@ -51,14 +51,16 @@ export function MobileLayout({
               <div className="flex items-center px-3 py-2 border-b border-primary/15 bg-primary/[0.03] shrink-0">
                 <button
                   onClick={onGoHome}
-                  className="text-primary/60 hover:text-primary transition-colors mr-3 font-mono text-sm"
+                  className="text-primary/60 hover:text-primary active:text-primary transition-colors mr-3 font-mono text-2xl leading-none -mt-0.5 px-1"
                 >
                   ‹
                 </button>
-                <span className="font-mono text-2xs text-muted-foreground/50 flex-1 text-center">
-                  {activeConfig && (ui.shortTitles[activeConfig.id] ?? activeConfig.shortTitle)}
+                <span className="font-mono text-xs text-muted-foreground/50 flex-1 text-center">
+                  {activeConfig &&
+                    (ui.shortTitles[activeConfig.id] ??
+                      activeConfig.shortTitle)}
                 </span>
-                <span className="font-mono text-3xs text-primary/30">
+                <span className="font-mono text-xs text-primary/30">
                   fredrir@hansteen
                 </span>
               </div>

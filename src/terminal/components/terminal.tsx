@@ -150,7 +150,7 @@ const Terminal = ({ mainText, locale }: Props) => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleInputSubmit}
-                  className="flex-1 bg-transparent text-foreground outline-hidden font-mono caret-primary min-w-0 text-xs md:text-sm"
+                  className="flex-1 bg-transparent text-foreground outline-hidden font-mono caret-primary min-w-0 text-base md:text-sm"
                   placeholder="Type 'help' for available commands..."
                   autoComplete="off"
                 />
