@@ -230,14 +230,14 @@ export function ContactPane({
         onSubmit={handleSubmit}
         className="flex flex-col flex-1 font-mono text-xs"
       >
-        <div className="border-b border-primary/10 px-3 py-2 space-y-1.5">
-          <div className="flex items-center border-b border-primary/10 pb-1.5">
+        <div className="border-b border-border-faint px-3 py-2 space-y-1.5">
+          <div className="flex items-center border-b border-border-faint pb-1.5">
             <span className="text-yellow-600 dark:text-yellow-400/70 w-10 shrink-0">
               To:
             </span>
             <span className="text-muted-foreground">fhansteen@gmail.com</span>
           </div>
-          <div className="flex items-center border-b border-primary/10 pb-1.5">
+          <div className="flex items-center border-b border-border-faint pb-1.5">
             <label
               htmlFor="contact-name"
               className="text-yellow-600 dark:text-yellow-400/70 w-10 shrink-0"
@@ -256,7 +256,7 @@ export function ContactPane({
                 required
                 disabled={isSending}
                 className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-muted-foreground/30 disabled:opacity-50"
+                  placeholder:text-placeholder disabled:opacity-50"
                 placeholder={contact.name}
                 autoComplete="off"
               />
@@ -265,7 +265,7 @@ export function ContactPane({
               )}
             </div>
           </div>
-          <div className="flex items-center border-b border-primary/10 pb-1.5">
+          <div className="flex items-center border-b border-border-faint pb-1.5">
             <label
               htmlFor="contact-email"
               className="text-yellow-600 dark:text-yellow-400/70 w-10 shrink-0"
@@ -284,7 +284,7 @@ export function ContactPane({
                 required
                 disabled={isSending}
                 className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-muted-foreground/30 disabled:opacity-50"
+                  placeholder:text-placeholder disabled:opacity-50"
                 placeholder={contact.email}
                 autoComplete="off"
               />
@@ -311,7 +311,7 @@ export function ContactPane({
                 onBlur={() => setFocusedField(null)}
                 disabled={isSending}
                 className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  placeholder:text-muted-foreground/30 disabled:opacity-50"
+                  placeholder:text-placeholder disabled:opacity-50"
                 placeholder={`${contact.phone} (optional)`}
                 autoComplete="off"
               />
@@ -324,7 +324,7 @@ export function ContactPane({
 
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 flex min-h-36">
-            <div className="w-8 shrink-0 border-r border-primary/10 bg-primary/[0.02] flex flex-col items-end pt-2 pr-1 select-none">
+            <div className="w-8 shrink-0 border-r border-border-faint bg-surface-tint flex flex-col items-end pt-2 pr-1 select-none">
               {(formData.message.length > 0 ? messageLines : [""]).map(
                 (_, i) => (
                   <span
@@ -368,7 +368,7 @@ export function ContactPane({
                 required
                 disabled={isSending}
                 className="w-full h-full min-h-36 bg-transparent text-foreground outline-hidden font-mono text-xs max-md:text-base
-                  resize-none p-2 leading-editor placeholder:text-muted-foreground/30 disabled:opacity-50"
+                  resize-none p-2 leading-editor placeholder:text-placeholder disabled:opacity-50"
                 placeholder={
                   vimMode === "normal"
                     ? 'Press "i" to start typing...'
@@ -381,7 +381,7 @@ export function ContactPane({
         </div>
 
         {showLog && (
-          <div className="border-t border-primary/10 bg-muted/50 dark:bg-black/20 px-3 py-2 max-h-32 overflow-y-auto">
+          <div className="border-t border-border-faint bg-muted/50 dark:bg-black/20 px-3 py-2 max-h-32 overflow-y-auto">
             {sendLog.map((line, i) => (
               <div key={i} className="leading-relaxed">
                 {line.includes("[  OK  ]") ? (
@@ -405,7 +405,7 @@ export function ContactPane({
                   line.startsWith("Connection error:") ? (
                   <span className="text-red-400">{line}</span>
                 ) : (
-                  <span className="text-muted-foreground/70">{line}</span>
+                  <span className="text-muted-hover">{line}</span>
                 )}
               </div>
             ))}
@@ -413,27 +413,27 @@ export function ContactPane({
           </div>
         )}
 
-        <div className="flex items-center justify-between px-3 py-1 border-t border-primary/15 bg-primary/[0.02]">
+        <div className="flex items-center justify-between px-3 py-1 border-t border-wm-border bg-surface-tint">
           <div className="flex-1 min-w-0">
             {showCmd ? (
               <div className="flex items-center text-xs">
                 <span className="text-foreground">:</span>
                 <span className="text-foreground">{cmdBuffer}</span>
-                <span className="text-primary/60 animate-pulse">█</span>
+                <span className="text-primary-soft animate-pulse">█</span>
               </div>
             ) : vimMode === "insert" ? (
               <span className="text-xs font-bold text-foreground">
                 -- INSERT --
               </span>
             ) : sendState === "idle" ? (
-              <span className="text-xs text-muted-foreground/40">
-                Type <span className="text-primary/50">i</span> to edit,{" "}
-                <span className="text-primary/50">:wq</span> to send
+              <span className="text-xs text-subtle">
+                Type <span className="text-primary-muted">i</span> to edit,{" "}
+                <span className="text-primary-muted">:wq</span> to send
               </span>
             ) : null}
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-muted-foreground/30 text-2xs">
+            <span className="text-ghost text-2xs">
               {messageLines.length},
               {formData.message.length > 0
                 ? (messageLines[messageLines.length - 1]?.length ?? 0) + 1
@@ -442,9 +442,9 @@ export function ContactPane({
             <button
               type="submit"
               disabled={isSending}
-              className="font-mono text-xs px-3 py-0.5 rounded border border-primary/30
-                text-primary hover:bg-primary/10 hover:border-primary/60
-                active:bg-primary/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="font-mono text-xs px-3 py-0.5 rounded border border-control-border-hover
+                text-primary hover:bg-control-active hover:border-wm-border-swap
+                active:bg-surface-selected transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {isSending ? contact.submitLoading : ":wq"}
             </button>

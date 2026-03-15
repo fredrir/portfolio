@@ -55,6 +55,100 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
+  /* Interactive control states */
+  --color-control-active: hsl(var(--primary) / 0.1);
+  --color-control-hover: hsl(var(--primary) / 0.05);
+  --color-control-border: hsl(var(--primary) / 0.1);
+  --color-control-border-hover: hsl(var(--primary) / 0.3);
+
+  /* Window chrome */
+  --color-wm-border: hsl(var(--primary) / 0.15);
+  --color-wm-border-focus: hsl(var(--primary) / 0.5);
+  --color-wm-border-drag: hsl(var(--primary) / 0.3);
+  --color-wm-border-swap: hsl(var(--primary) / 0.6);
+  --color-wm-shadow: hsl(var(--primary) / 0.1);
+  --color-wm-shadow-soft: hsl(var(--primary) / 0.05);
+  --color-wm-ring: hsl(var(--primary) / 0.3);
+  --color-wm-titlebar: hsl(var(--primary) / 0.03);
+  --color-wm-close: hsl(var(--destructive) / 0.6);
+  --color-wm-minimize: hsl(var(--accent-yellow) / 0.6);
+  --color-wm-maximize: hsl(var(--primary) / 0.6);
+
+  /* Text: muted-foreground hierarchy */
+  --color-faded: hsl(var(--muted-foreground) / 0.5);
+  --color-subtle: hsl(var(--muted-foreground) / 0.4);
+  --color-ghost: hsl(var(--muted-foreground) / 0.3);
+  --color-readable: hsl(var(--muted-foreground) / 0.6);
+  --color-muted-hover: hsl(var(--muted-foreground) / 0.7);
+
+  /* Text: primary hierarchy */
+  --color-primary-bold: hsl(var(--primary) / 0.8);
+  --color-primary-medium: hsl(var(--primary) / 0.7);
+  --color-primary-soft: hsl(var(--primary) / 0.6);
+  --color-primary-muted: hsl(var(--primary) / 0.5);
+  --color-primary-dim: hsl(var(--primary) / 0.4);
+  --color-primary-subtle: hsl(var(--primary) / 0.3);
+  --color-primary-hint: hsl(var(--primary) / 0.2);
+  --color-primary-ghost: hsl(var(--primary) / 0.9);
+
+  /* Surfaces */
+  --color-surface-tint: hsl(var(--primary) / 0.02);
+  --color-surface-faint: hsl(var(--primary) / 0.03);
+  --color-surface-dim: hsl(var(--primary) / 0.05);
+  --color-surface-soft: hsl(var(--primary) / 0.08);
+  --color-surface-raised: hsl(var(--primary) / 0.12);
+  --color-surface-elevated: hsl(var(--primary) / 0.15);
+  --color-surface-selected: hsl(var(--primary) / 0.2);
+  --color-surface-strong: hsl(var(--primary) / 0.25);
+
+  /* Data visualization / progress */
+  --color-chart-track: hsl(var(--primary) / 0.05);
+  --color-chart-fill: hsl(var(--primary) / 0.4);
+  --color-progress-track: hsl(var(--primary) / 0.1);
+  --color-progress-fill: hsl(var(--primary) / 0.6);
+
+  /* Decorative borders */
+  --color-border-faint: hsl(var(--primary) / 0.1);
+  --color-border-medium: hsl(var(--primary) / 0.2);
+
+  /* Launcher button */
+  --color-launcher-bg: hsl(var(--primary) / 0.15);
+  --color-launcher-hover: hsl(var(--primary) / 0.25);
+  --color-launcher-active: hsl(var(--primary) / 0.35);
+
+  /* App launcher stop/start badges */
+  --color-badge-stop: rgb(239 68 68 / 0.15);
+  --color-badge-stop-hover: rgb(239 68 68 / 0.25);
+  --color-badge-start: hsl(var(--primary) / 0.15);
+  --color-badge-start-hover: hsl(var(--primary) / 0.25);
+
+  /* Contribution graph */
+  --color-contrib-0: hsl(var(--muted-foreground) / 0.2);
+  --color-contrib-1-light: rgb(22 163 74 / 0.4);
+  --color-contrib-1-dark: rgb(74 222 128 / 0.3);
+  --color-contrib-2-light: rgb(22 163 74 / 0.6);
+  --color-contrib-2-dark: rgb(74 222 128 / 0.5);
+  --color-contrib-3-light: rgb(22 163 74 / 0.8);
+  --color-contrib-3-dark: rgb(74 222 128 / 0.7);
+
+  /* Terminal tab controls */
+  --color-terminal-close: rgb(239 68 68 / 0.7);
+  --color-terminal-minimize: rgb(234 179 8 / 0.4);
+  --color-terminal-maximize: rgb(34 197 94 / 0.7);
+
+  /* Tech badge */
+  --color-tech-badge: hsl(var(--primary) / 0.06);
+  --color-tech-badge-text: hsl(var(--primary) / 0.9);
+
+  /* Accent variants */
+  --color-date-accent: hsl(var(--accent-yellow) / 0.6);
+  --color-icon-close: hsl(var(--destructive) / 0.5);
+  --color-icon-minimize: hsl(var(--accent-yellow) / 0.5);
+
+  /* Placeholder */
+  --color-placeholder: hsl(var(--muted-foreground) / 0.3);
+  --color-placeholder-visible: hsl(var(--muted-foreground) / 0.5);
 }
 
 @utility bg-hero-pattern-dark {

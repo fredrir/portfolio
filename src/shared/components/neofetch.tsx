@@ -252,7 +252,7 @@ export default function Neofetch({
             ) : i === 0 ? (
               <span className="text-primary font-bold">{item.value}</span>
             ) : (
-              <span className="text-primary/30 text-[10px]">{item.value}</span>
+              <span className="text-primary-subtle text-[10px]">{item.value}</span>
             )}
           </div>
         ))}

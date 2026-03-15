@@ -47,20 +47,20 @@ export function MobileLayout({
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="flex-1 flex flex-col min-h-0"
           >
-            <div className="flex-1 flex flex-col m-2 rounded-xl border border-primary/20 bg-background/80 backdrop-blur-md shadow-lg shadow-primary/5 overflow-hidden min-h-0">
-              <div className="flex items-center px-3 py-2 border-b border-primary/15 bg-primary/[0.03] shrink-0">
+            <div className="flex-1 flex flex-col m-2 rounded-xl border border-border-medium bg-background/80 backdrop-blur-md shadow-lg shadow-wm-shadow-soft overflow-hidden min-h-0">
+              <div className="flex items-center px-3 py-2 border-b border-wm-border bg-wm-titlebar shrink-0">
                 <button
                   onClick={onGoHome}
-                  className="text-primary/60 hover:text-primary active:text-primary transition-colors mr-3 font-mono text-2xl leading-none -mt-0.5 px-1"
+                  className="text-primary-soft hover:text-primary active:text-primary transition-colors mr-3 font-mono text-2xl leading-none -mt-0.5 px-1"
                 >
                   ‹
                 </button>
-                <span className="font-mono text-xs text-muted-foreground/50 flex-1 text-center">
+                <span className="font-mono text-xs text-faded flex-1 text-center">
                   {activeConfig &&
                     (ui.shortTitles[activeConfig.id] ??
                       activeConfig.shortTitle)}
                 </span>
-                <span className="font-mono text-xs text-primary/30">
+                <span className="font-mono text-xs text-primary-subtle">
                   fredrir@hansteen
                 </span>
               </div>

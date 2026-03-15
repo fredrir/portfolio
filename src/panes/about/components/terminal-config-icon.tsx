@@ -7,7 +7,7 @@ export function TerminalConfigIcon() {
         width="40"
         height="36"
         rx="3"
-        className="stroke-primary/60"
+        className="stroke-primary-soft"
         strokeWidth="1.5"
         fill="none"
       />
@@ -17,16 +17,16 @@ export function TerminalConfigIcon() {
         width="40"
         height="8"
         rx="3"
-        className="stroke-primary/60 fill-primary/[0.04]"
+        className="stroke-primary-soft fill-wm-titlebar"
         strokeWidth="1.5"
       />
-      <circle cx="10" cy="10" r="1.5" className="fill-destructive/50" />
-      <circle cx="15" cy="10" r="1.5" className="fill-accent-yellow/50" />
-      <circle cx="20" cy="10" r="1.5" className="fill-primary/50" />
+      <circle cx="10" cy="10" r="1.5" className="fill-icon-close" />
+      <circle cx="15" cy="10" r="1.5" className="fill-icon-minimize" />
+      <circle cx="20" cy="10" r="1.5" className="fill-primary-muted" />
       <text
         x="8"
         y="22"
-        className="fill-primary/50"
+        className="fill-primary-muted"
         fontSize="4"
         fontFamily="monospace"
       >
@@ -35,7 +35,7 @@ export function TerminalConfigIcon() {
       <text
         x="8"
         y="27"
-        className="fill-primary/35"
+        className="fill-chart-fill"
         fontSize="4"
         fontFamily="monospace"
       >
@@ -44,7 +44,7 @@ export function TerminalConfigIcon() {
       <text
         x="8"
         y="32"
-        className="fill-primary/25"
+        className="fill-surface-strong"
         fontSize="4"
         fontFamily="monospace"
       >
@@ -53,7 +53,7 @@ export function TerminalConfigIcon() {
       <text
         x="8"
         y="37"
-        className="fill-primary/20"
+        className="fill-surface-selected"
         fontSize="4"
         fontFamily="monospace"
       >

@@ -79,7 +79,7 @@ export function TerminalPane({ locale }: Props) {
         className="flex-1 overflow-y-auto scroll-smooth px-3 pt-3 pb-1"
       >
         <div className="mb-2">
-          <div className="text-muted-foreground/40 mb-1">
+          <div className="text-subtle mb-1">
             <span className="text-primary">$</span> neofetch
           </div>
           <Neofetch animate={false} locale={locale} />
@@ -124,7 +124,7 @@ export function TerminalPane({ locale }: Props) {
           placeholder="Type 'help' for commands..."
           autoComplete="off"
         />
-        <span className="inline-block w-1.5 h-4 bg-primary/80 animate-pulse flex-shrink-0" />
+        <span className="inline-block w-1.5 h-4 bg-primary-bold animate-pulse flex-shrink-0" />
       </div>
     </div>
   );

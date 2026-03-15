@@ -32,8 +32,8 @@ export function AboutPane({ landing }: Props) {
         </div>
 
         <div className="group">
-          <div className="absolute -inset-1.5 rounded-2xl bg-primary/15 blur-lg group-hover:bg-primary/25 transition-all" />
-          <div className="relative rounded-2xl overflow-hidden w-24 h-24 @xs:w-28 @xs:h-28 @md:w-36 @md:h-36 @lg:w-40 @lg:h-40 border-2 border-primary/30 shadow-lg shadow-primary/10 transition-all">
+          <div className="absolute -inset-1.5 rounded-2xl bg-surface-elevated blur-lg group-hover:bg-surface-strong transition-all" />
+          <div className="relative rounded-2xl overflow-hidden w-24 h-24 @xs:w-28 @xs:h-28 @md:w-36 @md:h-36 @lg:w-40 @lg:h-40 border-2 border-control-border-hover shadow-lg shadow-wm-shadow transition-all">
             <Image
               src="/Fredrik_Carsten_Hansteen.png"
               alt="Fredrik Carsten Hansteen"

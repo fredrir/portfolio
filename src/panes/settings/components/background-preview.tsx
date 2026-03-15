@@ -16,11 +16,11 @@ function StarfieldPreview() {
     <svg viewBox="0 0 24 16" className="w-full h-full">
       <rect width="24" height="16" className="fill-background" />
       {dots.map((d, i) => (
-        <circle key={i} cx={d.cx} cy={d.cy} r={d.r} className="fill-primary/40" />
+        <circle key={i} cx={d.cx} cy={d.cy} r={d.r} className="fill-chart-fill" />
       ))}
-      <line x1="4" y1="3" x2="12" y2="6" className="stroke-primary/15" strokeWidth="0.3" />
-      <line x1="12" y1="6" x2="18" y2="4" className="stroke-primary/15" strokeWidth="0.3" />
-      <line x1="8" y1="10" x2="15" y2="12" className="stroke-primary/15" strokeWidth="0.3" />
+      <line x1="4" y1="3" x2="12" y2="6" className="stroke-wm-border" strokeWidth="0.3" />
+      <line x1="12" y1="6" x2="18" y2="4" className="stroke-wm-border" strokeWidth="0.3" />
+      <line x1="8" y1="10" x2="15" y2="12" className="stroke-wm-border" strokeWidth="0.3" />
     </svg>
   );
 }
@@ -43,7 +43,7 @@ function MatrixPreview() {
             x={col.x}
             y={col.y + j * 4}
             fontSize="3"
-            className="fill-primary/30"
+            className="fill-primary-subtle"
             fontFamily="monospace"
             textAnchor="middle"
           >
@@ -60,10 +60,10 @@ function GridPreview() {
     <svg viewBox="0 0 24 16" className="w-full h-full">
       <rect width="24" height="16" className="fill-background" />
       {[4, 8, 12, 16, 20].map((x) => (
-        <line key={`v${x}`} x1={x} y1="0" x2={x} y2="16" className="stroke-primary/8" strokeWidth="0.3" />
+        <line key={`v${x}`} x1={x} y1="0" x2={x} y2="16" className="stroke-surface-soft" strokeWidth="0.3" />
       ))}
       {[4, 8, 12].map((y) => (
-        <line key={`h${y}`} x1="0" y1={y} x2="24" y2={y} className="stroke-primary/8" strokeWidth="0.3" />
+        <line key={`h${y}`} x1="0" y1={y} x2="24" y2={y} className="stroke-surface-soft" strokeWidth="0.3" />
       ))}
     </svg>
   );
@@ -101,7 +101,7 @@ function PlainPreview() {
 
 export function BackgroundPreview({ config }: { config: BackgroundConfig }) {
   return (
-    <div className="w-full aspect-[3/2] rounded-sm overflow-hidden border border-primary/10">
+    <div className="w-full aspect-[3/2] rounded-sm overflow-hidden border border-control-border">
       {config.type === "animated-dots" && <StarfieldPreview />}
       {config.type === "matrix" && <MatrixPreview />}
       {config.type === "grid" && <GridPreview />}

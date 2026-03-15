@@ -54,7 +54,7 @@ function ImageDetail({ image }: { image: GalleryImage }) {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 gap-1">
-      <div className="flex-1 flex items-center justify-center min-h-0 rounded-md overflow-hidden border border-primary/10 bg-black/20">
+      <div className="flex-1 flex items-center justify-center min-h-0 rounded-md overflow-hidden border border-control-border bg-black/20">
         {isSvg(image.src) ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -73,7 +73,7 @@ function ImageDetail({ image }: { image: GalleryImage }) {
         )}
       </div>
 
-      <div className="shrink-0 flex pt-2 flex-wrap gap-x-3 gap-y-0.5 text-2xs text-muted-foreground/50 px-0.5">
+      <div className="shrink-0 flex pt-2 flex-wrap gap-x-3 gap-y-0.5 text-2xs text-faded px-0.5">
         {exifLoading && <span className="animate-pulse">reading exif...</span>}
         {displayDate && <span>{formatDate(displayDate)}</span>}
         {image.filename && <span> {image.filename} </span>}
@@ -100,7 +100,7 @@ function ImageDetail({ image }: { image: GalleryImage }) {
             href={`https://www.google.com/maps?q=${exif.latitude},${exif.longitude}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary/40 hover:text-primary/70 transition-colors"
+            className="text-primary-dim hover:text-primary-medium transition-colors"
           >
             {exif.latitude.toFixed(4)}, {exif.longitude.toFixed(4)}
           </a>
@@ -126,7 +126,7 @@ function CategoryBrowser({
             <button
               key={cat.name}
               onClick={() => onSelect(cat.name)}
-              className="rounded-lg overflow-hidden border border-primary/10 hover:border-primary/30 transition-all group bg-black/10 text-left"
+              className="rounded-lg overflow-hidden border border-control-border hover:border-control-border-hover transition-all group bg-black/10 text-left"
             >
               <div className="aspect-[3/2] overflow-hidden bg-black/20">
                 {preview && (
@@ -140,7 +140,7 @@ function CategoryBrowser({
                 <span className="text-xs text-primary truncate">
                   {cat.name}/
                 </span>
-                <span className="text-2xs text-muted-foreground/30 shrink-0">
+                <span className="text-2xs text-ghost shrink-0">
                   {cat.images.length}
                 </span>
               </div>
@@ -190,7 +190,7 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
       className="p-2 @xs:p-2.5 @sm:p-3 font-mono text-xs h-full flex flex-col @container"
     >
       {!compact && (
-        <div className="text-muted-foreground/50 mb-1.5 @sm:mb-2 shrink-0">
+        <div className="text-faded mb-1.5 @sm:mb-2 shrink-0">
           <span className="text-primary">$</span>{" "}
           {activeCategory ? `ls ~/gallery/${activeCategory}/` : "ls ~/gallery/"}
         </div>
@@ -198,12 +198,12 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
 
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
-          <span className="text-muted-foreground/40 animate-pulse">
+          <span className="text-subtle animate-pulse">
             {ui.searchingGallery}
           </span>
         </div>
       ) : categories.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center gap-2 text-muted-foreground/40">
+        <div className="flex-1 flex flex-col items-center justify-center gap-2 text-subtle">
           <span className="text-2xl">📂</span>
           <span>{ui.emptyGallery}</span>
         </div>
@@ -225,12 +225,12 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
                   }}
                   className={`px-2 py-0.5 @sm:py-1 rounded text-2xs whitespace-nowrap transition-all ${
                     activeCategory === cat.name
-                      ? "bg-primary/15 text-primary border border-primary/30"
-                      : "text-muted-foreground/50 border border-transparent hover:text-primary/70 hover:bg-primary/5"
+                      ? "bg-surface-elevated text-primary border border-control-border-hover"
+                      : "text-faded border border-transparent hover:text-primary-medium hover:bg-control-hover"
                   }`}
                 >
                   {cat.name}/
-                  <span className="text-muted-foreground/30 ml-1">
+                  <span className="text-ghost ml-1">
                     {cat.images.length}
                   </span>
                 </button>
@@ -243,7 +243,7 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
               <div className="flex items-center gap-2 mb-1 shrink-0">
                 <button
                   onClick={() => setSelectedImage(null)}
-                  className={`text-primary/50 hover:text-primary active:text-primary transition-colors ${narrow ? "text-sm py-1" : "text-2xs"}`}
+                  className={`text-primary-muted hover:text-primary active:text-primary transition-colors ${narrow ? "text-sm py-1" : "text-2xs"}`}
                 >
                   ← {activeCategory}
                 </button>
@@ -265,7 +265,7 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
                   <button
                     key={img.src}
                     onClick={() => setSelectedImage(img)}
-                    className="rounded overflow-hidden border border-primary/10 hover:border-primary/30 transition-all group bg-black/10 relative"
+                    className="rounded overflow-hidden border border-control-border hover:border-control-border-hover transition-all group bg-black/10 relative"
                   >
                     <div className="aspect-[4/3]">
                       <Thumbnail
@@ -291,9 +291,9 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
           )}
 
           {!compact && !narrow && (
-            <div className="pt-1 border-t border-primary/10 text-muted-foreground/30 text-2xs mt-1 flex justify-between shrink-0">
+            <div className="pt-1 border-t border-border-faint text-ghost text-2xs mt-1 flex justify-between shrink-0">
               <span>{currentCategory?.images.length ?? 0} images</span>
-              <span className="text-primary/30">
+              <span className="text-primary-subtle">
                 ~/gallery/{activeCategory}/
               </span>
             </div>

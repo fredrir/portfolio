@@ -21,7 +21,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
     <div className="font-mono text-xs h-full flex flex-col overflow-auto">
       <div className="flex-1 p-4 space-y-4">
         <div>
-          <div className="text-muted-foreground/40 text-2xs tracking-widest uppercase mb-1">
+          <div className="text-subtle text-2xs tracking-widest uppercase mb-1">
             {slug}(1)
           </div>
           <h2 className="text-lg font-bold text-foreground tracking-tight">
@@ -30,7 +30,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
         </div>
 
         {thumb && (
-          <div className="rounded-lg overflow-hidden border border-primary/15 bg-black/10">
+          <div className="rounded-lg overflow-hidden border border-wm-border bg-black/10">
             <Image
               src={thumb}
               alt={project.title}
@@ -46,7 +46,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
             <span className="text-primary font-bold text-xs uppercase tracking-wider">
               {ui.about}
             </span>
-            <div className="flex-1 h-px bg-primary/10" />
+            <div className="flex-1 h-px bg-border-faint" />
           </div>
           <p className="text-muted-foreground leading-relaxed text-xs">
             {project.description}
@@ -58,13 +58,13 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
             <span className="text-primary font-bold text-xs uppercase tracking-wider">
               {ui.techStack}
             </span>
-            <div className="flex-1 h-px bg-primary/10" />
+            <div className="flex-1 h-px bg-border-faint" />
           </div>
           <div className="flex flex-wrap gap-1.5">
             {langs.map((lang, i) => (
               <span
                 key={i}
-                className="px-2.5 py-1 rounded-md text-2xs border border-primary/20 bg-primary/[0.06] text-primary/90 font-medium"
+                className="px-2.5 py-1 rounded-md text-2xs border border-border-medium bg-tech-badge text-tech-badge-text font-medium"
               >
                 {lang}
               </span>
@@ -78,7 +78,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
               <span className="text-primary font-bold text-xs uppercase tracking-wider">
                 {ui.links}
               </span>
-              <div className="flex-1 h-px bg-primary/10" />
+              <div className="flex-1 h-px bg-border-faint" />
             </div>
             <div className="space-y-1.5">
               {project.websiteLink && (
@@ -86,9 +86,9 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
                   href={project.websiteLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 rounded-md border border-primary/15 hover:border-primary/30 hover:bg-primary/5 transition-all group"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md border border-wm-border hover:border-control-border-hover hover:bg-control-hover transition-all group"
                 >
-                  <span className="text-primary/50 group-hover:text-primary">
+                  <span className="text-primary-muted group-hover:text-primary">
                     →
                   </span>
                   <span className="text-foreground group-hover:text-primary transition-colors text-xs">
@@ -104,12 +104,12 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
                   href={project.githubLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 rounded-md border border-primary/15 hover:border-primary/30 hover:bg-primary/5 transition-all group"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md border border-wm-border hover:border-control-border-hover hover:bg-control-hover transition-all group"
                 >
                   <span>
                     <GithubLogoIcon className="group-hover:fill-primary w-4 h-4 fill-primary" />
                   </span>
-                  <span className="text-muted-foreground/70 group-hover:text-primary transition-colors text-xs">
+                  <span className="text-muted-hover group-hover:text-primary transition-colors text-xs">
                     {viewCode}
                   </span>
                 </Link>
@@ -119,7 +119,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
         )}
       </div>
 
-      <div className="px-4 py-2 border-t border-primary/10 bg-primary/[0.02] text-muted-foreground/30 text-2xs shrink-0 flex justify-between">
+      <div className="px-4 py-2 border-t border-border-faint bg-surface-tint text-ghost text-2xs shrink-0 flex justify-between">
         <span>{slug}(1)</span>
         <span>fredrir@hansteen</span>
       </div>

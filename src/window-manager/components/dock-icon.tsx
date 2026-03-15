@@ -17,12 +17,12 @@ export function DockIcon({ icon, label, isActive, onTap }: Props) {
       className="flex flex-col items-center justify-center gap-0.5 w-14"
     >
       <span
-        className={`transition-colors ${isActive ? "text-primary" : "text-muted-foreground/50"}`}
+        className={`transition-colors ${isActive ? "text-primary" : "text-faded"}`}
       >
         {icon}
       </span>
       <span
-        className={`text-xs transition-colors ${isActive ? "text-primary/80" : "text-muted-foreground/30"}`}
+        className={`text-xs transition-colors ${isActive ? "text-primary-bold" : "text-ghost"}`}
       >
         {label}
       </span>

@@ -36,17 +36,17 @@ export function Window({
       data-pane-id={config.id}
       className={`flex-1 min-w-0 flex flex-col rounded-xl border bg-background/80 backdrop-blur-md overflow-hidden transition-all duration-200 ${
         isDragging
-          ? "opacity-50 scale-[0.98] border-primary/30"
+          ? "opacity-50 scale-[0.98] border-wm-border-drag"
           : isSwapTarget
-            ? "border-primary/60 ring-2 ring-primary/30 shadow-lg shadow-primary/10 scale-[1.01]"
+            ? "border-wm-border-swap ring-2 ring-wm-ring shadow-lg shadow-wm-shadow scale-[1.01]"
             : isFocused
-              ? "border-primary/50 shadow-lg shadow-primary/10"
-              : "border-primary/15 shadow-md shadow-primary/5"
+              ? "border-wm-border-focus shadow-lg shadow-wm-shadow"
+              : "border-wm-border shadow-md shadow-wm-shadow-soft"
       }`}
       onMouseDown={onFocus}
     >
       <div
-        className="flex items-center justify-between px-3 py-1.5 border-b border-primary/15 bg-primary/[0.03] shrink-0 cursor-grab active:cursor-grabbing select-none"
+        className="flex items-center justify-between px-3 py-1.5 border-b border-wm-border bg-wm-titlebar shrink-0 cursor-grab active:cursor-grabbing select-none"
         onMouseDown={(e) => {
           if (e.button !== 0) return;
           onTitleMouseDown(config.id, e);
@@ -62,7 +62,7 @@ export function Window({
             onMouseDown={(e) => e.stopPropagation()}
             className="group"
           >
-            <div className="w-3.5 h-3.5 rounded-full bg-destructive/60 group-hover:bg-destructive transition-colors" />
+            <div className="w-3.5 h-3.5 rounded-full bg-wm-close group-hover:bg-destructive transition-colors" />
           </button>
           <button
             onClick={(e) => {
@@ -72,7 +72,7 @@ export function Window({
             onMouseDown={(e) => e.stopPropagation()}
             className="group"
           >
-            <div className="w-3.5 h-3.5 rounded-full bg-accent-yellow/60 group-hover:bg-accent-yellow transition-colors" />
+            <div className="w-3.5 h-3.5 rounded-full bg-wm-minimize group-hover:bg-accent-yellow transition-colors" />
           </button>
           <button
             onClick={(e) => {
@@ -82,15 +82,15 @@ export function Window({
             onMouseDown={(e) => e.stopPropagation()}
             className="group"
           >
-            <div className="w-3.5 h-3.5 rounded-full bg-primary/60 group-hover:bg-primary transition-colors" />
+            <div className="w-3.5 h-3.5 rounded-full bg-wm-maximize group-hover:bg-primary transition-colors" />
           </button>
         </div>
 
-        <span className="font-mono text-xs text-muted-foreground/50 truncate mx-2">
+        <span className="font-mono text-xs text-faded truncate mx-2">
           {config.title}
         </span>
 
-        <span className="font-mono text-3xs text-primary/30"></span>
+        <span className="font-mono text-3xs text-primary-subtle"></span>
       </div>
 
       <div className="flex-1 overflow-auto min-h-0 @container relative">
@@ -105,7 +105,7 @@ export function Window({
           >
             <svg
               viewBox="0 0 16 16"
-              className="w-full h-full text-primary/30 group-hover/grip:text-primary/60 transition-colors"
+              className="w-full h-full text-primary-subtle group-hover/grip:text-primary-soft transition-colors"
             >
               <line
                 x1="14"

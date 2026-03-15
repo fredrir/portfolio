@@ -175,8 +175,8 @@ export function CookieConsentBanner({
           ${isAnimating ? "translate-y-4 opacity-0" : "translate-y-0 opacity-100"}
         `}
       >
-        <div className="rounded-md border border-primary/30 bg-background/95 backdrop-blur-sm shadow-lg shadow-primary/5 overflow-hidden">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-primary/20 bg-primary/5">
+        <div className="rounded-md border border-control-border-hover bg-background/95 backdrop-blur-sm shadow-lg shadow-wm-shadow-soft overflow-hidden">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-border-medium bg-surface-dim">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
             <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
@@ -187,7 +187,7 @@ export function CookieConsentBanner({
 
           <div className="p-3 space-y-3">
             {showNeofetch && (
-              <div className="pb-1 border-b border-primary/10">
+              <div className="pb-1 border-b border-border-faint">
                 <Neofetch
                   info={getCookieInfo(locale, text.cookieLine)}
                   animate={true}
@@ -201,14 +201,14 @@ export function CookieConsentBanner({
                 <span className="text-foreground">
                   {typed}
                   {!doneTyping && (
-                    <span className="inline-block w-1.5 h-4 bg-primary/80 align-middle animate-pulse ml-px" />
+                    <span className="inline-block w-1.5 h-4 bg-primary-bold align-middle animate-pulse ml-px" />
                   )}
                 </span>
               </div>
             )}
 
             {showGdpr && (
-              <div className="border border-primary/20 rounded px-3 py-2 space-y-1.5 bg-primary/5">
+              <div className="border border-border-medium rounded px-3 py-2 space-y-1.5 bg-surface-dim">
                 <div className="text-primary text-xs font-bold">
                   {text.gdprTitle}
                 </div>
@@ -217,14 +217,14 @@ export function CookieConsentBanner({
                     key={i}
                     className="flex gap-2 text-xs text-muted-foreground"
                   >
-                    <span className="text-primary/60 shrink-0">·</span>
+                    <span className="text-primary-soft shrink-0">·</span>
                     <span>{line}</span>
                   </div>
                 ))}
                 <div className="pt-1">
                   <button
                     onClick={() => setShowGdpr(false)}
-                    className="text-xs text-muted-foreground/60 hover:text-muted-foreground hover:underline underline-offset-2 transition-colors"
+                    className="text-xs text-readable hover:text-muted-foreground hover:underline underline-offset-2 transition-colors"
                   >
                     {text.gdprBack}
                   </button>
@@ -237,7 +237,7 @@ export function CookieConsentBanner({
                 <span className="text-primary shrink-0">$</span>
                 <button
                   onClick={handleAccept}
-                  className="text-primary hover:text-primary/80 hover:underline underline-offset-2 transition-colors"
+                  className="text-primary hover:text-primary-bold hover:underline underline-offset-2 transition-colors"
                 >
                   {text.accept}
                 </button>
@@ -249,7 +249,7 @@ export function CookieConsentBanner({
                 </button>
                 <button
                   onClick={() => setShowGdpr((v) => !v)}
-                  className="text-muted-foreground/60 hover:text-muted-foreground hover:underline underline-offset-2 transition-colors ml-auto"
+                  className="text-readable hover:text-muted-foreground hover:underline underline-offset-2 transition-colors ml-auto"
                 >
                   {text.info}
                 </button>

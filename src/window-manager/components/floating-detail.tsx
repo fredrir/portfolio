@@ -22,19 +22,19 @@ export function FloatingDetail({ title, onClose, children }: Props) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg max-h-[80vh] rounded-xl border border-primary/30 bg-background/95 backdrop-blur-md shadow-2xl shadow-primary/10 overflow-hidden flex flex-col font-mono"
+        className="w-full max-w-lg max-h-[80vh] rounded-xl border border-wm-border-drag bg-background/95 backdrop-blur-md shadow-2xl shadow-wm-shadow overflow-hidden flex flex-col font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-4 py-2 border-b border-primary/15 bg-primary/[0.03] shrink-0">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-wm-border bg-wm-titlebar shrink-0">
           <div className="flex items-center gap-2.5">
             <button onClick={onClose} className="group">
-              <div className="w-3.5 h-3.5 rounded-full bg-destructive/60 group-hover:bg-destructive transition-colors" />
+              <div className="w-3.5 h-3.5 rounded-full bg-wm-close group-hover:bg-destructive transition-colors" />
             </button>
           </div>
-          <span className="text-xs text-muted-foreground/50 truncate mx-2">
+          <span className="text-xs text-faded truncate mx-2">
             {title}
           </span>
-          <span className="text-xs text-primary/30">fredrir@hansteen</span>
+          <span className="text-xs text-primary-subtle">fredrir@hansteen</span>
         </div>
         <div className="flex-1 overflow-auto">{children}</div>
       </div>

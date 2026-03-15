@@ -14,7 +14,7 @@ interface Props {
 export function ProjectsPane({ projects, viewCode, onOpenDetail, ui }: Props) {
   return (
     <div className="p-2 @sm:p-3 font-mono text-xs h-full flex flex-col">
-      <div className="text-muted-foreground/50 mb-2">
+      <div className="text-faded mb-2">
         <span className="text-primary">$</span> ls ~/projects/
       </div>
 
@@ -28,12 +28,12 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail, ui }: Props) {
             return (
               <div
                 key={project.id}
-                className="flex items-center gap-2 @sm:gap-3 py-1 @sm:py-1.5 px-1.5 @sm:px-2 rounded-md hover:bg-primary/5 transition-colors group"
+                className="flex items-center gap-2 @sm:gap-3 py-1 @sm:py-1.5 px-1.5 @sm:px-2 rounded-md hover:bg-control-hover transition-colors group"
               >
                 {thumb && (
                   <button
                     onClick={() => onOpenDetail(project)}
-                    className="shrink-0 w-10 h-7 @sm:w-12 @sm:h-8 @lg:w-16 @lg:h-11 rounded-md overflow-hidden border border-primary/10 bg-background transition-all"
+                    className="shrink-0 w-10 h-7 @sm:w-12 @sm:h-8 @lg:w-16 @lg:h-11 rounded-md overflow-hidden border border-control-border bg-background transition-all"
                   >
                     <Image
                       src={thumb}
@@ -59,7 +59,7 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail, ui }: Props) {
                       .map((lang, i) => (
                         <span
                           key={i}
-                          className="text-3xs @sm:text-2xs text-muted-foreground/50"
+                          className="text-3xs @sm:text-2xs text-faded"
                         >
                           {lang.trim()}
                           {i <
@@ -67,7 +67,7 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail, ui }: Props) {
                               2,
                               project.languages.split(",").length - 1,
                             ) && (
-                            <span className="text-primary/20 ml-1">·</span>
+                            <span className="text-primary-hint ml-1">·</span>
                           )}
                         </span>
                       ))}
@@ -75,7 +75,7 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail, ui }: Props) {
                 </button>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <p className="text-primary/40 hover:text-primary transition-colors text-2xs">
+                  <p className="text-primary-dim hover:text-primary transition-colors text-2xs">
                     ↗
                   </p>
                 </div>
@@ -85,9 +85,9 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail, ui }: Props) {
         </div>
       </div>
 
-      <div className="pt-1 border-t border-primary/10 text-muted-foreground/30 text-2xs mt-1 flex justify-between">
+      <div className="pt-1 border-t border-border-faint text-ghost text-2xs mt-1 flex justify-between">
         <span>{projects.length} {ui.projects}</span>
-        <span className="text-primary/30">{ui.clickToOpen}</span>
+        <span className="text-primary-subtle">{ui.clickToOpen}</span>
       </div>
     </div>
   );

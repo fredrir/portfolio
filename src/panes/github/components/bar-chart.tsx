@@ -17,13 +17,13 @@ export function BarChart({
             <span className="text-muted-foreground w-14 @xs:w-20 shrink-0 truncate">
               {lang}
             </span>
-            <div className="flex-1 h-3 bg-primary/5 rounded-sm overflow-hidden">
+            <div className="flex-1 h-3 bg-chart-track rounded-sm overflow-hidden">
               <div
-                className="h-full bg-primary/40 rounded-sm transition-all duration-500"
+                className="h-full bg-chart-fill rounded-sm transition-all duration-500"
                 style={{ width: `${pct}%` }}
               />
             </div>
-            <span className="text-muted-foreground/60 shrink-0 w-6 text-right">
+            <span className="text-readable shrink-0 w-6 text-right">
               {count}
             </span>
           </div>

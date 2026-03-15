@@ -58,8 +58,8 @@ const Terminal = ({ mainText, locale }: Props) => {
           maxWidth: "100vw",
         }}
       >
-        <div className="rounded-md border border-primary/30 bg-background/95 backdrop-blur-sm shadow-lg shadow-primary/5 overflow-hidden h-full flex flex-col">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-primary/20 bg-primary/5 shrink-0">
+        <div className="rounded-md border border-control-border-hover bg-background/95 backdrop-blur-sm shadow-lg shadow-wm-shadow-soft overflow-hidden h-full flex flex-col">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-border-medium bg-surface-dim shrink-0">
             <button
               onClick={() => setIsClosed(true)}
               title="Close"
@@ -93,13 +93,13 @@ const Terminal = ({ mainText, locale }: Props) => {
           >
             <div className="flex-1">
               <div className="mb-2">
-                <div className="text-muted-foreground/40 mb-1">
+                <div className="text-subtle mb-1">
                   <span className="text-primary">$</span> neofetch
                 </div>
                 <Neofetch animate={true} locale={locale} />
               </div>
 
-              <div className="border-t border-primary/10 my-2" />
+              <div className="border-t border-border-faint my-2" />
 
               {showInitialAnimation && (
                 <article className="whitespace-pre-wrap break-words">
@@ -111,7 +111,7 @@ const Terminal = ({ mainText, locale }: Props) => {
                     {text.slice(mainText.length)}
                   </span>
                   {cursorVisible && (
-                    <span className="inline-block w-1.5 h-4 bg-primary/80 align-middle animate-pulse ml-px" />
+                    <span className="inline-block w-1.5 h-4 bg-primary-bold align-middle animate-pulse ml-px" />
                   )}
                 </article>
               )}
@@ -140,7 +140,7 @@ const Terminal = ({ mainText, locale }: Props) => {
             </div>
 
             {cursorIsFinished && (
-              <div className="flex items-center mt-1 md:mt-2 border-t border-primary/20 pt-2 pb-2 sticky bottom-0 bg-background/95 backdrop-blur-sm">
+              <div className="flex items-center mt-1 md:mt-2 border-t border-border-medium pt-2 pb-2 sticky bottom-0 bg-background/95 backdrop-blur-sm">
                 <span className="text-primary mr-1 md:mr-2 flex-shrink-0 text-xs md:text-sm">
                   [{currentPath}]${" "}
                 </span>
@@ -154,7 +154,7 @@ const Terminal = ({ mainText, locale }: Props) => {
                   placeholder="Type 'help' for available commands..."
                   autoComplete="off"
                 />
-                <span className="inline-block w-1.5 h-4 bg-primary/80 animate-pulse flex-shrink-0" />
+                <span className="inline-block w-1.5 h-4 bg-primary-bold animate-pulse flex-shrink-0" />
               </div>
             )}
           </div>
@@ -163,35 +163,35 @@ const Terminal = ({ mainText, locale }: Props) => {
         {!isMobile && (
           <>
             <div
-              className="absolute top-0 right-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-primary/20 transition-colors"
+              className="absolute top-0 right-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-surface-selected transition-colors"
               onMouseDown={(e) => handleResizeStart(e, "e")}
               onTouchStart={(e) => handleResizeStart(e, "e")}
             />
             <div
-              className="absolute top-0 left-0 w-1 h-full cursor-w-resize bg-transparent hover:bg-primary/20 transition-colors"
+              className="absolute top-0 left-0 w-1 h-full cursor-w-resize bg-transparent hover:bg-surface-selected transition-colors"
               onMouseDown={(e) => handleResizeStart(e, "w")}
               onTouchStart={(e) => handleResizeStart(e, "w")}
             />
             <div
-              className="absolute bottom-0 left-0 w-full h-1 cursor-ns-resize bg-transparent hover:bg-primary/20 transition-colors"
+              className="absolute bottom-0 left-0 w-full h-1 cursor-ns-resize bg-transparent hover:bg-surface-selected transition-colors"
               onMouseDown={(e) => handleResizeStart(e, "s")}
               onTouchStart={(e) => handleResizeStart(e, "s")}
             />
             <div
-              className="absolute bottom-0 right-0 w-3 h-3 cursor-nw-resize bg-transparent hover:bg-primary/30 transition-colors"
+              className="absolute bottom-0 right-0 w-3 h-3 cursor-nw-resize bg-transparent hover:bg-control-border-hover transition-colors"
               onMouseDown={(e) => handleResizeStart(e, "es")}
               onTouchStart={(e) => handleResizeStart(e, "es")}
             >
               <div className="absolute bottom-0 right-0 w-3 h-3">
-                <div className="absolute bottom-0 right-0 w-2 h-0.5 bg-primary/30" />
-                <div className="absolute bottom-0.5 right-0 w-0.5 h-2 bg-primary/30" />
+                <div className="absolute bottom-0 right-0 w-2 h-0.5 bg-control-border-hover" />
+                <div className="absolute bottom-0.5 right-0 w-0.5 h-2 bg-control-border-hover" />
               </div>
             </div>
           </>
         )}
 
         {isResizing && !isMobile && (
-          <div className="absolute top-8 left-2 bg-background/90 text-muted-foreground text-xs px-2 py-1 rounded font-mono border border-primary/20">
+          <div className="absolute top-8 left-2 bg-background/90 text-muted-foreground text-xs px-2 py-1 rounded font-mono border border-border-medium">
             {terminalSize.width} x {terminalSize.height}
           </div>
         )}

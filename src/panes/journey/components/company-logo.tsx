@@ -19,7 +19,7 @@ export function CompanyLogo({ journey }: { journey: journeyType }) {
   if (!src) return null;
 
   return (
-    <div className="shrink-0 w-8 h-8 rounded-md overflow-hidden bg-background border border-primary/10 flex items-center justify-center p-1">
+    <div className="shrink-0 w-8 h-8 rounded-md overflow-hidden bg-background border border-border-faint flex items-center justify-center p-1">
       <Image
         src={src}
         alt={journey.company}

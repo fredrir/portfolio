@@ -43,10 +43,10 @@ export const LANG_ICONS: Record<string, { icon: string; color: string }> = {
 export const CONTRIBUTION_LEVEL_CHARS = ["·", "░", "▒", "▓", "█"];
 
 export const CONTRIBUTION_LEVEL_COLORS = [
-  "text-muted-foreground/20",
-  "text-green-600/40 dark:text-green-400/30",
-  "text-green-600/60 dark:text-green-400/50",
-  "text-green-600/80 dark:text-green-400/70",
+  "text-contrib-0",
+  "text-contrib-1-light dark:text-contrib-1-dark",
+  "text-contrib-2-light dark:text-contrib-2-dark",
+  "text-contrib-3-light dark:text-contrib-3-dark",
   "text-green-600 dark:text-green-400",
 ];
 

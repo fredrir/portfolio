@@ -47,23 +47,23 @@ export function StatusBar({
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-2 font-mono text-xs border-t border-primary/15 bg-background/95 backdrop-blur-md select-none z-[9999]"
+      className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-2 font-mono text-xs border-t border-wm-border bg-background/95 backdrop-blur-md select-none z-[9999]"
       style={{ height: STATUS_BAR_HEIGHT }}
     >
       <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
         <button
           onClick={onOpenLauncher}
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/15 text-primary hover:bg-primary/25 active:bg-primary/35 transition-all font-bold border border-primary/20 hover:border-primary/40 hover:shadow-xs hover:shadow-primary/10 shrink-0"
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-launcher-bg text-primary hover:bg-launcher-hover active:bg-launcher-active transition-all font-bold border border-border-medium hover:border-chart-fill hover:shadow-xs hover:shadow-wm-shadow shrink-0"
         >
           <span className="text-2xs font-extrabold tracking-tight">F</span>
-          <span className="text-sm text-primary/70 hidden sm:inline">
+          <span className="text-sm text-primary-medium hidden sm:inline">
             FredOS
           </span>
         </button>
       </div>
 
-      <div className="flex items-center gap-3 text-muted-foreground/50">
-        <span className="text-primary/40 hidden sm:inline">
+      <div className="flex items-center gap-3 text-faded">
+        <span className="text-primary-dim hidden sm:inline">
           {ui.uptime}: {computeUptime()}
         </span>
 
@@ -101,13 +101,13 @@ export function StatusBar({
 
         <button
           onClick={onOpenSettings}
-          className="text-muted-foreground/40 hover:text-primary transition-colors text-xs"
+          className="text-subtle hover:text-primary transition-colors text-xs"
           title="Settings"
         >
           ⚙
         </button>
 
-        <span className="text-primary/50">
+        <span className="text-primary-muted">
           <Clock locale={locale} />
         </span>
       </div>

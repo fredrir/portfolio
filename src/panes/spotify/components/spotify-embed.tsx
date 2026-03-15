@@ -6,7 +6,7 @@ export function SpotifyEmbed({ trackId }: { trackId: string }) {
       height="80"
       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
       loading="lazy"
-      className="rounded-md border border-primary/10"
+      className="rounded-md border border-border-faint"
       title="Spotify player"
     />
   );

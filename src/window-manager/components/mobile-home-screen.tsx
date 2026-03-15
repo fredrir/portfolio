@@ -35,7 +35,7 @@ interface Props {
 export function MobileHomeScreen({ onOpenApp, ui }: Props) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 py-10">
-      <div className="font-mono text-base text-muted-foreground/60 mb-8 tracking-widest uppercase">
+      <div className="font-mono text-base text-readable mb-8 tracking-widest uppercase">
         fredrir@hansteen
       </div>
 
@@ -50,10 +50,10 @@ export function MobileHomeScreen({ onOpenApp, ui }: Props) {
             transition={{ delay: i * 0.04, duration: 0.3 }}
             className="flex flex-col items-center gap-1.5"
           >
-            <div className="w-14 h-14 rounded-2xl bg-primary/[0.08] border border-primary/20 backdrop-blur-md flex items-center justify-center text-primary/80 shadow-md shadow-primary/5 active:bg-primary/[0.15] transition-colors">
+            <div className="w-14 h-14 rounded-2xl bg-surface-soft border border-border-medium backdrop-blur-md flex items-center justify-center text-primary-bold shadow-md shadow-wm-shadow-soft active:bg-surface-elevated transition-colors">
               {GRID_ICONS[config.id]}
             </div>
-            <span className="font-mono text-xs text-muted-foreground/60 truncate max-w-[4rem]">
+            <span className="font-mono text-xs text-readable truncate max-w-[4rem]">
               {ui.shortTitles[config.id] ?? config.shortTitle}
             </span>
           </motion.button>

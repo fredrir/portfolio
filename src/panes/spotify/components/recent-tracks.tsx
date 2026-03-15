@@ -6,7 +6,7 @@ export function RecentTracks({ tracks }: { tracks: SpotifyTrack[] }) {
 
   return (
     <div className="space-y-1">
-      <div className="text-muted-foreground/50 text-2xs">
+      <div className="text-faded text-2xs">
         <span className="text-primary">$</span> tail /var/log/spotify/history
       </div>
       <div className="space-y-0.5">
@@ -18,7 +18,7 @@ export function RecentTracks({ tracks }: { tracks: SpotifyTrack[] }) {
                 alt={track.album}
                 width={20}
                 height={20}
-                className="w-5 h-5 rounded border border-primary/10 object-cover"
+                className="w-5 h-5 rounded border border-border-faint object-cover"
                 unoptimized
               />
             )}
@@ -38,7 +38,7 @@ export function RecentTracks({ tracks }: { tracks: SpotifyTrack[] }) {
                 </span>
               )}
             </div>
-            <span className="text-muted-foreground/30 text-3xs truncate max-w-20 hidden @xs:inline">
+            <span className="text-ghost text-3xs truncate max-w-20 hidden @xs:inline">
               {track.artist}
             </span>
           </div>

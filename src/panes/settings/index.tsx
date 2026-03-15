@@ -67,7 +67,7 @@ export function SettingsPane({
       className="p-2 @xs:p-3 @md:p-4 font-mono text-xs h-full flex flex-col overflow-y-auto @container"
     >
       {!compact && (
-        <div className="text-muted-foreground/50 mb-3 shrink-0">
+        <div className="text-faded mb-3 shrink-0">
           <span className="text-primary">$</span> settings
         </div>
       )}
@@ -95,8 +95,8 @@ export function SettingsPane({
                   onClick={() => setTheme(t.id)}
                   className={`flex items-center gap-1 px-1.5 py-1 @xs:px-2 @xs:py-1.5 rounded-md border text-2xs transition-all min-w-0 ${
                     theme === t.id
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-primary/10 text-muted-foreground hover:border-primary/30 hover:bg-primary/5"
+                      ? "border-primary bg-control-active text-primary"
+                      : "border-control-border text-muted-foreground hover:border-control-border-hover hover:bg-control-hover"
                   }`}
                 >
                   <ThemeSwatch colors={t.colors} />
@@ -123,8 +123,8 @@ export function SettingsPane({
                     href={`/${lang.code}`}
                     className={`flex items-center gap-1.5 px-2 py-1 @xs:px-2.5 @xs:py-1.5 rounded-md border text-2xs @xs:text-xs transition-all ${
                       isActive
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-primary/10 text-muted-foreground hover:border-primary/30 hover:bg-primary/5"
+                        ? "border-primary bg-control-active text-primary"
+                        : "border-control-border text-muted-foreground hover:border-control-border-hover hover:bg-control-hover"
                     }`}
                   >
                     <span>{lang.flag}</span>
@@ -162,8 +162,8 @@ export function SettingsPane({
                 onClick={() => onSelectBackground(preset)}
                 className={`flex flex-col items-center gap-1 p-1.5 rounded-md border text-xs transition-all ${
                   currentBackground.id === preset.id && !isCustomActive
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-primary/10 text-muted-foreground hover:border-primary/30 hover:bg-primary/5"
+                    ? "border-primary bg-control-active text-primary"
+                    : "border-control-border text-muted-foreground hover:border-control-border-hover hover:bg-control-hover"
                 }`}
               >
                 <BackgroundPreview config={preset} />
@@ -174,11 +174,11 @@ export function SettingsPane({
               onClick={() => fileInputRef.current?.click()}
               className={`flex flex-col items-center gap-1 p-1.5 rounded-md border text-2xs transition-all ${
                 isCustomActive
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-primary/10 text-muted-foreground hover:border-primary/30 hover:bg-primary/5"
+                  ? "border-primary bg-control-active text-primary"
+                  : "border-control-border text-muted-foreground hover:border-control-border-hover hover:bg-control-hover"
               }`}
             >
-              <div className="w-full aspect-[3/2] rounded-sm overflow-hidden border border-primary/10 flex items-center justify-center">
+              <div className="w-full aspect-[3/2] rounded-sm overflow-hidden border border-control-border flex items-center justify-center">
                 {isCustomActive && currentBackground.value ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -191,9 +191,9 @@ export function SettingsPane({
                     <rect width="24" height="16" className="fill-background" />
                     <path
                       d="M8 11l3-4 2.5 3 1.5-2 3 3H6z"
-                      className="fill-primary/15"
+                      className="fill-surface-elevated"
                     />
-                    <circle cx="8" cy="6" r="1.5" className="fill-primary/20" />
+                    <circle cx="8" cy="6" r="1.5" className="fill-surface-selected" />
                   </svg>
                 )}
               </div>

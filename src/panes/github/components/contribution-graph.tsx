@@ -52,8 +52,8 @@ export function ContributionGraph({
               onClick={() => onYearChange(y)}
               className={`text-2xs px-1.5 py-0.5 rounded transition-colors ${
                 selectedYear === y
-                  ? "bg-primary/20 text-primary"
-                  : "text-muted-foreground/40 hover:text-muted-foreground/70"
+                  ? "bg-surface-selected text-primary"
+                  : "text-subtle hover:text-muted-hover"
               }`}
             >
               {y === "last" ? lastYearLabel : y}

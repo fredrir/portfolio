@@ -44,7 +44,7 @@ export function GitHubPane({
       <div className="p-2 @sm:p-3 font-mono text-xs leading-relaxed h-full overflow-y-auto">
         <div ref={containerRef} className="h-full">
           {!compact && (
-            <div className="text-muted-foreground/50 mb-2">
+            <div className="text-faded mb-2">
               <span className="text-primary">$</span> cat /proc/github
             </div>
           )}
@@ -75,7 +75,7 @@ export function GitHubPane({
                     </TypedLine>
                     {!compact && (
                       <TypedLine delay={140}>
-                        <span className="text-primary/30 text-2xs">
+                        <span className="text-primary-subtle text-2xs">
                           ─────────────────────
                         </span>
                       </TypedLine>
@@ -134,7 +134,7 @@ export function GitHubPane({
                 {data.topLanguages.length > 0 && (
                   <TypedLine delay={500} className="w-full">
                     <div
-                      className={`w-full ${compact ? "" : "mt-2 pt-1 border-t border-primary/10"}`}
+                      className={`w-full ${compact ? "" : "mt-2 pt-1 border-t border-border-faint"}`}
                     >
                       <BarChart
                         items={data.topLanguages}
@@ -147,7 +147,7 @@ export function GitHubPane({
                   currentContributions &&
                   currentContributions.days.length > 0 && (
                     <TypedLine delay={600} className="w-full">
-                      <div className="mt-2 pt-2 w-full border-t border-primary/10">
+                      <div className="mt-2 pt-2 w-full border-t border-border-faint">
                         <ContributionGraph
                           contributions={currentContributions.days}
                           total={currentContributions.total}

@@ -350,7 +350,7 @@ export function WindowManager({
                           className="w-[10px] shrink-0 cursor-col-resize relative z-10 group"
                           onMouseDown={(e) => wm.startColResize(ri, ci, e)}
                         >
-                          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-primary/30 transition-opacity" />
+                          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
                         </div>
                       )}
                     </div>
@@ -362,7 +362,7 @@ export function WindowManager({
                   className="h-[10px] shrink-0 cursor-row-resize relative z-10 group"
                   onMouseDown={(e) => wm.startRowResize(ri, e)}
                 >
-                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-primary/30 transition-opacity" />
+                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
                 </div>
               )}
             </div>
@@ -412,7 +412,7 @@ export function WindowManager({
           if (!dragConfig) return null;
           return (
             <div
-              className="fixed z-[9990] pointer-events-none rounded-xl border border-primary/40 bg-background/70 backdrop-blur-md shadow-2xl shadow-primary/20 overflow-hidden flex flex-col"
+              className="fixed z-[9990] pointer-events-none rounded-xl border border-chart-fill bg-background/70 backdrop-blur-md shadow-2xl shadow-surface-selected overflow-hidden flex flex-col"
               style={{
                 left: wm.dragPos.x,
                 top: wm.dragPos.y,
@@ -421,16 +421,16 @@ export function WindowManager({
                 opacity: 0.85,
               }}
             >
-              <div className="flex items-center justify-between px-3 py-1.5 border-b border-primary/15 bg-primary/[0.05] shrink-0">
+              <div className="flex items-center justify-between px-3 py-1.5 border-b border-wm-border bg-surface-dim shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-3.5 h-3.5 rounded-full bg-destructive/60" />
-                  <div className="w-3.5 h-3.5 rounded-full bg-accent-yellow/60" />
-                  <div className="w-3.5 h-3.5 rounded-full bg-primary/60" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-wm-close" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-wm-minimize" />
+                  <div className="w-3.5 h-3.5 rounded-full bg-wm-maximize" />
                 </div>
-                <span className="font-mono text-xs text-muted-foreground/50 truncate mx-2">
+                <span className="font-mono text-xs text-faded truncate mx-2">
                   {dragConfig.title}
                 </span>
-                <span className="font-mono text-xs text-primary/30"></span>
+                <span className="font-mono text-xs text-primary-subtle"></span>
               </div>
               <div className="flex-1 overflow-hidden opacity-40">
                 {paneContent[wm.dragTarget]}

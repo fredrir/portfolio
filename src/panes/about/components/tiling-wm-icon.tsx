@@ -7,7 +7,7 @@ export function TilingWmIcon() {
         width="20"
         height="28"
         rx="2"
-        className="stroke-primary/60"
+        className="stroke-primary-soft"
         strokeWidth="1.5"
         fill="none"
       />
@@ -17,7 +17,7 @@ export function TilingWmIcon() {
         width="20"
         height="13"
         rx="2"
-        className="stroke-primary/60"
+        className="stroke-primary-soft"
         strokeWidth="1.5"
         fill="none"
       />
@@ -27,7 +27,7 @@ export function TilingWmIcon() {
         width="20"
         height="11"
         rx="2"
-        className="stroke-primary/60"
+        className="stroke-primary-soft"
         strokeWidth="1.5"
         fill="none"
       />
@@ -37,7 +37,7 @@ export function TilingWmIcon() {
         width="44"
         height="12"
         rx="2"
-        className="stroke-primary/60"
+        className="stroke-primary-soft"
         strokeWidth="1.5"
         fill="none"
       />
@@ -46,7 +46,7 @@ export function TilingWmIcon() {
         y1="8"
         x2="16"
         y2="8"
-        className="stroke-primary/40"
+        className="stroke-chart-fill"
         strokeWidth="1"
       />
       <line
@@ -54,7 +54,7 @@ export function TilingWmIcon() {
         y1="11"
         x2="14"
         y2="11"
-        className="stroke-primary/30"
+        className="stroke-primary-subtle"
         strokeWidth="1"
       />
       <line
@@ -62,16 +62,16 @@ export function TilingWmIcon() {
         y1="14"
         x2="18"
         y2="14"
-        className="stroke-primary/25"
+        className="stroke-surface-strong"
         strokeWidth="1"
       />
-      <circle cx="31" cy="8" r="1.5" className="fill-destructive/50" />
-      <circle cx="35" cy="8" r="1.5" className="fill-accent-yellow/50" />
-      <circle cx="39" cy="8" r="1.5" className="fill-primary/50" />
+      <circle cx="31" cy="8" r="1.5" className="fill-icon-close" />
+      <circle cx="35" cy="8" r="1.5" className="fill-icon-minimize" />
+      <circle cx="39" cy="8" r="1.5" className="fill-primary-muted" />
       <text
         x="6"
         y="41"
-        className="fill-primary/50"
+        className="fill-primary-muted"
         fontSize="5"
         fontFamily="monospace"
       >

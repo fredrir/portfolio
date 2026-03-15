@@ -111,7 +111,7 @@ export function SpotifyPane({
         <div ref={containerRef} className="h-full flex flex-col">
           <div className="flex-1 overflow-y-auto min-h-0">
             {!compact && (
-              <div className="text-muted-foreground/50 mb-2">
+              <div className="text-faded mb-2">
                 <span className="text-primary">$</span> cat
                 /proc/spotify/recently-played
               </div>
@@ -123,19 +123,19 @@ export function SpotifyPane({
                   {SPOTIFY_ASCII.map((line, i) => (
                     <span
                       key={i}
-                      className="text-muted-foreground/30 whitespace-pre text-2xs leading-tight block"
+                      className="text-ghost whitespace-pre text-2xs leading-tight block"
                     >
                       {line}
                     </span>
                   ))}
                 </div>
                 <div className="space-y-1">
-                  <span className="text-muted-foreground/50">
+                  <span className="text-faded">
                     {displayData?.notConfigured
                       ? "spotify: daemon not configured"
                       : "spotify: no track data available"}
                   </span>
-                  <div className="text-muted-foreground/30 text-2xs">
+                  <div className="text-ghost text-2xs">
                     {displayData?.notConfigured
                       ? "# error: not configured"
                       : "# waiting for playback..."}
@@ -153,7 +153,7 @@ export function SpotifyPane({
                           alt={displayData.album ?? "Album art"}
                           width={64}
                           height={64}
-                          className="w-16 h-16 rounded border border-primary/20 opacity-80"
+                          className="w-16 h-16 rounded border border-border-medium opacity-80"
                           unoptimized
                         />
                       ) : (
@@ -174,7 +174,7 @@ export function SpotifyPane({
                       <span className="text-primary font-semibold">
                         {displayData.isPlaying ? "▶" : "⏸"}
                       </span>
-                      <span className="text-muted-foreground/50">
+                      <span className="text-faded">
                         {displayData.isPlaying
                           ? (ui?.nowPlaying ?? "NOW PLAYING")
                           : lastPlayedLabel}
@@ -226,18 +226,18 @@ export function SpotifyPane({
                       displayData.durationMs && (
                         <div className="pt-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-muted-foreground/50 text-2xs w-8">
+                            <span className="text-faded text-2xs w-8">
                               {formatTime(displayData.progressMs)}
                             </span>
                             <div className="flex-1 flex items-center">
-                              <div className="w-full bg-primary/10 h-1 rounded-full overflow-hidden">
+                              <div className="w-full bg-progress-track h-1 rounded-full overflow-hidden">
                                 <div
-                                  className="h-full bg-primary/60 rounded-full transition-all duration-1000"
+                                  className="h-full bg-progress-fill rounded-full transition-all duration-1000"
                                   style={{ width: `${progressPct}%` }}
                                 />
                               </div>
                             </div>
-                            <span className="text-muted-foreground/50 text-2xs w-8 text-right">
+                            <span className="text-faded text-2xs w-8 text-right">
                               {formatTime(displayData.durationMs)}
                             </span>
                           </div>
@@ -253,9 +253,16 @@ export function SpotifyPane({
                                 audioRef.current?.pause();
                                 setIsPreviewPlaying(false);
                               } else {
-                                if (!audioRef.current || audioRef.current.src !== displayData.previewUrl) {
-                                  audioRef.current = new Audio(displayData.previewUrl);
-                                  audioRef.current.onended = () => setIsPreviewPlaying(false);
+                                if (
+                                  !audioRef.current ||
+                                  audioRef.current.src !==
+                                    displayData.previewUrl
+                                ) {
+                                  audioRef.current = new Audio(
+                                    displayData.previewUrl,
+                                  );
+                                  audioRef.current.onended = () =>
+                                    setIsPreviewPlaying(false);
                                 }
                                 audioRef.current.play();
                                 setIsPreviewPlaying(true);
@@ -264,11 +271,13 @@ export function SpotifyPane({
                               setShowEmbed((prev) => !prev);
                             }
                           }}
-                          className="text-2xs text-primary/60 hover:text-primary transition-colors flex items-center gap-1.5 px-2 py-1 rounded border border-primary/15 hover:border-primary/30 hover:bg-primary/5"
+                          className="text-2xs text-primary-soft hover:text-primary transition-colors flex items-center gap-1.5 px-2 py-1 rounded border border-wm-border hover:border-control-border-hover hover:bg-control-hover"
                         >
-                          <span>{(isPreviewPlaying || showEmbed) ? "⏹" : "▶"}</span>
                           <span>
-                            {(isPreviewPlaying || showEmbed)
+                            {isPreviewPlaying || showEmbed ? "⏹" : "▶"}
+                          </span>
+                          <span>
+                            {isPreviewPlaying || showEmbed
                               ? (ui?.hidePlayer ?? "hide player")
                               : (ui?.playInBrowser ?? "play in browser")}
                           </span>
@@ -278,16 +287,18 @@ export function SpotifyPane({
                   </div>
                 </div>
 
-                {showEmbed && !displayData.previewUrl && displayData.trackId && (
-                  <div>
-                    <SpotifyEmbed trackId={displayData.trackId} />
-                  </div>
-                )}
+                {showEmbed &&
+                  !displayData.previewUrl &&
+                  displayData.trackId && (
+                    <div>
+                      <SpotifyEmbed trackId={displayData.trackId} />
+                    </div>
+                  )}
 
                 {!compact &&
                   displayData.topArtists &&
                   displayData.topArtists.length > 0 && (
-                    <div className="border-t border-primary/10 pt-2">
+                    <div className="border-t border-border-faint pt-2">
                       <TopArtists artists={displayData.topArtists} />
                     </div>
                   )}
@@ -295,7 +306,7 @@ export function SpotifyPane({
                 {!compact &&
                   displayData.recentTracks &&
                   displayData.recentTracks.length > 0 && (
-                    <div className="border-t border-primary/10 pt-2">
+                    <div className="border-t border-border-faint pt-2">
                       <RecentTracks tracks={displayData.recentTracks} />
                     </div>
                   )}

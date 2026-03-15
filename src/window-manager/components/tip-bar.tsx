@@ -23,14 +23,14 @@ export function TipBar({ ui }: Props) {
   }, [dismissed]);
   if (!visible || dismissed) return null;
   return (
-    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[9998] font-mono text-2xs bg-background/90 border border-primary/20 backdrop-blur-md rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg shadow-primary/5">
+    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[9998] font-mono text-2xs bg-background/90 border border-border-medium backdrop-blur-md rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg shadow-wm-shadow-soft">
       <span className="text-primary">tip</span>
-      <span className="text-muted-foreground/60">
-        <span className="text-primary/70 font-bold">Ctrl+K</span>{" "}
+      <span className="text-readable">
+        <span className="text-primary-medium font-bold">Ctrl+K</span>{" "}
         {ui.tipLauncher}
-        <span className="text-primary/20 mx-2">|</span>
+        <span className="text-primary-hint mx-2">|</span>
         {ui.tipDrag}
-        <span className="text-primary/20 mx-2">|</span>
+        <span className="text-primary-hint mx-2">|</span>
         {ui.tipResize}
       </span>
       <button
@@ -39,7 +39,7 @@ export function TipBar({ ui }: Props) {
           setDismissed(true);
           sessionStorage.setItem("wm-tip-dismissed", "1");
         }}
-        className="text-muted-foreground/30 hover:text-foreground transition-colors ml-2"
+        className="text-ghost hover:text-foreground transition-colors ml-2"
       >
         ×
       </button>
