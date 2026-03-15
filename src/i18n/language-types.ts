@@ -18,4 +18,4 @@ export type Journey = {
   journeys: journeyType[];
 };
 
-export type localeParams = Promise<{ locale: "en" | "nb" | "nn" | "fr" }>;
+export type localeParams = Promise<{ locale: string }>;

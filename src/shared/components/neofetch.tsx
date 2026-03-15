@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
 import { THEMES } from "@/lib/themes";
+import { PORTFOLIO_VERSION, NEXT_VERSION, TAILWIND_VERSION } from "@/lib/version";
 
 export const LOGO_LINES = [
   "  \u256D\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256E",
@@ -64,11 +65,11 @@ export function getDefaultInfo(
       value:
         "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
     },
-    { label: "OS", value: "fredrir 2.0" },
-    { label: "Kernel", value: "Next.js 15.2.8" },
+    { label: "OS", value: `fredrir ${PORTFOLIO_VERSION}` },
+    { label: "Kernel", value: `Next.js ${NEXT_VERSION}` },
     { label: "Uptime", value: computeUptime() },
     { label: "Shell", value: "zsh 5.9" },
-    { label: "WM", value: "Tailwind CSS" },
+    { label: "WM", value: `Tailwind CSS v${TAILWIND_VERSION}` },
     { label: "Theme", value: themeName ?? "fredrir" },
     { label: "Locale", value: LOCALE_NAMES[locale ?? "en"] ?? "en_US.UTF-8" },
   ];

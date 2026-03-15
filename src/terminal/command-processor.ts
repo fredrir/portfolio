@@ -1,5 +1,9 @@
 import { FileSystemManager } from "./file-system";
-import { computeUptime, getNeofetchPlainText } from "@/shared/components/neofetch";
+import {
+  computeUptime,
+  getNeofetchPlainText,
+} from "@/shared/components/neofetch";
+import { PORTFOLIO_VERSION } from "@/lib/version";
 import type { CommandOutput } from "./types";
 
 export class CommandProcessor {
@@ -87,7 +91,7 @@ export class CommandProcessor {
         return {
           output: {
             command,
-            output: `fredrir v2.0
+            output: `fredrir v${PORTFOLIO_VERSION}
 Built with Next.js + Tailwind
 Type 'help' for available commands
 Repository: https://github.com/fredrir/portfolio
@@ -97,10 +101,9 @@ Author: Fredrik Carsten Hansteen`,
 
       case "uname":
         const unameFlag = args[0];
-        let unameOutput = "fredrir 2.0.0";
+        let unameOutput = `fredrir ${PORTFOLIO_VERSION}`;
         if (unameFlag === "-a") {
-          unameOutput =
-            "fredrir fredrir-terminal 2.0.0 #1 SMP Web Browser x86_64 GNU/Linux";
+          unameOutput = `fredrir fredrir-terminal ${PORTFOLIO_VERSION} #1 SMP Web Browser x86_64 GNU/Linux`;
         } else if (unameFlag === "-r") {
           unameOutput = "1.0.0";
         } else if (unameFlag === "-m") {

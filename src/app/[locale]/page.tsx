@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { WindowManager } from "@/window-manager";
 import type { localeParams } from "@/i18n/language-types";
-import { getDictionary, locales } from "@/i18n/dictionaries";
+import { getDictionary, locales, type Locale } from "@/i18n/dictionaries";
 import { fetchGitHubData } from "@/lib/github";
 import { fetchSpotifyData } from "@/lib/spotify";
 import { notFound } from "next/navigation";
@@ -107,11 +107,13 @@ export function generateStaticParams() {
 export const dynamicParams = false;
 
 export default async function Home(props: { params: localeParams }) {
-  const { locale } = await props.params;
+  const { locale: rawLocale } = await props.params;
 
-  if (!locales.includes(locale)) {
+  if (!locales.includes(rawLocale as Locale)) {
     notFound();
   }
+
+  const locale = rawLocale as Locale;
 
   const [dict, githubData, spotifyData] = await Promise.all([
     getDictionary(locale),
