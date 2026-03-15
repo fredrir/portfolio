@@ -34,7 +34,7 @@ export function MobileHomeScreen({ onOpenApp }: Props) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 py-10">
       <div className="font-mono text-2xs text-muted-foreground/40 mb-8 tracking-widest uppercase">
-        fredrir@arch ~
+        fredrir@hansteen: ~
       </div>
 
       <div className="grid grid-cols-4 gap-x-4 gap-y-6 w-full max-w-sm">

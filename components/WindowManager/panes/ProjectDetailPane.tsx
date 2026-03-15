@@ -13,8 +13,7 @@ interface Props {
 
 export function ProjectDetailPane({ project, viewCode, ui }: Props) {
   const thumb =
-    project.desktopImage ||
-    (project.mobileImages && project.mobileImages[0]);
+    project.desktopImage || (project.mobileImages && project.mobileImages[0]);
   const slug = project.title.toLowerCase().replace(/\s+/g, "-");
   const langs = project.languages.split(",").map((l) => l.trim());
 
@@ -93,7 +92,9 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-3 py-2 rounded-md border border-primary/15 hover:border-primary/30 hover:bg-primary/5 transition-all group"
                 >
-                  <span className="text-primary/50 group-hover:text-primary">→</span>
+                  <span className="text-primary/50 group-hover:text-primary">
+                    →
+                  </span>
                   <span className="text-foreground group-hover:text-primary transition-colors text-xs">
                     {project.websiteAlias ||
                       project.websiteLink
@@ -109,7 +110,9 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-3 py-2 rounded-md border border-primary/15 hover:border-primary/30 hover:bg-primary/5 transition-all group"
                 >
-                  <span className="text-primary/50 group-hover:text-primary">→</span>
+                  <span className="text-primary/50 group-hover:text-primary">
+                    →
+                  </span>
                   <span className="text-muted-foreground/70 group-hover:text-primary transition-colors text-xs">
                     {viewCode}
                   </span>
@@ -122,7 +125,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
 
       <div className="px-4 py-2 border-t border-primary/10 bg-primary/[0.02] text-muted-foreground/30 text-2xs shrink-0 flex justify-between">
         <span>{slug}(1)</span>
-        <span>fredrir@arch</span>
+        <span>fredrir@hansteen</span>
       </div>
     </div>
   );

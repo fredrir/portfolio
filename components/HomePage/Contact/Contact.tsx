@@ -49,7 +49,7 @@ const Contact = ({ contact, githubData, spotifyData, locale }: Props) => {
               tmux: contact [3 panes]
             </span>
             <span className="font-mono text-2xs text-primary/40">
-              fredrir@fredrir
+              fredrir@hansteen
             </span>
           </div>
 

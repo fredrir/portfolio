@@ -181,7 +181,7 @@ export function CookieConsentBanner({
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
             <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
             <span className="ml-2 text-xs text-muted-foreground">
-              fredrir@fredrir:~ (zsh)
+              fredrir@:hansteen:~ (zsh)
             </span>
           </div>
 

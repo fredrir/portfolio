@@ -112,7 +112,8 @@ function TipBar({ ui }: { ui: UiStrings }) {
     <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[9998] font-mono text-2xs bg-background/90 border border-primary/20 backdrop-blur-md rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg shadow-primary/5">
       <span className="text-primary">tip</span>
       <span className="text-muted-foreground/60">
-        <span className="text-primary/70 font-bold">Ctrl+K</span> {ui.tipLauncher}
+        <span className="text-primary/70 font-bold">Ctrl+K</span>{" "}
+        {ui.tipLauncher}
         <span className="text-primary/20 mx-2">|</span>
         {ui.tipDrag}
         <span className="text-primary/20 mx-2">|</span>
@@ -168,7 +169,7 @@ function FloatingDetail({
           <span className="text-2xs text-muted-foreground/50 truncate mx-2">
             {title}
           </span>
-          <span className="text-3xs text-primary/30">fredrir@arch</span>
+          <span className="text-3xs text-primary/30">fredrir@hansteen</span>
         </div>
         <div className="flex-1 overflow-auto">{children}</div>
       </div>
@@ -226,7 +227,7 @@ function MobileLayout({
                   {activeConfig?.shortTitle}
                 </span>
                 <span className="font-mono text-3xs text-primary/30">
-                  fredrir@arch
+                  fredrir@hansteen
                 </span>
               </div>
               <div className="flex-1 overflow-auto">
@@ -295,7 +296,9 @@ export function WindowManager({
     (p: projectType) => {
       setFloatingDetail({
         title: `~/projects/${p.title}`,
-        content: <ProjectDetailPane project={p} viewCode={project.viewCode} ui={ui} />,
+        content: (
+          <ProjectDetailPane project={p} viewCode={project.viewCode} ui={ui} />
+        ),
       });
     },
     [project.viewCode, ui],
@@ -306,7 +309,11 @@ export function WindowManager({
     github: <GitHubPaneWrapper initialData={githubData} />,
     spotify: <SpotifyPaneWrapper initialData={spotifyData} ui={ui} />,
     journey: (
-      <JourneyPane journey={journey} onOpenDetail={handleOpenJourneyDetail} ui={ui} />
+      <JourneyPane
+        journey={journey}
+        onOpenDetail={handleOpenJourneyDetail}
+        ui={ui}
+      />
     ),
     projects: (
       <ProjectsPane
@@ -345,14 +352,18 @@ export function WindowManager({
         isFocused={isFocused}
         isSwapTarget={wm.swapTarget === paneId}
         isDragging={wm.dragTarget === paneId}
-        showResizeGrip={isFocused && rowIndex !== undefined && colIndex !== undefined}
+        showResizeGrip={
+          isFocused && rowIndex !== undefined && colIndex !== undefined
+        }
         onClose={() => wm.closeWindow(paneId)}
         onMaximize={() => wm.toggleMaximize(paneId)}
         onFocus={() => handleFocus(paneId)}
         onTitleMouseDown={wm.startTitleDrag}
-        onCornerResize={rowIndex !== undefined && colIndex !== undefined
-          ? (e) => wm.startCornerResize(rowIndex, colIndex, e)
-          : undefined}
+        onCornerResize={
+          rowIndex !== undefined && colIndex !== undefined
+            ? (e) => wm.startCornerResize(rowIndex, colIndex, e)
+            : undefined
+        }
       >
         {paneContent[paneId]}
       </Window>
@@ -363,7 +374,8 @@ export function WindowManager({
     if (Array.isArray(cell)) {
       const visible = cell.filter((id) => wm.states[id]?.isOpen);
       if (visible.length === 0) return null;
-      if (visible.length === 1) return renderPane(visible[0], rowIndex, colIndex);
+      if (visible.length === 1)
+        return renderPane(visible[0], rowIndex, colIndex);
       const heightKey = cell.join(",");
       const heights = STACK_HEIGHTS[heightKey];
       return (
@@ -594,7 +606,7 @@ export function WindowManager({
                   {dragConfig.title}
                 </span>
                 <span className="font-mono text-3xs text-primary/30">
-                  fredrir@arch
+                  fredrir@hansteen
                 </span>
               </div>
               <div className="flex-1 overflow-hidden opacity-40">
