@@ -137,9 +137,9 @@ export function WindowManager({
   );
 
   const paneContent: Record<string, React.ReactNode> = {
-    about: <AboutPane locale={locale} landing={landing} />,
+    about: <AboutPane locale={locale} landing={landing} viewResume={ui.viewResume} />,
     github: <GitHubPane initialData={githubData} ui={ui} />,
-    spotify: <SpotifyPane initialData={spotifyData} ui={ui} />,
+    spotify: <SpotifyPane initialData={spotifyData} ui={ui} locale={locale} />,
     journey: (
       <JourneyPane
         journey={journey}
@@ -249,6 +249,7 @@ export function WindowManager({
             onOpenApp={setMobileActiveApp}
             onGoHome={() => setMobileActiveApp(null)}
             ui={ui}
+            locale={locale}
           />
         </div>
         <MobileDock
@@ -307,6 +308,7 @@ export function WindowManager({
           <AppLauncher
             states={wm.states}
             ui={ui}
+            locale={locale}
             onOpen={(id) => {
               wm.openWindow(id);
               setFocusedId(id);
@@ -401,6 +403,7 @@ export function WindowManager({
         <AppLauncher
           states={wm.states}
           ui={ui}
+          locale={locale}
           onOpen={(id) => {
             wm.openWindow(id);
             setFocusedId(id);

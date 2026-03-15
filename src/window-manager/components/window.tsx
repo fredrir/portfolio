@@ -53,16 +53,16 @@ export function Window({
         }}
         onDoubleClick={onMaximize}
       >
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center -ml-1.5">
           <button
             onClick={(e) => {
               e.stopPropagation();
               onClose();
             }}
             onMouseDown={(e) => e.stopPropagation()}
-            className="group"
+            className="group p-1.5"
           >
-            <div className="w-3.5 h-3.5 rounded-full bg-wm-close group-hover:bg-destructive transition-colors" />
+            <div className="w-3 h-3 rounded-full bg-wm-close group-hover:bg-destructive transition-colors" />
           </button>
           <button
             onClick={(e) => {
@@ -70,9 +70,9 @@ export function Window({
               onClose();
             }}
             onMouseDown={(e) => e.stopPropagation()}
-            className="group"
+            className="group p-1.5"
           >
-            <div className="w-3.5 h-3.5 rounded-full bg-wm-minimize group-hover:bg-accent-yellow transition-colors" />
+            <div className="w-3 h-3 rounded-full bg-wm-minimize group-hover:bg-accent-yellow transition-colors" />
           </button>
           <button
             onClick={(e) => {
@@ -80,9 +80,9 @@ export function Window({
               onMaximize();
             }}
             onMouseDown={(e) => e.stopPropagation()}
-            className="group"
+            className="group p-1.5"
           >
-            <div className="w-3.5 h-3.5 rounded-full bg-wm-maximize group-hover:bg-primary transition-colors" />
+            <div className="w-3 h-3 rounded-full bg-wm-maximize group-hover:bg-primary transition-colors" />
           </button>
         </div>
 

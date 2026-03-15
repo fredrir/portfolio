@@ -4,7 +4,11 @@ import Image from "next/image";
 import { USER_HOST } from "@/lib/constants";
 import Link from "next/link";
 import type { projectType, UiStrings } from "@/shared/types";
-import { GithubLogoIcon } from "@phosphor-icons/react/dist/ssr";
+import {
+  AppleLogoIcon,
+  GithubLogoIcon,
+  LinkIcon,
+} from "@phosphor-icons/react/dist/ssr";
 
 interface Props {
   project: projectType;
@@ -49,13 +53,40 @@ function MobileScreensShowcase({ images }: { images: string[] }) {
   );
 }
 
+function LaptopShowcase({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="flex justify-center py-3 px-2">
+      <div className="w-full max-w-[340px]">
+        <div className="rounded-t-lg border border-b-0 border-border-medium bg-black overflow-hidden shadow-lg">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-surface-dim border-b border-border-medium">
+            <div className="w-1.5 h-1.5 rounded-full bg-terminal-close" />
+            <div className="w-1.5 h-1.5 rounded-full bg-terminal-minimize" />
+            <div className="w-1.5 h-1.5 rounded-full bg-terminal-maximize" />
+          </div>
+          <Image
+            src={src}
+            alt={alt}
+            width={600}
+            height={340}
+            className="w-full h-auto"
+          />
+        </div>
+        <div
+          className="h-2.5 bg-border-medium rounded-b-sm mx-auto"
+          style={{ width: "108%", marginLeft: "-4%" }}
+        />
+        <div
+          className="h-1 bg-border-medium/60 rounded-b-md mx-auto"
+          style={{ width: "40%" }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function ProjectDetailPane({ project, viewCode, ui }: Props) {
-  const isMobileApp =
-    project.mobileImages && project.mobileImages.length > 0;
-  const thumb =
-    !isMobileApp
-      ? project.desktopImage
-      : null;
+  const isMobileApp = project.mobileImages && project.mobileImages.length > 0;
+  const thumb = !isMobileApp ? project.desktopImage : null;
   const slug = project.title.toLowerCase().replace(/\s+/g, "-");
   const langs = project.languages.split(",").map((l) => l.trim());
 
@@ -75,17 +106,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
           <MobileScreensShowcase images={project.mobileImages!} />
         )}
 
-        {thumb && (
-          <div className="rounded-lg overflow-hidden border border-wm-border bg-black/10">
-            <Image
-              src={thumb}
-              alt={project.title}
-              width={600}
-              height={340}
-              className="w-full h-auto"
-            />
-          </div>
-        )}
+        {thumb && <LaptopShowcase src={thumb} alt={project.title} />}
 
         <div>
           <div className="flex items-center gap-2 mb-1.5">
@@ -135,7 +156,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
                   className="flex items-center gap-2 px-3 py-2 rounded-md border border-wm-border hover:border-control-border-hover hover:bg-control-hover transition-all group"
                 >
                   <span className="text-primary-muted group-hover:text-primary">
-                    →
+                    <LinkIcon className="group-hover:fill-primary h-4 w-4 fill-primary" />
                   </span>
                   <span className="text-foreground group-hover:text-primary transition-colors text-xs">
                     {project.websiteAlias ||

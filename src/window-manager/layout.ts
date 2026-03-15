@@ -10,7 +10,7 @@ export const DEFAULT_LAYOUT: CellDef[][] = [
 
 export const MEDIUM_LAYOUT: CellDef[][] = [
   [["about", "spotify"], "projects", "github"],
-  ["journey", "contact"],
+  [["journey", "settings"], "contact"],
 ];
 
 export const SMALL_LAYOUT: CellDef[][] = [

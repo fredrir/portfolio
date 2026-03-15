@@ -14,9 +14,11 @@ import type { SpotifyData, UiStrings } from "@/shared/types";
 export function SpotifyPane({
   initialData,
   ui,
+  locale = "en",
 }: {
   initialData: SpotifyData;
   ui?: UiStrings;
+  locale?: string;
 }) {
   const [data, setData] = useState<SpotifyData>(initialData);
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
@@ -102,7 +104,7 @@ export function SpotifyPane({
   const lpLabel = ui?.lastPlayed ?? "LAST PLAYED";
   const lastPlayedLabel =
     !displayData?.isPlaying && displayData?.lastPlayedAt
-      ? `${lpLabel} ${relativeTime(displayData.lastPlayedAt)}`
+      ? `${lpLabel} ${relativeTime(displayData.lastPlayedAt, locale)}`
       : lpLabel;
 
   return (

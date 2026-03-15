@@ -162,7 +162,7 @@ export function SettingsPane({
             className="hidden"
           />
           <div
-            className={`grid gap-1 @xs:gap-1.5 ${compact ? "grid-cols-3 @xs:grid-cols-3" : "grid-cols-2 @xs:grid-cols-3 @sm:grid-cols-3"}`}
+            className={`grid gap-1 @xs:gap-1.5 ${compact ? "grid-cols-3 @xs:grid-cols-3" : "grid-cols-2 @xs:grid-cols-3 @md:grid-cols-4 @lg:grid-cols-6"}`}
           >
             {BACKGROUND_PRESETS.map((preset) => (
               <button

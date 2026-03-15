@@ -13,6 +13,8 @@ export interface WindowConfig {
   defaultOpen: boolean;
   order: number;
   isDynamic?: boolean;
+  isExternal?: boolean;
+  href?: string | Record<string, string>;
 }
 
 export interface WindowState {

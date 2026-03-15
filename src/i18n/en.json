@@ -309,6 +309,7 @@
       "plain": "Minimal",
       "custom": "Custom"
     },
+    "viewResume": "View Resume",
     "localeTitles": {
       "about": "About Me",
       "github": "GitHub",
@@ -319,7 +320,8 @@
       "settings": "Settings",
       "terminal": "Terminal",
       "gallery": "Gallery",
-      "home": "Home"
+      "home": "Home",
+      "resume": "Resume"
     },
     "shortTitles": {
       "about": "whoami",
@@ -330,7 +332,8 @@
       "contact": "mail",
       "settings": "settings",
       "terminal": "kitty",
-      "gallery": "gallery"
+      "gallery": "gallery",
+      "resume": "resume"
     }
   }
 }

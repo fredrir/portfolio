@@ -8,12 +8,13 @@ import type { UiStrings } from "@/shared/types";
 interface Props {
   states: WindowStates;
   ui: UiStrings;
+  locale: string;
   onOpen: (id: string) => void;
   onStop: (id: string) => void;
   onClose: () => void;
 }
 
-export function AppLauncher({ states, ui, onOpen, onStop, onClose }: Props) {
+export function AppLauncher({ states, ui, locale, onOpen, onStop, onClose }: Props) {
   const [query, setQuery] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -39,10 +40,17 @@ export function AppLauncher({ states, ui, onOpen, onStop, onClose }: Props) {
 
   const handleSelect = useCallback(
     (id: string) => {
+      const config = WINDOW_CONFIGS.find((c) => c.id === id);
+      if (config?.isExternal && config.href) {
+        const url = typeof config.href === "string" ? config.href : (config.href[locale] ?? config.href.en);
+        window.open(url, "_blank", "noopener,noreferrer");
+        onClose();
+        return;
+      }
       onOpen(id);
       onClose();
     },
-    [onOpen, onClose],
+    [onOpen, onClose, locale],
   );
 
   const handleKeyDown = useCallback(
@@ -137,19 +145,25 @@ export function AppLauncher({ states, ui, onOpen, onStop, onClose }: Props) {
                       </span>
                     </div>
                   </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      isOpen ? onStop(config.id) : handleSelect(config.id);
-                    }}
-                    className={`text-2xs px-1.5 py-0.5 rounded transition-colors ${
-                      isOpen
-                        ? "bg-badge-stop text-red-400 hover:bg-badge-stop-hover"
-                        : "bg-launcher-bg text-primary hover:bg-launcher-hover"
-                    }`}
-                  >
-                    {isOpen ? ui.stop : ui.start}
-                  </button>
+                  {config.isExternal ? (
+                    <span className="text-2xs px-1.5 py-0.5 rounded bg-launcher-bg text-primary">
+                      ↗
+                    </span>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        isOpen ? onStop(config.id) : handleSelect(config.id);
+                      }}
+                      className={`text-2xs px-1.5 py-0.5 rounded transition-colors ${
+                        isOpen
+                          ? "bg-badge-stop text-red-400 hover:bg-badge-stop-hover"
+                          : "bg-launcher-bg text-primary hover:bg-launcher-hover"
+                      }`}
+                    >
+                      {isOpen ? ui.stop : ui.start}
+                    </button>
+                  )}
                 </div>
               );
             })

@@ -65,6 +65,7 @@ export interface UiStrings {
   githubApiError: string;
   githubContributions: string;
   githubCommand: string;
+  viewResume: string;
   backgrounds: Record<string, string>;
   localeTitles: Record<string, string>;
   shortTitles: Record<string, string>;

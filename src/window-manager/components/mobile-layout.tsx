@@ -12,6 +12,7 @@ interface Props {
   onOpenApp: (id: string) => void;
   onGoHome: () => void;
   ui: UiStrings;
+  locale: string;
 }
 
 export function MobileLayout({
@@ -20,6 +21,7 @@ export function MobileLayout({
   onOpenApp,
   onGoHome,
   ui,
+  locale,
 }: Props) {
   const activeConfig = activeApp
     ? WINDOW_CONFIGS.find((c) => c.id === activeApp)
@@ -37,7 +39,7 @@ export function MobileLayout({
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="flex-1 flex flex-col"
           >
-            <MobileHomeScreen onOpenApp={onOpenApp} ui={ui} />
+            <MobileHomeScreen onOpenApp={onOpenApp} ui={ui} locale={locale} />
           </motion.div>
         ) : (
           <motion.div

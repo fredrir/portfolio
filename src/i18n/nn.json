@@ -309,6 +309,7 @@
       "plain": "Minimal",
       "custom": "Eigendefinert"
     },
+    "viewResume": "Sjå CV",
     "localeTitles": {
       "about": "Om meg",
       "github": "GitHub",
@@ -319,7 +320,8 @@
       "settings": "Innstillingar",
       "terminal": "Terminal",
       "gallery": "Galleri",
-      "home": "Heim"
+      "home": "Heim",
+      "resume": "CV"
     },
     "shortTitles": {
       "about": "whoami",
@@ -330,7 +332,8 @@
       "contact": "e-post",
       "settings": "innstillingar",
       "terminal": "kitty",
-      "gallery": "galleri"
+      "gallery": "galleri",
+      "resume": "cv"
     }
   }
 }

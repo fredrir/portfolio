@@ -309,6 +309,7 @@
       "plain": "Minimal",
       "custom": "Personnalisé"
     },
+    "viewResume": "Voir le CV",
     "localeTitles": {
       "about": "À propos",
       "github": "GitHub",
@@ -319,7 +320,8 @@
       "settings": "Paramètres",
       "terminal": "Terminal",
       "gallery": "Galerie",
-      "home": "Accueil"
+      "home": "Accueil",
+      "resume": "CV"
     },
     "shortTitles": {
       "about": "whoami",
@@ -330,7 +332,8 @@
       "contact": "courrier",
       "settings": "paramètres",
       "terminal": "kitty",
-      "gallery": "galerie"
+      "gallery": "galerie",
+      "resume": "cv"
     }
   }
 }

@@ -8,6 +8,7 @@ import {
   GearSix,
   Terminal,
   Images,
+  FileText,
 } from "@phosphor-icons/react";
 import type { WindowConfig, BackgroundConfig } from "./types";
 
@@ -89,6 +90,16 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
     icon: <Images size={S} weight={W} />,
     defaultOpen: false,
     order: 9,
+  },
+  {
+    id: "resume",
+    title: "cat ~/resume.pdf",
+    shortTitle: "resume",
+    icon: <FileText size={S} weight={W} />,
+    defaultOpen: false,
+    order: 10,
+    isExternal: true,
+    href: { en: "/cv-en.pdf", fr: "/cv-en.pdf", nb: "/cv-nb.pdf", nn: "/cv-nb.pdf" },
   },
 ];
 

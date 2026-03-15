@@ -11,6 +11,7 @@ import {
   GearSix,
   Terminal,
   Images,
+  FileText,
 } from "@phosphor-icons/react";
 import { WINDOW_CONFIGS } from "../constants";
 import type { UiStrings } from "@/shared/types";
@@ -25,14 +26,16 @@ const GRID_ICONS: Record<string, React.ReactNode> = {
   settings: <GearSix size={28} weight="duotone" />,
   terminal: <Terminal size={28} weight="duotone" />,
   gallery: <Images size={28} weight="duotone" />,
+  resume: <FileText size={28} weight="duotone" />,
 };
 
 interface Props {
   onOpenApp: (id: string) => void;
   ui: UiStrings;
+  locale: string;
 }
 
-export function MobileHomeScreen({ onOpenApp, ui }: Props) {
+export function MobileHomeScreen({ onOpenApp, ui, locale }: Props) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 py-10">
       <div className="font-mono text-sm text-readable mb-8 tracking-widest uppercase">
@@ -43,7 +46,14 @@ export function MobileHomeScreen({ onOpenApp, ui }: Props) {
         {WINDOW_CONFIGS.map((config, i) => (
           <motion.button
             key={config.id}
-            onClick={() => onOpenApp(config.id)}
+            onClick={() => {
+              if (config.isExternal && config.href) {
+                const url = typeof config.href === "string" ? config.href : (config.href[locale] ?? config.href.en);
+                window.open(url, "_blank", "noopener,noreferrer");
+              } else {
+                onOpenApp(config.id);
+              }
+            }}
             whileTap={{ scale: 0.85 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

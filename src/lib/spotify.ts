@@ -159,10 +159,12 @@ export async function fetchSpotifyData(): Promise<SpotifyData> {
     return { isPlaying: false, notConfigured: true };
   }
 
+  const cached = await loadFromSupabase();
+
   try {
     const { access_token } = await getAccessToken();
 
-    const [nowPlayingRes, topArtists, recentResult] = await Promise.all([
+    const [nowPlayingRes, freshArtists, recentResult] = await Promise.all([
       fetch(NOW_PLAYING_ENDPOINT, {
         headers: { Authorization: `Bearer ${access_token}` },
       }),
@@ -170,7 +172,12 @@ export async function fetchSpotifyData(): Promise<SpotifyData> {
       fetchRecentTracks(access_token),
     ]);
 
-    const { tracks: recentTracks, lastPlayedAt } = recentResult;
+    const { tracks: freshTracks, lastPlayedAt } = recentResult;
+
+    const topArtists =
+      freshArtists.length > 0 ? freshArtists : (cached?.topArtists ?? []);
+    const recentTracks =
+      freshTracks.length > 0 ? freshTracks : (cached?.recentTracks ?? []);
 
     if (nowPlayingRes.status === 200) {
       const body = await nowPlayingRes.json();
@@ -203,23 +210,20 @@ export async function fetchSpotifyData(): Promise<SpotifyData> {
       return result;
     }
 
-    const cached = await loadFromSupabase();
     if (cached) {
       return {
         ...cached,
         isPlaying: false,
         progressMs: undefined,
         durationMs: undefined,
-        topArtists: topArtists.length > 0 ? topArtists : cached.topArtists,
-        recentTracks:
-          recentTracks.length > 0 ? recentTracks : cached.recentTracks,
+        topArtists,
+        recentTracks,
       };
     }
 
     return { isPlaying: false, topArtists, recentTracks };
   } catch (error) {
     console.error("Spotify fetch error:", error);
-    const cached = await loadFromSupabase();
     if (cached) {
       return {
         ...cached,

@@ -14,7 +14,7 @@
   "landing": {
     "title": "Hei, jeg er",
     "terminal": {
-      "mainText": "For tiden tar jeg en mastergrad i datateknologi ved NTNU i Trondheim. Ta gjerne en titt på CV-en min eller ta kontakt."
+      "mainText": "For tiden tar jeg en mastergrad i datateknologi ved NTNU i Trondheim. Du er mer enn velkommen til å ta en titt på siden min eller å ta kontakt."
     }
   },
   "journey": {
@@ -149,7 +149,7 @@
       {
         "id": 6,
         "title": "Rif.no",
-        "description": "Jeg har utviklet og designet hovedsiden (rif.no) med Next.js og integrert Sanity som CMS. Dette lar ansatte dynamisk opprette og oppdatere sider og innhold via egendefinerte komponenter. Jeg bygget også et eget integrert dashbord for undersøkelser og arrangementregistrering med Next.js og PostgreSQL.",
+        "description": "Jeg har utviklet og designet hovedsiden (rif.no) med Next.js og integrert Sanity som CMS. Dette lar brukerne dynamisk opprette og oppdatere sider og innhold via egendefinerte komponenter. Jeg bygget også et eget integrert dashbord for undersøkelser og arrangementregistrering med Next.js og PostgreSQL.",
         "languages": "Next.js / PostgreSQL / Tailwind / Sanity",
         "desktopImage": "/rif.png",
         "websiteLink": "https://rif.no/"
@@ -297,7 +297,7 @@
     "githubStars": "Stjerner",
     "githubFollowers": "Følgere",
     "githubFollowing": "Følger",
-    "githubSince": "Siden",
+    "githubSince": "Anno",
     "githubApiError": "feil: kunne ikke nå github api",
     "githubContributions": "bidrag",
     "githubCommand": "cat /proc/github",
@@ -309,6 +309,7 @@
       "plain": "Minimal",
       "custom": "Egendefinert"
     },
+    "viewResume": "Se CV",
     "localeTitles": {
       "about": "Om meg",
       "github": "GitHub",
@@ -319,7 +320,8 @@
       "settings": "Innstillinger",
       "terminal": "Terminal",
       "gallery": "Galleri",
-      "home": "Hjem"
+      "home": "Hjem",
+      "resume": "CV"
     },
     "shortTitles": {
       "about": "whoami",
@@ -330,7 +332,8 @@
       "contact": "e-post",
       "settings": "innstillinger",
       "terminal": "kitty",
-      "gallery": "galleri"
+      "gallery": "galleri",
+      "resume": "cv"
     }
   }
 }

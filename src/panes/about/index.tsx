@@ -1,22 +1,31 @@
 "use client";
 
 import Image from "next/image";
+import { FileText } from "@phosphor-icons/react";
 import { TilingWmIcon } from "./components/tiling-wm-icon";
 import { BeerIcon } from "./components/beer-icon";
 import { DirewolfIcon } from "./components/direwolf-icon";
 import { TerminalConfigIcon } from "./components/terminal-config-icon";
 
+const CV_URLS: Record<string, string> = {
+  en: "/cv-en.pdf",
+  fr: "/cv-en.pdf",
+  nb: "/cv-nb.pdf",
+  nn: "/cv-nb.pdf",
+};
+
 interface Props {
   locale?: string;
+  viewResume?: string;
   landing: {
     title: string;
     terminal: { mainText: string };
   };
 }
 
-export function AboutPane({ landing }: Props) {
+export function AboutPane({ locale = "en", viewResume, landing }: Props) {
   return (
-    <div className="p-3 @sm:p-4 gap-8 font-mono text-xs h-full flex flex-row items-center justify-center overflow-auto @container">
+    <div className="p-3 @sm:p-4 gap-4 @sm:gap-8 font-mono text-xs h-full flex flex-col @sm:flex-row items-center justify-center overflow-auto @container">
       <div className="relative">
         <div className="absolute -top-5 -left-5 @xs:-top-7 @xs:-left-7 w-8 h-8 @xs:w-10 @xs:h-10 opacity-20 hover:opacity-40 transition-opacity">
           <TilingWmIcon />
