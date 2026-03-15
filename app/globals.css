@@ -3,18 +3,20 @@
 @tailwind utilities;
 
 :root {
-  --background: 44 87% 94%;
-  --foreground: 192 100% 11%;
-  --primary: 175 59% 33%;
-  --secondary: 44 44% 85%;
-  --muted-foreground: 194 14% 40%;
-  --destructive: 1 71% 45%;
-  --accent-yellow: 45 100% 28%;
-  --accent-blue: 205 69% 42%;
-  --accent-red: 1 71% 45%;
-  --scrollbar-track: #fdf6e3;
-  --scrollbar-thumb: #2aa198;
-  --scrollbar-thumb-hover: #268bd2;
+  color-scheme: dark;
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --primary: 142.1 70% 45.3%;
+  --primary-foreground: 144.9 80.4% 10%;
+  --secondary: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --destructive: 0 62.8% 30.6%;
+  --accent-yellow: 47.9 95.8% 53.1%;
+  --accent-blue: 217.2 91.2% 59.8%;
+  --accent-red: 0 62.8% 30.6%;
+  --scrollbar-track: #000000;
+  --scrollbar-thumb: #8bc34a;
+  --scrollbar-thumb-hover: #b8e6a9;
 
   --card: var(--background);
   --card-foreground: var(--foreground);
@@ -38,6 +40,7 @@
 
 .dark,
 .fredrir {
+  color-scheme: dark;
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 98%;
   --primary: 142.1 70% 45.3%;
@@ -54,6 +57,7 @@
 }
 
 .nord {
+  color-scheme: dark;
   --background: 222 16% 18%;
   --foreground: 218 27% 94%;
   --primary: 179 25% 65%;
@@ -69,6 +73,7 @@
 }
 
 .catppuccin-mocha {
+  color-scheme: dark;
   --background: 240 21% 15%;
   --foreground: 226 64% 88%;
   --primary: 267 84% 81%;
@@ -84,6 +89,7 @@
 }
 
 .rosepine {
+  color-scheme: dark;
   --background: 249 22% 12%;
   --foreground: 245 7% 81%;
   --primary: 343 76% 68%;
@@ -100,6 +106,7 @@
 }
 
 .tokyo-night {
+  color-scheme: dark;
   --background: 235 21% 13%;
   --foreground: 227 35% 75%;
   --primary: 218 89% 72%;
@@ -115,6 +122,7 @@
 }
 
 .gruvbox {
+  color-scheme: dark;
   --background: 0 0% 16%;
   --foreground: 42 54% 81%;
   --primary: 27 99% 55%;
@@ -130,6 +138,7 @@
 }
 
 .solarized-light {
+  color-scheme: light;
   --background: 44 87% 94%;
   --foreground: 192 100% 11%;
   --primary: 175 59% 33%;
@@ -145,6 +154,7 @@
 }
 
 .catppuccin-latte {
+  color-scheme: light;
   --background: 220 23% 95%;
   --foreground: 234 16% 28%;
   --primary: 267 83% 45%;
@@ -160,6 +170,7 @@
 }
 
 .rose-pine-dawn {
+  color-scheme: light;
   --background: 32 57% 95%;
   --foreground: 248 19% 30%;
   --primary: 271 28% 45%;
@@ -239,6 +250,7 @@ body {
   overflow: hidden;
   height: 100vh;
   height: 100dvh;
+  background-color: hsl(var(--background));
 }
 
 @keyframes dotPulse {

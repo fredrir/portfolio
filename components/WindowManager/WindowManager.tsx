@@ -255,7 +255,7 @@ export function WindowManager({
 }: Props) {
   const wm = useWindowManager();
   const bg = useBackground();
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [mobileActiveApp, setMobileActiveApp] = useState<string | null>(null);
   const [focusedId, setFocusedId] = useState<string | null>("about");
   const [floatingDetail, setFloatingDetail] = useState<{
@@ -397,6 +397,14 @@ export function WindowManager({
     }
     return renderPane(cell, rowIndex, colIndex);
   };
+
+  if (isMobile === null) {
+    return (
+      <div className="fixed inset-0 overflow-hidden">
+        <Background config={bg.current} />
+      </div>
+    );
+  }
 
   if (isMobile) {
     return (

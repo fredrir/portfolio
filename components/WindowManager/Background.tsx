@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTheme } from "next-themes";
 import type { BackgroundConfig } from "./types";
 
 function StarfieldBackground() {
@@ -150,10 +149,8 @@ interface Props {
 }
 
 export function Background({ config }: Props) {
-  const { theme } = useTheme();
-
   return (
-    <div className="fixed inset-0 overflow-hidden bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:from-[#080c14] dark:via-[#0a0e1a] dark:to-[#060a12] transition-colors duration-500">
+    <div className="fixed inset-0 overflow-hidden bg-background transition-colors duration-500">
       {config.type === "animated-dots" && <StarfieldBackground />}
       {config.type === "matrix" && <MatrixBackground />}
       {config.type === "grid" && <GridBackground />}
