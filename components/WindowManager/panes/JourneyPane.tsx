@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
 import type { journeyType } from "@/lib/types/types";
 import type { Journey } from "@/lib/locale/languageTypes";
 import type { UiStrings } from "../WindowManager";
@@ -15,14 +16,14 @@ interface Props {
 }
 
 function CompanyLogo({ journey }: { journey: journeyType }) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [src, setSrc] = useState("");
 
   useEffect(() => {
     setSrc(
-      theme === "dark" ? journey.darkModeImageUri : journey.lightModeImageUri,
+      isDarkTheme(resolvedTheme) ? journey.darkModeImageUri : journey.lightModeImageUri,
     );
-  }, [theme, journey.darkModeImageUri, journey.lightModeImageUri]);
+  }, [resolvedTheme, journey.darkModeImageUri, journey.lightModeImageUri]);
 
   if (!src) return null;
 

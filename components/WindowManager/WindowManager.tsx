@@ -37,9 +37,6 @@ export interface UiStrings {
   theme: string;
   language: string;
   wallpaper: string;
-  dark: string;
-  light: string;
-  system: string;
   customImage: string;
   nowPlaying: string;
   lastPlayed: string;

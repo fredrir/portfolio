@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
 import type { journeyType } from "@/lib/types/types";
 
 interface Props {
@@ -10,14 +11,14 @@ interface Props {
 }
 
 export function JourneyDetailPane({ journey }: Props) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [src, setSrc] = useState("");
 
   useEffect(() => {
     setSrc(
-      theme === "dark" ? journey.darkModeImageUri : journey.lightModeImageUri,
+      isDarkTheme(resolvedTheme) ? journey.darkModeImageUri : journey.lightModeImageUri,
     );
-  }, [theme, journey.darkModeImageUri, journey.lightModeImageUri]);
+  }, [resolvedTheme, journey.darkModeImageUri, journey.lightModeImageUri]);
 
   return (
     <div className="p-4 font-mono text-xs h-full flex flex-col overflow-auto">

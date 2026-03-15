@@ -3,6 +3,7 @@
 import type React from "react";
 import { useMemo, useState, useEffect } from "react";
 import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
 
 interface Dot {
   x: number;
@@ -50,8 +51,8 @@ function generateConnections(): Connection[] {
 }
 
 export const AnimatedBackground: React.FC = () => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  const { resolvedTheme } = useTheme();
+  const isDark = isDarkTheme(resolvedTheme);
   const [dots, setDots] = useState<Dot[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
 

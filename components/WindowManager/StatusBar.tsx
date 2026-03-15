@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
 import { STATUS_BAR_HEIGHT } from "./constants";
 import type { WindowConfig, WindowStates } from "./types";
 import type { UiStrings } from "./WindowManager";
@@ -94,17 +95,16 @@ export function StatusBar({
   onOpenSettings,
   onFocusWindow,
 }: Props) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const githubSrc =
-    mounted && theme === "dark" ? "/github-dark.svg" : "/github.svg";
-  const linkedInSrc =
-    mounted && theme === "dark" ? "/linkedin-dark.svg" : "/linkedin.svg";
+  const dark = mounted && isDarkTheme(resolvedTheme);
+  const githubSrc = dark ? "/github-dark.svg" : "/github.svg";
+  const linkedInSrc = dark ? "/linkedin-dark.svg" : "/linkedin.svg";
 
   return (
     <div

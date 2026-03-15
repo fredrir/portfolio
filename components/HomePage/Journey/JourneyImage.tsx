@@ -2,6 +2,7 @@
 import { memo, useState, useEffect } from "react";
 import type { journeyType } from "@/lib/types/types";
 import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
 import Image from "next/image";
 
 interface Props {
@@ -9,14 +10,14 @@ interface Props {
 }
 
 const JourneyImage = memo(({ journey }: Props) => {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [imageSrc, setImageSrc] = useState<string>("");
 
   useEffect(() => {
     setImageSrc(
-      theme === "dark" ? journey.darkModeImageUri : journey.lightModeImageUri
+      isDarkTheme(resolvedTheme) ? journey.darkModeImageUri : journey.lightModeImageUri
     );
-  }, [theme, journey.darkModeImageUri, journey.lightModeImageUri]);
+  }, [resolvedTheme, journey.darkModeImageUri, journey.lightModeImageUri]);
 
   return (
     <div className="relative z-20 size-32 rounded-full group overflow-hidden dark:bg-gray-800 bg-white shadow-lg bg-background flex items-center justify-center">

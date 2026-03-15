@@ -2,9 +2,9 @@
 
 import { useRef, useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { SunIcon, MoonIcon } from "lucide-react";
 import Link from "next/link";
 import { BACKGROUND_PRESETS } from "../constants";
+import { THEMES } from "@/lib/themes";
 import type { BackgroundConfig } from "../types";
 import type { NavbarType } from "@/lib/locale/languageTypes";
 import type { UiStrings } from "../WindowManager";
@@ -22,6 +22,20 @@ interface Props {
   currentBackground: BackgroundConfig;
   onSelectBackground: (config: BackgroundConfig) => void;
   ui: UiStrings;
+}
+
+function ThemeSwatch({ colors }: { colors: readonly [string, string, string] }) {
+  return (
+    <div className="flex gap-0.5 shrink-0">
+      {colors.map((c, i) => (
+        <div
+          key={i}
+          className="w-2 h-2 rounded-full border border-white/10"
+          style={{ background: c }}
+        />
+      ))}
+    </div>
+  );
 }
 
 export function SettingsPane({
@@ -78,23 +92,19 @@ export function SettingsPane({
         }>
           <section className={compact ? "flex-1 min-w-0" : ""}>
             <h3 className={`text-primary font-semibold mb-1.5 ${compact ? "text-2xs" : "text-xs mb-2"}`}>{ui.theme}</h3>
-            <div className="flex gap-1 @xs:gap-1.5 flex-wrap">
-              {([
-                { key: "dark", label: ui.dark, icon: <MoonIcon className="h-3 w-3 shrink-0" /> },
-                { key: "light", label: ui.light, icon: <SunIcon className="h-3 w-3 shrink-0" /> },
-                { key: "system", label: ui.system, icon: null },
-              ] as const).map(({ key, label, icon }) => (
+            <div className="grid grid-cols-3 gap-1 @xs:gap-1.5">
+              {THEMES.map((t) => (
                 <button
-                  key={key}
-                  onClick={() => setTheme(key)}
-                  className={`flex items-center gap-1 px-2 py-1 @xs:px-2.5 @xs:py-1.5 rounded-md border text-2xs @xs:text-xs transition-all flex-1 min-w-0 justify-center ${
-                    theme === key
+                  key={t.id}
+                  onClick={() => setTheme(t.id)}
+                  className={`flex items-center gap-1 px-1.5 py-1 @xs:px-2 @xs:py-1.5 rounded-md border text-2xs transition-all min-w-0 ${
+                    theme === t.id
                       ? "border-primary bg-primary/10 text-primary"
-                      : "border-primary/10 text-muted-foreground hover:border-primary/30"
+                      : "border-primary/10 text-muted-foreground hover:border-primary/30 hover:bg-primary/5"
                   }`}
                 >
-                  {icon}
-                  <span className="truncate">{label}</span>
+                  <ThemeSwatch colors={t.colors} />
+                  <span className="truncate">{t.name}</span>
                 </button>
               ))}
             </div>

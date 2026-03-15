@@ -10,6 +10,7 @@ import { CookieConsentBanner } from "@/components/Analytics/CookieConsent";
 import { ConditionalAnalytics } from "@/components/Analytics/ConditionalAnalytics";
 import { RecaptchaProvider } from "@/components/RecaptchaProvider";
 import type { localeParams } from "@/lib/locale/languageTypes";
+import { THEMES } from "@/lib/themes";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -38,8 +39,9 @@ export default async function RootLayout({
       <body className="h-screen overflow-hidden dark:text-white font-mono" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
+          themes={[...THEMES.map((t) => t.id), "system"]}
           disableTransitionOnChange
         >
           <AnalyticsConsentProvider>
