@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { TerminalPane } from "./TerminalPane";
 import {
@@ -11,7 +11,7 @@ import {
 } from "./constants";
 import { formatTime } from "./utils";
 import { getSpotifyData } from "@/app/actions/spotify";
-import type { SpotifyData } from "./types";
+import type { SpotifyData, SpotifyTrack, SpotifyArtist } from "./types";
 
 function CavaVisualizer({ isPlaying }: { isPlaying: boolean }) {
   const [bars, setBars] = useState<number[]>(Array(CAVA_BAR_COUNT).fill(2));
@@ -37,9 +37,7 @@ function CavaVisualizer({ isPlaying }: { isPlaying: boolean }) {
         <span
           key={i}
           className={isPlaying ? "text-green-400" : "text-muted-foreground/40"}
-          style={{
-            transition: "all 150ms ease",
-          }}
+          style={{ transition: "all 150ms ease" }}
         >
           {CAVA_CHARS[Math.min(level - 1, CAVA_CHARS.length - 1)]}
         </span>
@@ -48,15 +46,154 @@ function CavaVisualizer({ isPlaying }: { isPlaying: boolean }) {
   );
 }
 
+function SpotifyEmbed({ trackId }: { trackId: string }) {
+  return (
+    <iframe
+      src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`}
+      width="100%"
+      height="80"
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      loading="lazy"
+      className="rounded-md border border-primary/10 mt-1"
+      title="Spotify player"
+    />
+  );
+}
+
+function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
+  if (artists.length === 0) return null;
+
+  return (
+    <div className="space-y-1">
+      <div className="text-muted-foreground/50 text-2xs">
+        <span className="text-primary">$</span> cat /proc/spotify/top-artists
+      </div>
+      <div className="space-y-0.5">
+        {artists.map((artist, i) => (
+          <div key={artist.name} className="flex items-center gap-2 py-0.5">
+            <span className="text-primary/40 w-3 text-right text-2xs">{i + 1}</span>
+            {artist.imageUrl && (
+              <Image
+                src={artist.imageUrl}
+                alt={artist.name}
+                width={20}
+                height={20}
+                className="w-5 h-5 rounded-full border border-primary/10 object-cover"
+                unoptimized
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              {artist.url ? (
+                <a
+                  href={artist.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-foreground hover:text-primary hover:underline transition-colors text-2xs truncate block"
+                >
+                  {artist.name}
+                </a>
+              ) : (
+                <span className="text-foreground text-2xs truncate block">
+                  {artist.name}
+                </span>
+              )}
+            </div>
+            {artist.genres && artist.genres.length > 0 && (
+              <span className="text-muted-foreground/30 text-3xs truncate max-w-24 hidden @xs:inline">
+                {artist.genres.join(", ")}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RecentTracks({ tracks }: { tracks: SpotifyTrack[] }) {
+  if (tracks.length === 0) return null;
+
+  return (
+    <div className="space-y-1">
+      <div className="text-muted-foreground/50 text-2xs">
+        <span className="text-primary">$</span> tail /var/log/spotify/history
+      </div>
+      <div className="space-y-0.5">
+        {tracks.map((track, i) => (
+          <div key={`${track.title}-${i}`} className="flex items-center gap-2 py-0.5">
+            {track.albumArt && (
+              <Image
+                src={track.albumArt}
+                alt={track.album}
+                width={20}
+                height={20}
+                className="w-5 h-5 rounded border border-primary/10 object-cover"
+                unoptimized
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              {track.songUrl ? (
+                <a
+                  href={track.songUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-foreground hover:text-primary hover:underline transition-colors text-2xs truncate block"
+                >
+                  {track.title}
+                </a>
+              ) : (
+                <span className="text-foreground text-2xs truncate block">
+                  {track.title}
+                </span>
+              )}
+            </div>
+            <span className="text-muted-foreground/30 text-3xs truncate max-w-20 hidden @xs:inline">
+              {track.artist}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function SpotifyPane({ initialData, bare = false }: { initialData: SpotifyData; bare?: boolean }) {
   const [data, setData] = useState<SpotifyData>(initialData);
+  const [showEmbed, setShowEmbed] = useState(false);
+  const lastKnownRef = useRef<SpotifyData>(initialData);
+
+  useEffect(() => {
+    if (data?.title) {
+      lastKnownRef.current = data;
+    }
+  }, [data]);
 
   const fetchSpotify = useCallback(async () => {
     try {
       const d = await getSpotifyData();
-      setData(d);
+      if (d?.title) {
+        setData(d);
+      } else if (lastKnownRef.current?.title) {
+        setData({
+          ...lastKnownRef.current,
+          isPlaying: false,
+          progressMs: undefined,
+          durationMs: undefined,
+          topArtists: d?.topArtists ?? lastKnownRef.current.topArtists,
+          recentTracks: d?.recentTracks ?? lastKnownRef.current.recentTracks,
+        });
+      } else {
+        setData(d);
+      }
     } catch {
-      setData({ isPlaying: false });
+      if (lastKnownRef.current?.title) {
+        setData({
+          ...lastKnownRef.current,
+          isPlaying: false,
+          progressMs: undefined,
+          durationMs: undefined,
+        });
+      }
     }
   }, []);
 
@@ -70,13 +207,20 @@ export function SpotifyPane({ initialData, bare = false }: { initialData: Spotif
       ? Math.round((data.progressMs / data.durationMs) * 100)
       : 0;
 
+  const displayData = data?.title ? data : lastKnownRef.current?.title ? {
+    ...lastKnownRef.current,
+    isPlaying: false,
+    progressMs: undefined,
+    durationMs: undefined,
+  } : data;
+
   return (
     <TerminalPane title="cat /proc/spotify" bare={bare}>
       <div className="text-muted-foreground/50 mb-2">
         <span className="text-primary">$</span> cat /proc/spotify
       </div>
 
-      {!data?.title ? (
+      {!displayData?.title ? (
         <div className="flex gap-4 flex-col @sm:flex-row items-start">
           <div className="shrink-0 hidden @sm:block">
             {SPOTIFY_ASCII.map((line, i) => (
@@ -90,30 +234,25 @@ export function SpotifyPane({ initialData, bare = false }: { initialData: Spotif
           </div>
           <div className="space-y-1">
             <span className="text-muted-foreground/50">
-              {data?.notConfigured
+              {displayData?.notConfigured
                 ? "spotify: daemon not configured"
                 : "spotify: no track data available"}
             </span>
             <div className="text-muted-foreground/30 text-2xs">
-              {data?.notConfigured
+              {displayData?.notConfigured
                 ? "# error: not configured"
                 : "# waiting for playback..."}
             </div>
-            {data?.notConfigured && (
-              <div className="text-muted-foreground/30 text-2xs">
-                # error: not configured
-              </div>
-            )}
           </div>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex gap-4 flex-col @sm:flex-row items-start">
             <div className="shrink-0 block">
-              {data.albumArt ? (
+              {displayData.albumArt ? (
                 <Image
-                  src={data.albumArt}
-                  alt={data.album ?? "Album art"}
+                  src={displayData.albumArt}
+                  alt={displayData.album ?? "Album art"}
                   width={64}
                   height={64}
                   className="w-16 h-16 rounded border border-primary/20 opacity-80"
@@ -132,44 +271,44 @@ export function SpotifyPane({ initialData, bare = false }: { initialData: Spotif
             </div>
 
             <div className="min-w-0 space-y-0.5 flex-1">
-              <div>
+              <div className="flex items-center gap-2">
                 <span className="text-primary font-semibold">
-                  {data.isPlaying ? "▶" : "⏸"}
+                  {displayData.isPlaying ? "▶" : "⏸"}
                 </span>
-                <span className="text-muted-foreground/50 ml-1">
-                  {data.isPlaying ? "NOW PLAYING" : "LAST PLAYED"}
+                <span className="text-muted-foreground/50">
+                  {displayData.isPlaying ? "NOW PLAYING" : "LAST PLAYED"}
                 </span>
               </div>
               <div>
                 <span className="text-primary font-semibold">Track</span>
                 <span className="text-muted-foreground"> </span>
-                {data.songUrl ? (
+                {displayData.songUrl ? (
                   <a
-                    href={data.songUrl}
+                    href={displayData.songUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-foreground hover:text-primary hover:underline transition-colors"
                   >
-                    {data.title}
+                    {displayData.title}
                   </a>
                 ) : (
-                  <span className="text-foreground">{data.title}</span>
+                  <span className="text-foreground">{displayData.title}</span>
                 )}
               </div>
               <div>
                 <span className="text-primary font-semibold">Artist</span>
-                <span className="text-muted-foreground"> {data.artist}</span>
+                <span className="text-muted-foreground"> {displayData.artist}</span>
               </div>
               <div>
                 <span className="text-primary font-semibold">Album</span>
-                <span className="text-muted-foreground"> {data.album}</span>
+                <span className="text-muted-foreground"> {displayData.album}</span>
               </div>
 
-              {data.isPlaying && data.progressMs && data.durationMs && (
+              {displayData.isPlaying && displayData.progressMs && displayData.durationMs && (
                 <div className="pt-1">
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground/50 text-2xs w-8">
-                      {formatTime(data.progressMs)}
+                      {formatTime(displayData.progressMs)}
                     </span>
                     <div className="flex-1 flex items-center">
                       <div className="w-full bg-primary/10 h-1 rounded-full overflow-hidden">
@@ -180,15 +319,40 @@ export function SpotifyPane({ initialData, bare = false }: { initialData: Spotif
                       </div>
                     </div>
                     <span className="text-muted-foreground/50 text-2xs w-8 text-right">
-                      {formatTime(data.durationMs)}
+                      {formatTime(displayData.durationMs)}
                     </span>
                   </div>
                 </div>
               )}
+
+              {displayData.trackId && (
+                <button
+                  onClick={() => setShowEmbed((prev) => !prev)}
+                  className="mt-1 text-2xs text-primary/50 hover:text-primary transition-colors"
+                >
+                  {showEmbed ? "▾ hide player" : "▸ play preview"}
+                </button>
+              )}
             </div>
           </div>
 
-          <CavaVisualizer isPlaying={data.isPlaying} />
+          {showEmbed && displayData.trackId && (
+            <SpotifyEmbed trackId={displayData.trackId} />
+          )}
+
+          <CavaVisualizer isPlaying={displayData.isPlaying} />
+
+          {displayData.topArtists && displayData.topArtists.length > 0 && (
+            <div className="border-t border-primary/10 pt-2">
+              <TopArtists artists={displayData.topArtists} />
+            </div>
+          )}
+
+          {displayData.recentTracks && displayData.recentTracks.length > 0 && (
+            <div className="border-t border-primary/10 pt-2">
+              <RecentTracks tracks={displayData.recentTracks} />
+            </div>
+          )}
         </div>
       )}
     </TerminalPane>
