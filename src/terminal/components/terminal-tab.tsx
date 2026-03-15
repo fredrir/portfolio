@@ -12,7 +12,7 @@ const TerminalTab = ({
   return (
     <div className="min-h-[216px] max-w-lg w-full mt-10 mb-32 flex flex-col justify-end items-start">
       <button onClick={() => setIsClosed(false)} className="group">
-        <div className="rounded-md border border-control-border-hover bg-background/95 backdrop-blur-sm shadow-lg shadow-wm-shadow-soft overflow-hidden">
+        <div className="rounded-md border border-control-border-hover bg-glass-heavy backdrop-blur-sm shadow-lg shadow-wm-shadow-soft overflow-hidden">
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-dim">
             {minimized ?? (
               <>

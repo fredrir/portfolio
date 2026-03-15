@@ -47,7 +47,7 @@ export function StatusBar({
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-2 font-mono text-xs border-t border-wm-border bg-background/95 backdrop-blur-md select-none z-[9999]"
+      className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-2 font-mono text-xs border-t border-wm-border bg-glass-heavy backdrop-blur-md select-none z-[9999]"
       style={{ height: STATUS_BAR_HEIGHT }}
     >
       <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">

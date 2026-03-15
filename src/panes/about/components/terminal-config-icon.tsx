@@ -17,7 +17,7 @@ export function TerminalConfigIcon() {
         width="40"
         height="8"
         rx="3"
-        className="stroke-primary-soft fill-wm-titlebar"
+        className="stroke-primary-soft fill-surface-faint"
         strokeWidth="1.5"
       />
       <circle cx="10" cy="10" r="1.5" className="fill-icon-close" />

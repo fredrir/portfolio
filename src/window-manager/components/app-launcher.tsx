@@ -78,11 +78,11 @@ export function AppLauncher({ states, ui, onOpen, onStop, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[10000] flex items-start justify-center pt-[18vh] bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[10000] flex items-start justify-center pt-[18vh] bg-overlay-heavy backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg rounded-xl border border-border-medium bg-background/95 backdrop-blur-md shadow-2xl shadow-wm-shadow overflow-hidden font-mono"
+        className="w-full max-w-lg rounded-xl border border-border-medium bg-glass-heavy backdrop-blur-md shadow-2xl shadow-wm-shadow overflow-hidden font-mono"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 px-4 py-3 border-b border-wm-border">
@@ -144,7 +144,7 @@ export function AppLauncher({ states, ui, onOpen, onStop, onClose }: Props) {
                     }}
                     className={`text-2xs px-1.5 py-0.5 rounded transition-colors ${
                       isOpen
-                        ? "bg-red-500/15 text-red-400 hover:bg-red-500/25"
+                        ? "bg-badge-stop text-red-400 hover:bg-badge-stop-hover"
                         : "bg-launcher-bg text-primary hover:bg-launcher-hover"
                     }`}
                   >

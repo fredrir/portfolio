@@ -64,7 +64,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
             {langs.map((lang, i) => (
               <span
                 key={i}
-                className="px-2.5 py-1 rounded-md text-2xs border border-border-medium bg-tech-badge text-tech-badge-text font-medium"
+                className="px-2.5 py-1 rounded-md text-2xs border border-border-medium bg-surface-dim text-primary font-medium"
               >
                 {lang}
               </span>
@@ -119,7 +119,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
         )}
       </div>
 
-      <div className="px-4 py-2 border-t border-border-faint bg-surface-tint text-ghost text-2xs shrink-0 flex justify-between">
+      <div className="px-4 py-2 border-t border-border-faint bg-surface-faint text-ghost text-2xs shrink-0 flex justify-between">
         <span>{slug}(1)</span>
         <span>fredrir@hansteen</span>
       </div>

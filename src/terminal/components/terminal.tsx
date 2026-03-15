@@ -58,28 +58,28 @@ const Terminal = ({ mainText, locale }: Props) => {
           maxWidth: "100vw",
         }}
       >
-        <div className="rounded-md border border-control-border-hover bg-background/95 backdrop-blur-sm shadow-lg shadow-wm-shadow-soft overflow-hidden h-full flex flex-col">
+        <div className="rounded-md border border-control-border-hover bg-glass-heavy backdrop-blur-sm shadow-lg shadow-wm-shadow-soft overflow-hidden h-full flex flex-col">
           <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-border-medium bg-surface-dim shrink-0">
             <button
               onClick={() => setIsClosed(true)}
               title="Close"
               className="group"
             >
-              <div className="w-2.5 h-2.5 rounded-full bg-red-500/70 group-hover:bg-red-500 transition-colors" />
+              <div className="w-2.5 h-2.5 rounded-full bg-terminal-close group-hover:bg-red-500 transition-colors" />
             </button>
             <button
               onClick={() => setIsSmall(true)}
               title="Minimize"
               className="group"
             >
-              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70 group-hover:bg-yellow-500 transition-colors" />
+              <div className="w-2.5 h-2.5 rounded-full bg-terminal-minimize group-hover:bg-yellow-500 transition-colors" />
             </button>
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               title={isExpanded ? "Restore" : "Maximize"}
               className="group"
             >
-              <div className="w-2.5 h-2.5 rounded-full bg-green-500/70 group-hover:bg-green-500 transition-colors" />
+              <div className="w-2.5 h-2.5 rounded-full bg-terminal-maximize group-hover:bg-green-500 transition-colors" />
             </button>
             <span className="ml-2 text-xs text-muted-foreground font-mono truncate">
               fredrir@fredrir:{currentPath} (zsh)
@@ -140,7 +140,7 @@ const Terminal = ({ mainText, locale }: Props) => {
             </div>
 
             {cursorIsFinished && (
-              <div className="flex items-center mt-1 md:mt-2 border-t border-border-medium pt-2 pb-2 sticky bottom-0 bg-background/95 backdrop-blur-sm">
+              <div className="flex items-center mt-1 md:mt-2 border-t border-border-medium pt-2 pb-2 sticky bottom-0 bg-glass-heavy backdrop-blur-sm">
                 <span className="text-primary mr-1 md:mr-2 flex-shrink-0 text-xs md:text-sm">
                   [{currentPath}]${" "}
                 </span>
@@ -191,7 +191,7 @@ const Terminal = ({ mainText, locale }: Props) => {
         )}
 
         {isResizing && !isMobile && (
-          <div className="absolute top-8 left-2 bg-background/90 text-muted-foreground text-xs px-2 py-1 rounded font-mono border border-border-medium">
+          <div className="absolute top-8 left-2 bg-glass-medium text-muted-foreground text-xs px-2 py-1 rounded font-mono border border-border-medium">
             {terminalSize.width} x {terminalSize.height}
           </div>
         )}

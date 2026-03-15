@@ -34,7 +34,7 @@ export function Window({
   return (
     <div
       data-pane-id={config.id}
-      className={`flex-1 min-w-0 flex flex-col rounded-xl border bg-background/80 backdrop-blur-md overflow-hidden transition-all duration-200 ${
+      className={`flex-1 min-w-0 flex flex-col rounded-xl border bg-glass-light backdrop-blur-md overflow-hidden transition-all duration-200 ${
         isDragging
           ? "opacity-50 scale-[0.98] border-wm-border-drag"
           : isSwapTarget
@@ -46,7 +46,7 @@ export function Window({
       onMouseDown={onFocus}
     >
       <div
-        className="flex items-center justify-between px-3 py-1.5 border-b border-wm-border bg-wm-titlebar shrink-0 cursor-grab active:cursor-grabbing select-none"
+        className="flex items-center justify-between px-3 py-1.5 border-b border-wm-border bg-surface-faint shrink-0 cursor-grab active:cursor-grabbing select-none"
         onMouseDown={(e) => {
           if (e.button !== 0) return;
           onTitleMouseDown(config.id, e);

@@ -47,8 +47,8 @@ export function MobileLayout({
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="flex-1 flex flex-col min-h-0"
           >
-            <div className="flex-1 flex flex-col m-2 rounded-xl border border-border-medium bg-background/80 backdrop-blur-md shadow-lg shadow-wm-shadow-soft overflow-hidden min-h-0">
-              <div className="flex items-center px-3 py-2 border-b border-wm-border bg-wm-titlebar shrink-0">
+            <div className="flex-1 flex flex-col m-2 rounded-xl border border-border-medium bg-glass-light backdrop-blur-md shadow-lg shadow-wm-shadow-soft overflow-hidden min-h-0">
+              <div className="flex items-center px-3 py-2 border-b border-wm-border bg-surface-faint shrink-0">
                 <button
                   onClick={onGoHome}
                   className="text-primary-soft hover:text-primary active:text-primary transition-colors mr-3 font-mono text-2xl leading-none -mt-0.5 px-1"

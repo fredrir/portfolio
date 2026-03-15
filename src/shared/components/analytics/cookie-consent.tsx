@@ -175,11 +175,11 @@ export function CookieConsentBanner({
           ${isAnimating ? "translate-y-4 opacity-0" : "translate-y-0 opacity-100"}
         `}
       >
-        <div className="rounded-md border border-control-border-hover bg-background/95 backdrop-blur-sm shadow-lg shadow-wm-shadow-soft overflow-hidden">
+        <div className="rounded-md border border-control-border-hover bg-glass-heavy backdrop-blur-sm shadow-lg shadow-wm-shadow-soft overflow-hidden">
           <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-border-medium bg-surface-dim">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
+            <div className="w-2.5 h-2.5 rounded-full bg-terminal-close" />
+            <div className="w-2.5 h-2.5 rounded-full bg-terminal-minimize" />
+            <div className="w-2.5 h-2.5 rounded-full bg-terminal-maximize" />
             <span className="ml-2 text-xs text-muted-foreground">
               fredrir@:hansteen:~ (zsh)
             </span>

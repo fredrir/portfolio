@@ -232,7 +232,7 @@ export function ContactPane({
       >
         <div className="border-b border-border-faint px-3 py-2 space-y-1.5">
           <div className="flex items-center border-b border-border-faint pb-1.5">
-            <span className="text-yellow-600 dark:text-yellow-400/70 w-10 shrink-0">
+            <span className="text-yellow-600 dark:text-vim-label w-10 shrink-0">
               To:
             </span>
             <span className="text-muted-foreground">fhansteen@gmail.com</span>
@@ -240,7 +240,7 @@ export function ContactPane({
           <div className="flex items-center border-b border-border-faint pb-1.5">
             <label
               htmlFor="contact-name"
-              className="text-yellow-600 dark:text-yellow-400/70 w-10 shrink-0"
+              className="text-yellow-600 dark:text-vim-label w-10 shrink-0"
             >
               From:
             </label>
@@ -268,7 +268,7 @@ export function ContactPane({
           <div className="flex items-center border-b border-border-faint pb-1.5">
             <label
               htmlFor="contact-email"
-              className="text-yellow-600 dark:text-yellow-400/70 w-10 shrink-0"
+              className="text-yellow-600 dark:text-vim-label w-10 shrink-0"
             >
               Mail:
             </label>
@@ -296,7 +296,7 @@ export function ContactPane({
           <div className="flex items-center pb-1.5">
             <label
               htmlFor="contact-phone"
-              className="text-yellow-600 dark:text-yellow-400/70 w-10 shrink-0"
+              className="text-yellow-600 dark:text-vim-label w-10 shrink-0"
             >
               Tel:
             </label>
@@ -324,12 +324,12 @@ export function ContactPane({
 
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 flex min-h-36">
-            <div className="w-8 shrink-0 border-r border-border-faint bg-surface-tint flex flex-col items-end pt-2 pr-1 select-none">
+            <div className="w-8 shrink-0 border-r border-border-faint bg-surface-faint flex flex-col items-end pt-2 pr-1 select-none">
               {(formData.message.length > 0 ? messageLines : [""]).map(
                 (_, i) => (
                   <span
                     key={i}
-                    className="text-2xs leading-editor text-yellow-600/40 dark:text-yellow-400/25"
+                    className="text-2xs leading-editor text-yellow-600/40 dark:text-vim-line-number"
                   >
                     {i + 1}
                   </span>
@@ -341,7 +341,7 @@ export function ContactPane({
                 }).map((_, i) => (
                   <span
                     key={`tilde-${i}`}
-                    className="text-2xs leading-editor text-blue-500/40 dark:text-blue-400/30"
+                    className="text-2xs leading-editor text-blue-500/40 dark:text-vim-tilde"
                   >
                     ~
                   </span>
@@ -350,7 +350,7 @@ export function ContactPane({
                 Array.from({ length: 7 }).map((_, i) => (
                   <span
                     key={`tilde-${i}`}
-                    className="text-2xs leading-editor text-blue-500/40 dark:text-blue-400/30"
+                    className="text-2xs leading-editor text-blue-500/40 dark:text-vim-tilde"
                   >
                     ~
                   </span>
@@ -413,7 +413,7 @@ export function ContactPane({
           </div>
         )}
 
-        <div className="flex items-center justify-between px-3 py-1 border-t border-wm-border bg-surface-tint">
+        <div className="flex items-center justify-between px-3 py-1 border-t border-wm-border bg-surface-faint">
           <div className="flex-1 min-w-0">
             {showCmd ? (
               <div className="flex items-center text-xs">

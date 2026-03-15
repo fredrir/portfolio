@@ -412,7 +412,7 @@ export function WindowManager({
           if (!dragConfig) return null;
           return (
             <div
-              className="fixed z-[9990] pointer-events-none rounded-xl border border-chart-fill bg-background/70 backdrop-blur-md shadow-2xl shadow-surface-selected overflow-hidden flex flex-col"
+              className="fixed z-[9990] pointer-events-none rounded-xl border border-chart-fill bg-glass-faint backdrop-blur-md shadow-2xl shadow-surface-selected overflow-hidden flex flex-col"
               style={{
                 left: wm.dragPos.x,
                 top: wm.dragPos.y,
