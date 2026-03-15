@@ -57,9 +57,16 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail }: Props) {
                       .split(",")
                       .slice(0, 3)
                       .map((lang, i) => (
-                        <span key={i} className="text-3xs @sm:text-2xs text-muted-foreground/50">
+                        <span
+                          key={i}
+                          className="text-3xs @sm:text-2xs text-muted-foreground/50"
+                        >
                           {lang.trim()}
-                          {i < Math.min(2, project.languages.split(",").length - 1) && (
+                          {i <
+                            Math.min(
+                              2,
+                              project.languages.split(",").length - 1,
+                            ) && (
                             <span className="text-primary/20 ml-1">·</span>
                           )}
                         </span>
@@ -68,28 +75,9 @@ export function ProjectsPane({ projects, viewCode, onOpenDetail }: Props) {
                 </button>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  {project.websiteLink && (
-                    <Link
-                      href={project.websiteLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary/40 hover:text-primary transition-colors text-2xs"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      ↗
-                    </Link>
-                  )}
-                  {project.githubLink && (
-                    <Link
-                      href={project.githubLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted-foreground/30 hover:text-primary transition-colors text-2xs hidden @sm:inline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {viewCode}
-                    </Link>
-                  )}
+                  <p className="text-primary/40 hover:text-primary transition-colors text-2xs">
+                    ↗
+                  </p>
                 </div>
               </div>
             );

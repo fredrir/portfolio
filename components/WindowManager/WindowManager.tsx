@@ -8,7 +8,7 @@ import { StatusBar } from "./StatusBar";
 import { AppLauncher } from "./AppLauncher";
 import { Background } from "./Background";
 import { WINDOW_CONFIGS, GAP, STATUS_BAR_HEIGHT } from "./constants";
-import { LAYOUT_TIERS, STACK_HEIGHTS, getCellPanes } from "./layout";
+import { STACK_HEIGHTS } from "./layout";
 import type { CellDef } from "./layout";
 import { MobileHomeScreen } from "./MobileHomeScreen";
 import { MobileDock } from "./MobileDock";
@@ -78,7 +78,7 @@ function TipBar() {
         <span className="text-primary/20 mx-2">|</span>
         Drag titles to swap
         <span className="text-primary/20 mx-2">|</span>
-        Drag row borders to resize
+        Drag borders to resize
       </span>
       <button
         onClick={() => {
@@ -90,26 +90,6 @@ function TipBar() {
       >
         ×
       </button>
-    </div>
-  );
-}
-
-function RowDivider({
-  onMouseDown,
-}: {
-  onMouseDown: (e: React.MouseEvent) => void;
-}) {
-  return (
-    <div
-      className="h-[14px] -my-[4px] relative z-10 cursor-row-resize group flex items-center justify-center shrink-0"
-      onMouseDown={onMouseDown}
-    >
-      <div className="w-full h-[2px] rounded-full bg-primary/10 group-hover:bg-primary/30 group-active:bg-primary/50 transition-colors" />
-      <div className="absolute flex gap-1 items-center">
-        <div className="w-1 h-1 rounded-full bg-primary/15 group-hover:bg-primary/40 transition-colors" />
-        <div className="w-1 h-1 rounded-full bg-primary/15 group-hover:bg-primary/40 transition-colors" />
-        <div className="w-1 h-1 rounded-full bg-primary/15 group-hover:bg-primary/40 transition-colors" />
-      </div>
     </div>
   );
 }
@@ -313,32 +293,37 @@ export function WindowManager({
 
   const configMap = Object.fromEntries(WINDOW_CONFIGS.map((c) => [c.id, c]));
 
-  const renderPane = (paneId: string) => {
+  const renderPane = (paneId: string, rowIndex?: number, colIndex?: number) => {
     const config = configMap[paneId];
     if (!config || !wm.states[paneId]?.isOpen) return null;
+    const isFocused = focusedId === paneId;
     return (
       <Window
         key={paneId}
         config={config}
         state={wm.states[paneId]}
-        isFocused={focusedId === paneId}
+        isFocused={isFocused}
         isSwapTarget={wm.swapTarget === paneId}
         isDragging={wm.dragTarget === paneId}
+        showResizeGrip={isFocused && rowIndex !== undefined && colIndex !== undefined}
         onClose={() => wm.closeWindow(paneId)}
         onMaximize={() => wm.toggleMaximize(paneId)}
         onFocus={() => handleFocus(paneId)}
         onTitleMouseDown={wm.startTitleDrag}
+        onCornerResize={rowIndex !== undefined && colIndex !== undefined
+          ? (e) => wm.startCornerResize(rowIndex, colIndex, e)
+          : undefined}
       >
         {paneContent[paneId]}
       </Window>
     );
   };
 
-  const renderCell = (cell: CellDef) => {
+  const renderCell = (cell: CellDef, rowIndex: number, colIndex: number) => {
     if (Array.isArray(cell)) {
       const visible = cell.filter((id) => wm.states[id]?.isOpen);
       if (visible.length === 0) return null;
-      if (visible.length === 1) return renderPane(visible[0]);
+      if (visible.length === 1) return renderPane(visible[0], rowIndex, colIndex);
       const heightKey = cell.join(",");
       const heights = STACK_HEIGHTS[heightKey];
       return (
@@ -351,14 +336,14 @@ export function WindowManager({
                 className="flex min-h-0"
                 style={{ flex: `${h ?? 1} 0 0%` }}
               >
-                {renderPane(id)}
+                {renderPane(id, rowIndex, colIndex)}
               </div>
             );
           })}
         </div>
       );
     }
-    return renderPane(cell);
+    return renderPane(cell, rowIndex, colIndex);
   };
 
   if (isMobile) {
@@ -433,6 +418,14 @@ export function WindowManager({
             onClose={() => wm.setLauncherOpen(false)}
           />
         )}
+        {floatingDetail && (
+          <FloatingDetail
+            title={floatingDetail.title}
+            onClose={() => setFloatingDetail(null)}
+          >
+            {floatingDetail.content}
+          </FloatingDetail>
+        )}
       </div>
     );
   }
@@ -455,26 +448,39 @@ export function WindowManager({
             <div key={ri} className="contents">
               <div
                 className="flex shrink-0"
-                style={{ flex: `${h} 0 0%`, gap: GAP, minHeight: 0 }}
+                style={{ flex: `${h} 0 0%`, gap: 0, minHeight: 0 }}
               >
                 {row.map((cell, ci) => {
-                  const tierColWidths = LAYOUT_TIERS[wm.layoutTier].colWidths;
-                  const colWeights = tierColWidths[ri];
+                  const colWeights = wm.colWidths[ri];
                   const w = colWeights?.[ci] ?? 1;
                   const key = Array.isArray(cell) ? cell.join(",") : cell;
                   return (
-                    <div
-                      key={key}
-                      className="min-w-0 flex min-h-0"
-                      style={{ flex: `${w} 0 0%` }}
-                    >
-                      {renderCell(cell)}
+                    <div key={key} className="contents">
+                      <div
+                        className="min-w-0 flex min-h-0"
+                        style={{ flex: `${w} 0 0%` }}
+                      >
+                        {renderCell(cell, ri, ci)}
+                      </div>
+                      {ci < row.length - 1 && (
+                        <div
+                          className="w-[10px] shrink-0 cursor-col-resize relative z-10 group"
+                          onMouseDown={(e) => wm.startColResize(ri, ci, e)}
+                        >
+                          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-primary/30 transition-opacity" />
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
               {ri < wm.visibleLayout.length - 1 && (
-                <RowDivider onMouseDown={(e) => wm.startRowResize(ri, e)} />
+                <div
+                  className="h-[10px] shrink-0 cursor-row-resize relative z-10 group"
+                  onMouseDown={(e) => wm.startRowResize(ri, e)}
+                >
+                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-primary/30 transition-opacity" />
+                </div>
               )}
             </div>
           );

@@ -8,10 +8,12 @@ interface Props {
   isFocused?: boolean;
   isSwapTarget?: boolean;
   isDragging?: boolean;
+  showResizeGrip?: boolean;
   onClose: () => void;
   onMaximize: () => void;
   onFocus: () => void;
   onTitleMouseDown: (id: string, e: React.MouseEvent) => void;
+  onCornerResize?: (e: React.MouseEvent) => void;
   children: React.ReactNode;
 }
 
@@ -21,10 +23,12 @@ export function Window({
   isFocused,
   isSwapTarget,
   isDragging,
+  showResizeGrip,
   onClose,
   onMaximize,
   onFocus,
   onTitleMouseDown,
+  onCornerResize,
   children,
 }: Props) {
   return (
@@ -89,7 +93,27 @@ export function Window({
         <span className="font-mono text-3xs text-primary/30"></span>
       </div>
 
-      <div className="flex-1 overflow-auto min-h-0 @container">{children}</div>
+      <div className="flex-1 overflow-auto min-h-0 @container relative">
+        {children}
+        {showResizeGrip && (
+          <div
+            className="absolute bottom-0 right-0 w-5 h-5 cursor-nwse-resize z-20 group/grip"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              onCornerResize?.(e);
+            }}
+          >
+            <svg
+              viewBox="0 0 16 16"
+              className="w-full h-full text-primary/30 group-hover/grip:text-primary/60 transition-colors"
+            >
+              <line x1="14" y1="6" x2="6" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <line x1="14" y1="10" x2="10" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <line x1="14" y1="14" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
