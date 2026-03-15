@@ -10,6 +10,9 @@ import { Background } from "./Background";
 import { WINDOW_CONFIGS, GAP, STATUS_BAR_HEIGHT } from "./constants";
 import { DEFAULT_COL_WIDTHS, STACK_HEIGHTS, getCellPanes } from "./layout";
 import type { CellDef } from "./layout";
+import { MobileHomeScreen } from "./MobileHomeScreen";
+import { MobileDock } from "./MobileDock";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { AboutPane } from "./panes/AboutPane";
 import { JourneyPane } from "./panes/JourneyPane";
@@ -157,47 +160,69 @@ function FloatingDetail({
 
 function MobileLayout({
   paneContent,
+  activeApp,
+  onOpenApp,
+  onGoHome,
 }: {
   paneContent: Record<string, React.ReactNode>;
+  activeApp: string | null;
+  onOpenApp: (id: string) => void;
+  onGoHome: () => void;
 }) {
-  const order = [
-    "about",
-    "github",
-    "spotify",
-    "journey",
-    "projects",
-    "contact",
-    "terminal",
-  ];
+  const activeConfig = activeApp
+    ? WINDOW_CONFIGS.find((c) => c.id === activeApp)
+    : null;
+
   return (
-    <div className="flex flex-col gap-3 p-3 pb-12">
-      {order.map((id) => {
-        const config = WINDOW_CONFIGS.find((c) => c.id === id);
-        if (!config) return null;
-        return (
-          <div
-            key={id}
-            className="rounded-xl border border-primary/20 bg-background/80 backdrop-blur-md shadow-lg shadow-primary/5 overflow-hidden"
+    <div className="fixed inset-0 flex flex-col" style={{ paddingBottom: 76 }}>
+      <AnimatePresence mode="wait">
+        {activeApp === null ? (
+          <motion.div
+            key="home"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="flex-1 flex flex-col"
           >
-            <div className="flex items-center justify-between px-3 py-1.5 border-b border-primary/15 bg-primary/[0.03]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-3.5 h-3.5 rounded-full bg-destructive/60" />
-                <div className="w-3.5 h-3.5 rounded-full bg-accent-yellow/60" />
-                <div className="w-3.5 h-3.5 rounded-full bg-primary/60" />
+            <MobileHomeScreen onOpenApp={onOpenApp} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key={activeApp}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="flex-1 flex flex-col min-h-0"
+          >
+            <div className="flex-1 flex flex-col m-2 rounded-xl border border-primary/20 bg-background/80 backdrop-blur-md shadow-lg shadow-primary/5 overflow-hidden min-h-0">
+              <div className="flex items-center px-3 py-2 border-b border-primary/15 bg-primary/[0.03] shrink-0">
+                <button
+                  onClick={onGoHome}
+                  className="text-primary/60 hover:text-primary transition-colors mr-3 font-mono text-sm"
+                >
+                  ‹
+                </button>
+                <span className="font-mono text-2xs text-muted-foreground/50 flex-1 text-center">
+                  {activeConfig?.icon && (
+                    <span className="text-primary/60 mr-1">
+                      {activeConfig.icon}
+                    </span>
+                  )}
+                  {activeConfig?.shortTitle}
+                </span>
+                <span className="font-mono text-3xs text-primary/30">
+                  fredrir@arch
+                </span>
               </div>
-              <span className="font-mono text-2xs text-muted-foreground/50">
-                {config.title}
-              </span>
-              <span className="font-mono text-3xs text-primary/30">
-                fredrir@arch
-              </span>
+              <div className="flex-1 overflow-auto">
+                {paneContent[activeApp]}
+              </div>
             </div>
-            <div className="min-h-48 max-h-[500px] overflow-auto">
-              {paneContent[id]}
-            </div>
-          </div>
-        );
-      })}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -216,6 +241,7 @@ export function WindowManager({
   const wm = useWindowManager();
   const bg = useBackground();
   const [isMobile, setIsMobile] = useState(false);
+  const [mobileActiveApp, setMobileActiveApp] = useState<string | null>(null);
   const [focusedId, setFocusedId] = useState<string | null>("about");
   const [floatingDetail, setFloatingDetail] = useState<{
     title: string;
@@ -337,20 +363,29 @@ export function WindowManager({
 
   if (isMobile) {
     return (
-      <div className="min-h-screen">
+      <div className="fixed inset-0 overflow-hidden">
         <Background config={bg.current} />
-        <div className="relative z-10">
-          <MobileLayout paneContent={paneContent} />
+        <div className="relative z-10 h-full">
+          <MobileLayout
+            paneContent={paneContent}
+            activeApp={mobileActiveApp}
+            onOpenApp={setMobileActiveApp}
+            onGoHome={() => setMobileActiveApp(null)}
+          />
         </div>
-        <StatusBar
-          states={wm.states}
-          allConfigs={WINDOW_CONFIGS}
-          locale={locale}
-          focusedWindowId={null}
-          onOpenLauncher={() => wm.setLauncherOpen(true)}
-          onOpenSettings={handleOpenSettings}
-          onFocusWindow={handleFocus}
+        <MobileDock
+          activeApp={mobileActiveApp}
+          onOpenApp={setMobileActiveApp}
+          onGoHome={() => setMobileActiveApp(null)}
         />
+        {floatingDetail && (
+          <FloatingDetail
+            title={floatingDetail.title}
+            onClose={() => setFloatingDetail(null)}
+          >
+            {floatingDetail.content}
+          </FloatingDetail>
+        )}
       </div>
     );
   }

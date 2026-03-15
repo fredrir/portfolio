@@ -116,7 +116,9 @@ export function StatusBar({
           className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/15 text-primary hover:bg-primary/25 active:bg-primary/35 transition-all font-bold border border-primary/20 hover:border-primary/40 hover:shadow-sm hover:shadow-primary/10"
         >
           <span className="text-2xs font-extrabold tracking-tight">F</span>
-          <span className="text-3xs text-primary/70 hidden sm:inline">FredOS</span>
+          <span className="text-3xs text-primary/70 hidden sm:inline">
+            FredOS
+          </span>
         </button>
 
         <div className="flex items-center gap-0.5 ml-1">
@@ -124,7 +126,7 @@ export function StatusBar({
             <button
               key={config.id}
               onClick={() => onFocusWindow(config.id)}
-              className={`px-1.5 py-0.5 rounded transition-colors truncate max-w-24 ${
+              className={`px-1.5 py-0.5 flex items-center rounded transition-colors truncate max-w-24 ${
                 focusedWindowId === config.id
                   ? "text-primary bg-primary/10"
                   : "text-muted-foreground/60 hover:text-primary hover:bg-primary/10"

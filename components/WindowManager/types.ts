@@ -8,7 +8,8 @@ export interface Rect {
 export interface WindowConfig {
   id: string;
   title: string;
-  icon: string;
+  shortTitle: string;
+  icon: React.ReactNode;
   defaultOpen: boolean;
   order: number;
   isDynamic?: boolean;

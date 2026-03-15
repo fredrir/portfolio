@@ -83,9 +83,6 @@ export function Window({
         </div>
 
         <span className="font-mono text-2xs text-muted-foreground/50 truncate mx-2">
-          {config.icon && (
-            <span className="text-primary/60 mr-1">{config.icon}</span>
-          )}
           {config.title}
         </span>
 
