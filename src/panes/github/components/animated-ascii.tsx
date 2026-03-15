@@ -141,8 +141,8 @@ export function AnimatedAscii() {
   useEffect(() => {
     let raf: number;
     let lastTime = 0;
-    const fps = 60;
-    const interval = 4000 / fps;
+    const fps = 24;
+    const interval = 1500 / fps;
 
     const loop = (time: number) => {
       raf = requestAnimationFrame(loop);

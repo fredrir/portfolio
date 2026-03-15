@@ -75,7 +75,20 @@ export function WindowManager({
   const wm = useWindowManager();
   const bg = useBackground();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
-  const [mobileActiveApp, setMobileActiveApp] = useState<string | null>(null);
+  const [mobileActiveApp, _setMobileActiveApp] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("mobileActiveApp");
+    }
+    return null;
+  });
+  const setMobileActiveApp = useCallback((app: string | null) => {
+    _setMobileActiveApp(app);
+    if (app) {
+      sessionStorage.setItem("mobileActiveApp", app);
+    } else {
+      sessionStorage.removeItem("mobileActiveApp");
+    }
+  }, []);
   const [focusedId, setFocusedId] = useState<string | null>("about");
   const [floatingDetail, setFloatingDetail] = useState<{
     title: string;

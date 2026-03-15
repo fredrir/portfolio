@@ -231,7 +231,7 @@
 
 .nord {
   color-scheme: dark;
-  --background: 222 16% 18%;
+  --background: 222 16% 5%;
   --foreground: 218 27% 94%;
   --primary: 179 25% 65%;
   --secondary: 220 17% 24%;
@@ -240,14 +240,14 @@
   --accent-yellow: 40 71% 73%;
   --accent-blue: 213 32% 52%;
   --accent-red: 354 42% 56%;
-  --scrollbar-track: #2e3440;
+  --scrollbar-track: #0b0c0f;
   --scrollbar-thumb: #8fbcbb;
   --scrollbar-thumb-hover: #88c0d0;
 }
 
 .catppuccin-mocha {
   color-scheme: dark;
-  --background: 240 21% 15%;
+  --background: 240 21% 5%;
   --foreground: 226 64% 88%;
   --primary: 267 84% 81%;
   --secondary: 237 16% 23%;
@@ -256,31 +256,31 @@
   --accent-yellow: 41 86% 83%;
   --accent-blue: 217 92% 76%;
   --accent-red: 343 81% 75%;
-  --scrollbar-track: #1e1e2e;
+  --scrollbar-track: #0a0a0f;
   --scrollbar-thumb: #cba6f7;
   --scrollbar-thumb-hover: #b4befe;
 }
 
 .rosepine {
   color-scheme: dark;
-  --background: 249 22% 12%;
+  --background: 249 22% 5%;
   --foreground: 245 7% 81%;
   --primary: 343 76% 68%;
-  --primary-foreground: 249 22% 12%;
+  --primary-foreground: 249 22% 5%;
   --secondary: 249 15% 20%;
   --muted-foreground: 249 12% 47%;
   --destructive: 343 76% 68%;
   --accent-yellow: 35 88% 72%;
   --accent-blue: 189 43% 73%;
   --accent-red: 343 76% 68%;
-  --scrollbar-track: #191724;
+  --scrollbar-track: #0b0a10;
   --scrollbar-thumb: #eb6f92;
   --scrollbar-thumb-hover: #ebbcba;
 }
 
 .tokyo-night {
   color-scheme: dark;
-  --background: 235 21% 13%;
+  --background: 235 21% 5%;
   --foreground: 227 35% 75%;
   --primary: 218 89% 72%;
   --secondary: 225 22% 33%;
@@ -289,14 +289,14 @@
   --accent-yellow: 35 68% 64%;
   --accent-blue: 198 100% 75%;
   --accent-red: 348 86% 71%;
-  --scrollbar-track: #1a1b26;
+  --scrollbar-track: #0a0b0f;
   --scrollbar-thumb: #7aa2f7;
   --scrollbar-thumb-hover: #7dcfff;
 }
 
 .gruvbox {
   color-scheme: dark;
-  --background: 0 0% 16%;
+  --background: 0 0% 5%;
   --foreground: 42 54% 81%;
   --primary: 27 99% 55%;
   --secondary: 10 5% 22%;
@@ -305,7 +305,7 @@
   --accent-yellow: 42 96% 58%;
   --accent-blue: 106 31% 62%;
   --accent-red: 5 96% 60%;
-  --scrollbar-track: #282828;
+  --scrollbar-track: #0d0d0d;
   --scrollbar-thumb: #fe8019;
   --scrollbar-thumb-hover: #fabd2f;
 }

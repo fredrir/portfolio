@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useTransition } from "react";
 import { useTheme } from "next-themes";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { BACKGROUND_PRESETS } from "@/window-manager/constants";
 import { THEMES } from "@/lib/themes";
 import { ThemeSwatch } from "./components/theme-swatch";
@@ -27,6 +27,8 @@ export function SettingsPane({
   ui,
 }: Props) {
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
+  const [, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [compact, setCompact] = useState(false);
@@ -88,7 +90,7 @@ export function SettingsPane({
             >
               {ui.theme}
             </h3>
-            <div className="grid grid-cols-3 gap-1 @xs:gap-1.5">
+            <div className="grid grid-cols-2 @md:grid-cols-3 gap-1 @xs:gap-1.5">
               {THEMES.map((t) => (
                 <button
                   key={t.id}
@@ -118,9 +120,15 @@ export function SettingsPane({
               {languages.map((lang) => {
                 const isActive = lang.code === currentLocale;
                 return (
-                  <Link
+                  <button
                     key={lang.code}
-                    href={`/${lang.code}`}
+                    onClick={() => {
+                      if (!isActive) {
+                        startTransition(() => {
+                          router.replace(`/${lang.code}`);
+                        });
+                      }
+                    }}
                     className={`flex items-center gap-1.5 px-2 py-1 @xs:px-2.5 @xs:py-1.5 rounded-md border text-2xs @xs:text-xs transition-all ${
                       isActive
                         ? "border-primary bg-control-active text-primary"
@@ -133,7 +141,7 @@ export function SettingsPane({
                     >
                       {lang.name}
                     </span>
-                  </Link>
+                  </button>
                 );
               })}
             </div>
