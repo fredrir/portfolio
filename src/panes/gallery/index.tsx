@@ -73,9 +73,7 @@ function ImageDetail({ image }: { image: GalleryImage }) {
       </div>
 
       <div className="shrink-0 flex flex-wrap gap-x-3 gap-y-0.5 text-2xs text-muted-foreground/50 px-0.5">
-        {exifLoading && (
-          <span className="animate-pulse">reading exif...</span>
-        )}
+        {exifLoading && <span className="animate-pulse">reading exif...</span>}
         {displayDate && <span>{formatDate(displayDate)}</span>}
         {exif?.camera && <span>{exif.camera}</span>}
         {exif?.focalLength && (
@@ -129,7 +127,12 @@ function CategoryBrowser({
               className="rounded-lg overflow-hidden border border-primary/10 hover:border-primary/30 transition-all group bg-black/10 text-left"
             >
               <div className="aspect-[3/2] overflow-hidden bg-black/20">
-                {preview && <Thumbnail image={preview} className="group-hover:scale-105 transition-transform duration-300" />}
+                {preview && (
+                  <Thumbnail
+                    image={preview}
+                    className="group-hover:scale-105 transition-transform duration-300"
+                  />
+                )}
               </div>
               <div className="px-2 py-1.5 flex items-baseline justify-between gap-1">
                 <span className="text-xs text-primary truncate">
@@ -187,9 +190,7 @@ export function ImagePane() {
       {!compact && (
         <div className="text-muted-foreground/50 mb-1.5 @sm:mb-2 shrink-0">
           <span className="text-primary">$</span>{" "}
-          {activeCategory
-            ? `ls ~/gallery/${activeCategory}/`
-            : "ls ~/gallery/"}
+          {activeCategory ? `ls ~/gallery/${activeCategory}/` : "ls ~/gallery/"}
         </div>
       )}
 
@@ -203,9 +204,6 @@ export function ImagePane() {
         <div className="flex-1 flex flex-col items-center justify-center gap-2 text-muted-foreground/40">
           <span className="text-2xl">📂</span>
           <span>~/gallery/ is empty</span>
-          <span className="text-2xs text-muted-foreground/25">
-            add images to /public/gallery/&lt;category&gt;/
-          </span>
         </div>
       ) : showBrowser ? (
         <CategoryBrowser
@@ -214,19 +212,7 @@ export function ImagePane() {
         />
       ) : (
         <>
-          {narrow ? (
-            <div className="flex items-center gap-2 mb-2 shrink-0">
-              <button
-                onClick={() => {
-                  setActiveCategory(null);
-                  setSelectedImage(null);
-                }}
-                className="text-primary/50 hover:text-primary active:text-primary text-sm py-1 transition-colors"
-              >
-                ← ~/gallery/
-              </button>
-            </div>
-          ) : (
+          {narrow ? null : (
             <div className="flex gap-1 mb-1.5 @sm:mb-2 overflow-x-auto shrink-0">
               {categories.map((cat) => (
                 <button

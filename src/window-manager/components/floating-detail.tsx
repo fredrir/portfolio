@@ -30,13 +30,11 @@ export function FloatingDetail({ title, onClose, children }: Props) {
             <button onClick={onClose} className="group">
               <div className="w-3.5 h-3.5 rounded-full bg-destructive/60 group-hover:bg-destructive transition-colors" />
             </button>
-            <div className="w-3.5 h-3.5 rounded-full bg-accent-yellow/60" />
-            <div className="w-3.5 h-3.5 rounded-full bg-primary/60" />
           </div>
-          <span className="text-2xs text-muted-foreground/50 truncate mx-2">
+          <span className="text-xs text-muted-foreground/50 truncate mx-2">
             {title}
           </span>
-          <span className="text-3xs text-primary/30">fredrir@hansteen</span>
+          <span className="text-xs text-primary/30">fredrir@hansteen</span>
         </div>
         <div className="flex-1 overflow-auto">{children}</div>
       </div>

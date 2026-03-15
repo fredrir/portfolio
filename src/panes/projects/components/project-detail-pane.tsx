@@ -19,10 +19,6 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
 
   return (
     <div className="font-mono text-xs h-full flex flex-col overflow-auto">
-      <div className="px-4 py-2 border-b border-primary/10 bg-primary/[0.02] text-muted-foreground/40 shrink-0">
-        <span className="text-primary">$</span> man {slug}
-      </div>
-
       <div className="flex-1 p-4 space-y-4">
         <div>
           <div className="text-muted-foreground/40 text-2xs tracking-widest uppercase mb-1">
