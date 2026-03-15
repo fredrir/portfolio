@@ -55,6 +55,7 @@ export interface UiStrings {
   stop: string;
   start: string;
   lastYear: string;
+  shortTitles: Record<string, string>;
 }
 
 export interface ContactProps {
@@ -105,6 +106,7 @@ export interface SpotifyTrack {
   albumArt?: string;
   songUrl?: string;
   trackId?: string;
+  previewUrl?: string;
 }
 
 export interface SpotifyArtist {
@@ -123,6 +125,7 @@ export interface SpotifyData {
   albumArt?: string;
   songUrl?: string;
   trackId?: string;
+  previewUrl?: string;
   progressMs?: number;
   durationMs?: number;
   recentTracks?: SpotifyTrack[];

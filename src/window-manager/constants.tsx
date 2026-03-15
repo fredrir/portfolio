@@ -68,7 +68,7 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   },
   {
     id: "settings",
-    title: "settings",
+    title: "./settings.sh",
     shortTitle: "settings",
     icon: <GearSix size={S} weight={W} />,
     defaultOpen: true,

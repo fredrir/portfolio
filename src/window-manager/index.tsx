@@ -235,6 +235,7 @@ export function WindowManager({
             activeApp={mobileActiveApp}
             onOpenApp={setMobileActiveApp}
             onGoHome={() => setMobileActiveApp(null)}
+            ui={ui}
           />
         </div>
         <MobileDock
@@ -426,17 +427,10 @@ export function WindowManager({
                   <div className="w-3.5 h-3.5 rounded-full bg-accent-yellow/60" />
                   <div className="w-3.5 h-3.5 rounded-full bg-primary/60" />
                 </div>
-                <span className="font-mono text-2xs text-muted-foreground/50 truncate mx-2">
-                  {dragConfig.icon && (
-                    <span className="text-primary/60 mr-1">
-                      {dragConfig.icon}
-                    </span>
-                  )}
+                <span className="font-mono text-xs text-muted-foreground/50 truncate mx-2">
                   {dragConfig.title}
                 </span>
-                <span className="font-mono text-3xs text-primary/30">
-                  fredrir@hansteen
-                </span>
+                <span className="font-mono text-xs text-primary/30"></span>
               </div>
               <div className="flex-1 overflow-hidden opacity-40">
                 {paneContent[wm.dragTarget]}

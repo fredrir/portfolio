@@ -290,6 +290,17 @@
     "active": "active",
     "stop": "stop",
     "start": "start",
-    "lastYear": "Last year"
+    "lastYear": "Last year",
+    "shortTitles": {
+      "about": "whoami",
+      "github": "github",
+      "spotify": "spotify",
+      "journey": "log",
+      "projects": "projects",
+      "contact": "mail",
+      "settings": "settings",
+      "terminal": "kitty",
+      "gallery": "gallery"
+    }
   }
 }

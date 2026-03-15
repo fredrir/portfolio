@@ -57,6 +57,7 @@ interface SpotifyTrackRaw {
   };
   external_urls: { spotify: string };
   id: string;
+  preview_url?: string;
 }
 
 function parseTrack(track: SpotifyTrackRaw): SpotifyTrack {
@@ -67,6 +68,7 @@ function parseTrack(track: SpotifyTrackRaw): SpotifyTrack {
     albumArt: track.album.images?.[0]?.url,
     songUrl: track.external_urls.spotify,
     trackId: track.id,
+    previewUrl: track.preview_url ?? undefined,
   };
 }
 

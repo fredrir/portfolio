@@ -22,7 +22,7 @@ export function CavaVisualizer() {
       {bars.map((level, i) => (
         <span
           key={i}
-          className="text-green-400 flex-1 text-center"
+          className="text-primary/60 flex-1 text-center"
           style={{ transition: "all 150ms ease" }}
         >
           {CAVA_CHARS[Math.min(level - 1, CAVA_CHARS.length - 1)]}

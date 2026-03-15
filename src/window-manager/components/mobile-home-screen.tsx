@@ -13,6 +13,7 @@ import {
   Images,
 } from "@phosphor-icons/react";
 import { WINDOW_CONFIGS } from "../constants";
+import type { UiStrings } from "@/shared/types";
 
 const GRID_ICONS: Record<string, React.ReactNode> = {
   about: <UserCircle size={28} weight="duotone" />,
@@ -28,9 +29,10 @@ const GRID_ICONS: Record<string, React.ReactNode> = {
 
 interface Props {
   onOpenApp: (id: string) => void;
+  ui: UiStrings;
 }
 
-export function MobileHomeScreen({ onOpenApp }: Props) {
+export function MobileHomeScreen({ onOpenApp, ui }: Props) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 py-10">
       <div className="font-mono text-2xs text-muted-foreground/40 mb-8 tracking-widest uppercase">
@@ -52,7 +54,7 @@ export function MobileHomeScreen({ onOpenApp }: Props) {
               {GRID_ICONS[config.id]}
             </div>
             <span className="font-mono text-3xs text-muted-foreground/60 truncate max-w-[4rem]">
-              {config.shortTitle}
+              {ui.shortTitles[config.id] ?? config.shortTitle}
             </span>
           </motion.button>
         ))}

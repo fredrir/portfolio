@@ -26,9 +26,12 @@ export function AppLauncher({ states, ui, onOpen, onStop, onClose }: Props) {
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
     return WINDOW_CONFIGS.filter(
-      (c) => c.title.toLowerCase().includes(q) || c.id.toLowerCase().includes(q),
+      (c) =>
+        c.title.toLowerCase().includes(q) ||
+        c.id.toLowerCase().includes(q) ||
+        (ui.shortTitles[c.id] ?? c.shortTitle).toLowerCase().includes(q),
     );
-  }, [query]);
+  }, [query, ui.shortTitles]);
 
   useEffect(() => {
     setSelectedIdx(0);
@@ -67,7 +70,9 @@ export function AppLauncher({ states, ui, onOpen, onStop, onClose }: Props) {
   );
 
   useEffect(() => {
-    const el = listRef.current?.children[selectedIdx] as HTMLElement | undefined;
+    const el = listRef.current?.children[selectedIdx] as
+      | HTMLElement
+      | undefined;
     el?.scrollIntoView({ block: "nearest" });
   }, [selectedIdx]);
 
@@ -128,7 +133,7 @@ export function AppLauncher({ states, ui, onOpen, onStop, onClose }: Props) {
                         {config.title}
                       </span>
                       <span className="text-2xs text-muted-foreground/30 ml-2">
-                        {config.id}
+                        {ui.shortTitles[config.id] ?? config.shortTitle}
                       </span>
                     </div>
                   </button>
@@ -157,7 +162,9 @@ export function AppLauncher({ states, ui, onOpen, onStop, onClose }: Props) {
             <span className="text-primary/40 ml-3">Enter</span> {ui.open}
             <span className="text-primary/40 ml-3">Esc</span> {ui.close}
           </span>
-          <span>{filtered.length} {ui.apps}</span>
+          <span>
+            {filtered.length} {ui.apps}
+          </span>
         </div>
       </div>
     </div>

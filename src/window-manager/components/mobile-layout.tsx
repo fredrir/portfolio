@@ -3,12 +3,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { WINDOW_CONFIGS } from "../constants";
 import { MobileHomeScreen } from "./mobile-home-screen";
+import type { UiStrings } from "@/shared/types";
 
 interface Props {
   paneContent: Record<string, React.ReactNode>;
   activeApp: string | null;
   onOpenApp: (id: string) => void;
   onGoHome: () => void;
+  ui: UiStrings;
 }
 
 export function MobileLayout({
@@ -16,6 +18,7 @@ export function MobileLayout({
   activeApp,
   onOpenApp,
   onGoHome,
+  ui,
 }: Props) {
   const activeConfig = activeApp
     ? WINDOW_CONFIGS.find((c) => c.id === activeApp)
@@ -33,7 +36,7 @@ export function MobileLayout({
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="flex-1 flex flex-col"
           >
-            <MobileHomeScreen onOpenApp={onOpenApp} />
+            <MobileHomeScreen onOpenApp={onOpenApp} ui={ui} />
           </motion.div>
         ) : (
           <motion.div
@@ -53,7 +56,7 @@ export function MobileLayout({
                   ‹
                 </button>
                 <span className="font-mono text-2xs text-muted-foreground/50 flex-1 text-center">
-                  {activeConfig?.shortTitle}
+                  {activeConfig && (ui.shortTitles[activeConfig.id] ?? activeConfig.shortTitle)}
                 </span>
                 <span className="font-mono text-3xs text-primary/30">
                   fredrir@hansteen

@@ -47,7 +47,7 @@ export function StatusBar({
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-2 font-mono text-3xs border-t border-primary/15 bg-background/95 backdrop-blur-md select-none z-[9999]"
+      className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-2 font-mono text-xs border-t border-primary/15 bg-background/95 backdrop-blur-md select-none z-[9999]"
       style={{ height: STATUS_BAR_HEIGHT }}
     >
       <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
@@ -56,7 +56,7 @@ export function StatusBar({
           className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/15 text-primary hover:bg-primary/25 active:bg-primary/35 transition-all font-bold border border-primary/20 hover:border-primary/40 hover:shadow-xs hover:shadow-primary/10 shrink-0"
         >
           <span className="text-2xs font-extrabold tracking-tight">F</span>
-          <span className="text-3xs text-primary/70 hidden sm:inline">
+          <span className="text-sm text-primary/70 hidden sm:inline">
             FredOS
           </span>
         </button>

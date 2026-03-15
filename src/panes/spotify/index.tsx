@@ -19,7 +19,9 @@ export function SpotifyPane({
   ui?: UiStrings;
 }) {
   const [data, setData] = useState<SpotifyData>(initialData);
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
   const [showEmbed, setShowEmbed] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastKnownRef = useRef<SpotifyData>(initialData);
   const containerRef = useRef<HTMLDivElement>(null);
   const [compact, setCompact] = useState(false);
@@ -39,6 +41,11 @@ export function SpotifyPane({
   useEffect(() => {
     if (data?.title) {
       lastKnownRef.current = data;
+    }
+    if (audioRef.current && data?.previewUrl !== audioRef.current.src) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setIsPreviewPlaying(false);
     }
   }, [data]);
 
@@ -237,15 +244,31 @@ export function SpotifyPane({
                         </div>
                       )}
 
-                    {displayData.trackId && (
+                    {(displayData.previewUrl || displayData.trackId) && (
                       <div className="pt-1">
                         <button
-                          onClick={() => setShowEmbed((prev) => !prev)}
+                          onClick={() => {
+                            if (displayData.previewUrl) {
+                              if (isPreviewPlaying) {
+                                audioRef.current?.pause();
+                                setIsPreviewPlaying(false);
+                              } else {
+                                if (!audioRef.current || audioRef.current.src !== displayData.previewUrl) {
+                                  audioRef.current = new Audio(displayData.previewUrl);
+                                  audioRef.current.onended = () => setIsPreviewPlaying(false);
+                                }
+                                audioRef.current.play();
+                                setIsPreviewPlaying(true);
+                              }
+                            } else {
+                              setShowEmbed((prev) => !prev);
+                            }
+                          }}
                           className="text-2xs text-primary/60 hover:text-primary transition-colors flex items-center gap-1.5 px-2 py-1 rounded border border-primary/15 hover:border-primary/30 hover:bg-primary/5"
                         >
-                          <span>{showEmbed ? "⏹" : "▶"}</span>
+                          <span>{(isPreviewPlaying || showEmbed) ? "⏹" : "▶"}</span>
                           <span>
-                            {showEmbed
+                            {(isPreviewPlaying || showEmbed)
                               ? (ui?.hidePlayer ?? "hide player")
                               : (ui?.playInBrowser ?? "play in browser")}
                           </span>
@@ -255,7 +278,7 @@ export function SpotifyPane({
                   </div>
                 </div>
 
-                {showEmbed && displayData.trackId && (
+                {showEmbed && !displayData.previewUrl && displayData.trackId && (
                   <div>
                     <SpotifyEmbed trackId={displayData.trackId} />
                   </div>
