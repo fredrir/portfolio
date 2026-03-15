@@ -6,6 +6,7 @@ import Link from "next/link";
 import { BACKGROUND_PRESETS } from "@/window-manager/constants";
 import { THEMES } from "@/lib/themes";
 import { ThemeSwatch } from "./components/theme-swatch";
+import { BackgroundPreview } from "./components/background-preview";
 import { languages } from "./constants";
 import type { BackgroundConfig } from "@/window-manager/types";
 import type { NavbarType } from "@/i18n/language-types";
@@ -58,21 +59,35 @@ export function SettingsPane({
     reader.readAsDataURL(file);
   };
 
+  const isCustomActive = currentBackground.type === "custom-image";
+
   return (
-    <div ref={containerRef} className="p-2 @xs:p-3 @md:p-4 font-mono text-xs h-full flex flex-col overflow-y-auto @container">
+    <div
+      ref={containerRef}
+      className="p-2 @xs:p-3 @md:p-4 font-mono text-xs h-full flex flex-col overflow-y-auto @container"
+    >
       {!compact && (
         <div className="text-muted-foreground/50 mb-3 shrink-0">
           <span className="text-primary">$</span> settings
         </div>
       )}
 
-      <div className={`flex-1 ${compact ? "flex flex-col gap-2" : "space-y-4 @md:space-y-5"}`}>
-        <div className={compact
-          ? "flex gap-3 flex-wrap"
-          : "@md:grid @md:grid-cols-2 @md:gap-4 space-y-4 @md:space-y-0"
-        }>
+      <div
+        className={`flex-1 ${compact ? "flex flex-col gap-2" : "space-y-4 @md:space-y-5"}`}
+      >
+        <div
+          className={
+            compact
+              ? "flex gap-3 flex-wrap"
+              : "@md:grid @md:grid-cols-2 @md:gap-4 space-y-4 @md:space-y-0"
+          }
+        >
           <section className={compact ? "flex-1 min-w-0" : ""}>
-            <h3 className={`text-primary font-semibold mb-1.5 ${compact ? "text-2xs" : "text-xs mb-2"}`}>{ui.theme}</h3>
+            <h3
+              className={`text-primary font-semibold mb-1.5 ${compact ? "text-2xs" : "text-xs mb-2"}`}
+            >
+              {ui.theme}
+            </h3>
             <div className="grid grid-cols-3 gap-1 @xs:gap-1.5">
               {THEMES.map((t) => (
                 <button
@@ -92,8 +107,14 @@ export function SettingsPane({
           </section>
 
           <section className={compact ? "flex-1 min-w-0" : ""}>
-            <h3 className={`text-primary font-semibold mb-1.5 ${compact ? "text-2xs" : "text-xs mb-2"}`}>{ui.language}</h3>
-            <div className={`grid gap-1 @xs:gap-1.5 ${compact ? "grid-cols-4" : "grid-cols-2"}`}>
+            <h3
+              className={`text-primary font-semibold mb-1.5 ${compact ? "text-2xs" : "text-xs mb-2"}`}
+            >
+              {ui.language}
+            </h3>
+            <div
+              className={`grid gap-1 @xs:gap-1.5 ${compact ? "grid-cols-4" : "grid-cols-2"}`}
+            >
               {languages.map((lang) => {
                 const isActive = lang.code === currentLocale;
                 return (
@@ -107,7 +128,11 @@ export function SettingsPane({
                     }`}
                   >
                     <span>{lang.flag}</span>
-                    <span className={`truncate ${compact ? "hidden @sm:inline" : ""}`}>{lang.name}</span>
+                    <span
+                      className={`truncate ${compact ? "hidden @sm:inline" : ""}`}
+                    >
+                      {lang.name}
+                    </span>
                   </Link>
                 );
               })}
@@ -116,54 +141,65 @@ export function SettingsPane({
         </div>
 
         <section>
-          <h3 className={`text-primary font-semibold mb-1.5 ${compact ? "text-2xs" : "text-xs mb-2"}`}>
+          <h3
+            className={`text-primary font-semibold mb-1.5 ${compact ? "text-2xs" : "text-xs mb-2"}`}
+          >
             {ui.wallpaper}
           </h3>
-          <div className={`grid gap-1 @xs:gap-1.5 ${compact ? "grid-cols-3 @xs:grid-cols-5" : "grid-cols-2 @xs:grid-cols-3 @sm:grid-cols-5"}`}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          <div
+            className={`grid gap-1 @xs:gap-1.5 ${compact ? "grid-cols-3 @xs:grid-cols-6" : "grid-cols-2 @xs:grid-cols-3 @sm:grid-cols-6"}`}
+          >
             {BACKGROUND_PRESETS.map((preset) => (
               <button
                 key={preset.id}
                 onClick={() => onSelectBackground(preset)}
-                className={`px-2 py-1.5 rounded-md border text-2xs text-center transition-all ${
-                  currentBackground.id === preset.id
+                className={`flex flex-col items-center gap-1 p-1.5 rounded-md border text-xs transition-all ${
+                  currentBackground.id === preset.id && !isCustomActive
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-primary/10 text-muted-foreground hover:border-primary/30 hover:bg-primary/5"
                 }`}
               >
-                {preset.name}
+                <BackgroundPreview config={preset} />
+                <span>{ui.backgrounds[preset.id] ?? preset.name}</span>
               </button>
             ))}
-          </div>
-
-          {!compact && (
-            <div className="mt-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className={`w-full px-3 py-2 rounded-md border text-xs transition-all flex items-center justify-center gap-2 ${
-                  currentBackground.type === "custom-image"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-dashed border-primary/20 text-muted-foreground/50 hover:border-primary/40 hover:text-primary/70 hover:bg-primary/5"
-                }`}
-              >
-                {currentBackground.type === "custom-image" && currentBackground.value && (
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex flex-col items-center gap-1 p-1.5 rounded-md border text-2xs transition-all ${
+                isCustomActive
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-primary/10 text-muted-foreground hover:border-primary/30 hover:bg-primary/5"
+              }`}
+            >
+              <div className="w-full aspect-[3/2] rounded-sm overflow-hidden border border-primary/10 flex items-center justify-center">
+                {isCustomActive && currentBackground.value ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={currentBackground.value}
                     alt=""
-                    className="w-5 h-5 rounded object-cover border border-primary/20"
+                    className="w-full h-full object-cover"
                   />
+                ) : (
+                  <svg viewBox="0 0 24 16" className="w-full h-full">
+                    <rect width="24" height="16" className="fill-background" />
+                    <path
+                      d="M8 11l3-4 2.5 3 1.5-2 3 3H6z"
+                      className="fill-primary/15"
+                    />
+                    <circle cx="8" cy="6" r="1.5" className="fill-primary/20" />
+                  </svg>
                 )}
-                {ui.customImage}
-              </button>
-            </div>
-          )}
+              </div>
+              <span>{ui.backgrounds.custom ?? ui.customImage}</span>
+            </button>
+          </div>
         </section>
       </div>
     </div>

@@ -94,13 +94,8 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
 
 export const BACKGROUND_PRESETS: BackgroundConfig[] = [
   { id: "starfield", name: "Starfield", type: "animated-dots" },
-  { id: "matrix", name: "Matrix Rain", type: "matrix" },
+  { id: "matrix", name: "Matrix", type: "matrix" },
   { id: "grid", name: "Grid", type: "grid" },
-  {
-    id: "gradient",
-    name: "Gradient",
-    type: "gradient",
-    value: "linear-gradient(135deg, #0a0e1a 0%, #0d1117 50%, #090c14 100%)",
-  },
+  { id: "gradient", name: "Gradient", type: "gradient" },
   { id: "plain", name: "Minimal", type: "plain" },
 ];

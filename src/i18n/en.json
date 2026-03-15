@@ -293,6 +293,14 @@
     "lastYear": "Last year",
     "searchingGallery": "searching gallery...",
     "emptyGallery": "~/gallery/ is empty",
+    "backgrounds": {
+      "starfield": "Starfield",
+      "matrix": "Matrix",
+      "grid": "Grid",
+      "gradient": "Gradient",
+      "plain": "Minimal",
+      "custom": "Custom"
+    },
     "shortTitles": {
       "about": "whoami",
       "github": "github",

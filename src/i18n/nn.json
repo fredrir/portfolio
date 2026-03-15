@@ -293,6 +293,14 @@
     "lastYear": "Siste år",
     "searchingGallery": "søkjer i galleri...",
     "emptyGallery": "~/gallery/ er tomt",
+    "backgrounds": {
+      "starfield": "Stjernefelt",
+      "matrix": "Matrix",
+      "grid": "Rutenett",
+      "gradient": "Gradient",
+      "plain": "Minimal",
+      "custom": "Eigendefinert"
+    },
     "shortTitles": {
       "about": "whoami",
       "github": "github",

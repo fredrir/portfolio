@@ -57,6 +57,7 @@ export interface UiStrings {
   lastYear: string;
   searchingGallery: string;
   emptyGallery: string;
+  backgrounds: Record<string, string>;
   shortTitles: Record<string, string>;
 }
 
