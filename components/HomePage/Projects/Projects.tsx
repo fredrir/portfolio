@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
 
 interface Props {
   title: string;
@@ -52,8 +53,8 @@ function ProjectSection({ project, index, viewCode }: ProjectSectionProps) {
     once: true,
     amount: 0.5,
   });
-  const { theme } = useTheme();
-  const githubSrc = theme === "dark" ? "/github-dark.svg" : "/github.svg";
+  const { resolvedTheme } = useTheme();
+  const githubSrc = isDarkTheme(resolvedTheme) ? "/github-dark.svg" : "/github.svg";
   const isEven = index % 2 === 0;
 
   return (

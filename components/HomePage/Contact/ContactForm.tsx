@@ -10,7 +10,10 @@ import type { ContactProps } from "./types";
 type SendState = "idle" | "sending" | "success" | "error";
 type VimMode = "normal" | "insert";
 
-export function ContactForm({ contact }: ContactProps) {
+export function ContactForm({
+  contact,
+  bare = false,
+}: ContactProps & { bare?: boolean }) {
   const { executeRecaptcha } = useRecaptcha();
   const [formData, setFormData] = useState({
     name: "",
@@ -221,35 +224,8 @@ export function ContactForm({ contact }: ContactProps) {
     <div
       ref={containerRef}
       tabIndex={0}
-      className="flex-1 rounded-md border border-primary/20 bg-background/80 backdrop-blur-sm overflow-hidden flex flex-col outline-none"
+      className={`flex-1 overflow-hidden flex flex-col outline-none ${bare ? "h-full" : "rounded-md border border-primary/20 bg-background/80 backdrop-blur-sm"}`}
     >
-      <div className="flex items-center justify-between px-3 py-1 border-b border-primary/15 bg-primary/[0.03]">
-        <div className="flex items-center gap-3">
-          <span className="text-primary text-2xs">VIM</span>
-          <span className="text-muted-foreground/30 text-2xs">
-            mail.tmp [+]
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground/30 text-2xs">
-            {formData.message.length > 0
-              ? `${messageLines.length}L, ${formData.message.length}C`
-              : "0L, 0C"}
-          </span>
-          {sendState === "sending" && (
-            <span className="text-yellow-400/80 text-2xs animate-pulse">
-              SENDING
-            </span>
-          )}
-          {sendState === "success" && (
-            <span className="text-green-400/80 text-2xs">SENT</span>
-          )}
-          {sendState === "error" && (
-            <span className="text-red-400/80 text-2xs">ERROR</span>
-          )}
-        </div>
-      </div>
-
       <form
         ref={formRef}
         onSubmit={handleSubmit}
@@ -280,7 +256,7 @@ export function ContactForm({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-base sm:text-xs
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-xs
                   placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={contact.name}
                 autoComplete="off"
@@ -308,7 +284,7 @@ export function ContactForm({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-base sm:text-xs
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-xs
                   placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={contact.email}
                 autoComplete="off"
@@ -335,7 +311,7 @@ export function ContactForm({ contact }: ContactProps) {
                 onFocus={() => handleFocus("phone")}
                 onBlur={() => setFocusedField(null)}
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-base sm:text-xs
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-xs
                   placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={`${contact.phone} (optional)`}
                 autoComplete="off"
@@ -392,7 +368,7 @@ export function ContactForm({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="w-full h-full min-h-36 bg-transparent text-foreground outline-none font-mono text-base sm:text-xs
+                className="w-full h-full min-h-36 bg-transparent text-foreground outline-none font-mono text-xs
                   resize-none p-2 leading-editor placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={
                   vimMode === "normal"
@@ -467,7 +443,7 @@ export function ContactForm({ contact }: ContactProps) {
             <button
               type="submit"
               disabled={isSending}
-              className="font-mono text-2xs sm:text-xs px-3 py-0.5 rounded border border-primary/30
+              className="font-mono text-xs px-3 py-0.5 rounded border border-primary/30
                 text-primary hover:bg-primary/10 hover:border-primary/60
                 active:bg-primary/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
 import {
   XIcon as XMarkIcon,
   TextIcon as DocumentTextIcon,
@@ -29,7 +30,8 @@ interface Props {
 export default function Navbar({ navbar, currentLocale }: Props) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = isDarkTheme(resolvedTheme);
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
@@ -111,13 +113,13 @@ export default function Navbar({ navbar, currentLocale }: Props) {
                 />
 
                 <button
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  onClick={() => setTheme(isDark ? "solarized-light" : "fredrir")}
                   className="rounded-full p-2 group text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
                   aria-label={
-                    theme === "dark" ? navbar.lightMode : navbar.darkMode
+                    isDark ? navbar.lightMode : navbar.darkMode
                   }
                 >
-                  {theme === "dark" ? (
+                  {isDark ? (
                     <SunIcon className="h-5 w-5 text-amber-500 group-hover:animate-[spin_2s_linear_infinite] transition-transform" />
                   ) : (
                     <MoonIcon className="h-5 w-5 text-emerald-400" />

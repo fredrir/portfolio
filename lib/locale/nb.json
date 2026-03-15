@@ -14,7 +14,7 @@
   "landing": {
     "title": "Hei, jeg er",
     "terminal": {
-      "mainText": "FFor tiden tar jeg en mastergrad i datateknologi ved NTNU i Trondheim. Ta gjerne en titt på CV-en min eller ta kontakt."
+      "mainText": "For tiden tar jeg en mastergrad i datateknologi ved NTNU i Trondheim. Ta gjerne en titt på CV-en min eller ta kontakt."
     }
   },
   "journey": {
@@ -27,7 +27,8 @@
         "description": "Ansvarlig for veiledning av bachelorgrupper, faglig oppfølging og evaluering av midtveisprogresjon gjennom semesteret.",
         "date": "Januar 2026 - Juni 2026",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": true
       },
       {
         "id": 11,
@@ -36,7 +37,8 @@
         "description": "Læringsassistent i emnet Eksperter i team – Miljøpåvirkning og vippepunkter. Fasiliterte tverrfaglig samarbeid og veiledet studenter i å løse reelle problemstillinger.",
         "date": "Januar 2026 - Juni 2026",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": true
       },
       {
         "id": 12,
@@ -45,9 +47,9 @@
         "description": "Oppgaver knyttet til veiledning, gruppeledelse (inkludert øvinger, kollokvier og seminarer), samt evaluering.",
         "date": "Januar 2026 - Juni 2026",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": true
       },
-
       {
         "id": 9,
         "jobTitle": "Læringsassistent i IT3212",
@@ -55,7 +57,8 @@
         "description": "Læringsassistent i faget Datadrevet programvare. Oppgaver knyttet til veiledning, gruppeledelse (inkludert øvinger, kollokviegrupper og seminarer) og evaluering.",
         "date": "August 2025 - Desember 2025",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 8,
@@ -64,7 +67,8 @@
         "description": "Tilbydde teknisk veiledning i faget Informatikk prosjektarbeid I. Holdt tre ukentlige øvingstimer hvor jeg veiledet studentene i utvikling og problemløsning relatert til Java- og Maven-baserte prosjekter.",
         "date": "August 2025 - Desember 2025",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 5,
@@ -73,7 +77,8 @@
         "description": "Designet og utviklet hjemmesiden (rif.no) med Next.js, og integrerte Sanity som CMS. Utviklet et integrert dashbord for spørreundersøkelser og arrangementspåmelding med Next.js og PostgreSQL. Utviklet en kampanjeside for rapporten Norges tilstand (norgestilstand.no).",
         "date": "August 2024 - Nåværende",
         "lightModeImageUri": "/rif-logo.svg",
-        "darkModeImageUri": "/rif-logo-dark.svg"
+        "darkModeImageUri": "/rif-logo-dark.svg",
+        "isCurrent": true
       },
       {
         "id": 7,
@@ -82,9 +87,9 @@
         "description": "Læringsassistent i faget “Eksperter i team - Miljøpåvirkning og tålegrenser”. Tilrettelagte for tverrfaglig samarbeid og veiledet studenter i problemløsning basert på virkelige utfordringer.",
         "date": "Januar 2024 - Nåværende",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
-
       {
         "id": 6,
         "jobTitle": "Teknisk Læringsassistent i IT1901",
@@ -92,7 +97,8 @@
         "description": "Tilbydde teknisk veiledning i faget Informatikk prosjektarbeid I. Holdt tre ukentlige øvingstimer hvor jeg veiledet studentene i utvikling og problemløsning relatert til Java- og Maven-baserte prosjekter.",
         "date": "August 2024 - Desember 2024",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 1,
@@ -101,7 +107,8 @@
         "description": "Utviklet ende-tll-ende tester, som økte test dekningen av programvaren. Opprettet regresjonstest-dokumenter og utførte manuell regresjonstesting. Deltok i daglige standups og sprintplanlegging i et SCRUM-team,",
         "date": "Juni 2024 - Juli 2024",
         "lightModeImageUri": "/maritime-optima.svg",
-        "darkModeImageUri": "/maritime-optima-dark.svg"
+        "darkModeImageUri": "/maritime-optima-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 2,
@@ -110,7 +117,8 @@
         "description": "Ansvarlig for å lede et team på 19 utviklere, som var delt inn i forskjellige prosjekter. Hovedansvarlig for administrativt arbeid og å lede ukentlige møter. Ansvarlig for å arrangere ukentlige arbeidsdager på skolen og for opplæring av nye medlemmer.",
         "date": "Februar 2024 - Mars 2025",
         "lightModeImageUri": "/appkom.svg",
-        "darkModeImageUri": "/appkom-dark.svg"
+        "darkModeImageUri": "/appkom-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 3,
@@ -119,7 +127,8 @@
         "description": "Ledet ukentlige øvingstimer, rettet innleveringer og ga tilbakemeldinger til studentene.",
         "date": "August 2023 - Desember 2023",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 4,
@@ -128,7 +137,8 @@
         "description": "Opprettet detaljerte rapporter om effekten av krigen i Ukraina og samlet en oversikt over skip mistenkt for ulovlig transport av russisk olje. Analyserte den globale utviklingen og identifiserte nye muligheter i tankfartsektoren. Assisterte i befraktningen av selskapets flåte.",
         "date": "Juni 2023 - Juli 2023",
         "lightModeImageUri": "/nat-logo.png",
-        "darkModeImageUri": "/nat-logo.png"
+        "darkModeImageUri": "/nat-logo.png",
+        "isCurrent": false
       }
     ]
   },
@@ -246,5 +256,40 @@
   "footer": {
     "license1": "Alle rettigheter forbeholdt.",
     "license2": "Lisensiert under MIT-lisensen."
+  },
+  "ui": {
+    "theme": "Tema",
+    "language": "Språk",
+    "wallpaper": "Bakgrunn",
+    "customImage": "Velg eget bilde...",
+    "nowPlaying": "SPILLES NÅ",
+    "lastPlayed": "SIST SPILT",
+    "track": "Spor",
+    "artist": "Artist",
+    "album": "Album",
+    "playInBrowser": "spill i nettleser",
+    "hidePlayer": "skjul spiller",
+    "about": "Sammendrag",
+    "techStack": "Avhengigheter",
+    "links": "Se også",
+    "visitors": "besøkende",
+    "uptime": "oppetid",
+    "searchApps": "Søk etter applikasjoner...",
+    "noMatching": "Ingen treff",
+    "navigate": "naviger",
+    "open": "åpne",
+    "close": "lukk",
+    "apps": "apper",
+    "tipLauncher": "applansering",
+    "tipDrag": "Dra titler for å bytte",
+    "tipResize": "Dra kanter for å endre størrelse",
+    "entries": "oppføringer",
+    "projects": "prosjekter",
+    "images": "bilder",
+    "clickToOpen": "klikk for å åpne",
+    "active": "aktiv",
+    "running": "kjører",
+    "stopped": "stoppet",
+    "lastYear": "Siste år"
   }
 }

@@ -28,8 +28,12 @@ const WAVE_COLORS = [
 
 function AnimatedAscii() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef(0);
-  const glitchRef = useRef<{ row: number; col: number; char: string; ttl: number }[]>([]);
+  const scaleRef = useRef(1);
+  const glitchRef = useRef<
+    { row: number; col: number; char: string; ttl: number }[]
+  >([]);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -39,7 +43,7 @@ function AnimatedAscii() {
 
     const dpr = window.devicePixelRatio || 1;
     const charW = 7.2 * dpr;
-    const charH = 13 * dpr;
+    const charH = 11 * dpr;
     const maxCols = Math.max(...GITHUB_ASCII.map((l) => l.length));
     const rows = GITHUB_ASCII.length;
 
@@ -122,6 +126,27 @@ function AnimatedAscii() {
   }, []);
 
   useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        const dpr = window.devicePixelRatio || 1;
+        const baseW = Math.ceil(Math.max(...GITHUB_ASCII.map((l) => l.length)) * 7.2);
+        const baseH = Math.ceil(GITHUB_ASCII.length * 11);
+        const scaleW = width / baseW;
+        const scaleH = height / baseH;
+        scaleRef.current = Math.min(scaleW, scaleH, 1.5);
+        if (canvasRef.current) {
+          canvasRef.current.style.transform = `scale(${scaleRef.current})`;
+        }
+      }
+    });
+    ro.observe(wrapper);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
     let raf: number;
     let lastTime = 0;
     const fps = 24;
@@ -139,11 +164,13 @@ function AnimatedAscii() {
   }, [draw]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="text-primary"
-      style={{ imageRendering: "pixelated" }}
-    />
+    <div ref={wrapperRef} className="flex items-center justify-center overflow-hidden">
+      <canvas
+        ref={canvasRef}
+        className="text-primary origin-center"
+        style={{ imageRendering: "pixelated" }}
+      />
+    </div>
   );
 }
 
@@ -177,7 +204,7 @@ function BarChart({
         return (
           <div key={lang} className="flex items-center gap-2 w-full">
             <LangIcon lang={lang} />
-            <span className="text-muted-foreground w-20 shrink-0 truncate">
+            <span className="text-muted-foreground w-14 @xs:w-20 shrink-0 truncate">
               {lang}
             </span>
             <div className="flex-1 h-3 bg-primary/5 rounded-sm overflow-hidden">
@@ -202,12 +229,14 @@ function ContributionGraph({
   selectedYear,
   years,
   onYearChange,
+  lastYearLabel = "Last year",
 }: {
   contributions: ContributionDay[];
   total: number;
   selectedYear: string;
   years: string[];
   onYearChange: (year: string) => void;
+  lastYearLabel?: string;
 }) {
   const numWeeks = Math.ceil(contributions.length / 7);
   const weeks: (ContributionDay | null)[][] = Array.from(
@@ -245,7 +274,7 @@ function ContributionGraph({
                   : "text-muted-foreground/40 hover:text-muted-foreground/70"
               }`}
             >
-              {y === "last" ? "Last year" : y}
+              {y === "last" ? lastYearLabel : y}
             </button>
           ))}
         </div>
@@ -279,8 +308,28 @@ function ContributionGraph({
   );
 }
 
-export function GitHubPane({ initialData }: { initialData: GitHubData | null }) {
+export function GitHubPane({
+  initialData,
+  bare = false,
+}: {
+  initialData: GitHubData | null;
+  bare?: boolean;
+}) {
   const [selectedYear, setSelectedYear] = useState("last");
+  const [compact, setCompact] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setCompact(entry.contentRect.height < 250 || entry.contentRect.width < 300);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const data = initialData;
   const currentContributions = data?.contributionsByYear.find(
@@ -292,97 +341,105 @@ export function GitHubPane({ initialData }: { initialData: GitHubData | null }) 
     : 1;
 
   return (
-    <TerminalPane title="cat /proc/github">
-      <div className="text-muted-foreground/50 mb-2">
-        <span className="text-primary">$</span> cat /proc/github
-      </div>
-      <div className="flex flex-col gap-4">
-        {!data ? (
-          <span className="text-red-400">
-            error: could not reach github api
-          </span>
-        ) : (
-          <>
-            <div className="flex gap-6 flex-col sm:flex-row">
-              <div className="shrink-0 hidden sm:block">
-                <AnimatedAscii />
-              </div>
-
-              <div className="min-w-0 space-y-0.5">
-                <TypedLine delay={80}>
-                  <a
-                    href={data.profileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary font-bold hover:underline"
-                  >
-                    {data.username}@github
-                  </a>
-                </TypedLine>
-                <TypedLine delay={140}>
-                  <span className="text-primary/30 text-2xs">
-                    ─────────────────────
-                  </span>
-                </TypedLine>
-                <TypedLine delay={200}>
-                  <span className="text-primary font-semibold">Repos</span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    {data.publicRepos}
-                  </span>
-                </TypedLine>
-                <TypedLine delay={260}>
-                  <span className="text-primary font-semibold">Stars</span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    {data.totalStars}
-                  </span>
-                </TypedLine>
-                <TypedLine delay={320}>
-                  <span className="text-primary font-semibold">Followers</span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    {data.followers}
-                  </span>
-                </TypedLine>
-                <TypedLine delay={380}>
-                  <span className="text-primary font-semibold">Following</span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    {data.following}
-                  </span>
-                </TypedLine>
-                <TypedLine delay={440}>
-                  <span className="text-primary font-semibold">Since</span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    {new Date(data.createdAt).getFullYear()}
-                  </span>
-                </TypedLine>
-              </div>
-            </div>
-            {data.topLanguages.length > 0 && (
-              <TypedLine delay={500} className="w-full">
-                <div className="mt-2 pt-1 w-full border-t border-primary/10">
-                  <BarChart items={data.topLanguages} maxCount={maxLangCount} />
-                </div>
-              </TypedLine>
-            )}
-            {currentContributions && currentContributions.days.length > 0 && (
-              <TypedLine delay={600} className="w-full">
-                <div className="mt-2 pt-2 w-full border-t border-primary/10">
-                  <ContributionGraph
-                    contributions={currentContributions.days}
-                    total={currentContributions.total}
-                    selectedYear={selectedYear}
-                    years={years}
-                    onYearChange={setSelectedYear}
-                  />
-                </div>
-              </TypedLine>
-            )}
-          </>
+    <TerminalPane title="cat /proc/github" bare={bare}>
+      <div ref={containerRef} className="h-full">
+        {!compact && (
+          <div className="text-muted-foreground/50 mb-2">
+            <span className="text-primary">$</span> cat /proc/github
+          </div>
         )}
+        <div className={`flex flex-col ${compact ? "gap-2" : "gap-4"}`}>
+          {!data ? (
+            <span className="text-red-400">
+              error: could not reach github api
+            </span>
+          ) : (
+            <>
+              <div className={`flex ${compact ? "gap-3" : "gap-4 @sm:gap-6"} flex-col @sm:flex-row`}>
+                <div className="shrink-0">
+                  <AnimatedAscii />
+                </div>
+
+                <div className="min-w-0 space-y-0.5 flex-1">
+                  <TypedLine delay={80}>
+                    <a
+                      href={data.profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary font-bold hover:underline"
+                    >
+                      {data.username}@github
+                    </a>
+                  </TypedLine>
+                  {!compact && (
+                    <TypedLine delay={140}>
+                      <span className="text-primary/30 text-2xs">
+                        ─────────────────────
+                      </span>
+                    </TypedLine>
+                  )}
+                  <div className={`grid gap-x-4 gap-y-0.5 ${compact ? "grid-cols-3 @xs:grid-cols-5" : "grid-cols-2 @sm:grid-cols-1"}`}>
+                    <TypedLine delay={200}>
+                      <span className="text-primary font-semibold">Repos</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        {data.publicRepos}
+                      </span>
+                    </TypedLine>
+                    <TypedLine delay={260}>
+                      <span className="text-primary font-semibold">Stars</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        {data.totalStars}
+                      </span>
+                    </TypedLine>
+                    <TypedLine delay={320}>
+                      <span className="text-primary font-semibold">Followers</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        {data.followers}
+                      </span>
+                    </TypedLine>
+                    <TypedLine delay={380}>
+                      <span className="text-primary font-semibold">Following</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        {data.following}
+                      </span>
+                    </TypedLine>
+                    <TypedLine delay={440}>
+                      <span className="text-primary font-semibold">Since</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        {new Date(data.createdAt).getFullYear()}
+                      </span>
+                    </TypedLine>
+                  </div>
+                </div>
+              </div>
+              {data.topLanguages.length > 0 && (
+                <TypedLine delay={500} className="w-full">
+                  <div className={`w-full ${compact ? "" : "mt-2 pt-1 border-t border-primary/10"}`}>
+                    <BarChart items={data.topLanguages} maxCount={maxLangCount} />
+                  </div>
+                </TypedLine>
+              )}
+              {!compact && currentContributions && currentContributions.days.length > 0 && (
+                <TypedLine delay={600} className="w-full">
+                  <div className="mt-2 pt-2 w-full border-t border-primary/10">
+                    <ContributionGraph
+                      contributions={currentContributions.days}
+                      total={currentContributions.total}
+                      selectedYear={selectedYear}
+                      years={years}
+                      onYearChange={setSelectedYear}
+                    />
+                  </div>
+                </TypedLine>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </TerminalPane>
   );

@@ -3,14 +3,15 @@ import "../globals.css";
 import { Toaster } from "react-hot-toast";
 import { Roboto } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { AnimatedBackground } from "@/components/AnimatedLinesBackground";
 import { ThemeProvider } from "next-themes";
 import { Suspense } from "react";
 import { AnalyticsConsentProvider } from "@/components/Analytics/AnalyticsConsentProvider";
 import { CookieConsentBanner } from "@/components/Analytics/CookieConsent";
 import { ConditionalAnalytics } from "@/components/Analytics/ConditionalAnalytics";
 import { RecaptchaProvider } from "@/components/RecaptchaProvider";
+
 import type { localeParams } from "@/lib/locale/languageTypes";
+import { THEMES } from "@/lib/themes";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -36,17 +37,17 @@ export default async function RootLayout({
           content="UU8-qICRv5a4sAtHbMB5rFbj9CuO-wzdPKfDur29ai8"
         />
       </head>
-      <body className="flex flex-col min-h-screen dark:text-white font-mono" suppressHydrationWarning>
+      <body className="h-screen overflow-hidden dark:text-white font-mono" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="fredrir"
           enableSystem
+          themes={[...THEMES.map((t) => t.id), "system"]}
           disableTransitionOnChange
         >
           <AnalyticsConsentProvider>
             <RecaptchaProvider>
               <Suspense fallback={null}>
-                <AnimatedBackground />
                 <Toaster />
 
                 {children}

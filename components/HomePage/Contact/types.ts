@@ -39,6 +39,22 @@ export interface GitHubData {
   contributionsByYear: ContributionYear[];
 }
 
+export interface SpotifyTrack {
+  title: string;
+  artist: string;
+  album: string;
+  albumArt?: string;
+  songUrl?: string;
+  trackId?: string;
+}
+
+export interface SpotifyArtist {
+  name: string;
+  imageUrl?: string;
+  url?: string;
+  genres?: string[];
+}
+
 export interface SpotifyData {
   isPlaying: boolean;
   notConfigured?: boolean;
@@ -47,6 +63,10 @@ export interface SpotifyData {
   album?: string;
   albumArt?: string;
   songUrl?: string;
+  trackId?: string;
   progressMs?: number;
   durationMs?: number;
+  recentTracks?: SpotifyTrack[];
+  topArtists?: SpotifyArtist[];
+  lastPlayedAt?: string;
 }

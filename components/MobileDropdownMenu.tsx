@@ -10,6 +10,7 @@ import {
   MoonIcon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
 import { useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,7 +22,8 @@ interface Props {
 }
 
 const MobileDropdownMenu = ({ toggleDropdown, navbar, cvHref }: Props) => {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = isDarkTheme(resolvedTheme);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -156,11 +158,11 @@ const MobileDropdownMenu = ({ toggleDropdown, navbar, cvHref }: Props) => {
         <div className="my-2 h-px bg-gray-200 dark:bg-gray-800" />
         <button
           onClick={() => {
-            setTheme(theme === "dark" ? "light" : "dark");
+            setTheme(isDark ? "solarized-light" : "fredrir");
           }}
           className="group flex items-center gap-2 rounded-lg px-3 py-2 text-gray-800 transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800"
         >
-          {theme === "dark" ? (
+          {isDark ? (
             <>
               <SunIcon className="h-5 w-5 text-amber-500 transition-transform duration-300 group-hover:rotate-45" />
               <span>{navbar.lightMode}</span>

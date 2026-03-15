@@ -27,7 +27,8 @@
         "description": "Ansvarleg for rettleiing av bachelorgrupper, fagleg oppfølging og evaluering av midtvegsprogresjon gjennom semesteret.",
         "date": "Januar 2026 - Juni 2026",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": true
       },
       {
         "id": 11,
@@ -36,7 +37,8 @@
         "description": "Studentassistent i emnet Ekspertar i team – Miljøpåverknad og vippepunkt. Fasiliterte tverrfagleg samarbeid og rettleidde studentar i å løyse verkelege problemstillingar.",
         "date": "Januar 2026 - Juni 2026",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": true
       },
       {
         "id": 12,
@@ -45,7 +47,8 @@
         "description": "Oppgåver knytte til rettleiing, gruppeleiing (inkludert øvingar, kollokviegrupper og seminar), samt evaluering.",
         "date": "Januar 2026 - Juni 2026",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": true
       },
       {
         "id": 9,
@@ -54,7 +57,8 @@
         "description": "Læringsassistent i emnet Datadriven programvare. Arbeidsoppgåver knytt til rettleiing, gruppeleiing (inkludert øvingar, kollokviegrupper og seminar) og evaluering.",
         "date": "August 2025 - Desember 2025",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 8,
@@ -63,27 +67,29 @@
         "description": "Tilbaud teknisk rettleiing i emnet Informatikk prosjektarbeid I. Halde tre vekentlege øvingstimar der eg rettleia studentane i utvikling og problemløysing knytt til Java- og Maven-baserte prosjekt.",
         "date": "August 2025 - Desember 2025",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 5,
         "jobTitle": "Utviklar",
         "company": "RIF - Rådgjevande Ingeniørar Forening",
         "description": "Designa og utvikla heimesida (rif.no) med Next.js, og integrerte Sanity som CMS. Utvikla eit integrert dashbord for spørjeundersøkingar og arrangementpåmelding med Next.js og PostgreSQL. Utvikla ei kampanjeside for rapporten Norges tilstand (norgestilstand.no).",
-        "date": "August 2024 - Nuvanande",
+        "date": "August 2024 - Nåverande",
         "lightModeImageUri": "/rif-logo.svg",
-        "darkModeImageUri": "/rif-logo-dark.svg"
+        "darkModeImageUri": "/rif-logo-dark.svg",
+        "isCurrent": true
       },
       {
         "id": 7,
         "jobTitle": "Læringsassistent i KJ2095",
         "company": "NTNU",
         "description": "Læringsassistent i faget “Eksperter i team - Miljøpåverknad og tålegrenser”. Tilrettelaga for tverrfagleg samarbeid og rettleidde studentar i problemløysing basert på verkelege utfordringar.",
-        "date": "Januar 2024 - Nuvanande",
+        "date": "Januar 2024 - Nåverande",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
-
       {
         "id": 6,
         "jobTitle": "Teknisk læringsassistent i IT1901",
@@ -91,7 +97,8 @@
         "description": "Tilboda teknisk rettleiing i faget Informatikk prosjektarbeid I. Heldt tre ukentlege øvingstimar der eg rettleidde studentane i utvikling og problemløysing knytt til Java- og Maven-baserte prosjekt.",
         "date": "August 2024 - Desember 2024",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 1,
@@ -100,7 +107,8 @@
         "description": "Utvikla ende-til-ende testar, som auka testdekninga til programvara. Oppretta regresjonstestdokumentasjon og gjennomførte manuell regresjonstesting. Deltok i daglege standups og sprintplanlegging i eit SCRUM-team,",
         "date": "Juni 2024 - Juli 2024",
         "lightModeImageUri": "/maritime-optima.svg",
-        "darkModeImageUri": "/maritime-optima-dark.svg"
+        "darkModeImageUri": "/maritime-optima-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 2,
@@ -109,7 +117,8 @@
         "description": "Ansvarleg for å leie eit team på 19 utviklarar, som var delt inn i ulike prosjekt. Hovudansvarleg for administrativt arbeid og for å leie ukentlege møte. Ansvarleg for å arrangere ukentlege arbeidsdagar på skulen og for opplæring av nye medlemmar.",
         "date": "Februar 2024 - Mars 2025",
         "lightModeImageUri": "/appkom.svg",
-        "darkModeImageUri": "/appkom-dark.svg"
+        "darkModeImageUri": "/appkom-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 3,
@@ -118,7 +127,8 @@
         "description": "Lei ut ukentlege øvingstimar, retta innleveringar og gav tilbakemeldingar til studentane.",
         "date": "August 2023 - Desember 2023",
         "lightModeImageUri": "/ntnu-logo.svg",
-        "darkModeImageUri": "/ntnu-logo-dark.svg"
+        "darkModeImageUri": "/ntnu-logo-dark.svg",
+        "isCurrent": false
       },
       {
         "id": 4,
@@ -127,7 +137,8 @@
         "description": "Oppretta detaljerte rapportar om verknaden av krigen i Ukraina og samla ei oversikt over skip mista ved ulovleg transport av russisk olje. Analyserte den globale utviklinga og identifiserte nye moglegheiter i tankfartsektoren. Assisterte med befraktninga av selskapet si flåte.",
         "date": "Juni 2023 - Juli 2023",
         "lightModeImageUri": "/nat-logo.png",
-        "darkModeImageUri": "/nat-logo.png"
+        "darkModeImageUri": "/nat-logo.png",
+        "isCurrent": false
       }
     ]
   },
@@ -245,5 +256,40 @@
   "footer": {
     "license1": "Alle rettar forbehalde.",
     "license2": "Lisensiert under MIT-lisensen."
+  },
+  "ui": {
+    "theme": "Tema",
+    "language": "Språk",
+    "wallpaper": "Bakgrunn",
+    "customImage": "Vel eige bilete...",
+    "nowPlaying": "SPELAR NÅ",
+    "lastPlayed": "SIST SPELT",
+    "track": "Spor",
+    "artist": "Artist",
+    "album": "Album",
+    "playInBrowser": "spel i nettlesar",
+    "hidePlayer": "gøym spelar",
+    "about": "Samandrag",
+    "techStack": "Avhengigheiter",
+    "links": "Sjå også",
+    "visitors": "besøkande",
+    "uptime": "oppetid",
+    "searchApps": "Søk etter applikasjonar...",
+    "noMatching": "Ingen treff",
+    "navigate": "naviger",
+    "open": "opne",
+    "close": "lukk",
+    "apps": "appar",
+    "tipLauncher": "applansering",
+    "tipDrag": "Dra titlar for å byte",
+    "tipResize": "Dra kantar for å endre storleik",
+    "entries": "oppføringar",
+    "projects": "prosjekt",
+    "images": "bilete",
+    "clickToOpen": "klikk for å opne",
+    "active": "aktiv",
+    "running": "køyrer",
+    "stopped": "stoppa",
+    "lastYear": "Siste år"
   }
 }

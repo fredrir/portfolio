@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
-import Contact from "@/components/HomePage/Contact/Contact";
-import Journey from "@/components/HomePage/Journey/Journey";
-import LandingComponent from "@/components/HomePage/Landing/LandingComponent";
-import Projects from "@/components/HomePage/Projects/Projects";
+import { WindowManager } from "@/components/WindowManager/WindowManager";
 import { localeParams } from "@/lib/locale/languageTypes";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getDictionary, locales } from "@/lib/locale/dictionaries";
 import { fetchGitHubData } from "@/lib/github";
 import { fetchSpotifyData } from "@/lib/spotify";
@@ -125,24 +120,17 @@ export default async function Home(props: { params: localeParams }) {
   ]);
 
   return (
-    <>
-      <Navbar navbar={dict.navbar} currentLocale={locale} />
-      <main className="flex-grow bg-fixed z-20">
-        <LandingComponent landing={dict.landing} locale={locale} />
-        <Journey journey={dict.journey} />
-        <Projects
-          title={dict.project.title}
-          projects={dict.project.projects}
-          viewCode={dict.project.viewCode}
-        />
-        <Contact
-          contact={dict.contact}
-          githubData={githubData}
-          spotifyData={spotifyData}
-          locale={locale}
-        />
-      </main>
-      <Footer license1={dict.footer.license1} license2={dict.footer.license2} />
-    </>
+    <WindowManager
+      locale={locale}
+      currentLocale={locale as "en" | "nb" | "nn" | "fr"}
+      navbar={dict.navbar}
+      landing={dict.landing}
+      journey={dict.journey}
+      project={dict.project}
+      contact={dict.contact}
+      ui={dict.ui}
+      githubData={githubData}
+      spotifyData={spotifyData}
+    />
   );
 }

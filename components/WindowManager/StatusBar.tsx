@@ -1,0 +1,217 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
+import { STATUS_BAR_HEIGHT } from "./constants";
+import type { WindowConfig, WindowStates } from "./types";
+import type { UiStrings } from "./WindowManager";
+import { computeUptime } from "@/components/Neofetch";
+import { useRecaptcha } from "@/components/RecaptchaProvider";
+import { recordVisit, getVisitorCount } from "@/app/actions/visitor";
+
+interface Props {
+  states: WindowStates;
+  allConfigs?: WindowConfig[];
+  locale: string;
+  ui: UiStrings;
+  focusedWindowId: string | null;
+  onOpenLauncher: () => void;
+  onOpenSettings: () => void;
+  onFocusWindow: (id: string) => void;
+}
+
+function Clock({ locale }: { locale: string }) {
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      setTime(
+        now.toLocaleTimeString(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }),
+      );
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [locale]);
+
+  return <span>{time}</span>;
+}
+
+function Weather() {
+  const [weather, setWeather] = useState<string | null>(null);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem("wm-weather");
+    if (stored) {
+      setWeather(stored);
+      return;
+    }
+    fetch("https://wttr.in/?format=%t+%C&m")
+      .then((r) => r.text())
+      .then((text) => {
+        const clean = text.trim().slice(0, 30);
+        setWeather(clean);
+        sessionStorage.setItem("wm-weather", clean);
+      })
+      .catch(() => setWeather(null));
+  }, []);
+
+  if (!weather) return null;
+  return <span>{weather}</span>;
+}
+
+function VisitorCount({ label }: { label: string }) {
+  const [count, setCount] = useState<number | null>(null);
+  const { executeRecaptcha } = useRecaptcha();
+
+  useEffect(() => {
+    const visited = sessionStorage.getItem("wm-visited");
+
+    if (visited) {
+      getVisitorCount().then(setCount).catch(() => setCount(null));
+      return;
+    }
+
+    if (!executeRecaptcha) return;
+
+    executeRecaptcha("page_visit")
+      .then((token) => recordVisit(token))
+      .then((result) => {
+        if (result.success) {
+          sessionStorage.setItem("wm-visited", "1");
+          setCount(result.count ?? 0);
+        } else {
+          getVisitorCount().then(setCount).catch(() => setCount(null));
+        }
+      })
+      .catch(() => {
+        getVisitorCount().then(setCount).catch(() => setCount(null));
+      });
+  }, [executeRecaptcha]);
+
+  if (count === null) return null;
+  return <span>{label}: {count}</span>;
+}
+
+export function StatusBar({
+  states,
+  allConfigs = [],
+  locale,
+  ui,
+  focusedWindowId,
+  onOpenLauncher,
+  onOpenSettings,
+  onFocusWindow,
+}: Props) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const dark = mounted && isDarkTheme(resolvedTheme);
+  const githubSrc = dark ? "/github-dark.svg" : "/github.svg";
+  const linkedInSrc = dark ? "/linkedin-dark.svg" : "/linkedin.svg";
+
+  return (
+    <div
+      className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-2 font-mono text-3xs border-t border-primary/15 bg-background/95 backdrop-blur-md select-none z-[9999]"
+      style={{ height: STATUS_BAR_HEIGHT }}
+    >
+      <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+        <button
+          onClick={onOpenLauncher}
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/15 text-primary hover:bg-primary/25 active:bg-primary/35 transition-all font-bold border border-primary/20 hover:border-primary/40 hover:shadow-sm hover:shadow-primary/10 shrink-0"
+        >
+          <span className="text-2xs font-extrabold tracking-tight">F</span>
+          <span className="text-3xs text-primary/70 hidden sm:inline">
+            FredOS
+          </span>
+        </button>
+
+        <div className="flex items-center gap-0.5 ml-1 min-w-0 overflow-x-auto scrollbar-none">
+          {allConfigs.map((config) => {
+            const isOpen = states[config.id]?.isOpen;
+            const isFocused = focusedWindowId === config.id;
+            return (
+              <button
+                key={config.id}
+                onClick={() => onFocusWindow(config.id)}
+                className={`px-1.5 py-0.5 flex items-center rounded transition-colors shrink-0 ${
+                  isFocused
+                    ? "text-primary bg-primary/10"
+                    : isOpen
+                      ? "text-muted-foreground/60 hover:text-primary hover:bg-primary/10"
+                      : "text-muted-foreground/25 hover:text-muted-foreground/50 hover:bg-primary/5"
+                }`}
+              >
+                {config.icon && <span className="mr-0.5">{config.icon}</span>}
+                <span className="hidden sm:inline">{config.id}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 text-muted-foreground/50">
+        <span className="text-primary/40 hidden sm:inline">
+          {ui.uptime}: {computeUptime()}
+        </span>
+
+        <Weather />
+        <VisitorCount label={ui.visitors} />
+
+        <div className="flex items-center gap-1.5">
+          <Link
+            href="https://www.linkedin.com/in/fredrir"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              src={linkedInSrc}
+              alt="LinkedIn"
+              width={12}
+              height={12}
+              className="opacity-50 hover:opacity-100 transition-opacity"
+            />
+          </Link>
+          <Link
+            href="https://www.github.com/fredrir"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              src={githubSrc}
+              alt="GitHub"
+              width={12}
+              height={12}
+              className="opacity-50 hover:opacity-100 transition-opacity"
+            />
+          </Link>
+        </div>
+
+        <button
+          onClick={onOpenSettings}
+          className="text-muted-foreground/40 hover:text-primary transition-colors text-xs"
+          title="Settings"
+        >
+          ⚙
+        </button>
+
+        <span className="text-primary/50">
+          <Clock locale={locale} />
+        </span>
+      </div>
+    </div>
+  );
+}

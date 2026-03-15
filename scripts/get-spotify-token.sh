@@ -36,7 +36,7 @@ echo "Using redirect URI: $REDIRECT_URI"
 echo ""
 echo "Open this URL in your browser:"
 echo ""
-echo "https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=user-read-currently-playing%20user-read-recently-played"
+echo "https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=user-read-currently-playing%20user-read-recently-played%20user-top-read"
 echo ""
 read -p "Paste the 'code' from the redirect URL: " AUTH_CODE
 

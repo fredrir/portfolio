@@ -4,6 +4,7 @@ import { HeartIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
 
 interface Props {
   license1: string;
@@ -18,14 +19,15 @@ interface FallingHeart {
 const Footer = ({ license1, license2 }: Props) => {
   const [hearts, setHearts] = useState<FallingHeart[]>([]);
   const [mounted, setMounted] = useState(false);
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const githubSrc = mounted && theme === "dark" ? "/github-dark.svg" : "/github.svg";
-  const linkedInSrc = mounted && theme === "dark" ? "/linkedin-dark.svg" : "/linkedin.svg";
+  const dark = mounted && isDarkTheme(resolvedTheme);
+  const githubSrc = dark ? "/github-dark.svg" : "/github.svg";
+  const linkedInSrc = dark ? "/linkedin-dark.svg" : "/linkedin.svg";
 
   const handleHeartClick = () => {
     const newHearts: FallingHeart[] = [];

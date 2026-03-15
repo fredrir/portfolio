@@ -1,0 +1,101 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { useTheme } from "next-themes";
+import { isDarkTheme } from "@/lib/themes";
+import type { journeyType } from "@/lib/types/types";
+import type { Journey } from "@/lib/locale/languageTypes";
+import type { UiStrings } from "../WindowManager";
+
+
+interface Props {
+  journey: Journey;
+  onOpenDetail: (journey: journeyType) => void;
+  ui: UiStrings;
+}
+
+function CompanyLogo({ journey }: { journey: journeyType }) {
+  const { resolvedTheme } = useTheme();
+  const [src, setSrc] = useState("");
+
+  useEffect(() => {
+    setSrc(
+      isDarkTheme(resolvedTheme) ? journey.darkModeImageUri : journey.lightModeImageUri,
+    );
+  }, [resolvedTheme, journey.darkModeImageUri, journey.lightModeImageUri]);
+
+  if (!src) return null;
+
+  return (
+    <div className="shrink-0 w-8 h-8 rounded-md overflow-hidden bg-background border border-primary/10 flex items-center justify-center p-1">
+      <Image
+        src={src}
+        alt={journey.company}
+        width={28}
+        height={28}
+        className="object-contain w-full h-full"
+      />
+    </div>
+  );
+}
+
+export function JourneyPane({ journey, onOpenDetail, ui }: Props) {
+  const sorted = [...journey.journeys].sort((a, b) => {
+    if (a.isCurrent && !b.isCurrent) return -1;
+    if (!a.isCurrent && b.isCurrent) return 1;
+    return 0;
+  });
+
+  return (
+    <div className="p-2 @sm:p-3 font-mono text-xs h-full flex flex-col">
+      <div className="text-muted-foreground/50 mb-2">
+        <span className="text-primary">$</span> cat ~/.career/log
+      </div>
+
+      <div className="flex-1 overflow-y-auto space-y-0.5 min-h-0">
+        {sorted.map((j: journeyType) => (
+          <button
+            key={j.id}
+            onClick={() => onOpenDetail(j)}
+            className="w-full text-left flex items-center gap-2 @sm:gap-2.5 py-1 @sm:py-1.5 px-1.5 @sm:px-2 rounded-md hover:bg-primary/5 transition-colors group"
+          >
+            <CompanyLogo journey={j} />
+
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-primary font-semibold truncate text-2xs @sm:text-xs group-hover:underline">
+                  {j.jobTitle}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-foreground/80 text-3xs @sm:text-2xs">
+                  {j.company}
+                </span>
+                <span className="text-muted-foreground/30 text-3xs @sm:text-2xs">•</span>
+                <span className="text-accent-yellow/60 text-3xs @sm:text-2xs">
+                  {j.date}
+                </span>
+              </div>
+            </div>
+
+            {j.isCurrent && (
+              <span className="text-primary/50 text-3xs @sm:text-2xs px-1 @sm:px-1.5 py-0.5 rounded bg-primary/8 shrink-0">
+                {ui.active}
+              </span>
+            )}
+
+            <span className="text-primary/20 group-hover:text-primary/50 transition-colors shrink-0">
+              ↗
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <div className="pt-1 border-t border-primary/10 text-muted-foreground/30 text-2xs mt-1 flex justify-between">
+        <span>{journey.journeys.length} {ui.entries}</span>
+        <span className="text-primary/30">{ui.clickToOpen}</span>
+      </div>
+    </div>
+  );
+}
