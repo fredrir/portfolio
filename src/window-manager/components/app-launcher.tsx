@@ -87,7 +87,7 @@ export function AppLauncher({ states, ui, onOpen, onClose }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent text-foreground text-sm outline-none placeholder:text-muted-foreground/30"
+            className="flex-1 bg-transparent text-foreground text-sm outline-hidden placeholder:text-muted-foreground/30"
             placeholder={ui.searchApps}
             autoComplete="off"
           />

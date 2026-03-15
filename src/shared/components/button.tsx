@@ -24,7 +24,7 @@ const Button = (props: Props) => {
     sizeClasses = "px-6 py-3 ";
   }
 
-  const className = `font-medium hover:scale-105 text-center justify-center transition-all rounded-lg shadow-sm focus:ring focus:ring-primary-200 inline-flex items-center gap-1.5 ${colorClasses} ${sizeClasses}`;
+  const className = `font-medium hover:scale-105 text-center justify-center transition-all rounded-lg shadow-xs focus:ring-3 focus:ring-primary-200 inline-flex items-center gap-1.5 ${colorClasses} ${sizeClasses}`;
 
   return (
     <button type="button" onClick={props.onClick} className={className}>

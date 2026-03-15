@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { projectType, UiStrings } from "@/shared/types";
+import { GithubLogoIcon } from "@phosphor-icons/react/dist/ssr";
 
 interface Props {
   project: projectType;
@@ -109,8 +110,8 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-3 py-2 rounded-md border border-primary/15 hover:border-primary/30 hover:bg-primary/5 transition-all group"
                 >
-                  <span className="text-primary/50 group-hover:text-primary">
-                    →
+                  <span>
+                    <GithubLogoIcon className="group-hover:fill-primary w-4 h-4 fill-primary" />
                   </span>
                   <span className="text-muted-foreground/70 group-hover:text-primary transition-colors text-xs">
                     {viewCode}

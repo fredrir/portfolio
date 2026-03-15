@@ -1,7 +1,8 @@
+import pkg from "../../package.json";
 import nextPkg from "next/package.json";
 import tailwindPkg from "tailwindcss/package.json";
 
-export const PORTFOLIO_VERSION = "3.0";
+export const PORTFOLIO_VERSION = pkg.version;
 
 export const NEXT_VERSION = nextPkg.version;
 

@@ -53,7 +53,7 @@ export function StatusBar({
       <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
         <button
           onClick={onOpenLauncher}
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/15 text-primary hover:bg-primary/25 active:bg-primary/35 transition-all font-bold border border-primary/20 hover:border-primary/40 hover:shadow-sm hover:shadow-primary/10 shrink-0"
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/15 text-primary hover:bg-primary/25 active:bg-primary/35 transition-all font-bold border border-primary/20 hover:border-primary/40 hover:shadow-xs hover:shadow-primary/10 shrink-0"
         >
           <span className="text-2xs font-extrabold tracking-tight">F</span>
           <span className="text-3xs text-primary/70 hidden sm:inline">

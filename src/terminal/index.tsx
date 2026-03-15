@@ -120,7 +120,7 @@ export function TerminalPane({ locale }: Props) {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1 bg-transparent text-foreground outline-none font-mono caret-primary min-w-0 text-xs"
+          className="flex-1 bg-transparent text-foreground outline-hidden font-mono caret-primary min-w-0 text-xs"
           placeholder="Type 'help' for commands..."
           autoComplete="off"
         />

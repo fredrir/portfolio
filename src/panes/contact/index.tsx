@@ -223,7 +223,7 @@ export function ContactPane({
     <div
       ref={containerRef}
       tabIndex={0}
-      className="flex-1 overflow-hidden flex flex-col outline-none h-full"
+      className="flex-1 overflow-hidden flex flex-col outline-hidden h-full"
     >
       <form
         ref={formRef}
@@ -255,7 +255,7 @@ export function ContactPane({
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-xs
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs
                   placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={contact.name}
                 autoComplete="off"
@@ -283,7 +283,7 @@ export function ContactPane({
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-xs
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs
                   placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={contact.email}
                 autoComplete="off"
@@ -310,7 +310,7 @@ export function ContactPane({
                 onFocus={() => handleFocus("phone")}
                 onBlur={() => setFocusedField(null)}
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-none font-mono text-xs
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs
                   placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={`${contact.phone} (optional)`}
                 autoComplete="off"
@@ -367,7 +367,7 @@ export function ContactPane({
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="w-full h-full min-h-36 bg-transparent text-foreground outline-none font-mono text-xs
+                className="w-full h-full min-h-36 bg-transparent text-foreground outline-hidden font-mono text-xs
                   resize-none p-2 leading-editor placeholder:text-muted-foreground/30 disabled:opacity-50"
                 placeholder={
                   vimMode === "normal"
