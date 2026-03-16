@@ -232,6 +232,12 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
   }, []);
 
   useEffect(() => {
+    if (!narrow && !loading && categories.length > 0 && activeCategory === null) {
+      setActiveCategory(categories[0].name);
+    }
+  }, [narrow, loading, categories, activeCategory]);
+
+  useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
