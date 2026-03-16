@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText } from "@phosphor-icons/react";
+import { Envelope, FileText, Phone } from "@phosphor-icons/react";
 import { AsciiAvatar } from "./components/ascii-avatar";
 import { TilingWmIcon } from "./components/tiling-wm-icon";
 import { BeerIcon } from "./components/beer-icon";
@@ -49,7 +49,7 @@ export function AboutPane({ locale = "en", viewResume, landing }: Props) {
         </div>
       </div>
       <div className="flex flex-row gap-2">
-        <div className="text-start mt-4 space-y-1.5 max-w-xs @lg:max-w-sm">
+        <div className="text-start flex flex-col h-full mt-4 space-y-1.5 max-w-xs @lg:max-w-sm">
           <h1 className="text-sm @md:text-base font-bold text-foreground">
             {landing.title}
             <span className="text-primary">{" <Fredrik/>"}</span>
@@ -57,6 +57,30 @@ export function AboutPane({ locale = "en", viewResume, landing }: Props) {
           <p className="text-muted-foreground text-3xs @xs:text-2xs @md:text-xs leading-relaxed">
             {landing.terminal.mainText}
           </p>
+          <div className="pt-1.5  space-y-2 mt-auto text-3xs @xs:text-2xs @md:text-xs">
+            <a
+              href="mailto:fhansteen@gmail.com"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors group/link"
+            >
+              <Envelope
+                weight="bold"
+                className="w-3 h-3 text-primary opacity-60 group-hover/link:opacity-100 transition-opacity"
+              />
+              <span className="text-primary/70">~</span>
+              fhansteen@gmail.com
+            </a>
+            <a
+              href="tel:+4747630231"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors group/link"
+            >
+              <Phone
+                weight="bold"
+                className="w-3 h-3 text-primary opacity-60 group-hover/link:opacity-100 transition-opacity"
+              />
+              <span className="text-primary/70">~</span>
+              +47 476 30 231
+            </a>
+          </div>
         </div>
       </div>
     </div>
