@@ -53,10 +53,6 @@ export function JourneyDetailPane({ journey }: Props) {
       <div className="border-t border-border-faint" />
 
       <div className="space-y-2">
-        <div className="text-xs text-muted-foreground uppercase tracking-wider">
-          description
-        </div>
-
         <p className="text-xs leading-relaxed text-muted-foreground">
           {journey.description}
         </p>
