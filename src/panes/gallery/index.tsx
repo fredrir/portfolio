@@ -76,104 +76,100 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
 
   const showBrowser = narrow && !activeCategory;
 
-  if (loading) {
-    return (
-      <div className="p-2 @xs:p-2.5 @sm:p-3 font-mono text-xs h-full flex items-center justify-center">
-        <span className="text-subtle animate-pulse">
-          {ui.searchingGallery}
-        </span>
-      </div>
-    );
-  }
-
-  if (categories.length === 0) {
-    return (
-      <div className="p-2 @xs:p-2.5 @sm:p-3 font-mono text-xs h-full flex flex-col items-center justify-center gap-2 text-subtle">
-        <FolderOpen size={28} />
-        <span>{ui.emptyGallery}</span>
-      </div>
-    );
-  }
-
   return (
     <div
       ref={containerRef}
       className="p-2 @xs:p-2.5 @sm:p-3 font-mono text-xs h-full flex flex-col @container"
     >
-      {!compact && (
-        <div className="text-faded mb-1.5 @sm:mb-2 shrink-0 flex items-center gap-1">
-          <Terminal size={12} className="text-primary" />
-          {activeCategory ? `ls ~/gallery/${activeCategory}/` : "ls ~/gallery/"}
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <span className="text-subtle animate-pulse">
+            {ui.searchingGallery}
+          </span>
         </div>
-      )}
-
-      {showBrowser ? (
-        <CategoryBrowser
-          categories={categories}
-          onSelect={handleSelectCategory}
-        />
+      ) : categories.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-2 text-subtle">
+          <FolderOpen size={28} />
+          <span>{ui.emptyGallery}</span>
+        </div>
       ) : (
         <>
-          {narrow && !selectedImage ? (
-            <div className="flex items-center gap-1.5 mb-1.5 shrink-0">
-              <button
-                onClick={handleBack}
-                className="text-primary-muted hover:text-primary active:text-primary transition-colors text-sm py-0.5 inline-flex items-center gap-1"
-              >
-                <ArrowLeft size={14} />
-                ~/gallery
-              </button>
-              <span className="text-ghost text-2xs">{activeCategory}/</span>
+          {!compact && (
+            <div className="text-faded mb-1.5 @sm:mb-2 shrink-0 flex items-center gap-1">
+              <Terminal size={12} className="text-primary" />
+              {activeCategory ? `ls ~/gallery/${activeCategory}/` : "ls ~/gallery/"}
             </div>
-          ) : narrow ? null : (
-            <CategoryTabs
+          )}
+
+          {showBrowser ? (
+            <CategoryBrowser
               categories={categories}
-              activeCategory={activeCategory}
               onSelect={handleSelectCategory}
             />
-          )}
-
-          {selectedImage ? (
-            <div className="flex-1 flex flex-col min-h-0">
-              <div className="flex items-center gap-2 mb-1 shrink-0">
-                <button
-                  onClick={() => setSelectedImage(null)}
-                  className={`text-primary-muted hover:text-primary active:text-primary transition-colors inline-flex items-center gap-1 ${narrow ? "text-sm py-1" : "text-2xs"}`}
-                >
-                  <ArrowLeft size={narrow ? 14 : 12} />
-                  {activeCategory}
-                </button>
-              </div>
-              <ImageDetail
-                image={selectedImage}
-                onSwipe={handleSwipe}
-                narrow={narrow}
-                currentIndex={
-                  currentCategory
-                    ? currentCategory.images.findIndex(
-                        (img) => img.src === selectedImage.src,
-                      )
-                    : 0
-                }
-                totalCount={currentCategory?.images.length ?? 0}
-              />
-            </div>
           ) : (
-            <ImageGrid
-              images={currentCategory?.images ?? []}
-              narrow={narrow}
-              compact={compact}
-              onSelect={setSelectedImage}
-            />
-          )}
+            <>
+              {narrow && !selectedImage ? (
+                <div className="flex items-center gap-1.5 mb-1.5 shrink-0">
+                  <button
+                    onClick={handleBack}
+                    className="text-primary-muted hover:text-primary active:text-primary transition-colors text-sm py-0.5 inline-flex items-center gap-1"
+                  >
+                    <ArrowLeft size={14} />
+                    ~/gallery
+                  </button>
+                  <span className="text-ghost text-2xs">{activeCategory}/</span>
+                </div>
+              ) : narrow ? null : (
+                <CategoryTabs
+                  categories={categories}
+                  activeCategory={activeCategory}
+                  onSelect={handleSelectCategory}
+                />
+              )}
 
-          {!compact && !narrow && (
-            <div className="pt-1 border-t border-border-faint text-ghost text-2xs mt-1 flex justify-between shrink-0">
-              <span>{currentCategory?.images.length ?? 0} images</span>
-              <span className="text-primary-subtle">
-                ~/gallery/{activeCategory}/
-              </span>
-            </div>
+              {selectedImage ? (
+                <div className="flex-1 flex flex-col min-h-0">
+                  <div className="flex items-center gap-2 mb-1 shrink-0">
+                    <button
+                      onClick={() => setSelectedImage(null)}
+                      className={`text-primary-muted hover:text-primary active:text-primary transition-colors inline-flex items-center gap-1 ${narrow ? "text-sm py-1" : "text-2xs"}`}
+                    >
+                      <ArrowLeft size={narrow ? 14 : 12} />
+                      {activeCategory}
+                    </button>
+                  </div>
+                  <ImageDetail
+                    image={selectedImage}
+                    onSwipe={handleSwipe}
+                    narrow={narrow}
+                    currentIndex={
+                      currentCategory
+                        ? currentCategory.images.findIndex(
+                            (img) => img.src === selectedImage.src,
+                          )
+                        : 0
+                    }
+                    totalCount={currentCategory?.images.length ?? 0}
+                  />
+                </div>
+              ) : (
+                <ImageGrid
+                  images={currentCategory?.images ?? []}
+                  narrow={narrow}
+                  compact={compact}
+                  onSelect={setSelectedImage}
+                />
+              )}
+
+              {!compact && !narrow && (
+                <div className="pt-1 border-t border-border-faint text-ghost text-2xs mt-1 flex justify-between shrink-0">
+                  <span>{currentCategory?.images.length ?? 0} images</span>
+                  <span className="text-primary-subtle">
+                    ~/gallery/{activeCategory}/
+                  </span>
+                </div>
+              )}
+            </>
           )}
         </>
       )}
