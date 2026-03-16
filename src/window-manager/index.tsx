@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useWindowManager } from "./hooks/use-window-manager";
 import { useBackground } from "./hooks/use-background";
+import { useIsMobile } from "@/shared/hooks/use-is-mobile";
 import { Window } from "./components/window";
 import { StatusBar } from "./components/status-bar";
 import { AppLauncher } from "./components/app-launcher";
@@ -74,7 +75,7 @@ export function WindowManager({
 }: Props) {
   const wm = useWindowManager();
   const bg = useBackground();
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const isMobile = useIsMobile();
   const [mobileActiveApp, _setMobileActiveApp] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
       return sessionStorage.getItem("mobileActiveApp");
@@ -94,13 +95,6 @@ export function WindowManager({
     title: string;
     content: React.ReactNode;
   } | null>(null);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
 
   const handleFocus = useCallback(
     (id: string) => {

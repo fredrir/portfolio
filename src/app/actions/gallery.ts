@@ -24,25 +24,7 @@ const SUPABASE_FOLDERS = [
 
 const STATIC_CATEGORIES: GalleryCategory[] = [
   {
-    name: "career",
-    images: [
-      "/gallery/career/appkom.svg",
-      "/gallery/career/appkom-dark.svg",
-      "/gallery/career/maritime-optima.svg",
-      "/gallery/career/maritime-optima-dark.svg",
-      "/gallery/career/nat-logo.png",
-      "/gallery/career/ntnu-logo.svg",
-      "/gallery/career/ntnu-logo-dark.svg",
-      "/gallery/career/rif-logo.svg",
-      "/gallery/career/rif-logo-dark.svg",
-    ].map((src) => ({
-      src,
-      originalSrc: src,
-      filename: src.split("/").pop() ?? "",
-    })),
-  },
-  {
-    name: "projects",
+    name: "Projects",
     images: [
       "/gallery/projects/appkom.png",
       "/gallery/projects/app-picture.png",

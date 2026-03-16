@@ -3,6 +3,7 @@
 import type React from "react";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useIsMobile } from "@/shared/hooks/use-is-mobile";
 
 interface TerminalSize {
   width: number;
@@ -25,7 +26,7 @@ export const useTerminalResize = ({ isExpanded }: UseTerminalResizeProps) => {
     width: 0,
     height: 0,
   });
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile() ?? false;
 
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -33,15 +34,6 @@ export const useTerminalResize = ({ isExpanded }: UseTerminalResizeProps) => {
   const MIN_HEIGHT = 200;
   const MAX_WIDTH = 1200;
   const MAX_HEIGHT = 800;
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   useEffect(() => {
     const updateSize = () => {
