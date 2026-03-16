@@ -41,7 +41,11 @@ export class CommandProcessor {
   private isStandalone: boolean;
   private t: TerminalStrings;
 
-  constructor(config?: FileSystemConfig, isStandalone = false, locale?: string) {
+  constructor(
+    config?: FileSystemConfig,
+    isStandalone = false,
+    locale?: string,
+  ) {
     this.fileSystemManager = new FileSystemManager(config);
     this.paneIds = config?.paneIds ?? [];
     this.isStandalone = isStandalone;
@@ -59,7 +63,7 @@ export class CommandProcessor {
       case "help": {
         const maxLen = Math.max(...COMMANDS.map((c) => c.name.length));
         const lines = COMMANDS.map(
-          (c) => `  ${c.name.padEnd(maxLen + 2)} ${this.t[c.descKey]}`
+          (c) => `  ${c.name.padEnd(maxLen + 2)} ${this.t[c.descKey]}`,
         );
         return {
           output: {

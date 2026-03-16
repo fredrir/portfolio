@@ -1,7 +1,10 @@
 import type { FileSystemNode, FileSystemConfig } from "./types";
 
 function toFileName(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 export function createFileSystem(config?: FileSystemConfig): FileSystemNode {
@@ -31,11 +34,11 @@ export function createFileSystem(config?: FileSystemConfig): FileSystemNode {
   const careerChildren: Record<string, FileSystemNode> = {};
   if (config?.careers) {
     for (const c of config.careers) {
-      const name = toFileName(`${c.jobTitle}-${c.company}`);
+      const name = toFileName(`${c.company}`);
       careerChildren[name] = {
         name,
         type: "file",
-        content: `${c.jobTitle} @ ${c.company}`,
+        content: `${c.company}`,
       };
     }
   }
@@ -198,9 +201,7 @@ export class FileSystemManager {
     }
 
     const combined =
-      currentPath === "/"
-        ? `/${inputPath}`
-        : `${currentPath}/${inputPath}`;
+      currentPath === "/" ? `/${inputPath}` : `${currentPath}/${inputPath}`;
     return this.normalizePath(combined);
   }
 
@@ -249,7 +250,7 @@ export class FileSystemManager {
     return (
       items
         .map((item) =>
-          item.type === "directory" ? `📁 ${item.name}` : `📄 ${item.name}`
+          item.type === "directory" ? `📁 ${item.name}` : `📄 ${item.name}`,
         )
         .join("\n") || "(empty directory)"
     );
@@ -299,7 +300,8 @@ export class FileSystemManager {
       .map((name) => {
         const child = dirNode.children![name];
         const inputLastSlash = partialPath.lastIndexOf("/");
-        const inputDir = inputLastSlash >= 0 ? partialPath.slice(0, inputLastSlash + 1) : "";
+        const inputDir =
+          inputLastSlash >= 0 ? partialPath.slice(0, inputLastSlash + 1) : "";
         return inputDir + name + (child.type === "directory" ? "/" : "");
       });
   }
