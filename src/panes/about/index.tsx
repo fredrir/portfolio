@@ -50,7 +50,7 @@ export function AboutPane({ locale = "en", viewResume, landing }: Props) {
       </div>
       <div className="flex flex-row gap-2">
         <div className="text-start mt-4 space-y-1.5 max-w-xs @lg:max-w-sm">
-          <h1 className="text-xs @sm:text-sm @md:text-base font-bold text-foreground">
+          <h1 className="text-sm @md:text-base font-bold text-foreground">
             {landing.title}
             <span className="text-primary">{" <Fredrik/>"}</span>
           </h1>
