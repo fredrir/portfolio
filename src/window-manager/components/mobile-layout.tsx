@@ -48,7 +48,7 @@ export function MobileLayout({
   }, [activeApp, setBackAction, setSubtitle]);
 
   return (
-    <div className="fixed inset-0 flex flex-col" style={{ paddingBottom: 72 }}>
+    <div className="fixed inset-0 flex flex-col" style={{ paddingBottom: 80 }}>
       <AnimatePresence mode="wait">
         {activeApp === null ? (
           <motion.div

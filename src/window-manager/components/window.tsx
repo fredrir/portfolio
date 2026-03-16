@@ -46,7 +46,7 @@ export function Window({
       onMouseDown={onFocus}
     >
       <div
-        className="flex items-center justify-between px-3 py-1.5 border-b border-wm-border bg-surface-faint shrink-0 cursor-grab active:cursor-grabbing select-none"
+        className="flex items-center justify-between px-3 py-0.5 border-b border-wm-border bg-surface-faint shrink-0 cursor-grab active:cursor-grabbing select-none"
         onMouseDown={(e) => {
           if (e.button !== 0) return;
           onTitleMouseDown(config.id, e);

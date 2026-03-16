@@ -114,7 +114,7 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
   return (
     <div
       ref={containerRef}
-      className="p-2 @xs:p-2.5 @sm:p-3 font-mono text-xs h-full flex flex-col @container"
+      className="p-3 @xs:p-2.5 @sm:p-3 font-mono text-xs h-full flex flex-col @container"
     >
       {loading ? (
         <div className="flex-1 flex items-center justify-center">

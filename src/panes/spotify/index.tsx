@@ -10,6 +10,8 @@ import { TopArtists } from "./components/top-artists";
 import { RecentTracks } from "./components/recent-tracks";
 import { getSpotifyData } from "@/app/actions/spotify";
 import type { SpotifyData, UiStrings } from "@/shared/types";
+import { PauseIcon } from "@phosphor-icons/react/dist/ssr";
+import { PlayIcon } from "@phosphor-icons/react";
 
 export function SpotifyPane({
   initialData,
@@ -174,7 +176,11 @@ export function SpotifyPane({
                   <div className="min-w-0 space-y-0.5 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-primary font-semibold">
-                        {displayData.isPlaying ? "▶" : "⏸"}
+                        {displayData.isPlaying ? (
+                          <PlayIcon className="h-3 w-3 fill-primary-muted" />
+                        ) : (
+                          <PauseIcon className="h-3 w-3 fill-primary-muted" />
+                        )}
                       </span>
                       <span className="text-faded">
                         {displayData.isPlaying

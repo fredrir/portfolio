@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import {
-  UserCircle,
+  UserIcon,
   EnvelopeSimple,
   Terminal,
   GearSix,
@@ -22,7 +22,7 @@ interface Props {
 const DOCK_IDS = ["about", "contact", "home", "terminal", "settings"] as const;
 
 const DOCK_ICONS: Record<string, React.ReactNode> = {
-  about: <UserCircle size={20} weight="bold" />,
+  about: <UserIcon size={20} weight="bold" />,
   contact: <EnvelopeSimple size={20} weight="bold" />,
   home: <House size={22} weight="bold" />,
   terminal: <Terminal size={20} weight="bold" />,
@@ -66,7 +66,8 @@ function makeClipPath(center: number, flat: boolean): string {
 
 export function MobileDock({ activeApp, onOpenApp, onGoHome, ui }: Props) {
   const activeId = activeApp ?? "home";
-  const hasDockActive = activeApp === null || (DOCK_IDS as readonly string[]).includes(activeApp);
+  const hasDockActive =
+    activeApp === null || (DOCK_IDS as readonly string[]).includes(activeApp);
   const bulgeCenter = DOCK_CENTERS[activeId] ?? 50;
   const svgPath = makePath(bulgeCenter, !hasDockActive);
   const clipPath = makeClipPath(bulgeCenter, !hasDockActive);

@@ -1,11 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { FileText } from "@phosphor-icons/react";
+import { AsciiAvatar } from "./components/ascii-avatar";
 import { TilingWmIcon } from "./components/tiling-wm-icon";
 import { BeerIcon } from "./components/beer-icon";
 import { DirewolfIcon } from "./components/direwolf-icon";
 import { TerminalConfigIcon } from "./components/terminal-config-icon";
+import Image from "next/image";
 
 const CV_URLS: Record<string, string> = {
   en: "/cv-en.pdf",
@@ -41,28 +42,22 @@ export function AboutPane({ locale = "en", viewResume, landing }: Props) {
         </div>
 
         <div className="group">
-          <div className="absolute -inset-1.5 rounded-2xl bg-surface-elevated blur-lg group-hover:bg-surface-strong transition-all" />
-          <div className="relative rounded-2xl overflow-hidden w-24 h-24 @xs:w-28 @xs:h-28 @md:w-36 @md:h-36 @lg:w-40 @lg:h-40 border-2 border-control-border-hover shadow-lg shadow-wm-shadow transition-all">
-            <Image
-              src="/Fredrik_Carsten_Hansteen.png"
-              alt="Fredrik Carsten Hansteen"
-              priority
-              width={256}
-              height={256}
-              className="object-cover w-full h-full"
-            />
+          <div className="absolute -inset-1.5 " />
+          <div className="relative  p-2 @md:p-3 transition-all">
+            <AsciiAvatar />
           </div>
         </div>
       </div>
-
-      <div className="text-start mt-4 space-y-1.5 max-w-xs @lg:max-w-sm">
-        <h1 className="text-xs @sm:text-sm @md:text-base font-bold text-foreground">
-          {landing.title}
-          <span className="text-primary">{" <Fredrik/>"}</span>
-        </h1>
-        <p className="text-muted-foreground text-3xs @xs:text-2xs @md:text-xs leading-relaxed">
-          {landing.terminal.mainText}
-        </p>
+      <div className="flex flex-row gap-2">
+        <div className="text-start mt-4 space-y-1.5 max-w-xs @lg:max-w-sm">
+          <h1 className="text-xs @sm:text-sm @md:text-base font-bold text-foreground">
+            {landing.title}
+            <span className="text-primary">{" <Fredrik/>"}</span>
+          </h1>
+          <p className="text-muted-foreground text-3xs @xs:text-2xs @md:text-xs leading-relaxed">
+            {landing.terminal.mainText}
+          </p>
+        </div>
       </div>
     </div>
   );

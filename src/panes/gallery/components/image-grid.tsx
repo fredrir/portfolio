@@ -16,7 +16,7 @@ export function ImageGrid({
   return (
     <div className="flex-1 overflow-y-auto min-h-0">
       <div
-        className={`grid gap-2 ${
+        className={`grid gap-3 ${
           narrow
             ? "grid-cols-2"
             : compact

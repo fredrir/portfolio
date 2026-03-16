@@ -76,8 +76,8 @@ export function ImageDetail({
   );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 gap-1">
-      <div className="flex-1 min-h-0 rounded-md overflow-hidden border border-control-border bg-black/20 relative">
+    <div className="flex-1 flex flex-col min-h-0 gap-1 relative">
+      <div className="flex-1 min-h-0 rounded-md overflow-hidden relative border border-control-border bg-black/20">
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div
             key={image.src}
@@ -105,26 +105,26 @@ export function ImageDetail({
             />
           </motion.div>
         </AnimatePresence>
-        {onSwipe && (
-          <>
-            <button
-              onClick={() => hasPrev && onSwipe("right")}
-              className={`absolute left-1.5 top-1/2 -translate-y-1/2 z-10 font-mono text-sm px-2 py-3 rounded bg-black/60 backdrop-blur-sm border border-white/10 transition-all ${hasPrev ? "text-primary hover:text-primary-bold hover:bg-black/80 active:scale-95" : "text-white/20 pointer-events-none"}`}
-            >
-              <CaretLeft weight="bold" />
-            </button>
-            <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-10 font-mono text-2xs tabular-nums px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm border border-white/10 text-white/50">
-              [{currentIndex + 1}/{totalCount}]
-            </span>
-            <button
-              onClick={() => hasNext && onSwipe("left")}
-              className={`absolute right-1.5 top-1/2 -translate-y-1/2 z-10 font-mono text-sm px-2 py-3 rounded bg-black/60 backdrop-blur-sm border border-white/10 transition-all ${hasNext ? "text-primary hover:text-primary-bold hover:bg-black/80 active:scale-95" : "text-white/20 pointer-events-none"}`}
-            >
-              <CaretRight weight="bold" />
-            </button>
-          </>
-        )}
       </div>
+      {onSwipe && (
+        <>
+          <button
+            onClick={() => hasPrev && onSwipe("right")}
+            className={`absolute left-1.5 top-1/2 -translate-y-1/2 z-10 font-mono text-sm px-2 py-3 rounded bg-black/60 backdrop-blur-sm border border-white/10 transition-all ${hasPrev ? "text-primary hover:text-primary-bold hover:bg-black/80 active:scale-95" : "text-white/20 pointer-events-none"}`}
+          >
+            <CaretLeft weight="bold" />
+          </button>
+          <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-10 font-mono text-2xs tabular-nums px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm border border-white/10 text-white/50">
+            [{currentIndex + 1}/{totalCount}]
+          </span>
+          <button
+            onClick={() => hasNext && onSwipe("left")}
+            className={`absolute right-1.5 top-1/2 -translate-y-1/2 z-10 font-mono text-sm px-2 py-3 rounded bg-black/60 backdrop-blur-sm border border-white/10 transition-all ${hasNext ? "text-primary hover:text-primary-bold hover:bg-black/80 active:scale-95" : "text-white/20 pointer-events-none"}`}
+          >
+            <CaretRight weight="bold" />
+          </button>
+        </>
+      )}
 
       <div className="shrink-0 min-h-[1.25rem] flex pt-2 flex-wrap gap-x-3 gap-y-0.5 text-2xs text-faded px-0.5">
         {exifLoading && <span className="animate-pulse">...</span>}
