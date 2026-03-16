@@ -1,0 +1,275 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useAnalyticsConsent } from "./analytics-consent-provider";
+import Neofetch, {
+  type NeofetchInfoLine,
+  getDefaultInfo,
+} from "@/shared/components/neofetch";
+
+interface CookieConsentBannerProps {
+  locale?: string;
+}
+
+const content = {
+  en: {
+    prompt: "Fredrik Hansteen needs your cookies",
+    accept: "[Y] accept",
+    decline: "[n] decline",
+    info: "[i] info",
+    gdprTitle: "GDPR / Privacy Information",
+    gdprLines: [
+      "Data controller: Fredrik Carsten Hansteen (fhansteen@gmail.com)",
+      "Data collected: anonymous page views, web vitals, and referrer data",
+      "Provider: Vercel Inc. (San Francisco, CA)",
+      "No personal identifiers, IP addresses, or tracking cookies are stored",
+      "All data is aggregated and anonymized before storage",
+      "Legal basis: Art. 6(1)(a) GDPR / Norwegian Personal Data Act (Personopplysningsloven)",
+      "You may withdraw consent at any time by clearing your browser cookies",
+      "Right to complain: Datatilsynet (Norwegian Data Protection Authority) — datatilsynet.no",
+      "Data retention: Aggregated analytics only; no personal data is stored",
+    ],
+    gdprBack: "[q] back",
+    cookieLine: "pending...",
+  },
+  nb: {
+    prompt: "Fredrik Hansteen trenger dine informasjonskapsler",
+    accept: "[Y] godta",
+    decline: "[n] avslå",
+    info: "[i] info",
+    gdprTitle: "GDPR / Personverninformasjon",
+    gdprLines: [
+      "Behandlingsansvarlig: Fredrik Carsten Hansteen (fhansteen@gmail.com)",
+      "Data som samles inn: anonyme sidevisninger, web vitals og referansedata",
+      "Leverandør: Vercel Inc. (San Francisco, CA)",
+      "Ingen personlige identifikatorer, IP-adresser eller sporingskapsler lagres",
+      "All data er aggregert og anonymisert før lagring",
+      "Rettslig grunnlag: Art. 6(1)(a) GDPR / Personopplysningsloven § 1",
+      "Du kan trekke samtykket tilbake når som helst ved å slette nettleserens informasjonskapsler",
+      "Klagerett: Datatilsynet — datatilsynet.no",
+      "Lagringstid: Kun aggregerte analysedata; ingen personopplysninger lagres",
+    ],
+    gdprBack: "[q] tilbake",
+    cookieLine: "venter...",
+  },
+  nn: {
+    prompt: "Fredrik Hansteen treng dine informasjonskapslar",
+    accept: "[Y] godta",
+    decline: "[n] avslå",
+    info: "[i] info",
+    gdprTitle: "GDPR / Personverninformasjon",
+    gdprLines: [
+      "Behandlingsansvarleg: Fredrik Carsten Hansteen (fhansteen@gmail.com)",
+      "Data som vert samla inn: anonyme sidevisingar, web vitals og referansedata",
+      "Leverandør: Vercel Inc. (San Francisco, CA)",
+      "Ingen personlege identifikatorar, IP-adresser eller sporingskapslar vert lagra",
+      "All data er aggregert og anonymisert før lagring",
+      "Rettsleg grunnlag: Art. 6(1)(a) GDPR / Personopplysningslova § 1",
+      "Du kan trekkje samtykket tilbake når som helst ved å slette nettlesaren sine informasjonskapslar",
+      "Klagerett: Datatilsynet — datatilsynet.no",
+      "Lagringstid: Berre aggregerte analysedata; ingen personopplysningar vert lagra",
+    ],
+    gdprBack: "[q] tilbake",
+    cookieLine: "ventar...",
+  },
+  fr: {
+    prompt: "Fredrik Hansteen a besoin de vos cookies",
+    accept: "[Y] accepter",
+    decline: "[n] refuser",
+    info: "[i] info",
+    gdprTitle: "RGPD / Confidentialité",
+    gdprLines: [
+      "Responsable du traitement : Fredrik Carsten Hansteen (fhansteen@gmail.com)",
+      "Données collectées : pages vues anonymes, web vitals et données de référence",
+      "Fournisseur : Vercel Inc. (San Francisco, CA)",
+      "Aucun identifiant personnel, adresse IP ou cookie de suivi n'est stocké",
+      "Toutes les données sont agrégées et anonymisées avant stockage",
+      "Base juridique : Art. 6(1)(a) RGPD / Loi norvégienne sur les données personnelles (Personopplysningsloven)",
+      "Vous pouvez retirer votre consentement à tout moment en supprimant les cookies de votre navigateur",
+      "Droit de réclamation : Datatilsynet (Autorité norvégienne de protection des données) — datatilsynet.no",
+      "Conservation des données : Données analytiques agrégées uniquement ; aucune donnée personnelle n'est stockée",
+    ],
+    gdprBack: "[q] retour",
+    cookieLine: "en attente...",
+  },
+};
+
+function getCookieInfo(
+  locale: string,
+  cookieValue: string,
+): NeofetchInfoLine[] {
+  return [...getDefaultInfo(locale), { label: "Cookies", value: cookieValue }];
+}
+
+export function CookieConsentBanner({
+  locale = "en",
+}: CookieConsentBannerProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showNeofetch, setShowNeofetch] = useState(false);
+  const [typed, setTyped] = useState("");
+  const [showGdpr, setShowGdpr] = useState(false);
+  const { setConsent } = useAnalyticsConsent();
+
+  const text = content[locale as keyof typeof content] || content.en;
+  const fullPrompt = text.prompt;
+
+  useEffect(() => {
+    const consent = localStorage.getItem("vercel-analytics-consent");
+    if (!consent) {
+      setTimeout(() => setIsVisible(true), 800);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    const t = setTimeout(() => setShowNeofetch(true), 200);
+    return () => clearTimeout(t);
+  }, [isVisible]);
+
+  useEffect(() => {
+    if (!showNeofetch) return;
+    const delay = setTimeout(() => {
+      let i = 0;
+      const interval = setInterval(() => {
+        setTyped(fullPrompt.slice(0, i + 1));
+        i++;
+        if (i >= fullPrompt.length) clearInterval(interval);
+      }, 18);
+      return () => clearInterval(interval);
+    }, 600);
+    return () => clearTimeout(delay);
+  }, [showNeofetch, fullPrompt]);
+
+  const doneTyping = typed.length >= fullPrompt.length;
+
+  useEffect(() => {
+    if (!isVisible || !doneTyping) return;
+    const handler = (e: KeyboardEvent) => {
+      if (showGdpr) {
+        if (e.key === "q" || e.key === "Q" || e.key === "Escape") {
+          setShowGdpr(false);
+        }
+        return;
+      }
+      if (e.key === "y" || e.key === "Y" || e.key === "Enter") {
+        handleAccept();
+      } else if (e.key === "n" || e.key === "N" || e.key === "Escape") {
+        handleDecline();
+      } else if (e.key === "i" || e.key === "I") {
+        setShowGdpr(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible, doneTyping, showGdpr]);
+
+  const handleAccept = () => {
+    setConsent(true);
+    setIsAnimating(true);
+    setTimeout(() => setIsVisible(false), 250);
+  };
+
+  const handleDecline = () => {
+    setConsent(false);
+    setIsAnimating(true);
+    setTimeout(() => setIsVisible(false), 250);
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed bottom-4 right-4 sm:max-w-2xl z-50">
+      <div
+        className={`
+          font-mono text-sm transition-all duration-250 ease-out
+          ${isAnimating ? "translate-y-4 opacity-0" : "translate-y-0 opacity-100"}
+        `}
+      >
+        <div className="rounded-md border border-control-border-hover bg-glass-heavy backdrop-blur-sm shadow-lg shadow-wm-shadow-soft overflow-hidden">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-border-medium bg-surface-dim">
+            <div className="w-2.5 h-2.5 rounded-full bg-terminal-close" />
+            <div className="w-2.5 h-2.5 rounded-full bg-terminal-minimize" />
+            <div className="w-2.5 h-2.5 rounded-full bg-terminal-maximize" />
+            <span className="ml-2 text-xs text-muted-foreground">
+              fredrir@:hansteen:~ (zsh)
+            </span>
+          </div>
+
+          <div className="p-3 space-y-3">
+            {showNeofetch && (
+              <div className="pb-1 border-b border-border-faint">
+                <Neofetch
+                  info={getCookieInfo(locale, text.cookieLine)}
+                  animate={true}
+                />
+              </div>
+            )}
+
+            {showNeofetch && (
+              <div className="flex gap-2">
+                <span className="text-primary shrink-0">$</span>
+                <span className="text-foreground">
+                  {typed}
+                  {!doneTyping && (
+                    <span className="inline-block w-1.5 h-4 bg-primary-bold align-middle animate-pulse ml-px" />
+                  )}
+                </span>
+              </div>
+            )}
+
+            {showGdpr && (
+              <div className="border border-border-medium rounded px-3 py-2 space-y-1.5 bg-surface-dim max-h-64 overflow-y-auto">
+                <div className="text-primary text-xs font-bold">
+                  {text.gdprTitle}
+                </div>
+                {text.gdprLines.map((line, i) => (
+                  <div
+                    key={i}
+                    className="flex gap-2 text-xs text-muted-foreground"
+                  >
+                    <span className="text-primary-soft shrink-0">·</span>
+                    <span>{line}</span>
+                  </div>
+                ))}
+                <div className="pt-1">
+                  <button
+                    onClick={() => setShowGdpr(false)}
+                    className="text-xs text-readable hover:text-muted-foreground hover:underline underline-offset-2 transition-colors"
+                  >
+                    {text.gdprBack}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {doneTyping && (
+              <div className="flex items-center gap-3 pt-1">
+                <span className="text-primary shrink-0">$</span>
+                <button
+                  onClick={handleAccept}
+                  className="text-primary hover:text-primary-bold hover:underline underline-offset-2 transition-colors"
+                >
+                  {text.accept}
+                </button>
+                <button
+                  onClick={handleDecline}
+                  className="text-muted-foreground hover:text-foreground hover:underline underline-offset-2 transition-colors"
+                >
+                  {text.decline}
+                </button>
+                <button
+                  onClick={() => setShowGdpr((v) => !v)}
+                  className="text-readable hover:text-muted-foreground hover:underline underline-offset-2 transition-colors ml-auto"
+                >
+                  {text.info}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
