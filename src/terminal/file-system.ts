@@ -1,152 +1,167 @@
-import { FileSystemNode } from "./types";
+import type { FileSystemNode, FileSystemConfig } from "./types";
 
-export const createFileSystem = (): FileSystemNode => ({
-  name: "/",
-  type: "directory",
-  children: {
-    home: {
-      name: "home",
-      type: "directory",
-      children: {
-        fredrik: {
-          name: "fredrik",
-          type: "directory",
-          children: {
-            documents: {
-              name: "documents",
-              type: "directory",
-              children: {
-                "readme.txt": {
-                  name: "readme.txt",
-                  type: "file",
-                  content: "Welcome to FredrikOS!\n",
-                },
-                secret: {
-                  name: "secret",
-                  type: "directory",
-                  children: {
-                    "super-secret": {
-                      name: "super-secret",
-                      type: "directory",
-                      children: {
-                        "flag.txt": {
-                          name: "flag.txt",
-                          type: "file",
-                          content: "FLAG{congrats_you_found_me}",
+function toFileName(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+export function createFileSystem(config?: FileSystemConfig): FileSystemNode {
+  const appsChildren: Record<string, FileSystemNode> = {};
+  if (config?.paneIds) {
+    for (const id of config.paneIds) {
+      appsChildren[id] = {
+        name: id,
+        type: "file",
+        content: `Application: ${id}`,
+      };
+    }
+  }
+
+  const projectsChildren: Record<string, FileSystemNode> = {};
+  if (config?.projects) {
+    for (const p of config.projects) {
+      const name = toFileName(p.title);
+      projectsChildren[name] = {
+        name,
+        type: "file",
+        content: p.title,
+      };
+    }
+  }
+
+  const careerChildren: Record<string, FileSystemNode> = {};
+  if (config?.careers) {
+    for (const c of config.careers) {
+      const name = toFileName(`${c.jobTitle}-${c.company}`);
+      careerChildren[name] = {
+        name,
+        type: "file",
+        content: `${c.jobTitle} @ ${c.company}`,
+      };
+    }
+  }
+
+  return {
+    name: "/",
+    type: "directory",
+    children: {
+      home: {
+        name: "home",
+        type: "directory",
+        children: {
+          fredrik: {
+            name: "fredrik",
+            type: "directory",
+            children: {
+              apps: {
+                name: "apps",
+                type: "directory",
+                children: appsChildren,
+              },
+              documents: {
+                name: "documents",
+                type: "directory",
+                children: {
+                  projects: {
+                    name: "projects",
+                    type: "directory",
+                    children: projectsChildren,
+                  },
+                  career: {
+                    name: "career",
+                    type: "directory",
+                    children: careerChildren,
+                  },
+                  secret: {
+                    name: "secret",
+                    type: "directory",
+                    children: {
+                      "super-secret": {
+                        name: "super-secret",
+                        type: "directory",
+                        children: {
+                          "flag.txt": {
+                            name: "flag.txt",
+                            type: "file",
+                            content: "FLAG{congrats_you_found_me}",
+                          },
                         },
                       },
                     },
                   },
                 },
               },
-            },
-            projects: {
-              name: "projects",
-              type: "directory",
-              children: {
-                portfolio: {
-                  name: "portfolio",
-                  type: "directory",
-                  children: {
-                    LICENSE: {
-                      name: "LICENSE",
-                      type: "file",
-                      content: `MIT License\n\nCopyright (c) ${new Date().getFullYear()} Fredrik Carsten Hansteen\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.`,
-                    },
-
-                    "package.json": {
-                      name: "package.json",
-                      type: "file",
-                      content:
-                        '{\n  "name": "portfolio",\n  "version": "1.0.0"\n}',
-                    },
-                    app: {
-                      name: "app",
-                      type: "directory",
-                      children: {
-                        "page.tsx": {
-                          name: "page.tsx",
-                          type: "file",
-                          content:
-                            "export default function Page() {\n  return <div>Welcome to my portfolio!</div>;\n}",
-                        },
-                      },
-                    },
-                  },
-                },
+              "profile.txt": {
+                name: "profile.txt",
+                type: "file",
+                content:
+                  "Fredrik Carsten Hansteen - Developer of FredrikOS\n" +
+                  "Contact: fhansteen@gmail.com",
+              },
+              ".bashrc": {
+                name: ".bashrc",
+                type: "file",
+                content:
+                  "# ~/.bashrc\nexport PATH=$PATH:/usr/local/bin\nalias ll='ls -la'\nalias la='ls -A'",
               },
             },
-            "profile.txt": {
-              name: "profile.txt",
-              type: "file",
-              content:
-                "Fredrik Carsten Hansteen - Developer of FredrikOS\n" +
-                "Contact: fhansteen@gmail.com",
+          },
+        },
+      },
+      usr: {
+        name: "usr",
+        type: "directory",
+        children: {
+          bin: {
+            name: "bin",
+            type: "directory",
+            children: {
+              node: {
+                name: "node",
+                type: "file",
+                content: "Node.js executable",
+              },
             },
-            ".bashrc": {
-              name: ".bashrc",
-              type: "file",
-              content:
-                "# ~/.bashrc\nexport PATH=$PATH:/usr/local/bin\nalias ll='ls -la'\nalias la='ls -A'",
+          },
+          local: {
+            name: "local",
+            type: "directory",
+            children: {
+              bin: {
+                name: "bin",
+                type: "directory",
+                children: {},
+              },
+            },
+          },
+        },
+      },
+      var: {
+        name: "var",
+        type: "directory",
+        children: {
+          log: {
+            name: "log",
+            type: "directory",
+            children: {
+              "system.log": {
+                name: "system.log",
+                type: "file",
+                content:
+                  "[2024-01-15 10:30:15] System started\n[2024-01-15 10:30:16] Terminal initialized\n[2024-01-15 10:30:17] Ready for commands",
+              },
             },
           },
         },
       },
     },
-    usr: {
-      name: "usr",
-      type: "directory",
-      children: {
-        bin: {
-          name: "bin",
-          type: "directory",
-          children: {
-            node: {
-              name: "node",
-              type: "file",
-              content: "Node.js executable",
-            },
-          },
-        },
-        local: {
-          name: "local",
-          type: "directory",
-          children: {
-            bin: {
-              name: "bin",
-              type: "directory",
-              children: {},
-            },
-          },
-        },
-      },
-    },
-    var: {
-      name: "var",
-      type: "directory",
-      children: {
-        log: {
-          name: "log",
-          type: "directory",
-          children: {
-            "system.log": {
-              name: "system.log",
-              type: "file",
-              content:
-                "[2024-01-15 10:30:15] System started\n[2024-01-15 10:30:16] Terminal initialized\n[2024-01-15 10:30:17] Ready for commands",
-            },
-          },
-        },
-      },
-    },
-  },
-});
+  };
+}
 
 export class FileSystemManager {
   private fileSystem: FileSystemNode;
 
-  constructor() {
-    this.fileSystem = createFileSystem();
+  constructor(config?: FileSystemConfig) {
+    this.fileSystem = createFileSystem(config);
   }
 
   getNodeAtPath(path: string): FileSystemNode | null {
@@ -164,8 +179,12 @@ export class FileSystemManager {
   }
 
   resolvePath(inputPath: string, currentPath: string): string {
+    if (inputPath.startsWith("~")) {
+      inputPath = "/home/fredrik" + inputPath.slice(1);
+    }
+
     if (inputPath.startsWith("/")) {
-      return inputPath;
+      return this.normalizePath(inputPath);
     }
 
     if (inputPath === "..") {
@@ -178,9 +197,24 @@ export class FileSystemManager {
       return currentPath;
     }
 
-    return currentPath === "/"
-      ? `/${inputPath}`
-      : `${currentPath}/${inputPath}`;
+    const combined =
+      currentPath === "/"
+        ? `/${inputPath}`
+        : `${currentPath}/${inputPath}`;
+    return this.normalizePath(combined);
+  }
+
+  private normalizePath(path: string): string {
+    const parts = path.split("/").filter(Boolean);
+    const resolved: string[] = [];
+    for (const part of parts) {
+      if (part === "..") {
+        resolved.pop();
+      } else if (part !== ".") {
+        resolved.push(part);
+      }
+    }
+    return "/" + resolved.join("/");
   }
 
   buildDirectoryTree(node: FileSystemNode, prefix = "", isLast = true): string {
@@ -242,5 +276,31 @@ export class FileSystemManager {
 
   exists(path: string): boolean {
     return this.getNodeAtPath(path) !== null;
+  }
+
+  getCompletions(partialPath: string, currentPath: string): string[] {
+    const resolved = partialPath.startsWith("~")
+      ? "/home/fredrik" + partialPath.slice(1)
+      : partialPath.startsWith("/")
+        ? partialPath
+        : currentPath === "/"
+          ? `/${partialPath}`
+          : `${currentPath}/${partialPath}`;
+
+    const lastSlash = resolved.lastIndexOf("/");
+    const dirPath = lastSlash === 0 ? "/" : resolved.slice(0, lastSlash);
+    const prefix = resolved.slice(lastSlash + 1);
+
+    const dirNode = this.getNodeAtPath(dirPath);
+    if (!dirNode || !dirNode.children) return [];
+
+    return Object.keys(dirNode.children)
+      .filter((name) => name.startsWith(prefix))
+      .map((name) => {
+        const child = dirNode.children![name];
+        const inputLastSlash = partialPath.lastIndexOf("/");
+        const inputDir = inputLastSlash >= 0 ? partialPath.slice(0, inputLastSlash + 1) : "";
+        return inputDir + name + (child.type === "directory" ? "/" : "");
+      });
   }
 }

@@ -11,6 +11,7 @@ interface Props {
 
 const Terminal = ({ mainText, locale }: Props) => {
   const {
+    t,
     text,
     cursorVisible,
     cursorIsFinished,
@@ -21,14 +22,20 @@ const Terminal = ({ mainText, locale }: Props) => {
     inputValue,
     commandHistory,
     currentPath,
+    showNeofetch,
     inputRef,
     terminalContentRef,
+    gameContainerRef,
+    activeGame,
+    gameFrame,
     setIsClosed,
     setIsExpanded,
     setIsSmall,
     setInputValue,
     handleInputSubmit,
-  } = useTerminal({ mainText });
+    handleGameKey,
+    resetTabCount,
+  } = useTerminal({ mainText, locale });
 
   const { terminalSize, isResizing, isMobile, terminalRef, handleResizeStart } =
     useTerminalResize({ isExpanded });
@@ -86,78 +93,101 @@ const Terminal = ({ mainText, locale }: Props) => {
             </span>
           </div>
 
-          <div
-            ref={terminalContentRef}
-            className="flex-1 font-mono px-3 pt-3 overflow-y-auto scroll-smooth cursor-text text-xs md:text-sm bg-background/50"
-            onClick={() => inputRef.current?.focus()}
-          >
-            <div className="flex-1">
-              <div className="mb-2">
-                <div className="text-subtle mb-1">
-                  <span className="text-primary">$</span> neofetch
-                </div>
-                <Neofetch animate={true} locale={locale} />
+          {activeGame ? (
+            <div
+              ref={gameContainerRef}
+              className="flex-1 font-mono px-3 pt-3 overflow-y-auto scroll-smooth text-xs md:text-sm bg-background/50 outline-none"
+              onKeyDown={handleGameKey}
+              tabIndex={0}
+            >
+              <pre className="text-foreground leading-tight text-xs">
+                {gameFrame}
+              </pre>
+              <div className="mt-2 text-muted-foreground text-xs">
+                {t.pressQToQuit}
               </div>
-
-              <div className="border-t border-border-faint my-2" />
-
-              {showInitialAnimation && (
-                <article className="whitespace-pre-wrap break-words">
-                  <span className="text-primary">$</span>{" "}
-                  <span className="text-foreground">
-                    {text.slice(0, mainText.length)}
-                  </span>
-                  <span className="text-red-500">
-                    {text.slice(mainText.length)}
-                  </span>
-                  {cursorVisible && (
-                    <span className="inline-block w-1.5 h-4 bg-primary-bold align-middle animate-pulse ml-px" />
-                  )}
-                </article>
-              )}
-
-              {commandHistory.map((entry, index) => (
-                <div key={index} className="mt-1 md:mt-2">
-                  <div className="flex items-start flex-wrap">
-                    <span className="text-primary flex-shrink-0">
-                      [{currentPath}]${" "}
-                    </span>
-                    <span className="text-foreground ml-1 break-all">
-                      {entry.command}
-                    </span>
-                  </div>
-                  {entry.output && (
-                    <div
-                      className={`mt-1 whitespace-pre-wrap break-words ${
-                        entry.isError ? "text-red-500" : "text-muted-foreground"
-                      }`}
-                    >
-                      {entry.output}
-                    </div>
-                  )}
-                </div>
-              ))}
             </div>
+          ) : (
+            <div
+              ref={terminalContentRef}
+              className="flex-1 font-mono px-3 pt-3 overflow-y-auto scroll-smooth cursor-text text-xs md:text-sm bg-background/50"
+              onClick={() => inputRef.current?.focus()}
+            >
+              <div className="flex-1">
+                {showNeofetch && (
+                  <>
+                    <div className="mb-2">
+                      <div className="text-subtle mb-1">
+                        <span className="text-primary">$</span> neofetch
+                      </div>
+                      <Neofetch animate={true} locale={locale} />
+                    </div>
 
-            {cursorIsFinished && (
-              <div className="flex items-center mt-1 md:mt-2 border-t border-border-medium pt-2 pb-2 sticky bottom-0 bg-glass-heavy backdrop-blur-sm">
-                <span className="text-primary mr-1 md:mr-2 flex-shrink-0 text-xs md:text-sm">
-                  [{currentPath}]${" "}
-                </span>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={handleInputSubmit}
-                  className="flex-1 bg-transparent text-foreground outline-hidden font-mono caret-primary min-w-0 text-base md:text-sm"
-                  placeholder="Type 'help' for available commands..."
-                  autoComplete="off"
-                />
-                <span className="inline-block w-1.5 h-4 bg-primary-bold animate-pulse flex-shrink-0" />
+                    <div className="border-t border-border-faint my-2" />
+                  </>
+                )}
+
+                {showInitialAnimation && (
+                  <article className="whitespace-pre-wrap break-words">
+                    <span className="text-primary">$</span>{" "}
+                    <span className="text-foreground">
+                      {text.slice(0, mainText.length)}
+                    </span>
+                    <span className="text-red-500">
+                      {text.slice(mainText.length)}
+                    </span>
+                    {cursorVisible && (
+                      <span className="inline-block w-1.5 h-4 bg-primary-bold align-middle animate-pulse ml-px" />
+                    )}
+                  </article>
+                )}
+
+                {commandHistory.map((entry, index) => (
+                  <div key={index} className="mt-1 md:mt-2">
+                    <div className="flex items-start flex-wrap">
+                      <span className="text-primary flex-shrink-0">
+                        [{currentPath}]${" "}
+                      </span>
+                      <span className="text-foreground ml-1 break-all">
+                        {entry.command}
+                      </span>
+                    </div>
+                    {entry.output && (
+                      <div
+                        className={`mt-1 whitespace-pre-wrap break-words ${
+                          entry.isError ? "text-red-500" : "text-muted-foreground"
+                        }`}
+                      >
+                        {entry.output}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
+
+              {cursorIsFinished && (
+                <div className="flex items-center mt-1 md:mt-2 border-t border-border-medium pt-2 pb-2 sticky bottom-0 bg-glass-heavy backdrop-blur-sm">
+                  <span className="text-primary mr-1 md:mr-2 flex-shrink-0 text-xs md:text-sm">
+                    [{currentPath}]${" "}
+                  </span>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => {
+                      setInputValue(e.target.value);
+                      resetTabCount();
+                    }}
+                    onKeyDown={handleInputSubmit}
+                    className="flex-1 bg-transparent text-foreground outline-hidden font-mono caret-primary min-w-0 text-base md:text-sm"
+                    placeholder={t.inputPlaceholder}
+                    autoComplete="off"
+                  />
+                  <span className="inline-block w-1.5 h-4 bg-primary-bold animate-pulse flex-shrink-0" />
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {!isMobile && (

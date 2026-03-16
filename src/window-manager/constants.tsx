@@ -77,8 +77,8 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   },
   {
     id: "terminal",
-    title: "kitty",
-    shortTitle: "kitty",
+    title: "~/ terminal",
+    shortTitle: "terminal",
     icon: <Terminal size={S} weight={W} />,
     defaultOpen: true,
     order: 8,

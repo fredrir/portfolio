@@ -22,3 +22,28 @@ export interface TerminalState {
   commandHistory: CommandOutput[];
   currentPath: string;
 }
+
+export interface CommandAction {
+  type: "openPane" | "closePane" | "startGame";
+  payload: string;
+}
+
+export interface CommandResult {
+  output: CommandOutput;
+  newPath?: string;
+  action?: CommandAction;
+}
+
+export interface TerminalGame {
+  id: string;
+  render(): string;
+  handleKey(key: string): void;
+  isFinished(): boolean;
+  getScore(): number;
+}
+
+export interface FileSystemConfig {
+  paneIds: string[];
+  projects: { title: string }[];
+  careers: { jobTitle: string; company: string }[];
+}

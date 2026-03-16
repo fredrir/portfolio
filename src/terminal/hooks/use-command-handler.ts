@@ -3,8 +3,9 @@
 import type React from "react";
 
 import { useCallback } from "react";
-import type { CommandOutput } from "../types";
+import type { CommandOutput, CommandResult, TerminalGame } from "../types";
 import type { CommandProcessor } from "../command-processor";
+import { createGame } from "../games";
 
 interface UseCommandHandlerProps {
   inputValue: string;
@@ -16,6 +17,7 @@ interface UseCommandHandlerProps {
   commandProcessor: CommandProcessor;
   terminalContentRef: React.RefObject<HTMLDivElement>;
   onClear: () => void;
+  onGameStart?: (game: TerminalGame) => void;
 }
 
 export const useCommandHandler = ({
@@ -27,6 +29,7 @@ export const useCommandHandler = ({
   commandProcessor,
   terminalContentRef,
   onClear,
+  onGameStart,
 }: UseCommandHandlerProps) => {
   const scrollToBottom = useCallback(() => {
     if (terminalContentRef.current) {
@@ -40,7 +43,7 @@ export const useCommandHandler = ({
       if (e.key === "Enter") {
         const command = inputValue.trim();
         if (command) {
-          const result = commandProcessor.processCommand(command, currentPath);
+          const result: CommandResult = commandProcessor.processCommand(command, currentPath);
 
           if (command.toLowerCase() === "clear") {
             setCommandHistory([]);
@@ -51,6 +54,11 @@ export const useCommandHandler = ({
 
           if (result.newPath) {
             setCurrentPath(result.newPath);
+          }
+
+          if (result.action?.type === "startGame" && onGameStart) {
+            const game = createGame(result.action.payload);
+            onGameStart(game);
           }
 
           setTimeout(scrollToBottom, 10);
@@ -67,6 +75,7 @@ export const useCommandHandler = ({
       scrollToBottom,
       setInputValue,
       onClear,
+      onGameStart,
     ]
   );
 

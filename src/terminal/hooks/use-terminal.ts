@@ -1,22 +1,29 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { CommandOutput } from "../types";
+import type { CommandOutput, TerminalGame } from "../types";
 import { CommandProcessor } from "../command-processor";
+import { useAutocomplete } from "./use-autocomplete";
 import { useCursor } from "./use-cursor";
 import { useCommandHandler } from "./use-command-handler";
 import { useTypingAnimation } from "./use-typing-animation";
+import { getTerminalStrings } from "../translations";
 
 interface UseTerminalProps {
   mainText: string;
+  locale?: string;
 }
 
-export const useTerminal = ({ mainText }: UseTerminalProps) => {
+export const useTerminal = ({ mainText, locale }: UseTerminalProps) => {
+  const t = getTerminalStrings(locale);
   const [isClosed, setIsClosed] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSmall, setIsSmall] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [commandHistory, setCommandHistory] = useState<CommandOutput[]>([]);
   const [currentPath, setCurrentPath] = useState("/home/fredrik");
+  const [showNeofetch, setShowNeofetch] = useState(true);
+  const [activeGame, setActiveGame] = useState<TerminalGame | null>(null);
+  const [gameFrame, setGameFrame] = useState("");
 
   const inputRef = useRef<HTMLInputElement>(
     null
@@ -24,7 +31,16 @@ export const useTerminal = ({ mainText }: UseTerminalProps) => {
   const terminalContentRef = useRef<HTMLDivElement>(
     null
   ) as React.RefObject<HTMLDivElement>;
-  const commandProcessor = useRef(new CommandProcessor());
+  const gameContainerRef = useRef<HTMLDivElement>(
+    null
+  ) as React.RefObject<HTMLDivElement>;
+  const commandProcessor = useRef(new CommandProcessor(undefined, true, locale));
+
+  const { getCompletions, resetTabCount } = useAutocomplete({
+    fileSystemManager: commandProcessor.current.fs,
+    currentPath,
+    paneIds: [],
+  });
 
   const { text, isTypingComplete, showInitialAnimation, resetTyping } =
     useTypingAnimation({
@@ -36,7 +52,7 @@ export const useTerminal = ({ mainText }: UseTerminalProps) => {
     inputRef,
   });
 
-  const { handleInputSubmit, scrollToBottom } = useCommandHandler({
+  const { handleInputSubmit: baseHandleInputSubmit, scrollToBottom } = useCommandHandler({
     inputValue,
     setInputValue,
     commandHistory,
@@ -45,8 +61,83 @@ export const useTerminal = ({ mainText }: UseTerminalProps) => {
     setCurrentPath,
     commandProcessor: commandProcessor.current,
     terminalContentRef,
-    onClear: resetTyping,
+    onClear: () => {
+      resetTyping();
+      setShowNeofetch(false);
+    },
+    onGameStart: (game) => {
+      setActiveGame(game);
+      setGameFrame(game.render());
+    },
   });
+
+  const handleInputSubmit = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const result = getCompletions(inputValue);
+        setInputValue(result.completed);
+        if (result.suggestions.length > 0) {
+          setCommandHistory((prev) => [
+            ...prev,
+            { command: inputValue, output: result.suggestions.join("  ") },
+          ]);
+        }
+        return;
+      }
+      resetTabCount();
+      baseHandleInputSubmit(e);
+    },
+    [inputValue, getCompletions, resetTabCount, baseHandleInputSubmit],
+  );
+
+  useEffect(() => {
+    if (!activeGame || activeGame.id !== "snake") return;
+    const interval = setInterval(() => {
+      activeGame.handleKey("tick");
+      setGameFrame(activeGame.render());
+      if (activeGame.isFinished()) clearInterval(interval);
+    }, 150);
+    return () => clearInterval(interval);
+  }, [activeGame]);
+
+  useEffect(() => {
+    if (activeGame && gameContainerRef.current) {
+      gameContainerRef.current.focus();
+    }
+  }, [activeGame]);
+
+  const handleGameKey = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!activeGame) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.key === "q" || e.key === "Escape") {
+        const score = activeGame.getScore();
+        setCommandHistory((prev) => [
+          ...prev,
+          { command: activeGame.id, output: `${t.gameOver}: ${score}` },
+        ]);
+        setActiveGame(null);
+        setGameFrame("");
+        return;
+      }
+      activeGame.handleKey(e.key);
+      setGameFrame(activeGame.render());
+      if (activeGame.isFinished()) {
+        setTimeout(() => {
+          const score = activeGame.getScore();
+          setCommandHistory((prev) => [
+            ...prev,
+            { command: activeGame.id, output: `${t.gameOver}: ${score}` },
+          ]);
+          setActiveGame(null);
+          setGameFrame("");
+        }, 1500);
+      }
+    },
+    [activeGame, t],
+  );
 
   const resetTerminal = useCallback(() => {
     resetTyping();
@@ -54,13 +145,17 @@ export const useTerminal = ({ mainText }: UseTerminalProps) => {
     setCurrentPath("/home/fredrik");
     setInputValue("");
     setCursorIsFinished(false);
+    setActiveGame(null);
+    setGameFrame("");
+    setShowNeofetch(true);
   }, [resetTyping, setCursorIsFinished]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [commandHistory, scrollToBottom]);
+  }, [commandHistory, gameFrame, scrollToBottom]);
 
   return {
+    t,
     text,
     cursorVisible,
     cursorIsFinished,
@@ -71,13 +166,19 @@ export const useTerminal = ({ mainText }: UseTerminalProps) => {
     inputValue,
     commandHistory,
     currentPath,
+    showNeofetch,
     inputRef,
     terminalContentRef,
+    gameContainerRef,
+    activeGame,
+    gameFrame,
     setIsClosed,
     setIsExpanded,
     setIsSmall,
     setInputValue,
     handleInputSubmit,
+    handleGameKey,
     resetTerminal,
+    resetTabCount,
   };
 };

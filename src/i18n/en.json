@@ -331,7 +331,7 @@
       "projects": "projects",
       "contact": "mail",
       "settings": "settings",
-      "terminal": "kitty",
+      "terminal": "terminal",
       "gallery": "gallery",
       "resume": "resume"
     }

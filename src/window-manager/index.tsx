@@ -166,7 +166,19 @@ export function WindowManager({
         ui={ui}
       />
     ),
-    terminal: <TerminalPane locale={locale} />,
+    terminal: (
+      <TerminalPane
+        locale={locale}
+        paneIds={WINDOW_CONFIGS.map((c) => c.id)}
+        projects={project.projects.map((p) => ({ title: p.title }))}
+        careers={journey.journeys.map((j) => ({ jobTitle: j.jobTitle, company: j.company }))}
+        onOpenPane={(id) => {
+          wm.openWindow(id);
+          setFocusedId(id);
+        }}
+        onClosePane={(id) => wm.closeWindow(id)}
+      />
+    ),
     gallery: <ImagePane ui={ui} />,
   };
 

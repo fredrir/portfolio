@@ -4,43 +4,70 @@ import {
   getNeofetchPlainText,
 } from "@/shared/components/neofetch";
 import { PORTFOLIO_VERSION } from "@/lib/version";
-import type { CommandOutput } from "./types";
+import type { CommandResult, FileSystemConfig } from "./types";
+import { getTerminalStrings, type TerminalStrings } from "./translations";
+
+interface CommandDef {
+  name: string;
+  descKey: keyof TerminalStrings;
+}
+
+const COMMANDS: CommandDef[] = [
+  { name: "help", descKey: "helpDesc" },
+  { name: "neofetch", descKey: "neofetchDesc" },
+  { name: "ls [path]", descKey: "lsDesc" },
+  { name: "cd <path>", descKey: "cdDesc" },
+  { name: "pwd", descKey: "pwdDesc" },
+  { name: "cat <file>", descKey: "catDesc" },
+  { name: "clear", descKey: "clearDesc" },
+  { name: "whoami", descKey: "whoamiDesc" },
+  { name: "date", descKey: "dateDesc" },
+  { name: "echo <text>", descKey: "echoDesc" },
+  { name: "tree", descKey: "treeDesc" },
+  { name: "about", descKey: "aboutDesc" },
+  { name: "uname", descKey: "unameDesc" },
+  { name: "uptime", descKey: "uptimeDesc" },
+  { name: "open <pane>", descKey: "openDesc" },
+  { name: "close <pane>", descKey: "closeDesc" },
+  { name: "snake", descKey: "snakeDesc" },
+  { name: "2048", descKey: "game2048Desc" },
+];
+
+export const COMMAND_NAMES = COMMANDS.map((c) => c.name.split(" ")[0]);
 
 export class CommandProcessor {
   private fileSystemManager: FileSystemManager;
+  private paneIds: string[];
+  private isStandalone: boolean;
+  private t: TerminalStrings;
 
-  constructor() {
-    this.fileSystemManager = new FileSystemManager();
+  constructor(config?: FileSystemConfig, isStandalone = false, locale?: string) {
+    this.fileSystemManager = new FileSystemManager(config);
+    this.paneIds = config?.paneIds ?? [];
+    this.isStandalone = isStandalone;
+    this.t = getTerminalStrings(locale);
   }
 
-  processCommand(
-    command: string,
-    currentPath: string,
-  ): { output: CommandOutput; newPath?: string } {
+  get fs(): FileSystemManager {
+    return this.fileSystemManager;
+  }
+
+  processCommand(command: string, currentPath: string): CommandResult {
     const [cmd, ...args] = command.trim().split(" ");
 
     switch (cmd.toLowerCase()) {
-      case "help":
+      case "help": {
+        const maxLen = Math.max(...COMMANDS.map((c) => c.name.length));
+        const lines = COMMANDS.map(
+          (c) => `  ${c.name.padEnd(maxLen + 2)} ${this.t[c.descKey]}`
+        );
         return {
           output: {
             command,
-            output: `Available commands:
-  help          - Show this help message
-  neofetch      - System information display
-  ls [path]     - List directory contents
-  cd <path>     - Change directory
-  pwd           - Print working directory
-  cat <file>    - Display file contents
-  clear         - Clear terminal
-  whoami        - Display current user
-  date          - Show current date and time
-  echo <text>   - Display text
-  tree          - Show directory tree
-  about         - About this terminal
-  uname         - System information
-  uptime        - System uptime`,
+            output: this.t.availableCommands + "\n" + lines.join("\n"),
           },
         };
+      }
 
       case "neofetch":
         return {
@@ -99,7 +126,7 @@ Author: Fredrik Carsten Hansteen`,
           },
         };
 
-      case "uname":
+      case "uname": {
         const unameFlag = args[0];
         let unameOutput = `fredrir ${PORTFOLIO_VERSION}`;
         if (unameFlag === "-a") {
@@ -112,6 +139,7 @@ Author: Fredrik Carsten Hansteen`,
         return {
           output: { command, output: unameOutput },
         };
+      }
 
       case "uptime":
         return {
@@ -121,22 +149,128 @@ Author: Fredrik Carsten Hansteen`,
           },
         };
 
+      case "open":
+        return this.handleOpenCommand(command, args);
+
+      case "close":
+        return this.handleCloseCommand(command, args);
+
+      case "snake":
+        if (this.isStandalone) {
+          return {
+            output: { command, output: this.t.wmOnly, isError: true },
+          };
+        }
+        return {
+          output: { command, output: this.t.startingSnake },
+          action: { type: "startGame", payload: "snake" },
+        };
+
+      case "2048":
+        if (this.isStandalone) {
+          return {
+            output: { command, output: this.t.wmOnly, isError: true },
+          };
+        }
+        return {
+          output: { command, output: this.t.starting2048 },
+          action: { type: "startGame", payload: "2048" },
+        };
+
       default:
         return {
           output: {
             command,
-            output: `zsh: command not found: ${cmd}`,
+            output: `zsh: ${this.t.commandNotFound}: ${cmd}`,
             isError: true,
           },
         };
     }
   }
 
+  private handleOpenCommand(command: string, args: string[]): CommandResult {
+    if (this.isStandalone) {
+      return {
+        output: { command, output: this.t.wmOnlyOpenClose, isError: true },
+      };
+    }
+
+    if (!args[0]) {
+      return {
+        output: {
+          command,
+          output: `${this.t.usageOpen}\n${this.t.available}: ${this.paneIds.join(", ")}`,
+          isError: true,
+        },
+      };
+    }
+
+    const paneId = args[0].toLowerCase();
+    if (!this.paneIds.includes(paneId)) {
+      return {
+        output: {
+          command,
+          output: `${this.t.unknownPane}: ${paneId}\n${this.t.available}: ${this.paneIds.join(", ")}`,
+          isError: true,
+        },
+      };
+    }
+
+    return {
+      output: { command, output: `${this.t.opening} ${paneId}...` },
+      action: { type: "openPane", payload: paneId },
+    };
+  }
+
+  private handleCloseCommand(command: string, args: string[]): CommandResult {
+    if (this.isStandalone) {
+      return {
+        output: { command, output: this.t.wmOnlyOpenClose, isError: true },
+      };
+    }
+
+    if (!args[0]) {
+      return {
+        output: {
+          command,
+          output: `${this.t.usageClose}\n${this.t.available}: ${this.paneIds.join(", ")}`,
+          isError: true,
+        },
+      };
+    }
+
+    const paneId = args[0].toLowerCase();
+    if (!this.paneIds.includes(paneId)) {
+      return {
+        output: {
+          command,
+          output: `${this.t.unknownPane}: ${paneId}\n${this.t.available}: ${this.paneIds.join(", ")}`,
+          isError: true,
+        },
+      };
+    }
+
+    if (paneId === "terminal") {
+      return {
+        output: {
+          command,
+          output: this.t.cannotCloseTerminal,
+          isError: true,
+        },
+      };
+    }
+
+    return {
+      output: { command, output: `${this.t.closing} ${paneId}...` },
+      action: { type: "closePane", payload: paneId },
+    };
+  }
+
   private handleLsCommand(
     command: string,
     args: string[],
     currentPath: string,
-  ): { output: CommandOutput } {
+  ): CommandResult {
     try {
       const lsPath = args[0]
         ? this.fileSystemManager.resolvePath(args[0], currentPath)
@@ -162,8 +296,8 @@ Author: Fredrik Carsten Hansteen`,
     command: string,
     args: string[],
     currentPath: string,
-  ): { output: CommandOutput; newPath?: string } {
-    if (!args[0]) {
+  ): CommandResult {
+    if (!args[0] || args[0] === "~") {
       return {
         output: { command, output: "" },
         newPath: "/home/fredrik",
@@ -176,7 +310,7 @@ Author: Fredrik Carsten Hansteen`,
         return {
           output: {
             command,
-            output: `cd: no such file or directory: ${args[0]}`,
+            output: `cd: ${this.t.noSuchFileOrDir}: ${args[0]}`,
             isError: true,
           },
         };
@@ -186,7 +320,7 @@ Author: Fredrik Carsten Hansteen`,
         return {
           output: {
             command,
-            output: `cd: not a directory: ${args[0]}`,
+            output: `cd: ${this.t.notADirectory}: ${args[0]}`,
             isError: true,
           },
         };
@@ -213,12 +347,12 @@ Author: Fredrik Carsten Hansteen`,
     command: string,
     args: string[],
     currentPath: string,
-  ): { output: CommandOutput } {
+  ): CommandResult {
     if (!args[0]) {
       return {
         output: {
           command,
-          output: "cat: missing file operand",
+          output: `cat: ${this.t.missingFileOperand}`,
           isError: true,
         },
       };
@@ -246,7 +380,7 @@ Author: Fredrik Carsten Hansteen`,
   private handleTreeCommand(
     command: string,
     currentPath: string,
-  ): { output: CommandOutput } {
+  ): CommandResult {
     try {
       const currentNode = this.fileSystemManager.getNodeAtPath(currentPath);
       if (currentNode) {
@@ -261,7 +395,7 @@ Author: Fredrik Carsten Hansteen`,
       return {
         output: {
           command,
-          output: "Error: Cannot access current directory",
+          output: `Error: ${this.t.cannotAccessDir}`,
           isError: true,
         },
       };
