@@ -94,9 +94,6 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
     <div className="font-mono text-xs h-full flex flex-col overflow-auto">
       <div className="flex-1 p-4 space-y-4">
         <div>
-          <div className="text-subtle text-2xs tracking-widest uppercase mb-1">
-            {slug}(1)
-          </div>
           <h2 className="text-lg font-bold text-foreground tracking-tight">
             {project.title}
           </h2>
@@ -184,11 +181,6 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
             </div>
           </div>
         )}
-      </div>
-
-      <div className="px-4 py-2 border-t border-border-faint bg-surface-faint text-ghost text-2xs shrink-0 flex justify-between">
-        <span>{slug}(1)</span>
-        <span>{USER_HOST}</span>
       </div>
     </div>
   );

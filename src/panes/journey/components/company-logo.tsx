@@ -12,20 +12,22 @@ export function CompanyLogo({ journey }: { journey: journeyType }) {
 
   useEffect(() => {
     setSrc(
-      isDarkTheme(resolvedTheme) ? journey.darkModeImageUri : journey.lightModeImageUri,
+      isDarkTheme(resolvedTheme)
+        ? journey.darkModeImageUri
+        : journey.lightModeImageUri,
     );
   }, [resolvedTheme, journey.darkModeImageUri, journey.lightModeImageUri]);
 
   if (!src) return null;
 
   return (
-    <div className="shrink-0 w-8 h-8 rounded-md overflow-hidden bg-background border border-border-faint flex items-center justify-center p-1">
+    <div className="shrink-0 w-10 h-10 rounded-md overflow-hidden bg-background border border-border-faint flex items-center justify-center p-1">
       <Image
         src={src}
         alt={journey.company}
-        width={28}
-        height={28}
-        className="object-contain w-full h-full"
+        width={75}
+        height={75}
+        className="object-contain w-8 h-8"
       />
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import type { WindowConfig, WindowState } from "../types";
-
+import { cn } from "@/shared/utils/cn";
 interface Props {
   config: WindowConfig;
   state: WindowState;
@@ -86,7 +86,13 @@ export function Window({
           </button>
         </div>
 
-        <span className="font-mono text-xs text-faded truncate mx-2">
+        <span
+          className={cn(
+            "font-mono text-xs truncate mx-2",
+
+            isFocused ? "text-primary-bold" : "text-primary-muted",
+          )}
+        >
           {config.title}
         </span>
 

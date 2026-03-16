@@ -19,10 +19,6 @@ export function JourneyPane({ journey, onOpenDetail, ui }: Props) {
 
   return (
     <div className="p-2 @sm:p-3 font-mono text-xs h-full flex flex-col">
-      <div className="text-faded mb-2">
-        <span className="text-primary">$</span> cat ~/.career/log
-      </div>
-
       <div className="flex-1 overflow-y-auto space-y-0.5 min-h-0">
         {sorted.map((j: journeyType) => (
           <button

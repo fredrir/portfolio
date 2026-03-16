@@ -11,8 +11,10 @@ export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
       </div>
       <div className="space-y-0.5">
         {artists.map((artist, i) => (
-          <div key={`${artist.name}-${i}`} className="flex items-center gap-2 py-0.5">
-            <span className="text-primary-dim w-3 text-right text-2xs">{i + 1}</span>
+          <div
+            key={`${artist.name}-${i}`}
+            className="flex items-center gap-2 py-0.5"
+          >
             {artist.imageUrl && (
               <Image
                 src={artist.imageUrl}
@@ -39,11 +41,9 @@ export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
                 </span>
               )}
             </div>
-            {artist.genres && artist.genres.length > 0 && (
-              <span className="text-ghost text-3xs truncate max-w-24 hidden @xs:inline">
-                {artist.genres.join(", ")}
-              </span>
-            )}
+            <span className="text-primary-dim w-3 text-right text-2xs">
+              {i + 1}
+            </span>
           </div>
         ))}
       </div>

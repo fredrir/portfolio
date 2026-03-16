@@ -16,41 +16,48 @@ export function JourneyDetailPane({ journey }: Props) {
 
   useEffect(() => {
     setSrc(
-      isDarkTheme(resolvedTheme) ? journey.darkModeImageUri : journey.lightModeImageUri,
+      isDarkTheme(resolvedTheme)
+        ? journey.darkModeImageUri
+        : journey.lightModeImageUri,
     );
   }, [resolvedTheme, journey.darkModeImageUri, journey.lightModeImageUri]);
 
   return (
-    <div className="p-4 font-mono text-xs h-full flex flex-col overflow-auto">
-      <div className="text-faded mb-3">
-        <span className="text-primary">$</span> cat ~/.career/{journey.company.toLowerCase().replace(/\s+/g, "-")}.md
-      </div>
-
-      <div className="flex gap-4 items-start mb-4">
+    <div className="h-full flex flex-col overflow-auto font-mono text-sm p-5 space-y-5">
+      <div className="flex gap-4 items-start">
         {src && (
-          <div className="shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-background border border-wm-border flex items-center justify-center">
+          <div className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden bg-background border border-border-faint flex items-center justify-center">
             <Image
               src={src}
               alt={journey.company}
-              width={48}
-              height={48}
-              className="object-contain p-1"
+              width={400}
+              height={400}
+              className="object-contain p-1 w-14 h-14"
             />
           </div>
         )}
-        <div className="min-w-0">
-          <h2 className="text-sm font-bold text-primary">{journey.jobTitle}</h2>
-          <div className="text-foreground/80 text-xs mt-0.5">
-            {journey.company}
-          </div>
-          <div className="text-date-accent text-2xs mt-0.5">
+
+        <div className="flex flex-col min-w-0 space-y-1">
+          <h2 className="text-base font-semibold text-primary leading-tight">
+            {journey.jobTitle}
+          </h2>
+
+          <div className="text-sm text-foreground">{journey.company}</div>
+
+          <div className="text-xs text-date-accent tracking-wide">
             {journey.date}
           </div>
         </div>
       </div>
 
-      <div className="border-t border-border-faint pt-3">
-        <p className="text-muted-foreground leading-relaxed text-xs">
+      <div className="border-t border-border-faint" />
+
+      <div className="space-y-2">
+        <div className="text-xs text-muted-foreground uppercase tracking-wider">
+          description
+        </div>
+
+        <p className="text-xs leading-relaxed text-muted-foreground">
           {journey.description}
         </p>
       </div>

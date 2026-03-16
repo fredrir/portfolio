@@ -1,9 +1,15 @@
 "use client";
 
+import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ArrowLeft } from "@phosphor-icons/react";
 import { USER_HOST } from "@/lib/constants";
 import { WINDOW_CONFIGS } from "../constants";
 import { MobileHomeScreen } from "./mobile-home-screen";
+import {
+  MobileBackContext,
+  useMobileBackState,
+} from "@/shared/hooks/use-mobile-back";
 import type { UiStrings } from "@/shared/types";
 
 interface Props {
@@ -27,8 +33,22 @@ export function MobileLayout({
     ? WINDOW_CONFIGS.find((c) => c.id === activeApp)
     : null;
 
+  const {
+    hasBack,
+    backLabel,
+    subtitle,
+    triggerBack,
+    setBackAction,
+    setSubtitle,
+  } = useMobileBackState();
+
+  useEffect(() => {
+    setBackAction(null);
+    setSubtitle(null);
+  }, [activeApp, setBackAction, setSubtitle]);
+
   return (
-    <div className="fixed inset-0 flex flex-col" style={{ paddingBottom: 84 }}>
+    <div className="fixed inset-0 flex flex-col" style={{ paddingBottom: 72 }}>
       <AnimatePresence mode="wait">
         {activeApp === null ? (
           <motion.div
@@ -50,25 +70,35 @@ export function MobileLayout({
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="flex-1 flex flex-col min-h-0"
           >
-            <div className="flex-1 flex flex-col m-2 rounded-xl border border-border-medium bg-glass-light backdrop-blur-md shadow-lg shadow-wm-shadow-soft overflow-hidden min-h-0">
+            <div className="flex-1 flex flex-col m-3 rounded-xl border border-border-medium bg-glass-light backdrop-blur-md shadow-lg shadow-wm-shadow-soft overflow-hidden min-h-0">
               <div className="flex items-center px-3 py-2 border-b border-wm-border bg-surface-faint shrink-0">
-                <button
-                  onClick={onGoHome}
-                  className="text-primary-soft hover:text-primary active:text-primary transition-colors mr-3 font-mono text-2xl leading-none -mt-0.5 px-1"
-                >
-                  ‹
-                </button>
-                <span className="font-mono text-xs text-faded flex-1 text-center">
-                  {activeConfig &&
-                    (ui.localeTitles[activeConfig.id] ??
-                      activeConfig.shortTitle)}
+                {hasBack ? (
+                  <button
+                    onClick={triggerBack}
+                    className="text-primary-soft hover:text-primary active:text-primary transition-colors mr-1 font-mono text-xs inline-flex items-center gap-1 shrink-0 "
+                  >
+                    <ArrowLeft size={18} weight="bold" />
+                    {backLabel && <span className="text-2xs">{backLabel}</span>}
+                  </button>
+                ) : (
+                  <div className="w-5 shrink-0" />
+                )}
+                <span className="font-mono text-xs text-faded flex-1 text-center truncate">
+                  {subtitle ??
+                    (activeConfig &&
+                      (ui.localeTitles[activeConfig.id] ??
+                        activeConfig.shortTitle))}
                 </span>
                 <span className="font-mono text-xs text-primary-subtle">
                   {USER_HOST}
                 </span>
               </div>
               <div className="flex-1 overflow-auto">
-                {paneContent[activeApp]}
+                <MobileBackContext.Provider
+                  value={{ setBackAction, setSubtitle }}
+                >
+                  {paneContent[activeApp]}
+                </MobileBackContext.Provider>
               </div>
             </div>
           </motion.div>

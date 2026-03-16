@@ -16,7 +16,7 @@ export function ImageGrid({
   return (
     <div className="flex-1 overflow-y-auto min-h-0">
       <div
-        className={`grid gap-1 ${
+        className={`grid gap-2 ${
           narrow
             ? "grid-cols-2"
             : compact
@@ -39,9 +39,7 @@ export function ImageGrid({
             {img.date && (
               <div
                 className={`absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-1 py-0.5 text-3xs text-white/70 text-left ${
-                  narrow
-                    ? "opacity-100"
-                    : "opacity-0 group-hover:opacity-100"
+                  narrow ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                 } transition-opacity`}
               >
                 {formatDate(img.date)}

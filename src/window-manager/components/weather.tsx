@@ -22,5 +22,5 @@ export function Weather() {
   }, []);
 
   if (!weather) return null;
-  return <span>{weather}</span>;
+  return <span>Trondheim • {weather}</span>;
 }

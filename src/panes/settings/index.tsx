@@ -68,12 +68,6 @@ export function SettingsPane({
       ref={containerRef}
       className="p-2 @xs:p-3 @md:p-4 font-mono text-xs h-full flex flex-col overflow-y-auto @container"
     >
-      {!compact && (
-        <div className="text-faded mb-3 shrink-0">
-          <span className="text-primary">$</span> settings
-        </div>
-      )}
-
       <div
         className={`flex-1 ${compact ? "flex flex-col gap-2" : "space-y-4 @md:space-y-5"}`}
       >

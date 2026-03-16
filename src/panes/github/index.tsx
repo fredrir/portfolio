@@ -45,11 +45,6 @@ export function GitHubPane({
     <div className="h-full overflow-auto">
       <div className="p-2 @sm:p-3 font-mono text-xs leading-relaxed h-full overflow-y-auto">
         <div ref={containerRef} className="h-full">
-          {!compact && (
-            <div className="text-faded mb-2">
-              <span className="text-primary">$</span> {ui.githubCommand}
-            </div>
-          )}
           <div className={`flex flex-col ${compact ? "gap-2" : "gap-4"}`}>
             {!data ? (
               <span className="text-red-400">

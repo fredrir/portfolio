@@ -51,22 +51,25 @@ function bulgePoints(center: number) {
   };
 }
 
-function makeBulgePath(center: number): string {
+function makePath(center: number, flat: boolean): string {
   const b = bulgePoints(center);
-  return `M 4.4,100 Q 0,100 0,78 L 0,44 Q 0,22 4.4,22 L ${b.left},22 C ${b.lcp1},22 ${b.lcp2},0 ${center},0 C ${b.rcp1},0 ${b.rcp2},22 ${b.right},22 L 95.6,22 Q 100,22 100,44 L 100,78 Q 100,100 95.6,100 Z`;
+  const y = flat ? 22 : 0;
+  return `M 4.4,100 Q 0,100 0,78 L 0,44 Q 0,22 4.4,22 L ${b.left},22 C ${b.lcp1},22 ${b.lcp2},${y} ${center},${y} C ${b.rcp1},${y} ${b.rcp2},22 ${b.right},22 L 95.6,22 Q 100,22 100,44 L 100,78 Q 100,100 95.6,100 Z`;
 }
 
-function makeClipBulgePath(center: number): string {
+function makeClipPath(center: number, flat: boolean): string {
   const b = bulgePoints(center);
   const n = (v: number) => (v / 100).toFixed(3);
-  return `M 0.044,1 Q 0,1 0,0.78 L 0,0.44 Q 0,0.22 0.044,0.22 L ${n(b.left)},0.22 C ${n(b.lcp1)},0.22 ${n(b.lcp2)},0 ${n(center)},0 C ${n(b.rcp1)},0 ${n(b.rcp2)},0.22 ${n(b.right)},0.22 L 0.956,0.22 Q 1,0.22 1,0.44 L 1,0.78 Q 1,1 0.956,1 Z`;
+  const y = flat ? "0.22" : "0";
+  return `M 0.044,1 Q 0,1 0,0.78 L 0,0.44 Q 0,0.22 0.044,0.22 L ${n(b.left)},0.22 C ${n(b.lcp1)},0.22 ${n(b.lcp2)},${y} ${n(center)},${y} C ${n(b.rcp1)},${y} ${n(b.rcp2)},0.22 ${n(b.right)},0.22 L 0.956,0.22 Q 1,0.22 1,0.44 L 1,0.78 Q 1,1 0.956,1 Z`;
 }
 
 export function MobileDock({ activeApp, onOpenApp, onGoHome, ui }: Props) {
   const activeId = activeApp ?? "home";
+  const hasDockActive = activeApp === null || (DOCK_IDS as readonly string[]).includes(activeApp);
   const bulgeCenter = DOCK_CENTERS[activeId] ?? 50;
-  const svgPath = makeBulgePath(bulgeCenter);
-  const clipPath = makeClipBulgePath(bulgeCenter);
+  const svgPath = makePath(bulgeCenter, !hasDockActive);
+  const clipPath = makeClipPath(bulgeCenter, !hasDockActive);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[9999] font-mono">
