@@ -55,6 +55,9 @@ interface Props {
     submitError: string;
     submitLoading: string;
     recaptchaError: string;
+    optional: string;
+    vimHintNormal: string;
+    vimHintStatus: string;
   };
   ui: UiStrings;
   githubData: GitHubData | null;

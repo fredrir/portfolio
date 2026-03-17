@@ -251,7 +251,10 @@
     "submitSuccess": "Votre message a été envoyé avec succès. Je vous répondrai dès que possible.",
     "submitError": "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard.",
     "submitLoading": "Envoi en cours...",
-    "recaptchaError": "Veuillez compléter le reCAPTCHA."
+    "recaptchaError": "Veuillez compléter le reCAPTCHA.",
+    "optional": "facultatif",
+    "vimHintNormal": "Appuyez sur « i » pour commencer à écrire...",
+    "vimHintStatus": "Tapez {i} pour éditer, {wq} pour envoyer"
   },
   "footer": {
     "license1": "Tous droits réservés.",

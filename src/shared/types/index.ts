@@ -83,6 +83,9 @@ export interface ContactProps {
     submitError: string;
     submitLoading: string;
     recaptchaError: string;
+    optional: string;
+    vimHintNormal: string;
+    vimHintStatus: string;
   };
 }
 

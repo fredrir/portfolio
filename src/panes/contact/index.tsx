@@ -308,7 +308,7 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 disabled={isSending}
                 className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs                   placeholder:text-placeholder disabled:opacity-50"
-                placeholder={`${contact.phone} (optional)`}
+                placeholder={`${contact.phone} (${contact.optional})`}
                 autoComplete="off"
               />
               {focusedField === "phone" && (
@@ -367,7 +367,7 @@ export function ContactPane({ contact }: ContactProps) {
                   resize-none p-2 leading-editor placeholder:text-placeholder disabled:opacity-50"
                 placeholder={
                   vimMode === "normal"
-                    ? 'Press "i" to start typing...'
+                    ? contact.vimHintNormal
                     : contact.message + "..."
                 }
                 autoComplete="off"
@@ -423,8 +423,15 @@ export function ContactPane({ contact }: ContactProps) {
               </span>
             ) : sendState === "idle" ? (
               <span className="text-xs text-subtle">
-                Type <span className="text-primary-muted">i</span> to edit,{" "}
-                <span className="text-primary-muted">:wq</span> to send
+                {contact.vimHintStatus.split(/\{|\}/).map((part, i) =>
+                  part === "i" || part === "wq" ? (
+                    <span key={i} className="text-primary-muted">
+                      {part === "wq" ? `:${part}` : part}
+                    </span>
+                  ) : (
+                    <span key={i}>{part}</span>
+                  ),
+                )}
               </span>
             ) : null}
           </div>

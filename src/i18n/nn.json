@@ -251,7 +251,10 @@
     "submitSuccess": "Meldinga di har blitt sendt. Eg vil svare deg så snart som mogleg.",
     "submitError": "Noko gjekk gale. Ver venleg å prøv igjen seinare.",
     "submitLoading": "Sender melding...",
-    "recaptchaError": "Ver venleg og fullfør reCAPTCHA."
+    "recaptchaError": "Ver venleg og fullfør reCAPTCHA.",
+    "optional": "valfritt",
+    "vimHintNormal": "Trykk \"i\" for å byrje å skrive...",
+    "vimHintStatus": "Trykk {i} for å redigere, {wq} for å sende"
   },
   "footer": {
     "license1": "Alle rettar forbehalde.",

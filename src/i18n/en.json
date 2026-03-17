@@ -251,7 +251,10 @@
     "submitSuccess": "Your message has been sent successfully. I will get back to you as soon as possible.",
     "submitError": "An error occurred while sending your message. Please try again later.",
     "submitLoading": "Sending...",
-    "recaptchaError": "Please complete the reCAPTCHA."
+    "recaptchaError": "Please complete the reCAPTCHA.",
+    "optional": "optional",
+    "vimHintNormal": "Press \"i\" to start typing...",
+    "vimHintStatus": "Type {i} to edit, {wq} to send"
   },
   "footer": {
     "license1": "All rights reserved.",
