@@ -17,7 +17,7 @@ const ListView = ({
       <div className="flex-1 overflow-y-auto space-y-0.5 min-h-0">
         {children}
       </div>
-      <div className="pt-1 border-t border-border-faint text-ghost text-2xs mt-1 flex justify-between">
+      <div className="pt-2 mt-1 border-t border-border-faint text-ghost text-2xs flex items-center justify-between">
         <span>
           {numberOfItems} {uiEntries}
         </span>

@@ -148,7 +148,6 @@ export function WindowManager({
       <ProjectsPane
         title={project.title}
         projects={project.projects}
-        viewCode={project.viewCode}
         onOpenDetail={handleOpenProjectDetail}
         ui={ui}
       />
