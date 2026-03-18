@@ -13,9 +13,7 @@
   },
   "landing": {
     "title": "Hi, I'm",
-    "terminal": {
-      "mainText": "I'm currently pursuing a master's degree in Computer Science at the Norwegian University of Science and Technology (NTNU) in Trondheim, Norway. Feel free to explore my CV or get in touch with me."
-    }
+    "mainText": "I'm currently pursuing a master's degree in Computer Science at the Norwegian University of Science and Technology (NTNU) in Trondheim, Norway. Feel free to explore my CV or get in touch with me."
   },
   "journey": {
     "title": "My Journey",

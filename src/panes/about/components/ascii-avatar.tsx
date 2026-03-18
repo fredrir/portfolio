@@ -15,7 +15,11 @@ const LEFT_EYES = ["◠", "◠", "◉", "▰"];
 const RIGHT_EYES = ["━", "◠", "◉", "▰"];
 const MOUTHS = ["╰───╯", "╰═══╯", "  ○  ", "╰───╯"];
 
-export function AsciiAvatar() {
+interface Props {
+  isMobile?: boolean;
+}
+
+export function AsciiAvatar({ isMobile = false }: Props) {
   const [reaction, setReaction] = useState<string>("idle");
   const [exprIdx, setExprIdx] = useState(-1);
   const [hovered, setHovered] = useState(false);
@@ -68,7 +72,7 @@ export function AsciiAvatar() {
       <div className="hover:scale-105 transition-transform duration-300">
         <pre
           key={`${reaction}-${animKey.current}`}
-          className={`text-foreground leading-none font-mono select-none text-[6px] @xs:text-[7px] @sm:text-[8px] @md:text-[9px] avatar-${reaction}`}
+          className={`text-foreground leading-none font-mono select-none ${isMobile ? "text-[9px]" : "text-[6px] @xs:text-[7px] @sm:text-[8px] @md:text-[9px]"} avatar-${reaction}`}
           style={{ transformStyle: "preserve-3d" }}
         >
           {"        ▄▓████▓▄\n"}

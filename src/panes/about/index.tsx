@@ -1,30 +1,20 @@
 "use client";
 
-import { Envelope, FileText, Phone } from "@phosphor-icons/react";
 import { AsciiAvatar } from "./components/ascii-avatar";
 import { TilingWmIcon } from "./components/tiling-wm-icon";
 import { BeerIcon } from "./components/beer-icon";
 import { DirewolfIcon } from "./components/direwolf-icon";
 import { TerminalConfigIcon } from "./components/terminal-config-icon";
-import Image from "next/image";
-
-const CV_URLS: Record<string, string> = {
-  en: "/cv-en.pdf",
-  fr: "/cv-en.pdf",
-  nb: "/cv-nb.pdf",
-  nn: "/cv-nb.pdf",
-};
+import { EnvelopeIcon } from "@phosphor-icons/react";
+import { PhoneIcon } from "@phosphor-icons/react/dist/ssr";
+import type { Landing } from "@/shared/types";
 
 interface Props {
-  locale?: string;
-  viewResume?: string;
-  landing: {
-    title: string;
-    terminal: { mainText: string };
-  };
+  landing: Landing;
+  isMobile?: boolean;
 }
 
-export function AboutPane({ locale = "en", viewResume, landing }: Props) {
+export function AboutPane({ landing, isMobile }: Props) {
   return (
     <div className="p-3 @sm:p-4 gap-4 @sm:gap-8 h-full flex flex-col @sm:flex-row items-center justify-center overflow-auto">
       <div className="relative">
@@ -44,7 +34,7 @@ export function AboutPane({ locale = "en", viewResume, landing }: Props) {
         <div className="group">
           <div className="absolute -inset-1.5 " />
           <div className="relative  p-2 @md:p-3 transition-all">
-            <AsciiAvatar />
+            <AsciiAvatar isMobile={isMobile} />
           </div>
         </div>
       </div>
@@ -55,14 +45,14 @@ export function AboutPane({ locale = "en", viewResume, landing }: Props) {
             <span className="text-primary">{" <Fredrik/>"}</span>
           </h1>
           <p className="text-muted-foreground text-3xs @xs:text-2xs @md:text-xs leading-relaxed">
-            {landing.terminal.mainText}
+            {landing.mainText}
           </p>
           <div className="pt-1.5  space-y-2 mt-auto text-3xs @xs:text-2xs @md:text-xs">
             <a
               href="mailto:fhansteen@gmail.com"
               className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors group/link"
             >
-              <Envelope
+              <EnvelopeIcon
                 weight="bold"
                 className="w-3 h-3 text-primary opacity-60 group-hover/link:opacity-100 transition-opacity"
               />
@@ -73,7 +63,7 @@ export function AboutPane({ locale = "en", viewResume, landing }: Props) {
               href="tel:+4747630231"
               className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors group/link"
             >
-              <Phone
+              <PhoneIcon
                 weight="bold"
                 className="w-3 h-3 text-primary opacity-60 group-hover/link:opacity-100 transition-opacity"
               />
