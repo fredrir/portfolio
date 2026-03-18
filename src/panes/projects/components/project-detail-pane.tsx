@@ -1,14 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { USER_HOST } from "@/lib/constants";
 import Link from "next/link";
 import type { projectType, UiStrings } from "@/shared/types";
-import {
-  AppleLogoIcon,
-  GithubLogoIcon,
-  LinkIcon,
-} from "@phosphor-icons/react/dist/ssr";
+import { GithubLogoIcon, LinkIcon } from "@phosphor-icons/react/dist/ssr";
 
 interface Props {
   project: projectType;
