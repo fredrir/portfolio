@@ -7,7 +7,7 @@ import { TerminalConfigIcon } from "./components/terminal-config-icon";
 import { EnvelopeIcon } from "@phosphor-icons/react";
 import { PhoneIcon } from "@phosphor-icons/react/dist/ssr";
 import type { Landing } from "@/shared/types";
-import { FredVatar } from "./components/fredvatar";
+import { FredVatar } from "./fredvatar";
 
 interface Props {
   landing: Landing;
