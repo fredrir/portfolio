@@ -81,16 +81,15 @@ export function SpotifyPane({
         });
       }
     }
-  }, []);
+  }, [executeRecaptcha]);
 
   useEffect(() => {
     const interval = setInterval(fetchSpotify, SPOTIFY_POLL_INTERVAL);
     return () => clearInterval(interval);
   }, [fetchSpotify]);
 
-  const displayData = data?.ok
-    ? data
-    : lastKnownRef.current?.title
+  const displayData =
+    data?.ok === false && lastKnownRef.current?.title
       ? {
           ...lastKnownRef.current,
           isPlaying: false,

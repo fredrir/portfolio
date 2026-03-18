@@ -17,7 +17,7 @@ const TOP_ARTISTS_ENDPOINT =
 
 const CACHE_KEY = "spotify_last_played";
 
-async function getAccessToken() {
+async function getAccessToken(): Promise<string> {
   const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64");
 
   const response = await fetch(TOKEN_ENDPOINT, {
@@ -32,7 +32,16 @@ async function getAccessToken() {
     }),
   });
 
-  return response.json();
+  if (!response.ok) {
+    throw new Error(`Spotify token refresh failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (!data.access_token) {
+    throw new Error("Spotify token response missing access_token");
+  }
+
+  return data.access_token;
 }
 
 interface SpotifyArtistRaw {
@@ -153,14 +162,14 @@ export async function fetchSpotifyData(): Promise<SpotifyData> {
   const cached = await loadFromSupabase();
 
   try {
-    const { access_token } = await getAccessToken();
+    const accessToken = await getAccessToken();
 
     const [nowPlayingRes, freshArtists, recentResult] = await Promise.all([
       fetch(NOW_PLAYING_ENDPOINT, {
-        headers: { Authorization: `Bearer ${access_token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       }),
-      fetchTopArtists(access_token),
-      fetchRecentTracks(access_token),
+      fetchTopArtists(accessToken),
+      fetchRecentTracks(accessToken),
     ]);
 
     const { tracks: freshTracks, lastPlayedAt } = recentResult;
@@ -183,7 +192,7 @@ export async function fetchSpotifyData(): Promise<SpotifyData> {
           topArtists,
           recentTracks,
         };
-        saveToSupabase(result);
+        await saveToSupabase(result);
         return result;
       }
     }
@@ -197,7 +206,7 @@ export async function fetchSpotifyData(): Promise<SpotifyData> {
         topArtists,
         recentTracks: recentTracks.slice(1),
       };
-      saveToSupabase(result);
+      await saveToSupabase(result);
       return result;
     }
 

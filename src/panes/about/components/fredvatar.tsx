@@ -125,7 +125,7 @@ function Eye({
       </mesh>
       <mesh ref={irisRef} position={[0, 0, 0.035]}>
         <sphereGeometry args={[0.03, 16, 16]} />
-        <meshStandardMaterial color="#5B8BA0" />
+        <meshStandardMaterial color="#0350F7" />
       </mesh>
       <mesh ref={pupilRef} position={[0, 0, 0.048]}>
         <sphereGeometry args={[0.015, 16, 16]} />
@@ -150,8 +150,8 @@ function Mouth({ expression }: { expression: number }) {
     } else {
       const t = clock.getElapsedTime();
       const wave =
-        Math.sin(t * 8) * 0.5 + Math.sin(t * 13) * 0.3 + Math.sin(t * 5) * 0.2;
-      const open = 0.5 + Math.max(0, wave) * 1.4;
+        Math.sin(t * 8) * 0.4 + Math.sin(t * 13) * 0.3 + Math.sin(t * 5) * 0.2;
+      const open = 0.3 + Math.max(0, wave) * 1.4;
       const wide = 1 + Math.max(0, wave) * 0.3;
       groupRef.current.scale.set(wide, open, 1);
     }
@@ -542,7 +542,7 @@ export function FredVatar() {
 
   return (
     <div
-      className="cursor-pointer w-[130px] h-[220px] @sm:w-[140px] @sm:h-[250px] @xl:w-[180px] @xl:h-[226px]"
+      className="cursor-pointer w-32.5 h-55 @sm:w-35 @sm:h-62.5 @xl:w-45 @xl:h-56.5"
       onClick={triggerReaction}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
