@@ -3,9 +3,10 @@
 import { useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { SHIRT, SKIN } from "./constants";
+import { SHIRT } from "./constants";
+import { Hand } from "./hand";
 
-export function Arm({ side, reaction }: { side: 1 | -1; reaction: string }) {
+export function Arm({ side, reaction }: { side: -1 | 1; reaction: string }) {
   const s = side;
   const shoulderRef = useRef<THREE.Group>(null);
   const elbowRef = useRef<THREE.Group>(null);
@@ -60,10 +61,7 @@ export function Arm({ side, reaction }: { side: 1 | -1; reaction: string }) {
             <meshStandardMaterial color={SHIRT} roughness={0.7} />
           </mesh>
 
-          <mesh position={[0, -0.36, 0.02]}>
-            <sphereGeometry args={[0.045, 24, 24]} />
-            <meshStandardMaterial color={SKIN} roughness={0.55} />
-          </mesh>
+          <Hand side={side} />
         </group>
       </group>
     </group>
