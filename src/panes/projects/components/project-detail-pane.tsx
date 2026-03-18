@@ -91,7 +91,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
   const langs = project.languages.split(",").map((l) => l.trim());
 
   return (
-    <div className="font-mono text-xs h-full flex flex-col overflow-auto">
+    <div className="h-full flex flex-col overflow-auto">
       <div className="flex-1 p-4 space-y-4">
         <div>
           <h2 className="text-lg font-bold text-foreground tracking-tight">

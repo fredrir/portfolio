@@ -100,8 +100,7 @@ export function SpotifyPane({
       : data;
 
   return (
-    <div className="h-full overflow-hidden">
-      <div className="px-2 @sm:px-3 font-mono text-xs leading-relaxed h-full overflow-hidden">
+      <div className="px-2 @sm:px-3 leading-relaxed h-full overflow-hidden">
         <div ref={containerRef} className="h-full flex flex-col">
           <div className="flex-1 overflow-y-auto min-h-0">
             <SpotifyCard title="/proc/spotify/recently-played" command="cat ">
@@ -137,7 +136,6 @@ export function SpotifyPane({
             <CavaVisualizer />
           </div>
         </div>
-      </div>
     </div>
   );
 }

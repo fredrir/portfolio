@@ -18,7 +18,7 @@ export function JourneyPane({ journey, onOpenDetail, ui }: Props) {
   });
 
   return (
-    <div className="p-2 @sm:p-3 font-mono text-xs h-full flex flex-col">
+    <div className="p-2 @sm:p-3 h-full flex flex-col">
       <div className="flex-1 overflow-y-auto space-y-0.5 min-h-0">
         {sorted.map((j: journeyType) => (
           <button

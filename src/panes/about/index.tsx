@@ -26,7 +26,7 @@ interface Props {
 
 export function AboutPane({ locale = "en", viewResume, landing }: Props) {
   return (
-    <div className="p-3 @sm:p-4 gap-4 @sm:gap-8 font-mono text-xs h-full flex flex-col @sm:flex-row items-center justify-center overflow-auto @container">
+    <div className="p-3 @sm:p-4 gap-4 @sm:gap-8 h-full flex flex-col @sm:flex-row items-center justify-center overflow-auto">
       <div className="relative">
         <div className="absolute -top-5 -left-5 @xs:-top-7 @xs:-left-7 w-8 h-8 @xs:w-10 @xs:h-10 opacity-20 hover:opacity-40 transition-opacity">
           <TilingWmIcon />

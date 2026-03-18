@@ -42,8 +42,7 @@ export function GitHubPane({
     : 1;
 
   return (
-    <div className="h-full overflow-auto">
-      <div className="p-2 @sm:p-3 font-mono text-xs leading-relaxed h-full overflow-y-auto">
+      <div className="p-2 @sm:p-3 leading-relaxed h-full overflow-y-auto">
         <div ref={containerRef} className="h-full">
           <div className={`flex flex-col ${compact ? "gap-2" : "gap-4"}`}>
             {!data ? (
@@ -161,7 +160,6 @@ export function GitHubPane({
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 }

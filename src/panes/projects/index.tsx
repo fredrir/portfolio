@@ -13,7 +13,7 @@ interface Props {
 
 export function ProjectsPane({ projects, viewCode, onOpenDetail, ui }: Props) {
   return (
-    <div className="p-2 @sm:p-3 font-mono text-xs h-full flex flex-col">
+    <div className="p-2 @sm:p-3 h-full flex flex-col">
       <div className="flex-1 overflow-y-auto min-h-0">
         <div className="grid gap-0.5 @md:gap-1">
           {projects.map((project) => {
