@@ -7,7 +7,8 @@ import { SKIN, SKIN_SHADOW, SHIRT, HAIR_DARK, easeInOut } from "./constants";
 import { Hair } from "./hair";
 import { Eye } from "./eye";
 import { Mouth } from "./mouth";
-import { Collar, Buttons, Arm, Leg, Shoe } from "./body";
+import { Collar, Buttons, Leg, Shoe } from "./body";
+import { Arm } from "./arm";
 
 export function AvatarModel({
   reaction,
@@ -200,8 +201,8 @@ export function AvatarModel({
 
       <Buttons />
 
-      <Arm side={-1} />
-      <Arm side={1} />
+      <Arm side={-1} reaction={reaction} />
+      <Arm side={1} reaction={reaction} />
 
       <Leg side={-1} />
       <Leg side={1} />

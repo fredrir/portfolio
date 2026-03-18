@@ -1,6 +1,6 @@
 "use client";
 
-import { SHIRT, SKIN, PANTS, PANTS_DARK } from "./constants";
+import { SHIRT, PANTS, PANTS_DARK } from "./constants";
 
 export function Collar() {
   return (
@@ -31,29 +31,6 @@ export function Buttons() {
   );
 }
 
-export function Arm({ side }: { side: 1 | -1 }) {
-  const s = side;
-  return (
-    <group position={[s * 0.3, -0.58, 0]}>
-      <mesh>
-        <sphereGeometry args={[0.07, 24, 24]} />
-        <meshStandardMaterial color={SHIRT} roughness={0.7} />
-      </mesh>
-      <mesh position={[s * -0.02, -0.22, 0]} rotation={[0, 0, s * 0.06]}>
-        <capsuleGeometry args={[0.055, 0.24, 16, 32]} />
-        <meshStandardMaterial color={SHIRT} roughness={0.7} />
-      </mesh>
-      <mesh position={[s * -0.04, -0.46, 0]}>
-        <capsuleGeometry args={[0.05, 0.22, 16, 32]} />
-        <meshStandardMaterial color={SHIRT} roughness={0.7} />
-      </mesh>
-      <mesh position={[s * -0.04, -0.66, 0.02]}>
-        <sphereGeometry args={[0.045, 24, 24]} />
-        <meshStandardMaterial color={SKIN} roughness={0.55} />
-      </mesh>
-    </group>
-  );
-}
 
 export function Leg({ side }: { side: 1 | -1 }) {
   return (
