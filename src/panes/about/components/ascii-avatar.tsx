@@ -4,7 +4,24 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-const REACTIONS = ["spin", "bounce", "wiggle", "flip"] as const;
+const REACTIONS = [
+  "spin",
+  "bounce",
+  "wiggle",
+  "flip",
+  "wave",
+  "nod",
+  "jello",
+  "disco",
+] as const;
+
+const SHIRT = "#B8A089";
+const SHIRT_DARK = "#A08870";
+const SKIN = "#F0C8AD";
+const SKIN_SHADOW = "#E8BFA3";
+const HAIR = "#8B6B4A";
+const HAIR_DARK = "#5C3A1E";
+const PANTS = "#2a2a3a";
 
 interface Props {
   isMobile?: boolean;
@@ -84,7 +101,7 @@ function Hair() {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, curls.length]}>
       <sphereGeometry args={[1, 8, 8]} />
-      <meshStandardMaterial color="#8B6B4A" roughness={0.85} />
+      <meshStandardMaterial color={HAIR} roughness={0.85} />
     </instancedMesh>
   );
 }
@@ -132,8 +149,8 @@ function Eye({
 
 function Mouth({ expression }: { expression: number }) {
   const geometry = useMemo(() => {
-    const smile =
-      expression >= 0 ? [0.035, 0.06, 0.005, 0.035][expression] : 0.03;
+    const smiles = [0.035, 0.06, 0.005, 0.035, 0.05, 0.02, 0.04, 0.07];
+    const smile = expression >= 0 ? smiles[expression] : 0.03;
     const pts: THREE.Vector3[] = [];
     for (let i = 0; i <= 20; i++) {
       const t = i / 20;
@@ -160,6 +177,35 @@ function Mouth({ expression }: { expression: number }) {
     <mesh geometry={geometry} position={[0, -0.13, 0.39]}>
       <meshStandardMaterial color="#C4756E" />
     </mesh>
+  );
+}
+
+function Collar() {
+  return (
+    <group position={[0, -0.52, 0.08]}>
+      <mesh position={[-0.05, 0, 0.04]} rotation={[-0.15, 0.4, 0.25]}>
+        <boxGeometry args={[0.12, 0.07, 0.012]} />
+        <meshStandardMaterial color="#C4B49A" roughness={0.6} />
+      </mesh>
+      <mesh position={[0.05, 0, 0.04]} rotation={[-0.15, -0.4, -0.25]}>
+        <boxGeometry args={[0.12, 0.07, 0.012]} />
+        <meshStandardMaterial color="#C4B49A" roughness={0.6} />
+      </mesh>
+    </group>
+  );
+}
+
+function Buttons() {
+  const positions = [-0.62, -0.72, -0.82, -0.92, -1.02];
+  return (
+    <group>
+      {positions.map((y, i) => (
+        <mesh key={i} position={[0, y, 0.22]}>
+          <cylinderGeometry args={[0.012, 0.012, 0.005, 8]} />
+          <meshStandardMaterial color={SHIRT_DARK} roughness={0.5} />
+        </mesh>
+      ))}
+    </group>
   );
 }
 
@@ -250,6 +296,50 @@ function AvatarModel({
         g.scale.set(s, s, s);
         break;
       }
+      case "wave": {
+        const d = 1.0;
+        const p = Math.min(e / d, 1);
+        const decay = 1 - p * p;
+        g.rotation.z = Math.sin(p * 16) * 0.2 * decay;
+        g.position.x = Math.sin(p * 16) * 0.15 * decay;
+        g.position.y = BY + Math.abs(Math.sin(p * 8)) * 0.1 * decay;
+        break;
+      }
+      case "nod": {
+        const d = 0.9;
+        const p = Math.min(e / d, 1);
+        const decay = 1 - p;
+        g.rotation.x = Math.sin(p * 14) * 0.2 * decay;
+        g.position.y = BY + Math.sin(p * 14) * 0.05 * decay;
+        break;
+      }
+      case "jello": {
+        const d = 1.2;
+        const p = Math.min(e / d, 1);
+        const decay = 1 - p;
+        const freq = p * 20;
+        g.scale.set(
+          1 + Math.sin(freq) * 0.15 * decay,
+          1 + Math.sin(freq + Math.PI) * 0.15 * decay,
+          1 + Math.sin(freq + Math.PI * 0.5) * 0.1 * decay
+        );
+        g.rotation.z = Math.sin(freq * 0.7) * 0.08 * decay;
+        break;
+      }
+      case "disco": {
+        const d = 1.4;
+        const p = Math.min(e / d, 1);
+        const decay = 1 - p * p;
+        const t = p * 18;
+        g.rotation.y = Math.sin(t) * 0.4 * decay;
+        g.rotation.z = Math.sin(t * 0.7) * 0.15 * decay;
+        g.position.y =
+          BY + Math.abs(Math.sin(t * 1.5)) * 0.2 * decay;
+        g.position.x = Math.sin(t * 0.5) * 0.12 * decay;
+        const s = 1 + Math.sin(t * 2) * 0.06 * decay;
+        g.scale.set(s, s, s);
+        break;
+      }
     }
 
     if (hovered && reaction === "idle") g.scale.multiplyScalar(1.05);
@@ -259,7 +349,7 @@ function AvatarModel({
     <group ref={ref} position={[0, 0.75, 0]}>
       <mesh scale={[1, 1.05, 0.95]}>
         <sphereGeometry args={[0.42, 32, 32]} />
-        <meshStandardMaterial color="#F0C8AD" roughness={0.55} />
+        <meshStandardMaterial color={SKIN} roughness={0.55} />
       </mesh>
 
       <Hair />
@@ -269,99 +359,139 @@ function AvatarModel({
 
       <mesh position={[-0.11, 0.13, 0.37]} rotation={[0, 0, 0.12]}>
         <boxGeometry args={[0.08, 0.012, 0.015]} />
-        <meshStandardMaterial color="#5C3A1E" />
+        <meshStandardMaterial color={HAIR_DARK} />
       </mesh>
       <mesh position={[0.11, 0.13, 0.37]} rotation={[0, 0, -0.12]}>
         <boxGeometry args={[0.08, 0.012, 0.015]} />
-        <meshStandardMaterial color="#5C3A1E" />
+        <meshStandardMaterial color={HAIR_DARK} />
       </mesh>
 
       <mesh position={[0, -0.02, 0.41]}>
         <sphereGeometry args={[0.022, 16, 16]} />
-        <meshStandardMaterial color="#E8BFA3" roughness={0.6} />
+        <meshStandardMaterial color={SKIN_SHADOW} roughness={0.6} />
       </mesh>
 
       <Mouth expression={exprIdx} />
 
       <mesh position={[-0.41, 0, 0]}>
         <sphereGeometry args={[0.045, 12, 12]} />
-        <meshStandardMaterial color="#E8BFA3" roughness={0.6} />
+        <meshStandardMaterial color={SKIN_SHADOW} roughness={0.6} />
       </mesh>
       <mesh position={[0.41, 0, 0]}>
         <sphereGeometry args={[0.045, 12, 12]} />
-        <meshStandardMaterial color="#E8BFA3" roughness={0.6} />
+        <meshStandardMaterial color={SKIN_SHADOW} roughness={0.6} />
       </mesh>
 
       <mesh position={[0, -0.5, 0]}>
         <cylinderGeometry args={[0.1, 0.13, 0.18, 16]} />
-        <meshStandardMaterial color="#F0C8AD" roughness={0.55} />
+        <meshStandardMaterial color={SKIN} roughness={0.55} />
       </mesh>
+
+      <Collar />
 
       <mesh position={[0, -0.72, 0]}>
         <cylinderGeometry args={[0.25, 0.22, 0.35, 16]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+        <meshStandardMaterial color={SHIRT} roughness={0.7} />
       </mesh>
       <mesh position={[0, -1.0, 0]}>
         <cylinderGeometry args={[0.22, 0.2, 0.25, 16]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+        <meshStandardMaterial color={SHIRT} roughness={0.7} />
       </mesh>
 
-      <group position={[-0.32, -0.65, 0]}>
-        <mesh rotation={[0, 0, 0.15]}>
-          <capsuleGeometry args={[0.06, 0.3, 8, 16]} />
-          <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+      <Buttons />
+
+      <group position={[-0.23, -0.58, 0]}>
+        <mesh>
+          <sphereGeometry args={[0.07, 12, 12]} />
+          <meshStandardMaterial color={SHIRT} roughness={0.7} />
         </mesh>
-        <mesh position={[-0.05, -0.28, 0]}>
-          <capsuleGeometry args={[0.055, 0.25, 8, 16]} />
-          <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+        <mesh position={[-0.02, -0.22, 0]} rotation={[0, 0, 0.08]}>
+          <capsuleGeometry args={[0.058, 0.24, 8, 16]} />
+          <meshStandardMaterial color={SHIRT} roughness={0.7} />
         </mesh>
-        <mesh position={[-0.06, -0.54, 0.02]}>
-          <sphereGeometry args={[0.05, 12, 12]} />
-          <meshStandardMaterial color="#F0C8AD" roughness={0.55} />
+        <mesh position={[-0.04, -0.46, 0]}>
+          <capsuleGeometry args={[0.052, 0.22, 8, 16]} />
+          <meshStandardMaterial color={SHIRT} roughness={0.7} />
+        </mesh>
+        <mesh position={[-0.04, -0.66, 0.02]}>
+          <sphereGeometry args={[0.045, 12, 12]} />
+          <meshStandardMaterial color={SKIN} roughness={0.55} />
         </mesh>
       </group>
 
-      <group position={[0.32, -0.65, 0]}>
-        <mesh rotation={[0, 0, -0.15]}>
-          <capsuleGeometry args={[0.06, 0.3, 8, 16]} />
-          <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+      <group position={[0.23, -0.58, 0]}>
+        <mesh>
+          <sphereGeometry args={[0.07, 12, 12]} />
+          <meshStandardMaterial color={SHIRT} roughness={0.7} />
         </mesh>
-        <mesh position={[0.05, -0.28, 0]}>
-          <capsuleGeometry args={[0.055, 0.25, 8, 16]} />
-          <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+        <mesh position={[0.02, -0.22, 0]} rotation={[0, 0, -0.08]}>
+          <capsuleGeometry args={[0.058, 0.24, 8, 16]} />
+          <meshStandardMaterial color={SHIRT} roughness={0.7} />
         </mesh>
-        <mesh position={[0.06, -0.54, 0.02]}>
-          <sphereGeometry args={[0.05, 12, 12]} />
-          <meshStandardMaterial color="#F0C8AD" roughness={0.55} />
+        <mesh position={[0.04, -0.46, 0]}>
+          <capsuleGeometry args={[0.052, 0.22, 8, 16]} />
+          <meshStandardMaterial color={SHIRT} roughness={0.7} />
+        </mesh>
+        <mesh position={[0.04, -0.66, 0.02]}>
+          <sphereGeometry args={[0.045, 12, 12]} />
+          <meshStandardMaterial color={SKIN} roughness={0.55} />
         </mesh>
       </group>
 
       <mesh position={[-0.1, -1.35, 0]}>
         <capsuleGeometry args={[0.08, 0.35, 8, 16]} />
-        <meshStandardMaterial color="#2a2a3a" roughness={0.7} />
+        <meshStandardMaterial color={PANTS} roughness={0.7} />
       </mesh>
       <mesh position={[0.1, -1.35, 0]}>
         <capsuleGeometry args={[0.08, 0.35, 8, 16]} />
-        <meshStandardMaterial color="#2a2a3a" roughness={0.7} />
+        <meshStandardMaterial color={PANTS} roughness={0.7} />
       </mesh>
 
       <mesh position={[-0.1, -1.72, 0]}>
         <capsuleGeometry args={[0.075, 0.3, 8, 16]} />
-        <meshStandardMaterial color="#2a2a3a" roughness={0.7} />
+        <meshStandardMaterial color={PANTS} roughness={0.7} />
       </mesh>
       <mesh position={[0.1, -1.72, 0]}>
         <capsuleGeometry args={[0.075, 0.3, 8, 16]} />
-        <meshStandardMaterial color="#2a2a3a" roughness={0.7} />
+        <meshStandardMaterial color={PANTS} roughness={0.7} />
       </mesh>
 
-      <mesh position={[-0.1, -2.0, 0.04]} rotation={[0.3, 0, 0]}>
-        <boxGeometry args={[0.1, 0.08, 0.18]} />
-        <meshStandardMaterial color="#222222" roughness={0.9} />
-      </mesh>
-      <mesh position={[0.1, -2.0, 0.04]} rotation={[0.3, 0, 0]}>
-        <boxGeometry args={[0.1, 0.08, 0.18]} />
-        <meshStandardMaterial color="#222222" roughness={0.9} />
-      </mesh>
+      <group position={[-0.1, -2.0, 0.04]} rotation={[0.3, 0, 0]}>
+        <mesh>
+          <boxGeometry args={[0.12, 0.09, 0.2]} />
+          <meshStandardMaterial color="#F0F0F0" roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.045, 0]}>
+          <boxGeometry args={[0.12, 0.02, 0.2]} />
+          <meshStandardMaterial color="#E8E8E8" roughness={0.5} />
+        </mesh>
+        <mesh position={[0, -0.045, 0]}>
+          <boxGeometry args={[0.13, 0.02, 0.21]} />
+          <meshStandardMaterial color="#DDDDDD" roughness={0.6} />
+        </mesh>
+        <mesh position={[0.03, 0.02, 0.06]}>
+          <boxGeometry args={[0.03, 0.02, 0.015]} />
+          <meshStandardMaterial color="#E85D3A" roughness={0.5} />
+        </mesh>
+      </group>
+      <group position={[0.1, -2.0, 0.04]} rotation={[0.3, 0, 0]}>
+        <mesh>
+          <boxGeometry args={[0.12, 0.09, 0.2]} />
+          <meshStandardMaterial color="#F0F0F0" roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.045, 0]}>
+          <boxGeometry args={[0.12, 0.02, 0.2]} />
+          <meshStandardMaterial color="#E8E8E8" roughness={0.5} />
+        </mesh>
+        <mesh position={[0, -0.045, 0]}>
+          <boxGeometry args={[0.13, 0.02, 0.21]} />
+          <meshStandardMaterial color="#DDDDDD" roughness={0.6} />
+        </mesh>
+        <mesh position={[-0.03, 0.02, 0.06]}>
+          <boxGeometry args={[0.03, 0.02, 0.015]} />
+          <meshStandardMaterial color="#E85D3A" roughness={0.5} />
+        </mesh>
+      </group>
     </group>
   );
 }
@@ -416,7 +546,11 @@ export function AsciiAvatar({ isMobile = false }: Props) {
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[3, 4, 5]} intensity={0.7} />
-        <directionalLight position={[-2, 2, 3]} intensity={0.3} color="#b0c4de" />
+        <directionalLight
+          position={[-2, 2, 3]}
+          intensity={0.3}
+          color="#b0c4de"
+        />
         <pointLight position={[0, 1, -2]} intensity={0.4} color="#8EC8E8" />
         <AvatarModel reaction={reaction} hovered={hovered} exprIdx={exprIdx} />
       </Canvas>
