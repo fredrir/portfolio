@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { getSupabase } from "@/lib/supabase";
+import { verifyCaptcha } from "@/lib/captcha";
 
 interface VisitorResult {
   success: boolean;
@@ -9,47 +10,13 @@ interface VisitorResult {
   error?: string;
 }
 
-async function verifyCaptcha(token: string): Promise<boolean> {
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-  if (!secretKey || !token) return false;
-
-  try {
-    const body = new URLSearchParams();
-    body.set("secret", secretKey);
-    body.set("response", token);
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-
-    let response: Response;
-    try {
-      response = await fetch(
-        "https://www.google.com/recaptcha/api/siteverify",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: body.toString(),
-          signal: controller.signal,
-        },
-      );
-    } finally {
-      clearTimeout(timeout);
-    }
-
-    const data = await response.json();
-    return (
-      data?.success === true &&
-      (typeof data?.score !== "number" || data.score >= 0.3)
-    );
-  } catch {
-    return false;
-  }
-}
-
 export async function recordVisit(
   recaptchaToken: string,
 ): Promise<VisitorResult> {
-  const captchaOk = await verifyCaptcha(recaptchaToken);
+  const captchaOk = await verifyCaptcha({
+    token: recaptchaToken,
+    expectedAction: "record_visit",
+  });
   if (!captchaOk) {
     return { success: false, error: "captcha_failed" };
   }

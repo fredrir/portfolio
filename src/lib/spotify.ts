@@ -1,11 +1,7 @@
 import "server-only";
 
 import { getSupabase } from "@/lib/supabase";
-import type {
-  SpotifyData,
-  SpotifyArtist,
-  SpotifyTrack,
-} from "@/shared/types";
+import type { SpotifyData, SpotifyArtist, SpotifyTrack } from "@/shared/types";
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
@@ -22,9 +18,7 @@ const TOP_ARTISTS_ENDPOINT =
 const CACHE_KEY = "spotify_last_played";
 
 async function getAccessToken() {
-  const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
-    "base64",
-  );
+  const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64");
 
   const response = await fetch(TOKEN_ENDPOINT, {
     method: "POST",
@@ -72,9 +66,7 @@ function parseTrack(track: SpotifyTrackRaw): SpotifyTrack {
   };
 }
 
-async function fetchTopArtists(
-  accessToken: string,
-): Promise<SpotifyArtist[]> {
+async function fetchTopArtists(accessToken: string): Promise<SpotifyArtist[]> {
   try {
     const res = await fetch(TOP_ARTISTS_ENDPOINT, {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -156,9 +148,8 @@ async function loadFromSupabase(): Promise<SpotifyData | null> {
 
 export async function fetchSpotifyData(): Promise<SpotifyData> {
   if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
-    return { isPlaying: false, notConfigured: true };
+    return { ok: false, error: "Spotify credentials not set" };
   }
-
   const cached = await loadFromSupabase();
 
   try {

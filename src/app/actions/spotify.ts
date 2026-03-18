@@ -2,6 +2,8 @@
 
 import { headers } from "next/headers";
 import { fetchSpotifyData } from "@/lib/spotify";
+import { SpotifyData, SpotifyTrack } from "@/shared/types";
+import { verifyCaptcha } from "@/lib/captcha";
 
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS = 10;
@@ -19,7 +21,16 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
-export async function getSpotifyData() {
+export async function getSpotifyData(
+  captchaToken: string,
+): Promise<SpotifyData> {
+  const captchaOk = await verifyCaptcha({
+    token: captchaToken,
+    expectedAction: "spotify_data",
+  });
+  if (!captchaOk) {
+    return { ok: false, error: "captcha_failed" };
+  }
   const h = await headers();
   const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 

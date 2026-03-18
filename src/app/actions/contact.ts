@@ -1,10 +1,11 @@
 "use server";
 
+import { verifyCaptcha } from "@/lib/captcha";
 import { z } from "zod";
 
 const contactSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
-  email: z.string().email("Invalid email address"),
+  email: z.email("Invalid email address"),
   phone: z.string().max(30, "Phone number is too long").optional().default(""),
   message: z
     .string()
@@ -17,57 +18,6 @@ interface ContactResult {
   success: boolean;
   error?: string;
   fieldErrors?: Record<string, string>;
-}
-
-async function verifyCaptcha({
-  token,
-  secretKey,
-  expectedAction,
-  minScore = 0.5,
-}: {
-  token: string;
-  secretKey: string;
-  expectedAction?: string;
-  minScore?: number;
-}): Promise<{ ok: boolean; data?: Record<string, unknown> }> {
-  try {
-    if (!secretKey) return { ok: false, data: { error: "missing-secret" } };
-    if (!token) return { ok: false, data: { error: "missing-token" } };
-
-    const body = new URLSearchParams();
-    body.set("secret", secretKey);
-    body.set("response", token);
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-
-    let response: Response;
-    try {
-      response = await fetch(
-        "https://www.google.com/recaptcha/api/siteverify",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: body.toString(),
-          signal: controller.signal,
-        },
-      );
-    } finally {
-      clearTimeout(timeout);
-    }
-
-    const data = await response.json();
-
-    const ok =
-      data?.success === true &&
-      (typeof data?.score !== "number" || data.score >= minScore) &&
-      (!expectedAction || data.action === expectedAction);
-
-    return { ok, data };
-  } catch (error) {
-    console.error("Error verifying captcha:", error);
-    return { ok: false, data: { error: "exception" } };
-  }
 }
 
 export async function sendContactForm(
@@ -88,14 +38,8 @@ export async function sendContactForm(
 
   const { name, email, phone, message, recaptchaToken } = parsed.data;
 
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-  if (!secretKey) {
-    return { success: false, error: "Server configuration error" };
-  }
-
   const captcha = await verifyCaptcha({
     token: recaptchaToken,
-    secretKey,
     expectedAction: "contact_form",
   });
 

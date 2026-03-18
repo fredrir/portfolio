@@ -133,8 +133,9 @@ export interface SpotifyArtist {
 }
 
 export interface SpotifyData {
-  isPlaying: boolean;
-  notConfigured?: boolean;
+  isPlaying?: boolean;
+  ok?: boolean;
+  error?: string;
   title?: string;
   artist?: string;
   album?: string;
