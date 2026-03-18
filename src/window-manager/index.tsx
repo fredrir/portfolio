@@ -135,7 +135,7 @@ export function WindowManager({
   );
 
   const paneContent: Record<string, React.ReactNode> = {
-    about: <AboutPane landing={landing} isMobile={isMobile ?? false} />,
+    about: <AboutPane landing={landing} />,
     github: <GitHubPane initialData={githubData} ui={ui} />,
     spotify: <SpotifyPane initialData={spotifyData} ui={ui} locale={locale} />,
     journey: (

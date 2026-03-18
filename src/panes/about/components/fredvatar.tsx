@@ -23,10 +23,6 @@ const HAIR = "#8B6B4A";
 const HAIR_DARK = "#5C3A1E";
 const PANTS = "#2a2a3a";
 
-interface Props {
-  isMobile?: boolean;
-}
-
 function sr(seed: number) {
   const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
   return x - Math.floor(x);
@@ -514,7 +510,7 @@ function AvatarModel({
   );
 }
 
-export function FredVatar({ isMobile = false }: Props) {
+export function FredVatar() {
   const [reaction, setReaction] = useState<string>("idle");
   const [exprIdx, setExprIdx] = useState(-1);
   const [hovered, setHovered] = useState(false);
@@ -546,16 +542,12 @@ export function FredVatar({ isMobile = false }: Props) {
 
   return (
     <div
-      className="cursor-pointer"
+      className="cursor-pointer w-[130px] h-[220px] @sm:w-[140px] @sm:h-[250px] @xl:w-[180px] @xl:h-[226px]"
       onClick={triggerReaction}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       role="img"
       aria-label="Interactive 3D avatar of Fredrik"
-      style={{
-        width: isMobile ? 130 : 140,
-        height: isMobile ? 220 : 250,
-      }}
     >
       <Canvas
         camera={{ position: [0, 0, 4.8], fov: 38 }}
