@@ -62,11 +62,7 @@ function Hair() {
       const y = -0.08 + sr(i * 19 + 200) * 0.35;
       const rad = 0.46 + sr(i * 29 + 300) * 0.1;
       result.push({
-        pos: new THREE.Vector3(
-          Math.cos(angle) * rad,
-          y,
-          Math.sin(angle) * rad
-        ),
+        pos: new THREE.Vector3(Math.cos(angle) * rad, y, Math.sin(angle) * rad),
         s: 0.04 + sr(i * 31 + 400) * 0.04,
       });
     }
@@ -76,7 +72,7 @@ function Hair() {
         pos: new THREE.Vector3(
           -0.2 + sr(i * 37 + 500) * 0.4,
           0.28 + sr(i * 41 + 600) * 0.16,
-          0.3 + sr(i * 43 + 700) * 0.12
+          0.3 + sr(i * 43 + 700) * 0.12,
         ),
         s: 0.03 + sr(i * 47 + 800) * 0.035,
       });
@@ -148,35 +144,58 @@ function Eye({
 }
 
 function Mouth({ expression }: { expression: number }) {
-  const geometry = useMemo(() => {
-    const smiles = [0.035, 0.06, 0.005, 0.035, 0.05, 0.02, 0.04, 0.07];
-    const smile = expression >= 0 ? smiles[expression] : 0.03;
-    const pts: THREE.Vector3[] = [];
-    for (let i = 0; i <= 20; i++) {
-      const t = i / 20;
-      pts.push(
-        new THREE.Vector3(
-          (t - 0.5) * 0.12,
-          -Math.sin(t * Math.PI) * smile,
-          0
-        )
-      );
-    }
-    return new THREE.TubeGeometry(
-      new THREE.CatmullRomCurve3(pts),
-      16,
-      0.005,
-      8,
-      false
-    );
-  }, [expression]);
+  const groupRef = useRef<THREE.Group>(null);
 
-  useEffect(() => () => geometry.dispose(), [geometry]);
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return;
+    if (expression >= 0) {
+      const heights = [0.8, 1.4, 0.3, 0.8, 1.2, 0.5, 1.0, 1.6];
+      groupRef.current.scale.set(1, heights[expression], 1);
+    } else {
+      const t = clock.getElapsedTime();
+      const wave =
+        Math.sin(t * 8) * 0.5 + Math.sin(t * 13) * 0.3 + Math.sin(t * 5) * 0.2;
+      const open = 0.5 + Math.max(0, wave) * 1.4;
+      const wide = 1 + Math.max(0, wave) * 0.3;
+      groupRef.current.scale.set(wide, open, 1);
+    }
+  });
 
   return (
-    <mesh geometry={geometry} position={[0, -0.13, 0.39]}>
-      <meshStandardMaterial color="#C4756E" />
-    </mesh>
+    <group ref={groupRef} position={[0, -0.14, 0.41]}>
+      <mesh scale={[1.4, 1, 1]}>
+        <sphereGeometry args={[0.045, 16, 16]} />
+        <meshStandardMaterial color="#C4756E" />
+      </mesh>
+      <mesh position={[-0.05, 0.025, 0.005]} scale={[0.7, 0.7, 0.7]}>
+        <sphereGeometry args={[0.025, 12, 12]} />
+        <meshStandardMaterial color="#C4756E" />
+      </mesh>
+      <mesh position={[0.05, 0.025, 0.005]} scale={[0.7, 0.7, 0.7]}>
+        <sphereGeometry args={[0.025, 12, 12]} />
+        <meshStandardMaterial color="#C4756E" />
+      </mesh>
+      <mesh position={[0, 0.02, 0.045]}>
+        <boxGeometry args={[0.065, 0.018, 0.008]} />
+        <meshBasicMaterial color="#F5F5F0" />
+      </mesh>
+      <mesh position={[-0.018, 0.02, 0.05]}>
+        <boxGeometry args={[0.02, 0.016, 0.006]} />
+        <meshBasicMaterial color="#FFFFFF" />
+      </mesh>
+      <mesh position={[0, 0.02, 0.05]}>
+        <boxGeometry args={[0.02, 0.016, 0.006]} />
+        <meshBasicMaterial color="#FFFFFF" />
+      </mesh>
+      <mesh position={[0.018, 0.02, 0.05]}>
+        <boxGeometry args={[0.02, 0.016, 0.006]} />
+        <meshBasicMaterial color="#FFFFFF" />
+      </mesh>
+      <mesh position={[0, -0.02, 0.048]}>
+        <boxGeometry args={[0.065, 0.016, 0.008]} />
+        <meshBasicMaterial color="#FFFFFF" />
+      </mesh>
+    </group>
   );
 }
 
@@ -321,7 +340,7 @@ function AvatarModel({
         g.scale.set(
           1 + Math.sin(freq) * 0.15 * decay,
           1 + Math.sin(freq + Math.PI) * 0.15 * decay,
-          1 + Math.sin(freq + Math.PI * 0.5) * 0.1 * decay
+          1 + Math.sin(freq + Math.PI * 0.5) * 0.1 * decay,
         );
         g.rotation.z = Math.sin(freq * 0.7) * 0.08 * decay;
         break;
@@ -333,8 +352,7 @@ function AvatarModel({
         const t = p * 18;
         g.rotation.y = Math.sin(t) * 0.4 * decay;
         g.rotation.z = Math.sin(t * 0.7) * 0.15 * decay;
-        g.position.y =
-          BY + Math.abs(Math.sin(t * 1.5)) * 0.2 * decay;
+        g.position.y = BY + Math.abs(Math.sin(t * 1.5)) * 0.2 * decay;
         g.position.x = Math.sin(t * 0.5) * 0.12 * decay;
         const s = 1 + Math.sin(t * 2) * 0.06 * decay;
         g.scale.set(s, s, s);
@@ -496,7 +514,7 @@ function AvatarModel({
   );
 }
 
-export function AsciiAvatar({ isMobile = false }: Props) {
+export function FredVatar({ isMobile = false }: Props) {
   const [reaction, setReaction] = useState<string>("idle");
   const [exprIdx, setExprIdx] = useState(-1);
   const [hovered, setHovered] = useState(false);
@@ -535,8 +553,8 @@ export function AsciiAvatar({ isMobile = false }: Props) {
       role="img"
       aria-label="Interactive 3D avatar of Fredrik"
       style={{
-        width: isMobile ? 130 : 160,
-        height: isMobile ? 220 : 270,
+        width: isMobile ? 130 : 140,
+        height: isMobile ? 220 : 250,
       }}
     >
       <Canvas
