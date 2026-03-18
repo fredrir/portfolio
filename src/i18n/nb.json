@@ -72,7 +72,7 @@
         "id": 5,
         "jobTitle": "Utvikler",
         "company": "RIF - Rådgivende Ingeniørers Forening",
-        "description": "Designet og utviklet hjemmesiden (rif.no) med Next.js, og integrerte Sanity som CMS. Utviklet et integrert dashbord for spørreundersøkelser og arrangementspåmelding med Next.js og PostgreSQL. Utviklet en kampanjeside for rapporten Norges tilstand (norgestilstand.no).",
+        "description": "Ansvarlig for å utvikle hjemmesiden (rif.no), et internt skjema-panel for spørreundersøkelser og arrangement-påmeldinger, et ekstern dashboard for ekspertgruppene å tilgjengeliggjøre veiledere og spørreundersøkelser.",
         "date": "August 2024 - Nåværende",
         "lightModeImageUri": "/rif-logo.svg",
         "darkModeImageUri": "/rif-logo-dark.svg",
@@ -147,7 +147,7 @@
       {
         "id": 6,
         "title": "Rif.no",
-        "description": "Jeg har utviklet og designet hovedsiden (rif.no) med Next.js og integrert Sanity som CMS. Dette lar brukerne dynamisk opprette og oppdatere sider og innhold via egendefinerte komponenter. Jeg bygget også et eget integrert dashbord for undersøkelser og arrangementregistrering med Next.js og PostgreSQL.",
+        "description": "rif.no er et monorepo som samler flere applikasjoner og tjenester i én helhetlig plattform. Løsningen består av hovedapplikasjonen (rif.no), utviklet i Next.js med App Router, som henter og renderer innhold fra et Sanity-basert CMS. Plattformen er strukturert rundt et dynamisk innholdsblokkssystem, som muligjor stor fleksibilitet i hvordan sider bygges opp og publiseres. I tillegg inngår et internt administrasjonsdashboard. Arkitekturen legger til rette forinkrementell revalidering via webhooks fra Sanity slik at innholdet er statisk rendret. Videre inngår et skjema-panel for å opprette, administrere og vise resultater fra spørreundersøkelser og arrangement-påmeldinger.",
         "languages": "Next.js / PostgreSQL / Tailwind / Sanity",
         "desktopImage": "/rif.png",
         "websiteLink": "https://rif.no/"
