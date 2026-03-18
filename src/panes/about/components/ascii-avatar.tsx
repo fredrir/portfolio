@@ -182,27 +182,27 @@ function Mouth({ expression }: { expression: number }) {
 
 function Collar() {
   return (
-    <group position={[0, -0.52, 0.08]}>
-      <mesh position={[-0.05, 0, 0.04]} rotation={[-0.15, 0.4, 0.25]}>
-        <boxGeometry args={[0.12, 0.07, 0.012]} />
-        <meshStandardMaterial color="#C4B49A" roughness={0.6} />
+    <group position={[0, -0.56, 0.22]}>
+      <mesh position={[-0.07, 0, 0]} rotation={[0, 0, 0.35]}>
+        <boxGeometry args={[0.13, 0.08, 0.015]} />
+        <meshStandardMaterial color="#C8B89E" roughness={0.55} />
       </mesh>
-      <mesh position={[0.05, 0, 0.04]} rotation={[-0.15, -0.4, -0.25]}>
-        <boxGeometry args={[0.12, 0.07, 0.012]} />
-        <meshStandardMaterial color="#C4B49A" roughness={0.6} />
+      <mesh position={[0.07, 0, 0]} rotation={[0, 0, -0.35]}>
+        <boxGeometry args={[0.13, 0.08, 0.015]} />
+        <meshStandardMaterial color="#C8B89E" roughness={0.55} />
       </mesh>
     </group>
   );
 }
 
 function Buttons() {
-  const positions = [-0.62, -0.72, -0.82, -0.92, -1.02];
+  const positions = [-0.6, -0.7, -0.8, -0.9, -1.0];
   return (
     <group>
       {positions.map((y, i) => (
-        <mesh key={i} position={[0, y, 0.22]}>
-          <cylinderGeometry args={[0.012, 0.012, 0.005, 8]} />
-          <meshStandardMaterial color={SHIRT_DARK} roughness={0.5} />
+        <mesh key={i} position={[0, y, 0.23]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.018, 0.018, 0.01, 12]} />
+          <meshStandardMaterial color="#F0EDE8" roughness={0.3} />
         </mesh>
       ))}
     </group>
@@ -400,59 +400,59 @@ function AvatarModel({
 
       <Buttons />
 
-      <group position={[-0.23, -0.58, 0]}>
+      <group position={[-0.3, -0.58, 0]}>
         <mesh>
-          <sphereGeometry args={[0.07, 12, 12]} />
+          <sphereGeometry args={[0.07, 24, 24]} />
           <meshStandardMaterial color={SHIRT} roughness={0.7} />
         </mesh>
-        <mesh position={[-0.02, -0.22, 0]} rotation={[0, 0, 0.08]}>
-          <capsuleGeometry args={[0.058, 0.24, 8, 16]} />
+        <mesh position={[-0.02, -0.22, 0]} rotation={[0, 0, 0.06]}>
+          <capsuleGeometry args={[0.055, 0.24, 16, 32]} />
           <meshStandardMaterial color={SHIRT} roughness={0.7} />
         </mesh>
         <mesh position={[-0.04, -0.46, 0]}>
-          <capsuleGeometry args={[0.052, 0.22, 8, 16]} />
+          <capsuleGeometry args={[0.05, 0.22, 16, 32]} />
           <meshStandardMaterial color={SHIRT} roughness={0.7} />
         </mesh>
         <mesh position={[-0.04, -0.66, 0.02]}>
-          <sphereGeometry args={[0.045, 12, 12]} />
+          <sphereGeometry args={[0.045, 24, 24]} />
           <meshStandardMaterial color={SKIN} roughness={0.55} />
         </mesh>
       </group>
 
-      <group position={[0.23, -0.58, 0]}>
+      <group position={[0.3, -0.58, 0]}>
         <mesh>
-          <sphereGeometry args={[0.07, 12, 12]} />
+          <sphereGeometry args={[0.07, 24, 24]} />
           <meshStandardMaterial color={SHIRT} roughness={0.7} />
         </mesh>
-        <mesh position={[0.02, -0.22, 0]} rotation={[0, 0, -0.08]}>
-          <capsuleGeometry args={[0.058, 0.24, 8, 16]} />
+        <mesh position={[0.02, -0.22, 0]} rotation={[0, 0, -0.06]}>
+          <capsuleGeometry args={[0.055, 0.24, 16, 32]} />
           <meshStandardMaterial color={SHIRT} roughness={0.7} />
         </mesh>
         <mesh position={[0.04, -0.46, 0]}>
-          <capsuleGeometry args={[0.052, 0.22, 8, 16]} />
+          <capsuleGeometry args={[0.05, 0.22, 16, 32]} />
           <meshStandardMaterial color={SHIRT} roughness={0.7} />
         </mesh>
         <mesh position={[0.04, -0.66, 0.02]}>
-          <sphereGeometry args={[0.045, 12, 12]} />
+          <sphereGeometry args={[0.045, 24, 24]} />
           <meshStandardMaterial color={SKIN} roughness={0.55} />
         </mesh>
       </group>
 
       <mesh position={[-0.1, -1.35, 0]}>
-        <capsuleGeometry args={[0.08, 0.35, 8, 16]} />
+        <capsuleGeometry args={[0.08, 0.35, 16, 32]} />
         <meshStandardMaterial color={PANTS} roughness={0.7} />
       </mesh>
       <mesh position={[0.1, -1.35, 0]}>
-        <capsuleGeometry args={[0.08, 0.35, 8, 16]} />
+        <capsuleGeometry args={[0.08, 0.35, 16, 32]} />
         <meshStandardMaterial color={PANTS} roughness={0.7} />
       </mesh>
 
       <mesh position={[-0.1, -1.72, 0]}>
-        <capsuleGeometry args={[0.075, 0.3, 8, 16]} />
+        <capsuleGeometry args={[0.075, 0.3, 16, 32]} />
         <meshStandardMaterial color={PANTS} roughness={0.7} />
       </mesh>
       <mesh position={[0.1, -1.72, 0]}>
-        <capsuleGeometry args={[0.075, 0.3, 8, 16]} />
+        <capsuleGeometry args={[0.075, 0.3, 16, 32]} />
         <meshStandardMaterial color={PANTS} roughness={0.7} />
       </mesh>
 
