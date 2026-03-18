@@ -226,7 +226,7 @@ export function ContactPane({ contact }: ContactProps) {
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="flex flex-col flex-1 font-mono text-xs "
+        className="flex flex-col flex-1"
       >
         <div className="border-b border-border-faint px-3 py-2 space-y-1.5">
           <div className="flex items-center border-b border-border-faint pb-1.5">

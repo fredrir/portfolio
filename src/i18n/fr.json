@@ -13,9 +13,7 @@
   },
   "landing": {
     "title": "Salut, je suis",
-    "terminal": {
-      "mainText": "Je poursuis actuellement un master en informatique à la Norwegian University of Science and Technology (NTNU) à Trondheim, Norvège. N'hésitez pas à consulter mon CV ou à me contacter."
-    }
+    "mainText": "Je poursuis actuellement un master en informatique à la Norwegian University of Science and Technology (NTNU) à Trondheim, Norvège. N'hésitez pas à consulter mon CV ou à me contacter."
   },
   "journey": {
     "title": "Mon Parcours",

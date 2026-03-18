@@ -21,55 +21,16 @@ export type journeyType = {
   isCurrent?: boolean;
 };
 
-export interface UiStrings {
-  theme: string;
-  language: string;
-  wallpaper: string;
-  customImage: string;
-  nowPlaying: string;
-  lastPlayed: string;
-  track: string;
-  artist: string;
-  album: string;
-  playInBrowser: string;
-  hidePlayer: string;
-  about: string;
-  techStack: string;
-  links: string;
-  visitors: string;
-  uptime: string;
-  searchApps: string;
-  noMatching: string;
-  navigate: string;
-  open: string;
-  close: string;
-  apps: string;
-  tipLauncher: string;
-  tipDrag: string;
-  tipResize: string;
-  entries: string;
-  projects: string;
-  images: string;
-  clickToOpen: string;
-  active: string;
-  stop: string;
-  start: string;
-  lastYear: string;
-  searchingGallery: string;
-  emptyGallery: string;
-  githubRepos: string;
-  githubStars: string;
-  githubFollowers: string;
-  githubFollowing: string;
-  githubSince: string;
-  githubApiError: string;
-  githubContributions: string;
-  githubCommand: string;
-  viewResume: string;
+import type EnDictionary from "@/i18n/en.json";
+
+export type Landing = (typeof EnDictionary)["landing"];
+
+type RawUi = (typeof EnDictionary)["ui"];
+export type UiStrings = Omit<RawUi, "backgrounds" | "localeTitles" | "shortTitles"> & {
   backgrounds: Record<string, string>;
   localeTitles: Record<string, string>;
   shortTitles: Record<string, string>;
-}
+};
 
 export interface ContactProps {
   contact: {

@@ -66,7 +66,7 @@ export function SettingsPane({
   return (
     <div
       ref={containerRef}
-      className="p-2 @xs:p-3 @md:p-4 font-mono text-xs h-full flex flex-col overflow-y-auto @container"
+      className="p-2 @xs:p-3 @md:p-4 h-full flex flex-col overflow-y-auto"
     >
       <div
         className={`flex-1 ${compact ? "flex flex-col gap-2" : "space-y-4 @md:space-y-5"}`}

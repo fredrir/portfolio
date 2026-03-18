@@ -31,6 +31,7 @@ import { ImagePane } from "@/panes/gallery";
 import type {
   UiStrings,
   GitHubData,
+  Landing,
   SpotifyData,
   projectType,
   journeyType,
@@ -41,7 +42,7 @@ interface Props {
   locale: string;
   currentLocale: "en" | "nb" | "nn" | "fr";
   navbar: NavbarType;
-  landing: { title: string; terminal: { mainText: string } };
+  landing: Landing;
   journey: Journey;
   project: { title: string; viewCode: string; projects: projectType[] };
   contact: {
@@ -134,7 +135,7 @@ export function WindowManager({
   );
 
   const paneContent: Record<string, React.ReactNode> = {
-    about: <AboutPane locale={locale} landing={landing} viewResume={ui.viewResume} />,
+    about: <AboutPane landing={landing} />,
     github: <GitHubPane initialData={githubData} ui={ui} />,
     spotify: <SpotifyPane initialData={spotifyData} ui={ui} locale={locale} />,
     journey: (
@@ -148,7 +149,6 @@ export function WindowManager({
       <ProjectsPane
         title={project.title}
         projects={project.projects}
-        viewCode={project.viewCode}
         onOpenDetail={handleOpenProjectDetail}
         ui={ui}
       />
@@ -168,7 +168,10 @@ export function WindowManager({
         locale={locale}
         paneIds={WINDOW_CONFIGS.map((c) => c.id)}
         projects={project.projects.map((p) => ({ title: p.title }))}
-        careers={journey.journeys.map((j) => ({ jobTitle: j.jobTitle, company: j.company }))}
+        careers={journey.journeys.map((j) => ({
+          jobTitle: j.jobTitle,
+          company: j.company,
+        }))}
         onOpenPane={(id) => {
           wm.openWindow(id);
           setFocusedId(id);

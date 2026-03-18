@@ -3,11 +3,25 @@
 import { CompanyLogo } from "./components/company-logo";
 import type { journeyType, UiStrings } from "@/shared/types";
 import type { Journey } from "@/i18n/language-types";
+import ListView from "@/shared/components/list-view";
+import ListItem from "@/shared/components/list-item";
 
 interface Props {
   journey: Journey;
   onOpenDetail: (journey: journeyType) => void;
   ui: UiStrings;
+}
+
+function JourneySubtitle({ j }: { j: journeyType }) {
+  return (
+    <p>
+      <span className="text-foreground/80 text-3xs @sm:text-2xs">
+        {j.company}
+      </span>
+      <span className="text-ghost text-3xs @sm:text-2xs"> • </span>
+      <span className="text-date-accent text-3xs @sm:text-2xs">{j.date}</span>
+    </p>
+  );
 }
 
 export function JourneyPane({ journey, onOpenDetail, ui }: Props) {
@@ -18,55 +32,27 @@ export function JourneyPane({ journey, onOpenDetail, ui }: Props) {
   });
 
   return (
-    <div className="p-2 @sm:p-3 font-mono text-xs h-full flex flex-col">
-      <div className="flex-1 overflow-y-auto space-y-0.5 min-h-0">
-        {sorted.map((j: journeyType) => (
-          <button
-            key={j.id}
-            onClick={() => onOpenDetail(j)}
-            className="w-full text-left flex items-center gap-2 @sm:gap-2.5 py-1 @sm:py-1.5 px-1.5 @sm:px-2 rounded-md hover:bg-control-hover transition-colors group"
-          >
-            <CompanyLogo journey={j} />
-
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-primary font-semibold truncate text-2xs @sm:text-xs group-hover:underline">
-                  {j.jobTitle}
-                </span>
-              </div>
-              <p className="mt-0.5">
-                <span className="text-foreground/80 text-3xs @sm:text-2xs">
-                  {j.company}
-                </span>
-                <span className="text-ghost text-3xs @sm:text-2xs">
-                  {" "}
-                  •{" "}
-                </span>
-                <span className="text-date-accent text-3xs @sm:text-2xs">
-                  {j.date}
-                </span>
-              </p>
-            </div>
-
-            {j.isCurrent && (
+    <ListView
+      numberOfItems={journey.journeys.length}
+      uiEntries={ui.entries}
+      uiClickToOpen={ui.clickToOpen}
+    >
+      {sorted.map((j: journeyType) => (
+        <ListItem
+          key={j.id}
+          visual={{ custom: <CompanyLogo journey={j} /> }}
+          title={j.jobTitle}
+          subtitle={<JourneySubtitle j={j} />}
+          onClick={() => onOpenDetail(j)}
+          badge={
+            j.isCurrent ? (
               <span className="text-primary-muted text-3xs @sm:text-2xs px-1 @sm:px-1.5 py-0.5 rounded bg-surface-soft shrink-0">
                 {ui.active}
               </span>
-            )}
-
-            <span className="text-primary-hint group-hover:text-primary-muted transition-colors shrink-0">
-              ↗
-            </span>
-          </button>
-        ))}
-      </div>
-
-      <div className="pt-1 border-t border-border-faint text-ghost text-2xs mt-1 flex justify-between">
-        <span>
-          {journey.journeys.length} {ui.entries}
-        </span>
-        <span className="text-primary-subtle">{ui.clickToOpen}</span>
-      </div>
-    </div>
+            ) : undefined
+          }
+        />
+      ))}
+    </ListView>
   );
 }

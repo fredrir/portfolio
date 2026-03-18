@@ -99,7 +99,7 @@ export function Window({
         <span className="font-mono text-3xs text-primary-subtle"></span>
       </div>
 
-      <div className="flex-1 overflow-auto min-h-0 @container relative">
+      <div className="flex-1 overflow-auto min-h-0 @container relative font-mono text-xs">
         {children}
         {showResizeGrip && (
           <div

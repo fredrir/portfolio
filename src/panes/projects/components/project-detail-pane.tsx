@@ -1,14 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { USER_HOST } from "@/lib/constants";
 import Link from "next/link";
 import type { projectType, UiStrings } from "@/shared/types";
-import {
-  AppleLogoIcon,
-  GithubLogoIcon,
-  LinkIcon,
-} from "@phosphor-icons/react/dist/ssr";
+import { GithubLogoIcon, LinkIcon } from "@phosphor-icons/react/dist/ssr";
 
 interface Props {
   project: projectType;
@@ -91,7 +86,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
   const langs = project.languages.split(",").map((l) => l.trim());
 
   return (
-    <div className="font-mono text-xs h-full flex flex-col overflow-auto">
+    <div className="h-full flex flex-col overflow-auto">
       <div className="flex-1 p-4 space-y-4">
         <div>
           <h2 className="text-lg font-bold text-foreground tracking-tight">

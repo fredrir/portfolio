@@ -23,7 +23,7 @@ export function JourneyDetailPane({ journey }: Props) {
   }, [resolvedTheme, journey.darkModeImageUri, journey.lightModeImageUri]);
 
   return (
-    <div className="h-full flex flex-col overflow-auto font-mono text-sm p-5 space-y-5">
+    <div className="h-full flex flex-col overflow-auto text-sm p-5 space-y-5">
       <div className="flex gap-4 items-start">
         {src && (
           <div className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden bg-background border border-border-faint flex items-center justify-center">
