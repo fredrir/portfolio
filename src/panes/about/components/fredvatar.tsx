@@ -21,7 +21,8 @@ const SKIN = "#F0C8AD";
 const SKIN_SHADOW = "#E8BFA3";
 const HAIR = "#8B6B4A";
 const HAIR_DARK = "#5C3A1E";
-const PANTS = "#2a2a3a";
+const PANTS = "#1E3A5F";
+const PANTS_DARK = "#162D4A";
 
 function sr(seed: number) {
   const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
@@ -475,20 +476,20 @@ function AvatarModel({
 
       <mesh position={[-0.1, -1.35, 0]}>
         <capsuleGeometry args={[0.08, 0.35, 16, 32]} />
-        <meshStandardMaterial color={PANTS} roughness={0.7} />
+        <meshStandardMaterial color={PANTS} roughness={0.95} metalness={0.02} />
       </mesh>
       <mesh position={[0.1, -1.35, 0]}>
         <capsuleGeometry args={[0.08, 0.35, 16, 32]} />
-        <meshStandardMaterial color={PANTS} roughness={0.7} />
+        <meshStandardMaterial color={PANTS} roughness={0.95} metalness={0.02} />
       </mesh>
 
       <mesh position={[-0.1, -1.72, 0]}>
         <capsuleGeometry args={[0.075, 0.3, 16, 32]} />
-        <meshStandardMaterial color={PANTS} roughness={0.7} />
+        <meshStandardMaterial color={PANTS_DARK} roughness={0.95} metalness={0.02} />
       </mesh>
       <mesh position={[0.1, -1.72, 0]}>
         <capsuleGeometry args={[0.075, 0.3, 16, 32]} />
-        <meshStandardMaterial color={PANTS} roughness={0.7} />
+        <meshStandardMaterial color={PANTS_DARK} roughness={0.95} metalness={0.02} />
       </mesh>
 
       <group position={[-0.1, -2.0, 0.04]} rotation={[0.3, 0, 0]}>
