@@ -21,31 +21,47 @@ function Hair() {
   const curls = useMemo(() => {
     const result: { pos: THREE.Vector3; s: number }[] = [];
 
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 150; i++) {
       const theta = sr(i * 7 + 1) * Math.PI * 2;
-      const phi = sr(i * 13 + 3) * Math.PI * 0.55;
-      const r = 0.44 + sr(i * 17 + 5) * 0.08;
+      const phi = sr(i * 13 + 3) * Math.PI * 0.6;
+      const r = 0.44 + sr(i * 17 + 5) * 0.14;
       const x = r * Math.sin(phi) * Math.cos(theta);
       const y = r * Math.cos(phi);
       const z = r * Math.sin(phi) * Math.sin(theta);
 
-      if (z > 0.2 && y < 0.15 && Math.abs(x) < 0.3) continue;
-      if (z > 0.3 && sr(i * 41 + 9) > 0.4) continue;
+      if (z > 0.2 && y < 0.1 && Math.abs(x) < 0.3) continue;
+      if (z > 0.35 && sr(i * 41 + 9) > 0.3) continue;
 
       result.push({
         pos: new THREE.Vector3(x, y, z),
-        s: 0.04 + sr(i * 23 + 7) * 0.04,
+        s: 0.045 + sr(i * 23 + 7) * 0.05,
       });
     }
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 30; i++) {
+      const angle = sr(i * 11 + 100) * Math.PI * 2;
+      const isSide = Math.abs(Math.cos(angle)) > 0.5;
+      if (!isSide && Math.sin(angle) > 0) continue;
+      const y = -0.08 + sr(i * 19 + 200) * 0.35;
+      const rad = 0.46 + sr(i * 29 + 300) * 0.1;
       result.push({
         pos: new THREE.Vector3(
-          -0.15 + sr(i * 37 + 500) * 0.3,
-          0.3 + sr(i * 41 + 600) * 0.12,
-          0.33 + sr(i * 43 + 700) * 0.08
+          Math.cos(angle) * rad,
+          y,
+          Math.sin(angle) * rad
         ),
-        s: 0.03 + sr(i * 47 + 800) * 0.025,
+        s: 0.04 + sr(i * 31 + 400) * 0.04,
+      });
+    }
+
+    for (let i = 0; i < 18; i++) {
+      result.push({
+        pos: new THREE.Vector3(
+          -0.2 + sr(i * 37 + 500) * 0.4,
+          0.28 + sr(i * 41 + 600) * 0.16,
+          0.3 + sr(i * 43 + 700) * 0.12
+        ),
+        s: 0.03 + sr(i * 47 + 800) * 0.035,
       });
     }
 
@@ -175,8 +191,9 @@ function AvatarModel({
     const g = ref.current;
     const e = (performance.now() - startRef.current) / 1000;
 
+    const BY = 0.75;
     g.rotation.set(0, 0, 0);
-    g.position.set(0, -0.15, 0);
+    g.position.set(0, BY, 0);
     g.scale.set(1, 1, 1);
 
     switch (reaction) {
@@ -184,7 +201,7 @@ function AvatarModel({
         const t = clock.getElapsedTime();
         g.rotation.y = Math.sin(t * 0.5) * 0.06;
         g.rotation.z = Math.sin(t * 0.35) * 0.02;
-        g.position.y = -0.15 + Math.sin(t * 0.7) * 0.015;
+        g.position.y = BY + Math.sin(t * 0.7) * 0.02;
         break;
       }
       case "spin": {
@@ -202,22 +219,22 @@ function AvatarModel({
           sy = 1 - (p / 0.15) * 0.15;
         } else if (p < 0.35) {
           const t = (p - 0.15) / 0.2;
-          yOff = t * 0.4;
+          yOff = t * 0.5;
           sy = 1 + t * 0.05;
         } else if (p < 0.55) {
           const t = (p - 0.35) / 0.2;
-          yOff = (1 - t) * 0.4;
+          yOff = (1 - t) * 0.5;
           sy = 1 + (1 - t) * 0.05;
         } else if (p < 0.72) {
           const t = (p - 0.55) / 0.17;
-          yOff = t * 0.15;
+          yOff = t * 0.2;
           sy = 1 + t * 0.02;
         } else {
           const t = (p - 0.72) / 0.28;
-          yOff = (1 - t) * 0.15;
+          yOff = (1 - t) * 0.2;
           sy = 1 + (1 - t) * 0.02;
         }
-        g.position.y = -0.15 + yOff;
+        g.position.y = BY + yOff;
         g.scale.set(1, sy, 1);
         break;
       }
@@ -239,7 +256,7 @@ function AvatarModel({
   });
 
   return (
-    <group ref={ref} position={[0, -0.15, 0]}>
+    <group ref={ref} position={[0, 0.75, 0]}>
       <mesh scale={[1, 1.05, 0.95]}>
         <sphereGeometry args={[0.42, 32, 32]} />
         <meshStandardMaterial color="#F0C8AD" roughness={0.55} />
@@ -280,9 +297,70 @@ function AvatarModel({
         <meshStandardMaterial color="#F0C8AD" roughness={0.55} />
       </mesh>
 
-      <mesh position={[0, -0.68, 0]}>
-        <cylinderGeometry args={[0.25, 0.3, 0.25, 16]} />
+      <mesh position={[0, -0.72, 0]}>
+        <cylinderGeometry args={[0.25, 0.22, 0.35, 16]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+      </mesh>
+      <mesh position={[0, -1.0, 0]}>
+        <cylinderGeometry args={[0.22, 0.2, 0.25, 16]} />
+        <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+      </mesh>
+
+      <group position={[-0.32, -0.65, 0]}>
+        <mesh rotation={[0, 0, 0.15]}>
+          <capsuleGeometry args={[0.06, 0.3, 8, 16]} />
+          <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+        </mesh>
+        <mesh position={[-0.05, -0.28, 0]}>
+          <capsuleGeometry args={[0.055, 0.25, 8, 16]} />
+          <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+        </mesh>
+        <mesh position={[-0.06, -0.54, 0.02]}>
+          <sphereGeometry args={[0.05, 12, 12]} />
+          <meshStandardMaterial color="#F0C8AD" roughness={0.55} />
+        </mesh>
+      </group>
+
+      <group position={[0.32, -0.65, 0]}>
+        <mesh rotation={[0, 0, -0.15]}>
+          <capsuleGeometry args={[0.06, 0.3, 8, 16]} />
+          <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+        </mesh>
+        <mesh position={[0.05, -0.28, 0]}>
+          <capsuleGeometry args={[0.055, 0.25, 8, 16]} />
+          <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+        </mesh>
+        <mesh position={[0.06, -0.54, 0.02]}>
+          <sphereGeometry args={[0.05, 12, 12]} />
+          <meshStandardMaterial color="#F0C8AD" roughness={0.55} />
+        </mesh>
+      </group>
+
+      <mesh position={[-0.1, -1.35, 0]}>
+        <capsuleGeometry args={[0.08, 0.35, 8, 16]} />
+        <meshStandardMaterial color="#2a2a3a" roughness={0.7} />
+      </mesh>
+      <mesh position={[0.1, -1.35, 0]}>
+        <capsuleGeometry args={[0.08, 0.35, 8, 16]} />
+        <meshStandardMaterial color="#2a2a3a" roughness={0.7} />
+      </mesh>
+
+      <mesh position={[-0.1, -1.72, 0]}>
+        <capsuleGeometry args={[0.075, 0.3, 8, 16]} />
+        <meshStandardMaterial color="#2a2a3a" roughness={0.7} />
+      </mesh>
+      <mesh position={[0.1, -1.72, 0]}>
+        <capsuleGeometry args={[0.075, 0.3, 8, 16]} />
+        <meshStandardMaterial color="#2a2a3a" roughness={0.7} />
+      </mesh>
+
+      <mesh position={[-0.1, -2.0, 0.04]} rotation={[0.3, 0, 0]}>
+        <boxGeometry args={[0.1, 0.08, 0.18]} />
+        <meshStandardMaterial color="#222222" roughness={0.9} />
+      </mesh>
+      <mesh position={[0.1, -2.0, 0.04]} rotation={[0.3, 0, 0]}>
+        <boxGeometry args={[0.1, 0.08, 0.18]} />
+        <meshStandardMaterial color="#222222" roughness={0.9} />
       </mesh>
     </group>
   );
@@ -327,12 +405,12 @@ export function AsciiAvatar({ isMobile = false }: Props) {
       role="img"
       aria-label="Interactive 3D avatar of Fredrik"
       style={{
-        width: isMobile ? 140 : 170,
-        height: isMobile ? 170 : 210,
+        width: isMobile ? 130 : 160,
+        height: isMobile ? 220 : 270,
       }}
     >
       <Canvas
-        camera={{ position: [0, 0, 2.2], fov: 40 }}
+        camera={{ position: [0, 0, 4.8], fov: 38 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: "transparent" }}
       >
