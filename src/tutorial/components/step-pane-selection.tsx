@@ -1,0 +1,61 @@
+"use client";
+
+import { WINDOW_CONFIGS } from "@/window-manager/constants";
+import type { TutorialStrings, UiStrings } from "@/shared/types";
+
+interface Props {
+  t: TutorialStrings;
+  ui: UiStrings;
+  selectedPanes: string[];
+  onTogglePane: (id: string) => void;
+}
+
+const selectableConfigs = WINDOW_CONFIGS.filter((c) => !c.isExternal);
+
+export function StepPaneSelection({
+  t,
+  ui,
+  selectedPanes,
+  onTogglePane,
+}: Props) {
+  return (
+    <div>
+      <h2 className="text-lg font-bold text-primary mb-1">
+        {t.paneSelectionTitle}
+      </h2>
+      <p className="text-sm text-readable mb-4">{t.paneSelectionBody}</p>
+      <div className="grid grid-cols-3 gap-3 max-h-48 overflow-y-auto">
+        {selectableConfigs.map((config) => {
+          const isSelected = selectedPanes.includes(config.id);
+          return (
+            <button
+              key={config.id}
+              onClick={() => onTogglePane(config.id)}
+              className={`flex flex-col items-start gap-0.5 p-2 rounded-lg border text-left transition-all ${
+                isSelected
+                  ? "border-primary bg-control-active"
+                  : "border-control-border hover:border-control-border-hover hover:bg-control-hover"
+              }`}
+            >
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={isSelected ? "text-primary" : "text-primary-dim"}
+                >
+                  {config.icon}
+                </span>
+                <span
+                  className={`text-xs font-medium truncate ${isSelected ? "text-primary" : "text-primary-dim"}`}
+                >
+                  {ui.localeTitles[config.id] ?? config.shortTitle}
+                </span>
+              </div>
+              <span className="text-xs text-faded line-clamp-2">
+                {t.paneDescriptions[config.id] ?? ""}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

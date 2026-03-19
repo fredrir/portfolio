@@ -8,9 +8,10 @@ import { THEMES } from "@/lib/themes";
 import { ThemeSwatch } from "./components/theme-swatch";
 import { BackgroundPreview } from "./components/background-preview";
 import { languages } from "./constants";
+import { LS_TUTORIAL_COMPLETED, LS_OPEN_PANES } from "@/tutorial/constants";
 import type { BackgroundConfig } from "@/window-manager/types";
 import type { NavbarType } from "@/i18n/language-types";
-import type { UiStrings } from "@/shared/types";
+import type { UiStrings, TutorialStrings } from "@/shared/types";
 
 interface Props {
   navbar: NavbarType;
@@ -18,6 +19,7 @@ interface Props {
   currentBackground: BackgroundConfig;
   onSelectBackground: (config: BackgroundConfig) => void;
   ui: UiStrings;
+  tutorial: TutorialStrings;
 }
 
 export function SettingsPane({
@@ -25,6 +27,7 @@ export function SettingsPane({
   currentBackground,
   onSelectBackground,
   ui,
+  tutorial,
 }: Props) {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
@@ -207,6 +210,21 @@ export function SettingsPane({
               <span>{ui.backgrounds.custom ?? ui.customImage}</span>
             </button>
           </div>
+        </section>
+
+        <section className={compact ? "mt-1" : "mt-2"}>
+          <button
+            onClick={() => {
+              try {
+                localStorage.removeItem(LS_TUTORIAL_COMPLETED);
+                localStorage.removeItem(LS_OPEN_PANES);
+              } catch {}
+              window.location.reload();
+            }}
+            className="px-3 py-1.5 rounded-md border border-control-border text-xs text-muted-foreground hover:border-control-border-hover hover:bg-control-hover transition-all"
+          >
+            {tutorial.restartTutorial}
+          </button>
         </section>
       </div>
     </div>

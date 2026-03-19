@@ -131,6 +131,7 @@ export default async function Home(props: { params: localeParams }) {
       project={dict.project}
       contact={dict.contact}
       ui={dict.ui}
+      tutorial={dict.tutorial}
       githubData={githubData}
       spotifyData={spotifyData}
     />

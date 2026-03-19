@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useWindowManager } from "./hooks/use-window-manager";
 import { useBackground } from "./hooks/use-background";
 import { useIsMobile } from "@/shared/hooks/use-is-mobile";
+import { useTutorial } from "@/tutorial/use-tutorial";
+import { TutorialOverlay } from "@/tutorial";
 import { Window } from "./components/window";
 import { StatusBar } from "./components/status-bar";
 import { AppLauncher } from "./components/app-launcher";
@@ -30,6 +32,7 @@ import { ImagePane } from "@/panes/gallery";
 
 import type {
   UiStrings,
+  TutorialStrings,
   GitHubData,
   Landing,
   SpotifyData,
@@ -61,6 +64,7 @@ interface Props {
     vimHintStatus: string;
   };
   ui: UiStrings;
+  tutorial: TutorialStrings;
   githubData: GitHubData | null;
   spotifyData: SpotifyData;
 }
@@ -74,12 +78,14 @@ export function WindowManager({
   project,
   contact,
   ui,
+  tutorial: tutorialStrings,
   githubData,
   spotifyData,
 }: Props) {
-  const wm = useWindowManager();
-  const bg = useBackground();
   const isMobile = useIsMobile();
+  const tutorial = useTutorial(isMobile === true, locale);
+  const wm = useWindowManager(tutorial.isActive);
+  const bg = useBackground();
   const [mobileActiveApp, _setMobileActiveApp] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
       return sessionStorage.getItem("mobileActiveApp");
@@ -114,6 +120,25 @@ export function WindowManager({
     wm.openWindow("settings");
     setFocusedId("settings");
   }, [wm]);
+
+  useEffect(() => {
+    if (!tutorial.isActive || !tutorial.step) return;
+    if (tutorial.step.id === "pane-selection") {
+      wm.setOpenPanes(tutorial.choices.openPanes);
+    }
+  }, [tutorial.isActive, tutorial.step, tutorial.choices.openPanes, wm]);
+
+  useEffect(() => {
+    if (!tutorial.isActive || !tutorial.step) return;
+    if (tutorial.step.id === "drag") {
+      wm.onSwapRef.current = tutorial.next;
+      return () => { wm.onSwapRef.current = null; };
+    }
+    if (tutorial.step.id === "resize") {
+      wm.onResizeRef.current = tutorial.next;
+      return () => { wm.onResizeRef.current = null; };
+    }
+  }, [tutorial.isActive, tutorial.step, tutorial.next, wm]);
 
   const handleOpenJourneyDetail = useCallback((j: journeyType) => {
     setFloatingDetail({
@@ -161,6 +186,7 @@ export function WindowManager({
         currentBackground={bg.current}
         onSelectBackground={bg.setBackground}
         ui={ui}
+        tutorial={tutorialStrings}
       />
     ),
     terminal: (
@@ -242,6 +268,32 @@ export function WindowManager({
     return renderPane(cell, rowIndex, colIndex);
   };
 
+  const postPaneSteps = new Set(["launcher", "drag", "resize", "done"]);
+  const tutorialIsFloating = tutorial.isActive && tutorial.step != null && postPaneSteps.has(tutorial.step.id);
+  const tutorialIsFullscreen = tutorial.isActive && !tutorialIsFloating;
+
+  const tutorialOverlay = tutorial.isActive && tutorial.step && (
+    <TutorialOverlay
+      t={tutorialStrings}
+      ui={ui}
+      currentLocale={currentLocale}
+      stepId={tutorial.step.id}
+      stepIndex={tutorial.stepIndex}
+      totalSteps={tutorial.totalSteps}
+      choices={tutorial.choices}
+      floating={tutorialIsFloating}
+      launcherOpen={wm.launcherOpen}
+      currentBackground={bg.current}
+      onSelectBackground={bg.setBackground}
+      onNext={tutorial.next}
+      onBack={tutorial.back}
+      onSkip={tutorial.skip}
+      onComplete={tutorial.complete}
+      onSetChoice={tutorial.setChoice}
+      onSaveStateForNav={tutorial.saveStateForNavigation}
+    />
+  );
+
   if (isMobile === null) {
     return (
       <div className="fixed inset-0 overflow-hidden">
@@ -254,22 +306,27 @@ export function WindowManager({
     return (
       <div className="fixed inset-0 overflow-hidden">
         <Background config={bg.current} />
-        <div className="relative z-10 h-full">
-          <MobileLayout
-            paneContent={paneContent}
+        {!tutorialIsFullscreen && (
+          <div className="relative z-10 h-full">
+            <MobileLayout
+              paneContent={paneContent}
+              activeApp={mobileActiveApp}
+              onOpenApp={setMobileActiveApp}
+              onGoHome={() => setMobileActiveApp(null)}
+              ui={ui}
+              locale={locale}
+            />
+          </div>
+        )}
+        {!tutorial.isActive && (
+          <MobileDock
             activeApp={mobileActiveApp}
             onOpenApp={setMobileActiveApp}
             onGoHome={() => setMobileActiveApp(null)}
             ui={ui}
-            locale={locale}
           />
-        </div>
-        <MobileDock
-          activeApp={mobileActiveApp}
-          onOpenApp={setMobileActiveApp}
-          onGoHome={() => setMobileActiveApp(null)}
-          ui={ui}
-        />
+        )}
+        {tutorialOverlay}
         {floatingDetail && (
           <FloatingDetail
             title={floatingDetail.title}
@@ -345,71 +402,75 @@ export function WindowManager({
     <div className="fixed inset-0 overflow-hidden">
       <Background config={bg.current} />
 
-      <div
-        className="relative flex flex-col w-full"
-        style={{
-          height: `calc(100vh - ${STATUS_BAR_HEIGHT}px)`,
-          padding: GAP,
-          gap: 0,
-        }}
-      >
-        {wm.visibleLayout.map((row, ri) => {
-          const h = wm.rowHeights[ri] ?? 100 / wm.visibleLayout.length;
-          return (
-            <div key={ri} className="contents">
-              <div
-                className="flex shrink-0"
-                style={{ flex: `${h} 0 0%`, gap: 0, minHeight: 0 }}
-              >
-                {row.map((cell, ci) => {
-                  const colWeights = wm.colWidths[ri];
-                  const w = colWeights?.[ci] ?? 1;
-                  const key = Array.isArray(cell) ? cell.join(",") : cell;
-                  return (
-                    <div key={key} className="contents">
-                      <div
-                        className="min-w-0 flex min-h-0"
-                        style={{ flex: `${w} 0 0%` }}
-                      >
-                        {renderCell(cell, ri, ci)}
-                      </div>
-                      {ci < row.length - 1 && (
-                        <div
-                          className="w-[10px] shrink-0 cursor-col-resize relative z-10 group"
-                          onMouseDown={(e) => wm.startColResize(ri, ci, e)}
-                        >
-                          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              {ri < wm.visibleLayout.length - 1 && (
+      {!tutorialIsFullscreen && (
+        <div
+          className="relative flex flex-col w-full"
+          style={{
+            height: `calc(100vh - ${STATUS_BAR_HEIGHT}px)`,
+            padding: GAP,
+            gap: 0,
+          }}
+        >
+          {wm.visibleLayout.map((row, ri) => {
+            const h = wm.rowHeights[ri] ?? 100 / wm.visibleLayout.length;
+            return (
+              <div key={ri} className="contents">
                 <div
-                  className="h-[10px] shrink-0 cursor-row-resize relative z-10 group"
-                  onMouseDown={(e) => wm.startRowResize(ri, e)}
+                  className="flex shrink-0"
+                  style={{ flex: `${h} 0 0%`, gap: 0, minHeight: 0 }}
                 >
-                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
+                  {row.map((cell, ci) => {
+                    const colWeights = wm.colWidths[ri];
+                    const w = colWeights?.[ci] ?? 1;
+                    const key = Array.isArray(cell) ? cell.join(",") : cell;
+                    return (
+                      <div key={key} className="contents">
+                        <div
+                          className="min-w-0 flex min-h-0"
+                          style={{ flex: `${w} 0 0%` }}
+                        >
+                          {renderCell(cell, ri, ci)}
+                        </div>
+                        {ci < row.length - 1 && (
+                          <div
+                            className="w-[10px] shrink-0 cursor-col-resize relative z-10 group"
+                            onMouseDown={(e) => wm.startColResize(ri, ci, e)}
+                          >
+                            <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+                {ri < wm.visibleLayout.length - 1 && (
+                  <div
+                    className="h-[10px] shrink-0 cursor-row-resize relative z-10 group"
+                    onMouseDown={(e) => wm.startRowResize(ri, e)}
+                  >
+                    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-      <TipBar ui={ui} />
+      {!tutorial.isActive && <TipBar ui={ui} />}
 
-      <StatusBar
-        states={wm.states}
-        allConfigs={WINDOW_CONFIGS}
-        locale={locale}
-        ui={ui}
-        focusedWindowId={focusedId}
-        onOpenLauncher={() => wm.setLauncherOpen(true)}
-        onOpenSettings={handleOpenSettings}
-        onFocusWindow={handleFocus}
-      />
+      {!tutorialIsFullscreen && (
+        <StatusBar
+          states={wm.states}
+          allConfigs={WINDOW_CONFIGS}
+          locale={locale}
+          ui={ui}
+          focusedWindowId={focusedId}
+          onOpenLauncher={() => wm.setLauncherOpen(true)}
+          onOpenSettings={handleOpenSettings}
+          onFocusWindow={handleFocus}
+        />
+      )}
 
       {wm.launcherOpen && (
         <AppLauncher
@@ -424,6 +485,9 @@ export function WindowManager({
           onClose={() => wm.setLauncherOpen(false)}
         />
       )}
+
+      {tutorialOverlay}
+
       {floatingDetail && (
         <FloatingDetail
           title={floatingDetail.title}

@@ -10,12 +10,27 @@ import {
 } from "../layout";
 import type { CellDef, LayoutTier } from "../layout";
 import type { WindowStates } from "../types";
+import { LS_OPEN_PANES } from "@/tutorial/constants";
 
-function getInitialStates(): WindowStates {
+function getInitialStates(allClosed: boolean): WindowStates {
   const states: WindowStates = {};
+
+  let savedPanes: string[] | null = null;
+  if (!allClosed && typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem(LS_OPEN_PANES);
+      if (raw) savedPanes = JSON.parse(raw);
+    } catch {}
+  }
+
   WINDOW_CONFIGS.forEach((config) => {
+    const isOpen = allClosed
+      ? false
+      : savedPanes
+        ? savedPanes.includes(config.id)
+        : config.defaultOpen;
     states[config.id] = {
-      isOpen: config.defaultOpen,
+      isOpen,
       isMaximized: false,
       zIndex: config.order,
     };
@@ -23,8 +38,8 @@ function getInitialStates(): WindowStates {
   return states;
 }
 
-export function useWindowManager() {
-  const [states, setStates] = useState<WindowStates>(getInitialStates);
+export function useWindowManager(initialAllClosed = false) {
+  const [states, setStates] = useState<WindowStates>(() => getInitialStates(initialAllClosed));
   const [layoutTier, setLayoutTier] = useState<LayoutTier>("large");
   const [layout, setLayout] = useState<CellDef[][]>(() =>
     DEFAULT_LAYOUT.map((row) =>
@@ -130,6 +145,23 @@ export function useWindowManager() {
     [maximizedId],
   );
 
+  const setOpenPanes = useCallback((ids: string[]) => {
+    const openSet = new Set(ids);
+    setStates((prev) => {
+      const next = { ...prev };
+      for (const id of Object.keys(next)) {
+        const shouldBeOpen = openSet.has(id);
+        if (next[id].isOpen !== shouldBeOpen) {
+          next[id] = { ...next[id], isOpen: shouldBeOpen };
+        }
+      }
+      return next;
+    });
+  }, []);
+
+  const onSwapRef = useRef<(() => void) | null>(null);
+  const onResizeRef = useRef<(() => void) | null>(null);
+
   const toggleMaximize = useCallback((id: string) => {
     setMaximizedId((prev) => (prev === id ? null : id));
   }, []);
@@ -182,6 +214,7 @@ export function useWindowManager() {
 
         if (dropTarget && dropTarget !== paneId) {
           setLayout((prev) => swapPanesInLayout(prev, paneId, dropTarget));
+          onSwapRef.current?.();
         }
 
         swapTargetRef.current = null;
@@ -222,6 +255,7 @@ export function useWindowManager() {
       const onMouseUp = () => {
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("mouseup", onMouseUp);
+        onResizeRef.current?.();
       };
 
       window.addEventListener("mousemove", onMouseMove);
@@ -256,6 +290,7 @@ export function useWindowManager() {
       const onMouseUp = () => {
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("mouseup", onMouseUp);
+        onResizeRef.current?.();
       };
 
       window.addEventListener("mousemove", onMouseMove);
@@ -297,6 +332,7 @@ export function useWindowManager() {
       const onMouseUp = () => {
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("mouseup", onMouseUp);
+        onResizeRef.current?.();
       };
 
       window.addEventListener("mousemove", onMouseMove);
@@ -337,11 +373,14 @@ export function useWindowManager() {
     setLauncherOpen,
     openWindow,
     closeWindow,
+    setOpenPanes,
     toggleMaximize,
     focusWindow,
     startTitleDrag,
     startRowResize,
     startColResize,
     startCornerResize,
+    onSwapRef,
+    onResizeRef,
   };
 }
