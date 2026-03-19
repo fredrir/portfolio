@@ -17,7 +17,7 @@ export function AboutPane({ landing }: Props) {
   return (
     <div className="p-3 @sm:p-4 @xl:p-6 gap-3 @sm:gap-6 @xl:gap-8 h-full flex flex-col @sm:flex-row items-center justify-center overflow-auto">
       <div className="flex flex-col items-center shrink-0">
-        <div className="flex flex-col items-center @xs:hidden">
+        <div className="flex flex-col items-center @xs:hidden -mb-2">
           <div className="bg-muted border border-border rounded-2xl px-3 py-1.5 text-xs font-bold text-foreground">
             {landing.title}
             <span className="text-primary">{" <Fredrik/>"}</span>

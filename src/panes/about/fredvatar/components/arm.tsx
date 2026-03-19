@@ -3,8 +3,8 @@
 import { useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { SHIRT } from "./constants";
 import { Hand } from "./hand";
+import { SHIRT } from "../constants";
 
 export function Arm({ side, reaction }: { side: -1 | 1; reaction: string }) {
   const s = side;
@@ -22,15 +22,13 @@ export function Arm({ side, reaction }: { side: -1 | 1; reaction: string }) {
         Math.sin(t * 0.55 + o) * 0.07 +
         Math.sin(t * 0.21 + o) * 0.035;
       shoulderRef.current.rotation.x =
-        Math.sin(t * 0.38 + o) * 0.05 +
-        Math.sin(t * 0.15 + o) * 0.025;
+        Math.sin(t * 0.38 + o) * 0.05 + Math.sin(t * 0.15 + o) * 0.025;
 
       elbowRef.current.rotation.z =
         s * -0.1 +
         Math.sin(t * 0.7 + o + 0.8) * 0.05 +
         Math.sin(t * 0.3 + o + 1.2) * 0.025;
-      elbowRef.current.rotation.x =
-        Math.sin(t * 0.45 + o + 0.5) * 0.03;
+      elbowRef.current.rotation.x = Math.sin(t * 0.45 + o + 0.5) * 0.03;
     } else {
       shoulderRef.current.rotation.set(0, 0, 0);
       elbowRef.current.rotation.set(0, 0, 0);

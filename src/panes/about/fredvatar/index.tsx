@@ -2,8 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
+import { AvatarModel } from "./components/avatar-model";
 import { REACTIONS } from "./constants";
-import { AvatarModel } from "./avatar-model";
 
 export function FredVatar() {
   const [reaction, setReaction] = useState<string>("idle");

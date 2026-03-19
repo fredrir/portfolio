@@ -3,12 +3,15 @@
 import { useRef, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { SKIN, SKIN_SHADOW, SHIRT, HAIR_DARK, easeInOut } from "./constants";
 import { Hair } from "./hair";
 import { Eye } from "./eye";
 import { Mouth } from "./mouth";
-import { Collar, Buttons, Leg, Shoe } from "./body";
+import { Collar } from "./collar";
+import { Buttons } from "./buttons";
+import { Leg } from "./leg";
+import { Shoe } from "./shoe";
 import { Arm } from "./arm";
+import { easeInOut, HAIR_DARK, SHIRT, SKIN, SKIN_SHADOW } from "../constants";
 
 export function AvatarModel({
   reaction,

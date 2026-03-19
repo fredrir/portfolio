@@ -1,6 +1,6 @@
 "use client";
 
-import { SKIN, SKIN_SHADOW } from "./constants";
+import { SKIN, SKIN_SHADOW } from "../constants";
 
 export function Hand({ side }: { side: 1 | -1 }) {
   const fingers = [

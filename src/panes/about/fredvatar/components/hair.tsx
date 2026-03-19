@@ -2,7 +2,7 @@
 
 import { useRef, useMemo, useEffect } from "react";
 import * as THREE from "three";
-import { HAIR, sr } from "./constants";
+import { HAIR, sr } from "../constants";
 
 export function Hair() {
   const meshRef = useRef<THREE.InstancedMesh>(null);
