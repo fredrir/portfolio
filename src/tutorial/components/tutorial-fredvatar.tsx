@@ -2,14 +2,21 @@
 
 import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
+import { cn } from "@/shared/utils/cn";
 import { AvatarModel } from "@/panes/about/fredvatar/components/avatar-model";
 
-export function TutorialFredVatar({ reaction }: { reaction: string }) {
+export function TutorialFredVatar({
+  reaction,
+  className,
+}: {
+  reaction: string;
+  className?: string;
+}) {
   const [hovered, setHovered] = useState(false);
 
   return (
     <div
-      className="w-20 h-50 md:w-40 md:h-60 shrink-0"
+      className={cn("w-20 h-50 md:w-40 md:h-60 shrink-0", className)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

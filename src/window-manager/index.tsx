@@ -121,12 +121,14 @@ export function WindowManager({
     setFocusedId("settings");
   }, [wm]);
 
+  const openPanesKey = tutorial.choices.openPanes.join(",");
   useEffect(() => {
     if (!tutorial.isActive || !tutorial.step) return;
     if (tutorial.step.id === "pane-selection") {
       wm.setOpenPanes(tutorial.choices.openPanes);
     }
-  }, [tutorial.isActive, tutorial.step, tutorial.choices.openPanes, wm]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tutorial.isActive, tutorial.step?.id, openPanesKey]);
 
   useEffect(() => {
     if (!tutorial.isActive || !tutorial.step) return;
@@ -268,7 +270,7 @@ export function WindowManager({
     return renderPane(cell, rowIndex, colIndex);
   };
 
-  const postPaneSteps = new Set(["launcher", "drag", "resize", "done"]);
+  const postPaneSteps = new Set(["launcher", "drag", "resize"]);
   const tutorialIsFloating = tutorial.isActive && tutorial.step != null && postPaneSteps.has(tutorial.step.id);
   const tutorialIsFullscreen = tutorial.isActive && !tutorialIsFloating;
 

@@ -47,7 +47,7 @@ function getReaction(stepId: string): string {
     case "welcome":
       return "wave";
     case "done":
-      return "disco";
+      return "thumbsup";
     default:
       return "idle";
   }
@@ -83,7 +83,10 @@ export function TutorialOverlay({
   }, [stepId, launcherOpen, onNext]);
 
   useEffect(() => {
-    if ((stepId === "drag" || stepId === "resize") && choices.openPanes.length < 2) {
+    if (
+      (stepId === "drag" || stepId === "resize") &&
+      choices.openPanes.length < 2
+    ) {
       onNext();
     }
   }, [stepId, choices.openPanes.length, onNext]);
@@ -147,11 +150,25 @@ export function TutorialOverlay({
     }
   };
 
+  const floatingPositions = [
+    "top-8 right-4",
+    "bottom-12 left-4",
+    "top-8 left-4",
+    "bottom-12 right-4",
+  ];
+  const posClass = floatingPositions[stepIndex % floatingPositions.length];
+
   if (floating) {
     return (
-      <div className="fixed top-8 right-4 z-[9995] flex items-end gap-3 max-w-md">
+      <motion.div
+        key={stepIndex}
+        className={`fixed ${posClass} z-9995 flex items-end gap-3 max-w-md`}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+      >
         <div className="flex-1">
-          <SpeechBubble>
+          <SpeechBubble isFloating>
             <AnimatePresence mode="wait">
               <motion.div
                 key={stepId}
@@ -201,12 +218,40 @@ export function TutorialOverlay({
         >
           {t.skip}
         </button>
+      </motion.div>
+    );
+  }
+
+  if (stepId === "done") {
+    return (
+      <div className="fixed inset-0 z-9995 flex items-center justify-center">
+        <div className="absolute inset-0 bg-overlay-medium" />
+        <motion.div
+          className="relative z-10 flex flex-col items-center gap-4"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <TutorialFredVatar
+            reaction="thumbsup"
+            className="w-48 h-64 md:w-64 md:h-80"
+          />
+          <h2 className="text-2xl md:text-3xl font-bold text-primary">
+            {t.doneTitle}
+          </h2>
+          <button
+            onClick={onComplete}
+            className="px-8 py-3 rounded-xl border border-primary-soft text-primary font-semibold text-base hover:text-primary hover:border-primary"
+          >
+            {t.startExploring}
+          </button>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-[9995] flex items-center justify-center">
+    <div className="fixed inset-0 z-9995 flex items-center justify-center">
       <div className="absolute inset-0 bg-overlay-medium" />
       <div className="relative z-10 flex items-end gap-4 max-w-lg w-full mx-4">
         <div className="flex-1">

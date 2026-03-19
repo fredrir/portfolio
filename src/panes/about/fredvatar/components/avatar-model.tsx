@@ -144,6 +144,13 @@ export function AvatarModel({
         g.scale.set(s, s, s);
         break;
       }
+      case "thumbsup": {
+        const t = clock.getElapsedTime();
+        g.rotation.y = Math.sin(t * 0.4) * 0.05;
+        g.rotation.z = -0.05;
+        g.position.y = BY + Math.sin(t * 0.8) * 0.02;
+        break;
+      }
     }
 
     if (hovered && reaction === "idle") g.scale.multiplyScalar(1.05);

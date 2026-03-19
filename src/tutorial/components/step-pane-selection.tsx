@@ -24,7 +24,7 @@ export function StepPaneSelection({
         {t.paneSelectionTitle}
       </h2>
       <p className="text-sm text-readable mb-4">{t.paneSelectionBody}</p>
-      <div className="grid grid-cols-3 gap-3 max-h-48 overflow-y-auto">
+      <div className="grid grid-cols-3 gap-3 ">
         {selectableConfigs.map((config) => {
           const isSelected = selectedPanes.includes(config.id);
           return (
@@ -37,14 +37,14 @@ export function StepPaneSelection({
                   : "border-control-border hover:border-control-border-hover hover:bg-control-hover"
               }`}
             >
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center md:mb-2 gap-1.5">
                 <span
-                  className={isSelected ? "text-primary" : "text-primary-dim"}
+                  className={isSelected ? "text-primary" : "text-primary-soft"}
                 >
                   {config.icon}
                 </span>
                 <span
-                  className={`text-xs font-medium truncate ${isSelected ? "text-primary" : "text-primary-dim"}`}
+                  className={`text-xs md:text-sm font-medium truncate ${isSelected ? "text-primary" : "text-primary-soft"}`}
                 >
                   {ui.localeTitles[config.id] ?? config.shortTitle}
                 </span>

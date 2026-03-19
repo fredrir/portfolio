@@ -13,7 +13,7 @@ interface CookieConsentBannerProps {
 
 const content = {
   en: {
-    prompt: "Fredrik Hansteen needs your cookies",
+    prompt: "Fredrik Carsten Hansteen wants your cookies",
     accept: "[Y] accept",
     decline: "[n] decline",
     info: "[i] info",
@@ -33,7 +33,7 @@ const content = {
     cookieLine: "pending...",
   },
   nb: {
-    prompt: "Fredrik Hansteen trenger dine informasjonskapsler",
+    prompt: "Fredrik Carsten Hansteen har lyst på dine informasjonskapsler",
     accept: "[Y] godta",
     decline: "[n] avslå",
     info: "[i] info",
@@ -53,7 +53,7 @@ const content = {
     cookieLine: "venter...",
   },
   nn: {
-    prompt: "Fredrik Hansteen treng dine informasjonskapslar",
+    prompt: "Fredrik Carsten Hansteen treng dine informasjonskapslar",
     accept: "[Y] godta",
     decline: "[n] avslå",
     info: "[i] info",
@@ -73,7 +73,7 @@ const content = {
     cookieLine: "ventar...",
   },
   fr: {
-    prompt: "Fredrik Hansteen a besoin de vos cookies",
+    prompt: "Fredrik Carsten Hansteen a besoin de vos cookies",
     accept: "[Y] accepter",
     decline: "[n] refuser",
     info: "[i] info",
