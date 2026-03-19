@@ -162,7 +162,6 @@ export function ContactPane({ contact }: ContactProps) {
     let token: string;
     try {
       token = await executeRecaptcha("contact_form");
-      console.log(token);
       appendLog("CAPTCHA verification .............. [  OK  ]");
     } catch (error) {
       appendLog("CAPTCHA verification .............. [FAILED]");

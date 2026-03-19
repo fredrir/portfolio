@@ -22,9 +22,8 @@ export function ContributionGraph({
   lastYearLabel?: string;
   contributionsLabel?: string;
 }) {
-  const numWeeks = Math.ceil(contributions.length / 7);
   const weeks: (ContributionDay | null)[][] = Array.from(
-    { length: numWeeks },
+    { length: 53 },
     () => Array(7).fill(null),
   );
 
@@ -36,7 +35,7 @@ export function ContributionGraph({
         MS_PER_DAY,
     );
     const weekIdx = Math.floor(daysSinceStart / 7);
-    if (weekIdx >= 0 && weekIdx < numWeeks) {
+    if (weekIdx >= 0 && weekIdx < 53) {
       weeks[weekIdx][dow] = day;
     }
   });
@@ -64,10 +63,13 @@ export function ContributionGraph({
         </div>
       </div>
 
-      <div className="w-full h-full overflow-y-hidden overflow-x-auto">
-        <div className="flex w-full font-mono leading-none">
+      <div className="w-full overflow-y-hidden overflow-x-auto">
+        <div
+          className="grid w-full font-mono leading-none"
+          style={{ gridTemplateColumns: "repeat(53, 1fr)" }}
+        >
           {weeks.map((week, wi) => (
-            <div key={wi} className="flex flex-col flex-1 min-w-0">
+            <div key={wi} className="flex flex-col">
               {week.map((day, di) => {
                 const level = day?.level ?? 0;
                 return (
