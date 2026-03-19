@@ -1,5 +1,6 @@
 "use client";
 
+import { StepLayout } from "./step-layout";
 import type { TutorialStrings } from "@/shared/types";
 
 interface Props {
@@ -8,13 +9,11 @@ interface Props {
 
 export function StepDrag({ t }: Props) {
   return (
-    <div>
-      <h2 className="text-lg font-bold text-primary mb-1">{t.dragTitle}</h2>
-      <p className="text-sm text-readable mb-3">{t.dragBody}</p>
+    <StepLayout command="hyprctl movewindow" title={t.dragTitle} body={t.dragBody}>
       <div className="flex items-center gap-2 text-xs text-faded">
         <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
         {t.dragWaiting}
       </div>
-    </div>
+    </StepLayout>
   );
 }

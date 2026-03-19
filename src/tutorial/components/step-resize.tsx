@@ -1,5 +1,6 @@
 "use client";
 
+import { StepLayout } from "./step-layout";
 import type { TutorialStrings } from "@/shared/types";
 
 interface Props {
@@ -8,13 +9,11 @@ interface Props {
 
 export function StepResize({ t }: Props) {
   return (
-    <div>
-      <h2 className="text-lg font-bold text-primary mb-1">{t.resizeTitle}</h2>
-      <p className="text-sm text-readable mb-3">{t.resizeBody}</p>
+    <StepLayout command="hyprctl resizewindow" title={t.resizeTitle} body={t.resizeBody}>
       <div className="flex items-center gap-2 text-xs text-faded">
         <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
         {t.resizeWaiting}
       </div>
-    </div>
+    </StepLayout>
   );
 }

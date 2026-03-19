@@ -3,6 +3,7 @@
 import { useTheme } from "next-themes";
 import { THEMES } from "@/lib/themes";
 import { ThemeSwatch } from "@/panes/settings/components/theme-swatch";
+import { StepLayout } from "./step-layout";
 import type { TutorialStrings } from "@/shared/types";
 
 interface Props {
@@ -14,9 +15,7 @@ export function StepTheme({ t, onSelectTheme }: Props) {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div>
-      <h2 className="text-lg font-bold text-primary mb-1">{t.themeTitle}</h2>
-      <p className="text-sm text-readable mb-4">{t.themeBody}</p>
+    <StepLayout command="hyprctl colorscheme" title={t.themeTitle} body={t.themeBody}>
       <div className="grid grid-cols-3 gap-1.5">
         {THEMES.map((th) => (
           <button
@@ -36,6 +35,6 @@ export function StepTheme({ t, onSelectTheme }: Props) {
           </button>
         ))}
       </div>
-    </div>
+    </StepLayout>
   );
 }

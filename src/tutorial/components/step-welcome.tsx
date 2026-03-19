@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { languages } from "@/panes/settings/constants";
+import { StepLayout } from "./step-layout";
 import type { TutorialStrings } from "@/shared/types";
 
 interface Props {
@@ -22,9 +23,7 @@ export function StepWelcome({
   const [, startTransition] = useTransition();
 
   return (
-    <div>
-      <h2 className="text-lg font-bold text-primary mb-1">{t.welcomeTitle}</h2>
-      <p className="text-sm text-readable mb-4">{t.welcomeBody}</p>
+    <StepLayout command="locale-gen" title={t.welcomeTitle} body={t.welcomeBody}>
       <div className="grid grid-cols-2 gap-2">
         {languages.map((lang) => {
           const isActive = lang.code === currentLocale;
@@ -52,6 +51,6 @@ export function StepWelcome({
           );
         })}
       </div>
-    </div>
+    </StepLayout>
   );
 }

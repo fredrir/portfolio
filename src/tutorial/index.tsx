@@ -205,7 +205,7 @@ export function TutorialOverlay({
               </div>
             )}
             {!showNav && stepId !== "done" && (
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border-faint">
+              <div className="flex p-4 md:p-6 items-center justify-between mt-3 pt-3 border-t border-border-faint">
                 <ProgressDots current={stepIndex} total={totalSteps} />
                 <div />
               </div>
@@ -275,7 +275,7 @@ export function TutorialOverlay({
               </motion.div>
             </AnimatePresence>
             {showNav && (
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-border-faint">
+              <div className="flex p-4 md:p-6 items-center justify-between mt-4 pt-3 border-t border-border-faint">
                 <ProgressDots current={stepIndex} total={totalSteps} />
                 <div className="flex gap-2">
                   {stepIndex > 0 && (
