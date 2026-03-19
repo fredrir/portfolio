@@ -52,7 +52,7 @@ const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
           </div>
         )}
 
-        <div className="min-w-0 text-xs @md:text-sm space-y-0.5 flex-1">
+        <div className="min-w-0 text-xs  space-y-0.5 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-primary font-semibold">
               {displayData.isPlaying ? (
