@@ -37,7 +37,7 @@ export function FredVatar() {
 
   return (
     <div
-      className="cursor-pointer w-42.5 h-65 @sm:w-35 @sm:h-62.5 @xl:w-45 @xl:h-56.5"
+      className="cursor-pointer w-38 h-65 @sm:w-35 @sm:h-62.5 @xl:w-45 @xl:h-56.5"
       onClick={triggerReaction}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

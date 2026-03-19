@@ -11,7 +11,7 @@ interface Props {
 
 export function AboutPane({ landing }: Props) {
   return (
-    <div className="p-4 gap-3  h-full flex flex-row items-center justify-center overflow-auto">
+    <div className="p-4 gap-3 h-full flex flex-row items-center overflow-auto">
       <FredVatar />
       <div className="flex flex-col min-w-0">
         <div className="inline-flex items-end gap-1.5 mb-2 @xl:mb-3">
