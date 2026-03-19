@@ -83,7 +83,7 @@ export function WindowManager({
   spotifyData,
 }: Props) {
   const isMobile = useIsMobile();
-  const tutorial = useTutorial(isMobile === true, locale);
+  const tutorial = useTutorial(locale);
   const wm = useWindowManager(tutorial.isActive);
   const bg = useBackground();
   const [mobileActiveApp, _setMobileActiveApp] = useState<string | null>(() => {
@@ -284,6 +284,7 @@ export function WindowManager({
       totalSteps={tutorial.totalSteps}
       choices={tutorial.choices}
       floating={tutorialIsFloating}
+      isMobile={isMobile === true}
       launcherOpen={wm.launcherOpen}
       currentBackground={bg.current}
       onSelectBackground={bg.setBackground}

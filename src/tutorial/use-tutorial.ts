@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { TUTORIAL_STEPS, LS_TUTORIAL_COMPLETED, LS_OPEN_PANES, SS_TUTORIAL_STATE } from "./constants";
+import { useIsMobile } from "@/shared/hooks/use-is-mobile";
 import type { TutorialStep, TutorialChoices } from "./types";
 
 interface SavedState {
@@ -32,7 +33,8 @@ function getDefaultChoices(locale: string): TutorialChoices {
   };
 }
 
-export function useTutorial(isMobile: boolean, locale: string) {
+export function useTutorial(locale: string) {
+  const isMobile = useIsMobile() === true;
   const [isActive, setIsActive] = useState(() => {
     const saved = peekSavedState();
     if (saved) return true;

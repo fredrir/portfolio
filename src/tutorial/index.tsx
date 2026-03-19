@@ -26,6 +26,7 @@ interface Props {
   totalSteps: number;
   choices: TutorialChoices;
   floating: boolean;
+  isMobile: boolean;
   launcherOpen: boolean;
   currentBackground: BackgroundConfig;
   onSelectBackground: (config: BackgroundConfig) => void;
@@ -62,6 +63,7 @@ export function TutorialOverlay({
   totalSteps,
   choices,
   floating,
+  isMobile,
   launcherOpen,
   currentBackground,
   onSelectBackground,
@@ -253,7 +255,12 @@ export function TutorialOverlay({
   return (
     <div className="fixed inset-0 z-9995 flex items-center justify-center">
       <div className="absolute inset-0 bg-overlay-medium" />
-      <div className="relative z-10 flex items-end gap-4 max-w-lg w-full mx-4">
+      {isMobile && (
+        <div className="absolute bottom-0 right-4 z-0">
+          <TutorialFredVatar reaction={getReaction(stepId)} />
+        </div>
+      )}
+      <div className="relative z-10 flex items-end gap-4 max-w-lg w-full mx-4 mb-28 md:mb-0">
         <div className="flex-1">
           <SpeechBubble>
             <AnimatePresence mode="wait">
@@ -291,7 +298,7 @@ export function TutorialOverlay({
             )}
           </SpeechBubble>
         </div>
-        <TutorialFredVatar reaction={getReaction(stepId)} />
+        {!isMobile && <TutorialFredVatar reaction={getReaction(stepId)} />}
       </div>
       <button
         onClick={onSkip}

@@ -180,7 +180,7 @@ export function CookieConsentBanner({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 sm:max-w-2xl z-50">
+    <div className="fixed bottom-4 mx-2 md:mx-0 md:right-4 sm:max-w-2xl z-50">
       <div
         className={`
           font-mono text-sm transition-all duration-250 ease-out

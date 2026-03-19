@@ -12,7 +12,7 @@ export function SpeechBubble({ children, isFloating = false }: Props) {
     <div
       className={cn(
         "relative bg-glass-heavy backdrop-blur-xl border border-border-medium rounded-xl p-4 md:p-6 shadow-lg shadow-wm-shadow-soft",
-        isFloating ? "" : "md:min-w-xl",
+        isFloating ? "" : "sm:min-w-lg lg:min-w-xl",
       )}
     >
       <div className="absolute -bottom-2 right-8 w-4 h-4 bg-glass-heavy border-b border-r border-border-medium rotate-45 -z-0" />

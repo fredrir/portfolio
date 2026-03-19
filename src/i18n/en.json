@@ -1,9 +1,9 @@
 {
   "tutorial": {
     "welcomeTitle": "Welcome!",
-    "welcomeBody": "I'm Fredrik — let me show you around my desktop. First, pick your language.",
+    "welcomeBody": "I'm Fredrik, let me show you around my desktop. Pick your language first.",
     "themeTitle": "Pick a theme",
-    "themeBody": "Choose a colorscheme that feels right.",
+    "themeBody": "Choose a color palette that suits you.",
     "wallpaperTitle": "Set your wallpaper",
     "wallpaperBody": "Pick a background for your desktop.",
     "paneSelectionTitle": "Choose your panes",
@@ -50,7 +50,7 @@
   },
   "landing": {
     "title": "Hi, I'm",
-    "mainText": "I'm currently pursuing a master's degree in Computer Science at the Norwegian University of Science and Technology (NTNU) in Trondheim, Norway. Feel free to explore my CV or get in touch with me."
+    "mainText": "I'm currently pursuing a master's degree in Computer Science at NTNU in Trondheim. You're more than welcome to have a look around or get in touch."
   },
   "journey": {
     "title": "My Journey",
@@ -107,9 +107,9 @@
       },
       {
         "id": 5,
-        "jobTitle": "Web Developer",
+        "jobTitle": "Developer",
         "company": "RIF - Consulting Engineers’ Association",
-        "description": "Designed and developed the website (rif.no) using Next.js, and integrated Sanity as a CMS. Built an integrated dashboard for surveys and event registration using Next.js and PostgreSQL. Developed a campaign site for the report Norges tilstand (norgestilstand.no)",
+        "description": "Responsible for developing the website (rif.no), an internal form panel for surveys and event registrations, and an external dashboard for expert groups to manage advisors and surveys.",
         "date": "August 2024 - Present",
         "lightModeImageUri": "/rif-logo.svg",
         "darkModeImageUri": "/rif-logo-dark.svg",
@@ -137,9 +137,9 @@
       },
       {
         "id": 1,
-        "jobTitle": "Summer Intern",
+        "jobTitle": "Test Developer",
         "company": "Maritime Optima",
-        "description": "Worked with the testing of Maritime Optima's products. Participated in the development of new regression tests for the company's products. ",
+        "description": "Developed end-to-end tests, increasing test coverage of the software. Created regression test documents and performed manual regression testing. Participated in daily standups and sprint planning in a SCRUM team.",
         "date": "June 2024 - July 2024",
         "lightModeImageUri": "/maritime-optima.svg",
         "darkModeImageUri": "/maritime-optima-dark.svg",
@@ -149,7 +149,7 @@
         "id": 2,
         "jobTitle": "Head of the Application Committee",
         "company": "Online - Student Organization",
-        "description": "Responsible for a team of 19 developers, who are divided into various projects. Overall responsibility for daily operations and administrative work related to the development and maintenance of our own IT systems.",
+        "description": "Responsible for leading a team of 19 developers, divided into various projects. Main responsibility for administrative work and leading weekly meetings. Responsible for organizing weekly work sessions and onboarding new members.",
         "date": "February 2024 - March 2025",
         "lightModeImageUri": "/appkom.svg",
         "darkModeImageUri": "/appkom-dark.svg",
@@ -159,7 +159,7 @@
         "id": 3,
         "jobTitle": "Teaching Assistant in MA0001",
         "company": "NTNU",
-        "description": "Provided academic guidance in mathematics to students at NTNU. Conducted weekly tutoring sessions Graded and provided feedback on student assignments.",
+        "description": "Led weekly exercise sessions, graded assignments and provided feedback to students.",
         "date": "August 2023 - December 2023",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg",
@@ -167,9 +167,9 @@
       },
       {
         "id": 4,
-        "jobTitle": "Summer Intern",
+        "jobTitle": "Chartering Agent Intern",
         "company": "Nordic American Tankers",
-        "description": "Introduced to the shipping company's fleet and business strategy. Assisted in the chartering of the company's fleet. Created analysis reports on global developments in the tanker market and new opportunities in the tanker sector.",
+        "description": "Created detailed reports on the impact of the war in Ukraine and compiled an overview of vessels suspected of illegally transporting Russian oil. Analyzed global developments and identified new opportunities in the tanker sector. Assisted in the chartering of the company's fleet.",
         "date": "June 2023 - July 2023",
         "lightModeImageUri": "/nat-logo.png",
         "darkModeImageUri": "/nat-logo.png",
@@ -184,7 +184,7 @@
       {
         "id": 6,
         "title": "Rif.no",
-        "description": "I've developed and designed the main website (rif.no) with Next.js, integrating Sanity as CMS, allowing the staff to dynamically create and update pages and content through custom, pre-designed components. I also built a separate, but integrated survey and event registration dashboard with Next.js and PostgreSQL for administrating the website.",
+        "description": "rif.no is a monorepo combining multiple applications and services in one unified platform. The solution consists of the main application (rif.no), built with Next.js App Router, fetching and rendering content from a Sanity-based CMS. The platform is structured around a dynamic content block system enabling great flexibility in how pages are built and published. It also includes an internal administration dashboard. The architecture supports incremental revalidation via webhooks from Sanity so content is statically rendered. Additionally, a form panel for creating, managing and displaying results from surveys and event registrations is included.",
         "languages": "Next.js / PostgreSQL / Tailwind / Sanity",
         "desktopImage": "/rif.png",
         "websiteLink": "https://rif.no/"
@@ -201,7 +201,7 @@
       {
         "id": 1,
         "title": "Admission Page",
-        "description": "Co-developed a web application with 4 fellow students to make the process of applying to committees at Online easier for both the applicants and the committees. This platform helps organize and manage applications, automate interview-time selection, making the process simpler and more straightforward for everyone.",
+        "description": "Developed a web application with 4 co-developers to make the process of applying to committees at Online easier for both applicants and committees. The platform helps organize applications and automate interview scheduling, making the process simpler and more transparent for everyone.",
         "languages": "Auth0 / Next.js / MongoDB / Tailwind",
         "desktopImage": "/online-opptak.png",
         "githubLink": "https://github.com/appKom/online-opptak/",
@@ -210,7 +210,7 @@
       {
         "id": 7,
         "title": "Charity Auction - Onlove",
-        "description": "A web app for a charity auction, where users can view auctions, bid on items, donate to the charity and view the results of the auction. A total of 66 796 NOK was raised for the charity.",
+        "description": "A web app for a charity auction, where users can view auctions, bid on items, donate to charity and view results. A total of 66,796 NOK was raised.",
         "languages": "Auth0 / Next.js / PostgreSQL / Prisma / Tailwind",
         "desktopImage": "/onlove.webp",
         "githubLink": "https://github.com/appKom/maccaroni",
@@ -227,7 +227,7 @@
       {
         "id": 5,
         "title": "Y - Social Media",
-        "description": "A social media platform where you can share posts, like posts, and follow other users. The platform is built with Vite, MongoDB and Express. The platform is built with a focus on performance and scalability, allowing it to handle a large number of users and posts. The project is hosted on a linux server with Apache2 and PM2.",
+        "description": "A social platform where you can share posts, like posts and follow other users. Built with Vite, MongoDB and Express, with a focus on performance and scalability. Hosted on a Linux server with Apache2 and PM2.",
         "languages": "Vite / MongoDB / Express / Apache2 / Tailwind",
         "desktopImage": "/y.png",
         "githubLink": "https://github.com/fredrir/Y",
@@ -236,7 +236,7 @@
       {
         "id": 9,
         "title": "Appkom - Website",
-        "description": "A website for the student committee AppKom, where you can find information about the committee, news, members and projects. The website is built with Next.js and has a custom CMS built with Prisma and PostgreSQL.",
+        "description": "A website for the student committee AppKom, with information about the committee, news, members and projects. Built with Next.js and a custom CMS with Prisma and PostgreSQL.",
         "languages": "Next.js / PostgreSQL / Prisma / Tailwind",
         "desktopImage": "/appkom.png",
         "githubLink": "https://github.com/appkom/home",
@@ -245,7 +245,7 @@
       {
         "id": 2,
         "title": "Online Events",
-        "description": "A mobile app, designed for students, where they can sign up for events, get notified about events, and play games",
+        "description": "A mobile app for students where they can sign up for events, get notifications and play games.",
         "languages": "Auth0 / Flutter / Firebase / Go / Google Cloud Platform",
         "mobileImages": [
           "/app-picture.png",
@@ -259,7 +259,7 @@
       {
         "id": 3,
         "title": "Movie Tracker",
-        "description": "A web app where you can track the movies you have watched and want to watch. Created as a project for a course in web development, in collaboration with 5 other students.",
+        "description": "A web app where you can keep track of movies you've watched and want to watch. Created as a project in web development in collaboration with 5 other students.",
         "languages": "Next.js / PostgreSQL / Tailwind",
         "desktopImage": "/movie-tracker.png",
         "githubLink": "https://github.com/fredrir/MovieTracker",
@@ -268,7 +268,7 @@
       {
         "id": 4,
         "title": "The Online Fond",
-        "description": "A web app showcasing the student organizations's fond, how it's used and it's performance. It also showcases the fond's members and the projects they have funded. The website is built with Next.js and has a custom admin panel built with Prisma and PostgreSQL, allowing the fond members to manage the website, portfolio and applications.",
+        "description": "A web app showcasing the student organization's fund, how it's used and its performance. Also shows the fund's members and projects that have received funding. The website has an admin panel built with Prisma and PostgreSQL, allowing fund members to manage the site, portfolio and applications.",
         "languages": "Next.js / OAuth 2.0 / Prisma / PostgreSQL / Tailwind",
         "desktopImage": "/onlinefondet.png",
         "githubLink": "https://github.com/appkom/onlinefondet",
