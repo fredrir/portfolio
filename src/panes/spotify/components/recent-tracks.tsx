@@ -27,12 +27,12 @@ export function RecentTracks({ tracks }: { tracks: SpotifyTrack[] }) {
                 href={track.songUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground hover:text-primary hover:underline transition-colors text-2xs truncate block"
+                className="text-foreground hover:text-primary hover:underline transition-colors text-xs truncate block"
               >
                 {track.title}
               </a>
             ) : (
-              <span className="text-foreground text-2xs truncate block">
+              <span className="text-foreground text-xs truncate block">
                 {track.title}
               </span>
             )}

@@ -82,7 +82,6 @@ function LaptopShowcase({ src, alt }: { src: string; alt: string }) {
 export function ProjectDetailPane({ project, viewCode, ui }: Props) {
   const isMobileApp = project.mobileImages && project.mobileImages.length > 0;
   const thumb = !isMobileApp ? project.desktopImage : null;
-  const slug = project.title.toLowerCase().replace(/\s+/g, "-");
   const langs = project.languages.split(",").map((l) => l.trim());
 
   return (
@@ -102,19 +101,19 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
 
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-primary font-bold text-xs uppercase tracking-wider">
+            <span className="text-primary font-bold text-base lg:text-lg uppercase tracking-wider">
               {ui.about}
             </span>
             <div className="flex-1 h-px bg-border-faint" />
           </div>
-          <p className="text-muted-foreground leading-relaxed text-xs">
+          <p className="text-muted-foreground leading-relaxed text-sm">
             {project.description}
           </p>
         </div>
 
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-primary font-bold text-xs uppercase tracking-wider">
+            <span className="text-primary font-bold text-base lg:text-lg uppercase tracking-wider">
               {ui.techStack}
             </span>
             <div className="flex-1 h-px bg-border-faint" />
@@ -123,7 +122,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
             {langs.map((lang, i) => (
               <span
                 key={i}
-                className="px-2.5 py-1 rounded-md text-2xs border border-border-medium bg-surface-dim text-primary font-medium"
+                className="px-2.5 py-1 rounded-md text-xs border border-border-medium bg-surface-dim text-primary font-medium"
               >
                 {lang}
               </span>

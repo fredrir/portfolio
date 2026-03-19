@@ -27,17 +27,17 @@ export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
                 href={artist.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground hover:text-primary hover:underline transition-colors text-2xs truncate block"
+                className="text-foreground hover:text-primary hover:underline transition-colors text-xs truncate block"
               >
                 {artist.name}
               </a>
             ) : (
-              <span className="text-foreground text-2xs truncate block">
+              <span className="text-foreground text-xs truncate block">
                 {artist.name}
               </span>
             )}
           </div>
-          <span className="text-primary-dim w-3 text-right text-2xs">
+          <span className="text-primary-dim w-3 text-right text-xs">
             {i + 1}
           </span>
         </div>

@@ -18,7 +18,7 @@ const SpotifyCard = ({
   return (
     <div className={cn("py-2 @sm:py-3", compact ? "space-y-1.5" : "space-y-3")}>
       <div className={cn("flex-1 overflow-y-auto min-h-0", className)}>
-        <div className="text-faded mb-2">
+        <div className="text-faded mb-2 text-xs">
           <span className="text-primary">$</span> {command}
           {title}
         </div>

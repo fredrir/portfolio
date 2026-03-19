@@ -42,7 +42,7 @@ export function JourneyDetailPane({ journey }: Props) {
             {journey.jobTitle}
           </h2>
 
-          <div className="text-sm text-foreground">{journey.company}</div>
+          <div className="text-base text-foreground">{journey.company}</div>
 
           <div className="text-xs text-date-accent tracking-wide">
             {journey.date}
@@ -53,7 +53,7 @@ export function JourneyDetailPane({ journey }: Props) {
       <div className="border-t border-border-faint" />
 
       <div className="space-y-2">
-        <p className="text-xs leading-relaxed text-muted-foreground">
+        <p className="text-sm leading-relaxed text-muted-foreground">
           {journey.description}
         </p>
       </div>

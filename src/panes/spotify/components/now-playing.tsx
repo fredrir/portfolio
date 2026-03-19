@@ -43,7 +43,7 @@ const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
               SPOTIFY_ASCII.map((line, i) => (
                 <span
                   key={i}
-                  className="text-green-400/60 whitespace-pre text-2xs leading-tight block"
+                  className="text-green-400/60 whitespace-pre text-xs leading-tight block"
                 >
                   {line}
                 </span>
@@ -52,7 +52,7 @@ const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
           </div>
         )}
 
-        <div className="min-w-0 space-y-0.5 flex-1">
+        <div className="min-w-0 text-xs @md:text-sm space-y-0.5 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-primary font-semibold">
               {displayData.isPlaying ? (
@@ -104,7 +104,7 @@ const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
           )}
           {displayData.isPlaying && (
             <div className="flex pt-1 items-center gap-2">
-              <span className="text-faded text-2xs w-8">
+              <span className="text-faded text-xs w-8">
                 {formatTime(displayData.progressMs ?? 0)}
               </span>
               <div className="flex-1 flex items-center">
@@ -115,14 +115,14 @@ const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
                   />
                 </div>
               </div>
-              <span className="text-faded text-2xs w-8 text-right">
+              <span className="text-faded text-xs w-8 text-right">
                 {formatTime(displayData.durationMs ?? 0)}
               </span>
             </div>
           )}
           <button
             onClick={() => setShowEmbed((prev) => !prev)}
-            className="text-2xs mt-1  text-primary-soft hover:text-primary transition-colors flex items-center gap-1.5 px-2 py-1 rounded border border-wm-border hover:border-control-border-hover hover:bg-control-hover"
+            className="text-xs mt-1  text-primary-soft hover:text-primary transition-colors flex items-center gap-1.5 px-2 py-1 rounded border border-wm-border hover:border-control-border-hover hover:bg-control-hover"
           >
             <PlayIcon className="h-2 w-2 fill-primary-soft" />
             {ui?.playInBrowser ?? "play in browser"}

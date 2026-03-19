@@ -142,7 +142,7 @@
   },
   "project": {
     "title": "Prosjektar",
-    "viewCode": "Vis kildekode",
+    "viewCode": "Kildekode",
     "projects": [
       {
         "id": 6,

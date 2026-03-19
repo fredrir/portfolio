@@ -93,7 +93,7 @@ export function MobileLayout({
                   {USER_HOST}
                 </span>
               </div>
-              <div className="flex-1 overflow-auto">
+              <div className="flex-1 overflow-auto @container font-mono text-xs">
                 <MobileBackContext.Provider
                   value={{ setBackAction, setSubtitle }}
                 >

@@ -142,7 +142,7 @@
   },
   "project": {
     "title": "Prosjekter",
-    "viewCode": "Vis Kildekode",
+    "viewCode": "Kildekode",
     "projects": [
       {
         "id": 6,

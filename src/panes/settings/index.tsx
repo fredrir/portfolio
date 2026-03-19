@@ -80,7 +80,7 @@ export function SettingsPane({
         >
           <section className={compact ? "flex-1 min-w-0" : ""}>
             <h3
-              className={`text-primary font-semibold mb-1.5 ${compact ? "text-2xs" : "text-xs mb-2"}`}
+              className={`text-primary font-semibold mb-1.5 ${compact ? "text-xs" : "text-xs mb-2"}`}
             >
               {ui.theme}
             </h3>
@@ -89,7 +89,7 @@ export function SettingsPane({
                 <button
                   key={t.id}
                   onClick={() => setTheme(t.id)}
-                  className={`flex items-center gap-1 px-1.5 py-1 @xs:px-2 @xs:py-1.5 rounded-md border text-2xs transition-all min-w-0 ${
+                  className={`flex items-center gap-1 px-1.5 py-1 @xs:px-2 @xs:py-1.5 rounded-md border text-xs transition-all min-w-0 ${
                     theme === t.id
                       ? "border-primary bg-control-active text-primary"
                       : "border-control-border text-muted-foreground hover:border-control-border-hover hover:bg-control-hover"
@@ -104,7 +104,7 @@ export function SettingsPane({
 
           <section className={compact ? "flex-1 min-w-0" : ""}>
             <h3
-              className={`text-primary font-semibold mb-1.5 ${compact ? "text-2xs" : "text-xs mb-2"}`}
+              className={`text-primary font-semibold mb-1.5 ${compact ? "text-xs" : "text-xs mb-2"}`}
             >
               {ui.language}
             </h3>
@@ -123,7 +123,7 @@ export function SettingsPane({
                         });
                       }
                     }}
-                    className={`flex items-center gap-1.5 px-2 py-1 @xs:px-2.5 @xs:py-1.5 rounded-md border text-2xs @xs:text-xs transition-all ${
+                    className={`flex items-center gap-1.5 px-2 py-1 @xs:px-2.5 @xs:py-1.5 rounded-md border text-xs @xs:text-xs transition-all ${
                       isActive
                         ? "border-primary bg-control-active text-primary"
                         : "border-control-border text-muted-foreground hover:border-control-border-hover hover:bg-control-hover"
@@ -144,7 +144,7 @@ export function SettingsPane({
 
         <section>
           <h3
-            className={`text-primary font-semibold mb-1.5 ${compact ? "text-2xs" : "text-xs mb-2"}`}
+            className={`text-primary font-semibold mb-1.5 ${compact ? "text-xs" : "text-xs mb-2"}`}
           >
             {ui.wallpaper}
           </h3>
@@ -174,7 +174,7 @@ export function SettingsPane({
             ))}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className={`flex flex-col items-center gap-1 p-1.5 rounded-md border text-2xs transition-all ${
+              className={`flex flex-col items-center gap-1 p-1.5 rounded-md border text-xs transition-all ${
                 isCustomActive
                   ? "border-primary bg-control-active text-primary"
                   : "border-control-border text-muted-foreground hover:border-control-border-hover hover:bg-control-hover"
