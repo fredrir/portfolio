@@ -32,6 +32,11 @@ export type UiStrings = Omit<RawUi, "backgrounds" | "localeTitles" | "shortTitle
   shortTitles: Record<string, string>;
 };
 
+type RawTutorial = (typeof EnDictionary)["tutorial"];
+export type TutorialStrings = Omit<RawTutorial, "paneDescriptions"> & {
+  paneDescriptions: Record<string, string>;
+};
+
 export interface ContactProps {
   contact: {
     title: string;
