@@ -23,8 +23,7 @@ export function TipBar({ ui }: Props) {
   }, [dismissed]);
   if (!visible || dismissed) return null;
   return (
-    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[9998] font-mono text-2xs bg-glass-medium border border-border-medium backdrop-blur-md rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg shadow-wm-shadow-soft">
-      <span className="text-primary">tip</span>
+    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[9998] font-mono text-xs bg-glass-medium border border-border-medium backdrop-blur-md rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg shadow-wm-shadow-soft">
       <span className="text-readable">
         <span className="text-primary-medium font-bold">Ctrl+K</span>{" "}
         {ui.tipLauncher}
