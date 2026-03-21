@@ -1,8 +1,8 @@
 "use client";
 
 import { CompanyLogo } from "./components/company-logo";
-import type { journeyType, UiStrings } from "@/shared/types";
-import type { Journey } from "@/i18n/language-types";
+import type { journeyType } from "@/shared/types";
+import type { Journey, UiStrings } from "@/i18n/types";
 import ListView from "@/shared/components/list-view";
 import ListItem from "@/shared/components/list-item";
 

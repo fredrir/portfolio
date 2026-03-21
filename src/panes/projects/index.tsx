@@ -1,6 +1,7 @@
 "use client";
 
-import type { projectType, UiStrings } from "@/shared/types";
+import type { projectType } from "@/shared/types";
+import type { UiStrings } from "@/i18n/types";
 import ListView from "@/shared/components/list-view";
 import ListItem from "@/shared/components/list-item";
 

@@ -5,7 +5,8 @@ import { AnimatedAscii } from "./components/animated-ascii";
 import { TypedLine } from "./components/typed-line";
 import { BarChart } from "./components/bar-chart";
 import { ContributionGraph } from "./components/contribution-graph";
-import type { GitHubData, UiStrings } from "@/shared/types";
+import type { GitHubData } from "@/shared/types";
+import type { UiStrings } from "@/i18n/types";
 
 export function GitHubPane({
   initialData,

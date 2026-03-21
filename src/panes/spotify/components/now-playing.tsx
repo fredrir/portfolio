@@ -1,4 +1,5 @@
-import { SpotifyData, UiStrings } from "@/shared/types";
+import type { SpotifyData } from "@/shared/types";
+import type { UiStrings } from "@/i18n/types";
 import Image from "next/image";
 import { SPOTIFY_ASCII } from "../constants";
 import { PauseIcon, PlayIcon } from "@phosphor-icons/react";

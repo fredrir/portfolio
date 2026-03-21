@@ -1,4 +1,4 @@
-import { UiStrings } from "../types";
+import type { UiStrings } from "@/i18n/types";
 
 interface Props {
   numberOfItems: number;

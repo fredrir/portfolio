@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { WINDOW_CONFIGS } from "../constants";
 import type { WindowStates } from "../types";
-import type { UiStrings } from "@/shared/types";
+import type { UiStrings } from "@/i18n/types";
 
 interface Props {
   states: WindowStates;

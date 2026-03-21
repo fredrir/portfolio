@@ -13,7 +13,7 @@ import { StepLauncher } from "./components/step-launcher";
 import { StepDrag } from "./components/step-drag";
 import { StepResize } from "./components/step-resize";
 import { StepDone } from "./components/step-done";
-import type { TutorialStrings, UiStrings } from "@/shared/types";
+import type { TutorialStrings, UiStrings } from "@/i18n/types";
 import type { BackgroundConfig } from "@/window-manager/types";
 import type { TutorialChoices } from "./types";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import type { TutorialStrings } from "@/shared/types";
+import type { TutorialStrings } from "@/i18n/types";
 
 interface Props {
   t: TutorialStrings;

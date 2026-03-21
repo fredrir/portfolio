@@ -4,7 +4,7 @@ import { useTheme } from "next-themes";
 import { THEMES } from "@/lib/themes";
 import { ThemeSwatch } from "@/panes/settings/components/theme-swatch";
 import { StepLayout } from "./step-layout";
-import type { TutorialStrings } from "@/shared/types";
+import type { TutorialStrings } from "@/i18n/types";
 
 interface Props {
   t: TutorialStrings;

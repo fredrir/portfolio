@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { UiStrings } from "@/shared/types";
+import type { UiStrings } from "@/i18n/types";
 
 interface Props {
   ui: UiStrings;

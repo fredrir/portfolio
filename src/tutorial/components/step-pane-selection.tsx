@@ -2,7 +2,7 @@
 
 import { WINDOW_CONFIGS } from "@/window-manager/constants";
 import { StepLayout } from "./step-layout";
-import type { TutorialStrings, UiStrings } from "@/shared/types";
+import type { TutorialStrings, UiStrings } from "@/i18n/types";
 
 interface Props {
   t: TutorialStrings;

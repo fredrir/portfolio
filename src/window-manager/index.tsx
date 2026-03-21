@@ -31,59 +31,30 @@ import { TerminalPane } from "@/terminal";
 import { ImagePane } from "@/panes/gallery";
 
 import type {
-  UiStrings,
-  TutorialStrings,
   GitHubData,
-  Landing,
   SpotifyData,
   projectType,
   journeyType,
 } from "@/shared/types";
-import type { Journey, NavbarType } from "@/i18n/language-types";
+import type { DictType, Locale } from "@/i18n/types";
 
 interface Props {
-  locale: string;
-  currentLocale: "en" | "nb" | "nn" | "fr";
-  navbar: NavbarType;
-  landing: Landing;
-  journey: Journey;
-  project: { title: string; viewCode: string; projects: projectType[] };
-  contact: {
-    title: string;
-    name: string;
-    email: string;
-    phone: string;
-    message: string;
-    submit: string;
-    submitSuccess: string;
-    submitError: string;
-    submitLoading: string;
-    recaptchaError: string;
-    optional: string;
-    vimHintNormal: string;
-    vimHintStatus: string;
-  };
-  ui: UiStrings;
-  tutorial: TutorialStrings;
+  currentLocale: Locale;
+  dict: DictType;
   githubData: GitHubData | null;
   spotifyData: SpotifyData;
 }
 
 export function WindowManager({
-  locale,
   currentLocale,
-  navbar,
-  landing,
-  journey,
-  project,
-  contact,
-  ui,
-  tutorial: tutorialStrings,
+  dict,
   githubData,
   spotifyData,
 }: Props) {
+  const { ui, landing, journey, project, contact, navbar } = dict;
+
   const isMobile = useIsMobile();
-  const tutorial = useTutorial(locale);
+  const tutorial = useTutorial(currentLocale);
   const wm = useWindowManager(tutorial.isActive);
   const bg = useBackground();
   const [mobileActiveApp, _setMobileActiveApp] = useState<string | null>(() => {
@@ -134,11 +105,15 @@ export function WindowManager({
     if (!tutorial.isActive || !tutorial.step) return;
     if (tutorial.step.id === "drag") {
       wm.onSwapRef.current = tutorial.next;
-      return () => { wm.onSwapRef.current = null; };
+      return () => {
+        wm.onSwapRef.current = null;
+      };
     }
     if (tutorial.step.id === "resize") {
       wm.onResizeRef.current = tutorial.next;
-      return () => { wm.onResizeRef.current = null; };
+      return () => {
+        wm.onResizeRef.current = null;
+      };
     }
   }, [tutorial.isActive, tutorial.step, tutorial.next, wm]);
 
@@ -164,7 +139,9 @@ export function WindowManager({
   const paneContent: Record<string, React.ReactNode> = {
     about: <AboutPane landing={landing} />,
     github: <GitHubPane initialData={githubData} ui={ui} />,
-    spotify: <SpotifyPane initialData={spotifyData} ui={ui} locale={locale} />,
+    spotify: (
+      <SpotifyPane initialData={spotifyData} ui={ui} locale={currentLocale} />
+    ),
     journey: (
       <JourneyPane
         journey={journey}
@@ -188,12 +165,12 @@ export function WindowManager({
         currentBackground={bg.current}
         onSelectBackground={bg.setBackground}
         ui={ui}
-        tutorial={tutorialStrings}
+        tutorial={dict.tutorial}
       />
     ),
     terminal: (
       <TerminalPane
-        locale={locale}
+        locale={currentLocale}
         paneIds={WINDOW_CONFIGS.map((c) => c.id)}
         projects={project.projects.map((p) => ({ title: p.title }))}
         careers={journey.journeys.map((j) => ({
@@ -271,12 +248,15 @@ export function WindowManager({
   };
 
   const postPaneSteps = new Set(["launcher", "drag", "resize"]);
-  const tutorialIsFloating = tutorial.isActive && tutorial.step != null && postPaneSteps.has(tutorial.step.id);
+  const tutorialIsFloating =
+    tutorial.isActive &&
+    tutorial.step != null &&
+    postPaneSteps.has(tutorial.step.id);
   const tutorialIsFullscreen = tutorial.isActive && !tutorialIsFloating;
 
   const tutorialOverlay = tutorial.isActive && tutorial.step && (
     <TutorialOverlay
-      t={tutorialStrings}
+      t={dict.tutorial}
       ui={ui}
       currentLocale={currentLocale}
       stepId={tutorial.step.id}
@@ -317,7 +297,7 @@ export function WindowManager({
               onOpenApp={setMobileActiveApp}
               onGoHome={() => setMobileActiveApp(null)}
               ui={ui}
-              locale={locale}
+              locale={currentLocale}
             />
           </div>
         )}
@@ -369,7 +349,7 @@ export function WindowManager({
         <StatusBar
           states={wm.states}
           allConfigs={WINDOW_CONFIGS}
-          locale={locale}
+          locale={currentLocale}
           ui={ui}
           focusedWindowId={wm.maximizedId}
           onOpenLauncher={() => wm.setLauncherOpen(true)}
@@ -380,7 +360,7 @@ export function WindowManager({
           <AppLauncher
             states={wm.states}
             ui={ui}
-            locale={locale}
+            locale={currentLocale}
             onOpen={(id) => {
               wm.openWindow(id);
               setFocusedId(id);
@@ -466,7 +446,7 @@ export function WindowManager({
         <StatusBar
           states={wm.states}
           allConfigs={WINDOW_CONFIGS}
-          locale={locale}
+          locale={currentLocale}
           ui={ui}
           focusedWindowId={focusedId}
           onOpenLauncher={() => wm.setLauncherOpen(true)}
@@ -479,7 +459,7 @@ export function WindowManager({
         <AppLauncher
           states={wm.states}
           ui={ui}
-          locale={locale}
+          locale={currentLocale}
           onOpen={(id) => {
             wm.openWindow(id);
             setFocusedId(id);

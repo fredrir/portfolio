@@ -5,7 +5,7 @@ import { useRecaptcha } from "@/shared/components/recaptcha-provider";
 import { sendContactForm } from "@/app/actions/contact";
 import toast from "react-hot-toast";
 import { delay, genQueueId } from "./utils";
-import type { ContactProps } from "@/shared/types";
+import type { ContactProps } from "@/i18n/types";
 
 type SendState = "idle" | "sending" | "success" | "error";
 type VimMode = "normal" | "insert";

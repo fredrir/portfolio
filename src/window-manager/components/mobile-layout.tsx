@@ -10,7 +10,7 @@ import {
   MobileBackContext,
   useMobileBackState,
 } from "@/shared/hooks/use-mobile-back";
-import type { UiStrings } from "@/shared/types";
+import type { UiStrings } from "@/i18n/types";
 
 interface Props {
   paneContent: Record<string, React.ReactNode>;

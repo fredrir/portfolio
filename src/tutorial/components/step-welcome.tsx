@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { languages } from "@/panes/settings/constants";
 import { StepLayout } from "./step-layout";
-import type { TutorialStrings } from "@/shared/types";
+import type { TutorialStrings } from "@/i18n/types";
 
 interface Props {
   t: TutorialStrings;

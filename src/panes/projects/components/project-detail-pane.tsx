@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { projectType, UiStrings } from "@/shared/types";
+import type { projectType } from "@/shared/types";
+import type { UiStrings } from "@/i18n/types";
 import { GithubLogoIcon, LinkIcon } from "@phosphor-icons/react/dist/ssr";
 
 interface Props {

@@ -21,40 +21,6 @@ export type journeyType = {
   isCurrent?: boolean;
 };
 
-import type EnDictionary from "@/i18n/en.json";
-
-export type Landing = (typeof EnDictionary)["landing"];
-
-type RawUi = (typeof EnDictionary)["ui"];
-export type UiStrings = Omit<RawUi, "backgrounds" | "localeTitles" | "shortTitles"> & {
-  backgrounds: Record<string, string>;
-  localeTitles: Record<string, string>;
-  shortTitles: Record<string, string>;
-};
-
-type RawTutorial = (typeof EnDictionary)["tutorial"];
-export type TutorialStrings = Omit<RawTutorial, "paneDescriptions"> & {
-  paneDescriptions: Record<string, string>;
-};
-
-export interface ContactProps {
-  contact: {
-    title: string;
-    name: string;
-    email: string;
-    phone: string;
-    message: string;
-    submit: string;
-    submitSuccess: string;
-    submitError: string;
-    submitLoading: string;
-    recaptchaError: string;
-    optional: string;
-    vimHintNormal: string;
-    vimHintStatus: string;
-  };
-}
-
 export interface ContributionDay {
   count: number;
   date: string;

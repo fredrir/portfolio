@@ -14,7 +14,7 @@ import {
   FileText,
 } from "@phosphor-icons/react";
 import { WINDOW_CONFIGS } from "../constants";
-import type { UiStrings } from "@/shared/types";
+import type { UiStrings } from "@/i18n/types";
 
 const GRID_ICONS: Record<string, React.ReactNode> = {
   about: <UserCircle size={28} weight="duotone" />,

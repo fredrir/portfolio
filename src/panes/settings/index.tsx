@@ -10,12 +10,11 @@ import { BackgroundPreview } from "./components/background-preview";
 import { languages } from "./constants";
 import { LS_TUTORIAL_COMPLETED, LS_OPEN_PANES } from "@/tutorial/constants";
 import type { BackgroundConfig } from "@/window-manager/types";
-import type { NavbarType } from "@/i18n/language-types";
-import type { UiStrings, TutorialStrings } from "@/shared/types";
+import type { NavbarType, UiStrings, TutorialStrings, Locale } from "@/i18n/types";
 
 interface Props {
   navbar: NavbarType;
-  currentLocale: "en" | "nb" | "nn" | "fr";
+  currentLocale: Locale;
   currentBackground: BackgroundConfig;
   onSelectBackground: (config: BackgroundConfig) => void;
   ui: UiStrings;

@@ -10,7 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import { WINDOW_CONFIGS } from "../constants";
 import { DockIcon } from "./dock-icon";
-import type { UiStrings } from "@/shared/types";
+import type { UiStrings } from "@/i18n/types";
 
 interface Props {
   activeApp: string | null;

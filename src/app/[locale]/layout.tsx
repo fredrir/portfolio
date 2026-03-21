@@ -10,7 +10,7 @@ import { CookieConsentBanner } from "@/shared/components/analytics/cookie-consen
 import { ConditionalAnalytics } from "@/shared/components/analytics/conditional-analytics";
 import { RecaptchaProvider } from "@/shared/components/recaptcha-provider";
 
-import type { localeParams } from "@/i18n/language-types";
+import type { localeParams } from "@/i18n/types";
 import { THEMES } from "@/lib/themes";
 
 const roboto = Roboto({

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { WindowManager } from "@/window-manager";
-import type { localeParams } from "@/i18n/language-types";
-import { getDictionary, locales, type Locale } from "@/i18n/dictionaries";
+import type { localeParams, Locale } from "@/i18n/types";
+import { getDictionary, locales } from "@/i18n/dictionaries";
 import { fetchGitHubData } from "@/lib/github";
 import { fetchSpotifyData } from "@/lib/spotify";
 import { notFound } from "next/navigation";
@@ -123,15 +123,8 @@ export default async function Home(props: { params: localeParams }) {
 
   return (
     <WindowManager
-      locale={locale}
-      currentLocale={locale as "en" | "nb" | "nn" | "fr"}
-      navbar={dict.navbar}
-      landing={dict.landing}
-      journey={dict.journey}
-      project={dict.project}
-      contact={dict.contact}
-      ui={dict.ui}
-      tutorial={dict.tutorial}
+      currentLocale={locale}
+      dict={dict}
       githubData={githubData}
       spotifyData={spotifyData}
     />

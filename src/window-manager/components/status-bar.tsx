@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 import { isDarkTheme } from "@/lib/themes";
 import { STATUS_BAR_HEIGHT } from "../constants";
 import type { WindowConfig, WindowStates } from "../types";
-import type { UiStrings } from "@/shared/types";
+import type { UiStrings } from "@/i18n/types";
 import { computeUptime } from "@/shared/components/neofetch";
 import { Clock } from "./clock";
 import { Weather } from "./weather";

@@ -4,7 +4,7 @@ import { BACKGROUND_PRESETS } from "@/window-manager/constants";
 import { BackgroundPreview } from "@/panes/settings/components/background-preview";
 import { StepLayout } from "./step-layout";
 import type { BackgroundConfig } from "@/window-manager/types";
-import type { TutorialStrings, UiStrings } from "@/shared/types";
+import type { TutorialStrings, UiStrings } from "@/i18n/types";
 
 interface Props {
   t: TutorialStrings;

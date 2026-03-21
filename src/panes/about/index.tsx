@@ -2,7 +2,7 @@
 
 import { EnvelopeIcon } from "@phosphor-icons/react";
 import { PhoneIcon } from "@phosphor-icons/react/dist/ssr";
-import type { Landing } from "@/shared/types";
+import type { Landing } from "@/i18n/types";
 import { FredVatar } from "./fredvatar";
 
 interface Props {
