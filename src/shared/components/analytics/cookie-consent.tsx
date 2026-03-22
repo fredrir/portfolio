@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { MY_NAME, MY_EMAIL } from "@/lib/constants";
+import { KEYS, read } from "@/lib/storage";
 import { useAnalyticsConsent } from "./analytics-consent-provider";
 import Neofetch, {
   type NeofetchInfoLine,
@@ -116,8 +117,7 @@ export function CookieConsentBanner({
   const fullPrompt = text.prompt;
 
   useEffect(() => {
-    const consent = localStorage.getItem("vercel-analytics-consent");
-    if (!consent) {
+    if (!read(KEYS.analyticsConsent)) {
       setTimeout(() => setIsVisible(true), 800);
     }
   }, []);

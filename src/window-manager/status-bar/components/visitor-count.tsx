@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRecaptcha } from "@/shared/components/recaptcha-provider";
 import { recordVisit, getVisitorCount } from "@/app/actions/visitor";
-import { STORAGE_KEYS } from "../../constants";
+import { KEYS, read, write } from "@/lib/storage";
 
 interface Props {
   label: string;
@@ -18,14 +18,13 @@ export function VisitorCount({ label }: Props) {
   }, []);
 
   useEffect(() => {
-    const visited = sessionStorage.getItem(STORAGE_KEYS.visited);
-    if (visited || !executeRecaptcha) return;
+    if (read(KEYS.visited, true) || !executeRecaptcha) return;
 
     executeRecaptcha("page_visit")
       .then((token) => recordVisit(token))
       .then((result) => {
         if (result.success) {
-          sessionStorage.setItem(STORAGE_KEYS.visited, "1");
+          write(KEYS.visited, "1", true);
           if (result.count) setCount(result.count);
         }
       })

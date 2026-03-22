@@ -5,10 +5,10 @@ import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { BACKGROUND_PRESETS } from "@/window-manager/constants";
 import { THEMES } from "@/lib/themes";
+import { KEYS, remove } from "@/lib/storage";
 import { ThemeSwatch } from "./components/theme-swatch";
 import { BackgroundPreview } from "./components/background-preview";
 import { languages } from "./constants";
-import { LS_TUTORIAL_COMPLETED, LS_OPEN_PANES } from "@/tutorial/constants";
 import type { BackgroundConfig } from "@/window-manager/types";
 import type { NavbarType, UiStrings, TutorialStrings, Locale } from "@/i18n/types";
 
@@ -214,10 +214,10 @@ export function SettingsPane({
         <section className={compact ? "mt-1" : "mt-2"}>
           <button
             onClick={() => {
-              try {
-                localStorage.removeItem(LS_TUTORIAL_COMPLETED);
-                localStorage.removeItem(LS_OPEN_PANES);
-              } catch {}
+              remove(KEYS.tutorialCompleted);
+              remove(KEYS.openPanes);
+              remove(KEYS.rowHeights);
+              remove(KEYS.colWidths);
               window.location.reload();
             }}
             className="px-3 py-1.5 rounded-md border border-control-border text-xs text-muted-foreground hover:border-control-border-hover hover:bg-control-hover transition-all"

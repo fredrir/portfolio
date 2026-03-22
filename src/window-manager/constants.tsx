@@ -16,16 +16,6 @@ import type { BackgroundConfig } from "./background/types";
 export const GAP = 10;
 export const STATUS_BAR_HEIGHT = 28;
 
-export const STORAGE_KEYS = {
-  openPanes: "wm-open-panes",
-  background: "wm-background",
-  backgroundImage: "wm-background-image",
-  mobileActiveApp: "mobileActiveApp",
-  tipDismissed: "wm-tip-dismissed",
-  weather: "wm-weather",
-  visited: "wm-visited",
-} as const;
-
 export function openExternalWindow(config: WindowConfig, locale: string): void {
   if (!config.href) return;
   const url =

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { TUTORIAL_STEPS, LS_TUTORIAL_COMPLETED, LS_OPEN_PANES, SS_TUTORIAL_STATE } from "./constants";
+import { TUTORIAL_STEPS } from "./constants";
+import { KEYS, read, readJson, write, writeJson, remove } from "@/lib/storage";
 import { useIsMobile } from "@/shared/hooks/use-is-mobile";
 import type { TutorialStep, TutorialChoices } from "./types";
 
@@ -11,17 +12,11 @@ interface SavedState {
 }
 
 function peekSavedState(): SavedState | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = sessionStorage.getItem(SS_TUTORIAL_STATE);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return null;
+  return readJson<SavedState>(KEYS.tutorialState, true);
 }
 
 function shouldShowTutorial(): boolean {
-  if (typeof window === "undefined") return false;
-  return !localStorage.getItem(LS_TUTORIAL_COMPLETED);
+  return !read(KEYS.tutorialCompleted);
 }
 
 function getDefaultChoices(locale: string): TutorialChoices {
@@ -50,7 +45,7 @@ export function useTutorial(locale: string) {
   });
 
   useEffect(() => {
-    sessionStorage.removeItem(SS_TUTORIAL_STATE);
+    remove(KEYS.tutorialState, true);
   }, []);
 
   useEffect(() => {
@@ -91,35 +86,24 @@ export function useTutorial(locale: string) {
 
   const complete = useCallback(() => {
     setIsActive(false);
-    try {
-      localStorage.setItem(LS_TUTORIAL_COMPLETED, "1");
-      localStorage.setItem(LS_OPEN_PANES, JSON.stringify(choices.openPanes));
-    } catch {}
+    write(KEYS.tutorialCompleted, "1");
+    writeJson(KEYS.openPanes, choices.openPanes);
   }, [choices.openPanes]);
 
   const skip = useCallback(() => {
     setIsActive(false);
-    try {
-      localStorage.setItem(LS_TUTORIAL_COMPLETED, "1");
-    } catch {}
+    write(KEYS.tutorialCompleted, "1");
   }, []);
 
   const restart = useCallback(() => {
-    try {
-      localStorage.removeItem(LS_TUTORIAL_COMPLETED);
-      localStorage.removeItem(LS_OPEN_PANES);
-    } catch {}
+    remove(KEYS.tutorialCompleted);
+    remove(KEYS.openPanes);
     window.location.reload();
   }, []);
 
   const saveStateForNavigation = useCallback(
     (nextStepIndex: number) => {
-      try {
-        sessionStorage.setItem(
-          SS_TUTORIAL_STATE,
-          JSON.stringify({ stepIndex: nextStepIndex, choices }),
-        );
-      } catch {}
+      writeJson(KEYS.tutorialState, { stepIndex: nextStepIndex, choices }, true);
     },
     [choices],
   );

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
-import { WINDOW_CONFIGS, STORAGE_KEYS } from "../../constants";
+import { WINDOW_CONFIGS } from "../../constants";
+import { KEYS, readJson, writeJson } from "@/lib/storage";
 import { LayoutEngine } from "../layout-engine";
 import { DEFAULT_ROW_HEIGHTS, LAYOUT_TIERS } from "../types";
 import type { CellDef } from "../types";
@@ -11,13 +12,7 @@ import { useResize } from "./use-resize";
 function getInitialStates(allClosed: boolean): WindowStates {
   const states: WindowStates = {};
 
-  let savedPanes: string[] | null = null;
-  if (!allClosed && typeof window !== "undefined") {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEYS.openPanes);
-      if (raw) savedPanes = JSON.parse(raw);
-    } catch {}
-  }
+  const savedPanes = allClosed ? null : readJson<string[]>(KEYS.openPanes);
 
   WINDOW_CONFIGS.forEach((config) => {
     const isOpen = allClosed
@@ -47,17 +42,21 @@ export function useTiling(initialAllClosed = false) {
       ].layout,
     ),
   );
-  const [rowHeights, setRowHeights] = useState<number[]>(
-    () => [...DEFAULT_ROW_HEIGHTS],
-  );
-  const [colWidths, setColWidths] = useState<number[][]>(
-    () =>
+  const [rowHeights, setRowHeights] = useState<number[]>(() => {
+    const saved = readJson<number[]>(KEYS.rowHeights);
+    return saved ?? [...DEFAULT_ROW_HEIGHTS];
+  });
+  const [colWidths, setColWidths] = useState<number[][]>(() => {
+    const saved = readJson<number[][]>(KEYS.colWidths);
+    return (
+      saved ??
       LAYOUT_TIERS[
         LayoutEngine.getTier(
           typeof window !== "undefined" ? window.innerWidth : 1280,
         )
-      ].colWidths.map((r) => [...r]),
-  );
+      ].colWidths.map((r) => [...r])
+    );
+  });
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [maximizedId, setMaximizedId] = useState<string | null>(null);
   const maxZRef = useRef(100);
@@ -151,6 +150,21 @@ export function useTiling(initialAllClosed = false) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  useEffect(() => {
+    const openIds = Object.entries(states)
+      .filter(([, s]) => s.isOpen)
+      .map(([id]) => id);
+    writeJson(KEYS.openPanes, openIds);
+  }, [states]);
+
+  useEffect(() => {
+    writeJson(KEYS.rowHeights, rowHeights);
+  }, [rowHeights]);
+
+  useEffect(() => {
+    writeJson(KEYS.colWidths, colWidths);
+  }, [colWidths]);
 
   const visibleLayout = LayoutEngine.getVisibleLayout(layout, states);
 

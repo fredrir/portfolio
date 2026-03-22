@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { STORAGE_KEYS } from "../../constants";
+import { KEYS, read, write } from "@/lib/storage";
 
 export function Weather() {
   const [weather, setWeather] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem(STORAGE_KEYS.weather);
+    const stored = read(KEYS.weather, true);
     if (stored) {
       setWeather(stored);
       return;
@@ -17,7 +17,7 @@ export function Weather() {
       .then((text) => {
         const clean = text.trim().slice(0, 30);
         setWeather(clean);
-        sessionStorage.setItem(STORAGE_KEYS.weather, clean);
+        write(KEYS.weather, clean, true);
       })
       .catch(() => setWeather(null));
   }, []);

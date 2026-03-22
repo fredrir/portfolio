@@ -1,21 +1,18 @@
 import { useState, useCallback } from "react";
-import { STORAGE_KEYS } from "../../constants";
+import { KEYS, read, write, remove } from "@/lib/storage";
 import type { MobileState } from "../types";
 
 export function useMobileApp(): MobileState {
-  const [activeApp, _setActiveApp] = useState<string | null>(() => {
-    if (typeof window !== "undefined") {
-      return sessionStorage.getItem(STORAGE_KEYS.mobileActiveApp);
-    }
-    return null;
-  });
+  const [activeApp, _setActiveApp] = useState<string | null>(
+    () => read(KEYS.mobileActiveApp, true),
+  );
 
   const setActiveApp = useCallback((app: string | null) => {
     _setActiveApp(app);
     if (app) {
-      sessionStorage.setItem(STORAGE_KEYS.mobileActiveApp, app);
+      write(KEYS.mobileActiveApp, app, true);
     } else {
-      sessionStorage.removeItem(STORAGE_KEYS.mobileActiveApp);
+      remove(KEYS.mobileActiveApp, true);
     }
   }, []);
 
