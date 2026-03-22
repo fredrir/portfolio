@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import { useWindowManager } from "./hooks/use-window-manager";
 import { useBackground } from "./hooks/use-background";
 import { useIsMobile } from "@/shared/hooks/use-is-mobile";
@@ -9,6 +8,7 @@ import { useTutorialSync } from "./hooks/use-tutorial-sync";
 import { useFloatingDetail } from "./hooks/use-floating-detail";
 import { useMobileApp } from "./hooks/use-mobile-app";
 import { usePaneContent } from "./hooks/use-pane-content";
+import { useFocus } from "./hooks/use-focus";
 import { TutorialOverlay } from "@/tutorial";
 import { StatusBar } from "./components/status-bar";
 import { AppLauncher } from "./components/app-launcher";
@@ -45,32 +45,9 @@ export function WindowManager({
   const bg = useBackground();
   const mobile = useMobileApp();
   const floating = useFloatingDetail(dict);
-  const [focusedId, setFocusedId] = useState<string | null>("about");
+  const { focusedId, focus, openPane, openSettings } = useFocus(wm);
 
   useTutorialSync(tutorial, wm);
-
-  const handleFocus = useCallback(
-    (id: string) => {
-      if (!wm.states[id]?.isOpen) {
-        wm.openWindow(id);
-      }
-      setFocusedId(id);
-      wm.focusWindow(id);
-    },
-    [wm],
-  );
-
-  const handleOpenPane = useCallback(
-    (id: string) => {
-      wm.openWindow(id);
-      setFocusedId(id);
-    },
-    [wm],
-  );
-
-  const handleOpenSettings = useCallback(() => {
-    handleOpenPane("settings");
-  }, [handleOpenPane]);
 
   const paneContent = usePaneContent({
     dict,
@@ -79,7 +56,7 @@ export function WindowManager({
     spotifyData,
     currentBackground: bg.current,
     onSelectBackground: bg.setBackground,
-    onOpenPane: handleOpenPane,
+    onOpenPane: openPane,
     onClosePane: wm.closeWindow,
     onOpenJourneyDetail: floating.openJourneyDetail,
     onOpenProjectDetail: floating.openProjectDetail,
@@ -97,21 +74,11 @@ export function WindowManager({
       t={dictTutorial}
       ui={ui}
       currentLocale={currentLocale}
-      stepId={tutorial.step.id}
-      stepIndex={tutorial.stepIndex}
-      totalSteps={tutorial.totalSteps}
-      choices={tutorial.choices}
+      tutorial={tutorial}
       floating={tutorialIsFloating}
       isMobile={isMobile === true}
       launcherOpen={wm.launcherOpen}
-      currentBackground={bg.current}
-      onSelectBackground={bg.setBackground}
-      onNext={tutorial.next}
-      onBack={tutorial.back}
-      onSkip={tutorial.skip}
-      onComplete={tutorial.complete}
-      onSetChoice={tutorial.setChoice}
-      onSaveStateForNav={tutorial.saveStateForNavigation}
+      background={bg}
     />
   );
 
@@ -126,7 +93,7 @@ export function WindowManager({
       states={wm.states}
       ui={ui}
       locale={currentLocale}
-      onOpen={handleOpenPane}
+      onOpen={openPane}
       onStop={wm.closeWindow}
       onClose={() => wm.setLauncherOpen(false)}
     />
@@ -161,21 +128,14 @@ export function WindowManager({
           <div className="relative z-10 h-full">
             <MobileLayout
               paneContent={paneContent}
-              activeApp={mobile.activeApp}
-              onOpenApp={mobile.setActiveApp}
-              onGoHome={mobile.goHome}
+              mobile={mobile}
               ui={ui}
               locale={currentLocale}
             />
           </div>
         )}
         {!tutorial.isActive && (
-          <MobileDock
-            activeApp={mobile.activeApp}
-            onOpenApp={mobile.setActiveApp}
-            onGoHome={mobile.goHome}
-            ui={ui}
-          />
+          <MobileDock mobile={mobile} ui={ui} />
         )}
         {tutorialOverlay}
         {floatingDetailOverlay}
@@ -214,8 +174,8 @@ export function WindowManager({
           ui={ui}
           focusedWindowId={wm.maximizedId}
           onOpenLauncher={() => wm.setLauncherOpen(true)}
-          onOpenSettings={handleOpenSettings}
-          onFocusWindow={handleFocus}
+          onOpenSettings={openSettings}
+          onFocusWindow={focus}
         />
         {appLauncher}
         {floatingDetailOverlay}
@@ -243,15 +203,11 @@ export function WindowManager({
             states={wm.states}
             focusedId={focusedId}
             paneContent={paneContent}
-            swapTarget={wm.drag.swapTarget}
-            dragTarget={wm.drag.dragTarget}
-            onTitleMouseDown={wm.drag.startTitleDrag}
-            onCornerResize={wm.resize.startCornerResize}
-            onColResize={wm.resize.startColResize}
-            onRowResize={wm.resize.startRowResize}
+            drag={wm.drag}
+            resize={wm.resize}
             onClose={wm.closeWindow}
             onMaximize={wm.toggleMaximize}
-            onFocus={handleFocus}
+            onFocus={focus}
           />
         </div>
       )}
@@ -266,8 +222,8 @@ export function WindowManager({
           ui={ui}
           focusedWindowId={focusedId}
           onOpenLauncher={() => wm.setLauncherOpen(true)}
-          onOpenSettings={handleOpenSettings}
-          onFocusWindow={handleFocus}
+          onOpenSettings={openSettings}
+          onFocusWindow={focus}
         />
       )}
 

@@ -13,9 +13,11 @@ import { DockIcon } from "./dock-icon";
 import type { UiStrings } from "@/i18n/types";
 
 interface Props {
-  activeApp: string | null;
-  onOpenApp: (id: string) => void;
-  onGoHome: () => void;
+  mobile: {
+    activeApp: string | null;
+    setActiveApp: (id: string) => void;
+    goHome: () => void;
+  };
   ui: UiStrings;
 }
 
@@ -64,7 +66,8 @@ function makeClipPath(center: number, flat: boolean): string {
   return `M 0.044,1 Q 0,1 0,0.78 L 0,0.44 Q 0,0.22 0.044,0.22 L ${n(b.left)},0.22 C ${n(b.lcp1)},0.22 ${n(b.lcp2)},${y} ${n(center)},${y} C ${n(b.rcp1)},${y} ${n(b.rcp2)},0.22 ${n(b.right)},0.22 L 0.956,0.22 Q 1,0.22 1,0.44 L 1,0.78 Q 1,1 0.956,1 Z`;
 }
 
-export function MobileDock({ activeApp, onOpenApp, onGoHome, ui }: Props) {
+export function MobileDock({ mobile, ui }: Props) {
+  const { activeApp } = mobile;
   const activeId = activeApp ?? "home";
   const hasDockActive =
     activeApp === null || (DOCK_IDS as readonly string[]).includes(activeApp);
@@ -127,7 +130,7 @@ export function MobileDock({ activeApp, onOpenApp, onGoHome, ui }: Props) {
                 icon={DOCK_ICONS[id]}
                 label={label}
                 isActive={isActive}
-                onTap={id === "home" ? onGoHome : () => onOpenApp(id)}
+                onTap={id === "home" ? mobile.goHome : () => mobile.setActiveApp(id)}
               />
             );
           })}

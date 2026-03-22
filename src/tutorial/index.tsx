@@ -16,29 +16,20 @@ import { StepDone } from "./components/step-done";
 import type { TutorialStrings, UiStrings } from "@/i18n/types";
 import type { BackgroundConfig } from "@/window-manager/types";
 import type { TutorialChoices } from "./types";
+import type { useTutorial } from "./use-tutorial";
 
 interface Props {
   t: TutorialStrings;
   ui: UiStrings;
   currentLocale: string;
-  stepId: string;
-  stepIndex: number;
-  totalSteps: number;
-  choices: TutorialChoices;
+  tutorial: ReturnType<typeof useTutorial>;
   floating: boolean;
   isMobile: boolean;
   launcherOpen: boolean;
-  currentBackground: BackgroundConfig;
-  onSelectBackground: (config: BackgroundConfig) => void;
-  onNext: () => void;
-  onBack: () => void;
-  onSkip: () => void;
-  onComplete: () => void;
-  onSetChoice: <K extends keyof TutorialChoices>(
-    key: K,
-    value: TutorialChoices[K],
-  ) => void;
-  onSaveStateForNav: (nextStep: number) => void;
+  background: {
+    current: BackgroundConfig;
+    setBackground: (config: BackgroundConfig) => void;
+  };
 }
 
 const interactiveSteps = new Set(["launcher", "drag", "resize", "done"]);
@@ -58,40 +49,33 @@ export function TutorialOverlay({
   t,
   ui,
   currentLocale,
-  stepId,
-  stepIndex,
-  totalSteps,
-  choices,
+  tutorial,
   floating,
   isMobile,
   launcherOpen,
-  currentBackground,
-  onSelectBackground,
-  onNext,
-  onBack,
-  onSkip,
-  onComplete,
-  onSetChoice,
-  onSaveStateForNav,
+  background,
 }: Props) {
+  const stepId = tutorial.step!.id;
+  const { stepIndex, totalSteps, choices } = tutorial;
+
   const prevLauncherRef = useRef(launcherOpen);
 
   useEffect(() => {
     if (stepId === "launcher" && !prevLauncherRef.current && launcherOpen) {
-      const timer = setTimeout(onNext, 600);
+      const timer = setTimeout(tutorial.next, 600);
       return () => clearTimeout(timer);
     }
     prevLauncherRef.current = launcherOpen;
-  }, [stepId, launcherOpen, onNext]);
+  }, [stepId, launcherOpen, tutorial.next]);
 
   useEffect(() => {
     if (
       (stepId === "drag" || stepId === "resize") &&
       choices.openPanes.length < 2
     ) {
-      onNext();
+      tutorial.next();
     }
-  }, [stepId, choices.openPanes.length, onNext]);
+  }, [stepId, choices.openPanes.length, tutorial.next]);
 
   const showNav = !interactiveSteps.has(stepId);
   const canAdvance =
@@ -102,7 +86,7 @@ export function TutorialOverlay({
     const next = current.includes(id)
       ? current.filter((p) => p !== id)
       : [...current, id];
-    onSetChoice("openPanes", next);
+    tutorial.setChoice("openPanes", next);
   };
 
   const renderStep = () => {
@@ -112,22 +96,22 @@ export function TutorialOverlay({
           <StepWelcome
             t={t}
             currentLocale={currentLocale}
-            onSelectLocale={(loc) => onSetChoice("locale", loc)}
-            onSaveState={onSaveStateForNav}
+            onSelectLocale={(loc) => tutorial.setChoice("locale", loc)}
+            onSaveState={tutorial.saveStateForNavigation}
           />
         );
       case "theme":
         return (
-          <StepTheme t={t} onSelectTheme={(id) => onSetChoice("theme", id)} />
+          <StepTheme t={t} onSelectTheme={(id) => tutorial.setChoice("theme", id)} />
         );
       case "wallpaper":
         return (
           <StepWallpaper
             t={t}
             ui={ui}
-            currentBackground={currentBackground}
-            onSelectBackground={onSelectBackground}
-            onSelectWallpaper={(id) => onSetChoice("wallpaper", id)}
+            currentBackground={background.current}
+            onSelectBackground={background.setBackground}
+            onSelectWallpaper={(id) => tutorial.setChoice("wallpaper", id)}
           />
         );
       case "pane-selection":
@@ -146,7 +130,7 @@ export function TutorialOverlay({
       case "resize":
         return <StepResize t={t} />;
       case "done":
-        return <StepDone t={t} onComplete={onComplete} />;
+        return <StepDone t={t} onComplete={tutorial.complete} />;
       default:
         return null;
     }
@@ -188,14 +172,14 @@ export function TutorialOverlay({
                 <div className="flex gap-2">
                   {stepIndex > 0 && (
                     <button
-                      onClick={onBack}
+                      onClick={tutorial.back}
                       className="px-3 py-1 text-xs rounded-md border border-control-border text-muted-foreground hover:bg-control-hover transition-colors"
                     >
                       {t.back}
                     </button>
                   )}
                   <button
-                    onClick={onNext}
+                    onClick={tutorial.next}
                     disabled={!canAdvance}
                     className="px-3 py-1 text-xs rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                   >
@@ -215,7 +199,7 @@ export function TutorialOverlay({
 
         <TutorialFredVatar reaction={getReaction(stepId)} />
         <button
-          onClick={onSkip}
+          onClick={tutorial.skip}
           className="absolute -top-8 right-0 text-xs text-faded hover:text-foreground transition-colors"
         >
           {t.skip}
@@ -242,7 +226,7 @@ export function TutorialOverlay({
             {t.doneTitle}
           </h2>
           <button
-            onClick={onComplete}
+            onClick={tutorial.complete}
             className="px-8 py-3 rounded-xl border border-primary-soft text-primary font-semibold text-base hover:text-primary hover:border-primary"
           >
             {t.startExploring}
@@ -280,14 +264,14 @@ export function TutorialOverlay({
                 <div className="flex gap-2">
                   {stepIndex > 0 && (
                     <button
-                      onClick={onBack}
+                      onClick={tutorial.back}
                       className="px-3 py-1.5 text-xs rounded-md border border-control-border text-muted-foreground hover:bg-control-hover transition-colors"
                     >
                       {t.back}
                     </button>
                   )}
                   <button
-                    onClick={onNext}
+                    onClick={tutorial.next}
                     disabled={!canAdvance}
                     className="px-3 py-1.5 text-xs font-medium rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                   >
@@ -301,7 +285,7 @@ export function TutorialOverlay({
         {!isMobile && <TutorialFredVatar reaction={getReaction(stepId)} />}
       </div>
       <button
-        onClick={onSkip}
+        onClick={tutorial.skip}
         className="absolute top-4 right-4 text-sm text-faded hover:text-foreground transition-colors z-20"
       >
         {t.skip}

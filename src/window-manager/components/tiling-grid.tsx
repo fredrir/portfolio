@@ -4,6 +4,18 @@ import { STACK_HEIGHTS } from "../layout";
 import type { CellDef } from "../layout";
 import type { WindowStates } from "../types";
 
+interface DragProps {
+  swapTarget: string | null;
+  dragTarget: string | null;
+  startTitleDrag: (id: string, e: React.MouseEvent) => void;
+}
+
+interface ResizeProps {
+  startCornerResize: (rowIndex: number, colIndex: number, e: React.MouseEvent) => void;
+  startColResize: (rowIndex: number, colIndex: number, e: React.MouseEvent) => void;
+  startRowResize: (rowIndex: number, e: React.MouseEvent) => void;
+}
+
 interface Props {
   visibleLayout: CellDef[][];
   rowHeights: number[];
@@ -11,12 +23,22 @@ interface Props {
   states: WindowStates;
   focusedId: string | null;
   paneContent: Record<string, React.ReactNode>;
-  swapTarget: string | null;
-  dragTarget: string | null;
-  onTitleMouseDown: (id: string, e: React.MouseEvent) => void;
-  onCornerResize: (rowIndex: number, colIndex: number, e: React.MouseEvent) => void;
-  onColResize: (rowIndex: number, colIndex: number, e: React.MouseEvent) => void;
-  onRowResize: (rowIndex: number, e: React.MouseEvent) => void;
+  drag: DragProps;
+  resize: ResizeProps;
+  onClose: (id: string) => void;
+  onMaximize: (id: string) => void;
+  onFocus: (id: string) => void;
+}
+
+interface PaneProps {
+  paneId: string;
+  states: WindowStates;
+  focusedId: string | null;
+  paneContent: Record<string, React.ReactNode>;
+  drag: DragProps;
+  resize: ResizeProps;
+  rowIndex?: number;
+  colIndex?: number;
   onClose: (id: string) => void;
   onMaximize: (id: string) => void;
   onFocus: (id: string) => void;
@@ -27,30 +49,14 @@ function TilingPane({
   states,
   focusedId,
   paneContent,
-  swapTarget,
-  dragTarget,
+  drag,
+  resize,
   rowIndex,
   colIndex,
-  onTitleMouseDown,
-  onCornerResize,
   onClose,
   onMaximize,
   onFocus,
-}: {
-  paneId: string;
-  states: WindowStates;
-  focusedId: string | null;
-  paneContent: Record<string, React.ReactNode>;
-  swapTarget: string | null;
-  dragTarget: string | null;
-  rowIndex?: number;
-  colIndex?: number;
-  onTitleMouseDown: (id: string, e: React.MouseEvent) => void;
-  onCornerResize: (rowIndex: number, colIndex: number, e: React.MouseEvent) => void;
-  onClose: (id: string) => void;
-  onMaximize: (id: string) => void;
-  onFocus: (id: string) => void;
-}) {
+}: PaneProps) {
   const config = configMap[paneId];
   if (!config || !states[paneId]?.isOpen) return null;
   const isFocused = focusedId === paneId;
@@ -60,18 +66,18 @@ function TilingPane({
       config={config}
       state={states[paneId]}
       isFocused={isFocused}
-      isSwapTarget={swapTarget === paneId}
-      isDragging={dragTarget === paneId}
+      isSwapTarget={drag.swapTarget === paneId}
+      isDragging={drag.dragTarget === paneId}
       showResizeGrip={
         isFocused && rowIndex !== undefined && colIndex !== undefined
       }
       onClose={() => onClose(paneId)}
       onMaximize={() => onMaximize(paneId)}
       onFocus={() => onFocus(paneId)}
-      onTitleMouseDown={onTitleMouseDown}
+      onTitleMouseDown={drag.startTitleDrag}
       onCornerResize={
         rowIndex !== undefined && colIndex !== undefined
-          ? (e) => onCornerResize(rowIndex, colIndex, e)
+          ? (e) => resize.startCornerResize(rowIndex, colIndex, e)
           : undefined
       }
     >
@@ -89,10 +95,7 @@ function TilingCell({
   cell: CellDef;
   rowIndex: number;
   colIndex: number;
-} & Omit<
-  React.ComponentProps<typeof TilingPane>,
-  "paneId" | "rowIndex" | "colIndex"
->) {
+} & Omit<PaneProps, "paneId" | "rowIndex" | "colIndex">) {
   if (!Array.isArray(cell)) {
     return (
       <TilingPane
@@ -146,8 +149,7 @@ export function TilingGrid({
   visibleLayout,
   rowHeights,
   colWidths,
-  onColResize,
-  onRowResize,
+  resize,
   ...cellProps
 }: Props) {
   return (
@@ -173,13 +175,14 @@ export function TilingGrid({
                         cell={cell}
                         rowIndex={ri}
                         colIndex={ci}
+                        resize={resize}
                         {...cellProps}
                       />
                     </div>
                     {ci < row.length - 1 && (
                       <div
                         className="w-2.5 shrink-0 cursor-col-resize relative z-10 group"
-                        onMouseDown={(e) => onColResize(ri, ci, e)}
+                        onMouseDown={(e) => resize.startColResize(ri, ci, e)}
                       >
                         <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-0.5 rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
                       </div>
@@ -191,7 +194,7 @@ export function TilingGrid({
             {ri < visibleLayout.length - 1 && (
               <div
                 className="h-2.5 shrink-0 cursor-row-resize relative z-10 group"
-                onMouseDown={(e) => onRowResize(ri, e)}
+                onMouseDown={(e) => resize.startRowResize(ri, e)}
               >
                 <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
               </div>

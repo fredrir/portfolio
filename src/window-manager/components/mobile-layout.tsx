@@ -14,21 +14,22 @@ import type { UiStrings } from "@/i18n/types";
 
 interface Props {
   paneContent: Record<string, React.ReactNode>;
-  activeApp: string | null;
-  onOpenApp: (id: string) => void;
-  onGoHome: () => void;
+  mobile: {
+    activeApp: string | null;
+    setActiveApp: (id: string) => void;
+    goHome: () => void;
+  };
   ui: UiStrings;
   locale: string;
 }
 
 export function MobileLayout({
   paneContent,
-  activeApp,
-  onOpenApp,
-  onGoHome,
+  mobile,
   ui,
   locale,
 }: Props) {
+  const { activeApp } = mobile;
   const activeConfig = activeApp
     ? WINDOW_CONFIGS.find((c) => c.id === activeApp)
     : null;
@@ -59,7 +60,7 @@ export function MobileLayout({
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="flex-1 flex flex-col"
           >
-            <MobileHomeScreen onOpenApp={onOpenApp} ui={ui} locale={locale} />
+            <MobileHomeScreen onOpenApp={mobile.setActiveApp} ui={ui} locale={locale} />
           </motion.div>
         ) : (
           <motion.div
