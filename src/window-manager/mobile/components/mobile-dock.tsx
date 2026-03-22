@@ -117,7 +117,7 @@ export function MobileDock({ mobile, ui }: Props) {
               id === "home" ? activeApp === null : activeApp === id;
             const label =
               ui.localeTitles[id] ??
-              (id === "home" ? "Home" : configMap[id].shortTitle);
+              (id === "home" ? "Home" : configMap[id].title);
 
             return (
               <DockIcon

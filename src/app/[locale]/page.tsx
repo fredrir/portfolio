@@ -4,27 +4,28 @@ import type { localeParams, Locale } from "@/i18n/types";
 import { getDictionary, locales } from "@/i18n/dictionaries";
 import { fetchGitHubData } from "@/lib/github";
 import { fetchSpotifyData } from "@/lib/spotify";
+import { MY_NAME } from "@/lib/constants";
 import { notFound } from "next/navigation";
 
 const localeContent = {
   en: {
-    title: "Fredrik Carsten Hansteen",
-    description: "Fredrik Carsten Hansteen's personal website",
+    title: MY_NAME,
+    description: `${MY_NAME}'s personal website`,
     locale: "en",
   },
   nb: {
-    title: "Fredrik Carsten Hansteen",
-    description: "Fredrik Carsten Hansteens personlige nettside",
+    title: MY_NAME,
+    description: `${MY_NAME}s personlige nettside`,
     locale: "nb",
   },
   nn: {
-    title: "Fredrik Carsten Hansteen",
-    description: "Fredrik Carsten Hansteen si personlege nettside",
+    title: MY_NAME,
+    description: `${MY_NAME} si personlege nettside`,
     locale: "nn",
   },
   fr: {
-    title: "Fredrik Carsten Hansteen",
-    description: "Site personnel de Fredrik Carsten Hansteen",
+    title: MY_NAME,
+    description: `Site personnel de ${MY_NAME}`,
     locale: "fr",
   },
 };
@@ -41,14 +42,14 @@ export async function generateMetadata({
   return {
     title: content.title,
     description: content.description,
-    keywords: ["Fredrik Carsten Hansteen", "Hansteen"],
+    keywords: [MY_NAME, "Hansteen"],
     authors: [
       {
-        name: "Fredrik Carsten Hansteen",
+        name: MY_NAME,
       },
     ],
-    creator: "Fredrik Carsten Hansteen",
-    publisher: "Fredrik Carsten Hansteen",
+    creator: MY_NAME,
+    publisher: MY_NAME,
     metadataBase: new URL("https://hansteen.dev"),
     alternates: {
       canonical: "https://hansteen.dev",

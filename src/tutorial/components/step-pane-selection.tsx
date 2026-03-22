@@ -20,7 +20,11 @@ export function StepPaneSelection({
   onTogglePane,
 }: Props) {
   return (
-    <StepLayout command="hyprctl dispatch" title={t.paneSelectionTitle} body={t.paneSelectionBody}>
+    <StepLayout
+      command="hyprctl dispatch"
+      title={t.paneSelectionTitle}
+      body={t.paneSelectionBody}
+    >
       <div className="grid grid-cols-3 gap-3">
         {selectableConfigs.map((config) => {
           const isSelected = selectedPanes.includes(config.id);
@@ -43,7 +47,7 @@ export function StepPaneSelection({
                 <span
                   className={`text-xs md:text-sm font-medium truncate ${isSelected ? "text-primary" : "text-primary-soft"}`}
                 >
-                  {ui.localeTitles[config.id] ?? config.shortTitle}
+                  {ui.localeTitles[config.id]}
                 </span>
               </div>
               <span className="text-xs text-faded line-clamp-2">

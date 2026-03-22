@@ -1,4 +1,5 @@
 import type { WindowConfig } from "../../types";
+import { WindowFrame } from "../../shell/components/window-frame";
 
 interface Props {
   config: WindowConfig;
@@ -10,7 +11,7 @@ interface Props {
 export function DragGhost({ config, pos, size, children }: Props) {
   return (
     <div
-      className="fixed z-9990 pointer-events-none rounded-xl border border-chart-fill bg-glass-faint backdrop-blur-md shadow-2xl shadow-surface-selected overflow-hidden flex flex-col"
+      className="fixed z-9990 pointer-events-none"
       style={{
         left: pos.x,
         top: pos.y,
@@ -19,18 +20,15 @@ export function DragGhost({ config, pos, size, children }: Props) {
         opacity: 0.85,
       }}
     >
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-wm-border bg-surface-dim shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-3.5 h-3.5 rounded-full bg-wm-close" />
-          <div className="w-3.5 h-3.5 rounded-full bg-wm-minimize" />
-          <div className="w-3.5 h-3.5 rounded-full bg-wm-maximize" />
-        </div>
-        <span className="font-mono text-xs text-faded truncate mx-2">
-          {config.title}
-        </span>
-        <span className="font-mono text-xs text-primary-subtle"></span>
-      </div>
-      <div className="flex-1 overflow-hidden opacity-40">{children}</div>
+      <WindowFrame
+        title={<span className="text-faded">{config.title}</span>}
+        dots="static"
+        className="h-full border-chart-fill bg-glass-faint shadow-2xl shadow-surface-selected"
+        titleBarClassName="py-1.5 bg-surface-dim"
+        contentClassName="opacity-40 overflow-hidden"
+      >
+        {children}
+      </WindowFrame>
     </div>
   );
 }

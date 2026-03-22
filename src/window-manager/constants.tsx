@@ -42,7 +42,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   {
     id: "about",
     title: "whoami",
-    shortTitle: "whoami",
     icon: <UserCircle size={S} weight={W} />,
     defaultOpen: true,
     order: 0,
@@ -50,7 +49,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   {
     id: "github",
     title: "cat /proc/github",
-    shortTitle: "github",
     icon: <GithubLogo size={S} weight={W} />,
     defaultOpen: true,
     order: 1,
@@ -58,7 +56,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   {
     id: "spotify",
     title: "./spotify.sh",
-    shortTitle: "spotify",
     icon: <SpotifyLogo size={S} weight={W} />,
     defaultOpen: true,
     order: 2,
@@ -66,7 +63,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   {
     id: "journey",
     title: "cat ~/.career/log",
-    shortTitle: "log",
     icon: <Path size={S} weight={W} />,
     defaultOpen: true,
     order: 3,
@@ -74,7 +70,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   {
     id: "projects",
     title: "ls ~/projects",
-    shortTitle: "projects",
     icon: <FolderSimple size={S} weight={W} />,
     defaultOpen: true,
     order: 4,
@@ -82,7 +77,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   {
     id: "contact",
     title: "vim mail.tmp",
-    shortTitle: "mail",
     icon: <EnvelopeSimple size={S} weight={W} />,
     defaultOpen: true,
     order: 5,
@@ -90,7 +84,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   {
     id: "settings",
     title: "./settings.sh",
-    shortTitle: "settings",
     icon: <GearSix size={S} weight={W} />,
     defaultOpen: true,
     order: 7,
@@ -98,7 +91,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   {
     id: "terminal",
     title: "~/ terminal",
-    shortTitle: "terminal",
     icon: <Terminal size={S} weight={W} />,
     defaultOpen: true,
     order: 8,
@@ -106,7 +98,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   {
     id: "gallery",
     title: "ls ~/gallery",
-    shortTitle: "gallery",
     icon: <Images size={S} weight={W} />,
     defaultOpen: false,
     order: 9,
@@ -114,7 +105,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   {
     id: "resume",
     title: "cat ~/resume.pdf",
-    shortTitle: "resume",
     icon: <FileText size={S} weight={W} />,
     defaultOpen: false,
     order: 10,

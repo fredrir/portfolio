@@ -85,7 +85,7 @@ export function MobileLayout({
                   {subtitle ??
                     (activeConfig &&
                       (ui.localeTitles[activeConfig.id] ??
-                        activeConfig.shortTitle))}
+                        activeConfig.title))}
                 </span>
                 <span className="font-mono text-xs text-primary-subtle">
                   {USER_HOST}

@@ -63,7 +63,7 @@ export function MobileHomeScreen({ onOpenApp, ui, locale }: Props) {
               {GRID_ICONS[config.id]}
             </div>
             <span className="font-mono text-xs text-readable truncate max-w-[4rem] capitalize">
-              {ui.localeTitles[config.id] ?? config.shortTitle}
+              {ui.localeTitles[config.id] ?? config.id}
             </span>
           </motion.button>
         ))}

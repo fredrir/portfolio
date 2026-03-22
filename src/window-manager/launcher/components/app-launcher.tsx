@@ -37,7 +37,7 @@ export function AppLauncher({
       (c) =>
         c.title.toLowerCase().includes(q) ||
         c.id.toLowerCase().includes(q) ||
-        (ui.shortTitles[c.id] ?? c.shortTitle).toLowerCase().includes(q),
+        (ui.shortTitles[c.id] ?? c.id).toLowerCase().includes(q),
     );
   }, [query, ui.shortTitles]);
 
@@ -147,7 +147,7 @@ export function AppLauncher({
                         {config.title}
                       </span>
                       <span className="text-2xs text-ghost ml-2">
-                        {ui.shortTitles[config.id] ?? config.shortTitle}
+                        {ui.shortTitles[config.id] ?? config.id}
                       </span>
                     </div>
                   </button>

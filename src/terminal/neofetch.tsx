@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
-import { USER_HOST } from "@/lib/constants";
+import { BIRTHDAY, USER_HOST } from "@/lib/constants";
 import { THEMES } from "@/lib/themes";
 import {
   PORTFOLIO_VERSION,
@@ -27,8 +27,6 @@ export interface NeofetchInfoLine {
   label: string | null;
   value: string;
 }
-
-const BIRTHDAY = new Date(2003, 9, 2);
 
 export function computeUptime(): string {
   const now = new Date();
