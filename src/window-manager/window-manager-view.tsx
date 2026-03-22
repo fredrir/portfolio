@@ -37,7 +37,7 @@ interface ViewContext {
 
 const POST_PANE_STEPS = new Set(["launcher", "drag", "resize"]);
 
-export type LayoutMode = "loading" | "mobile" | "maximized" | "tiling";
+export type LayoutMode = "loading" | "mobile" | "maximized" | "desktop";
 
 export class WindowManagerView {
   readonly paneContent: Record<string, React.ReactNode>;
@@ -60,7 +60,7 @@ export class WindowManagerView {
     if (this.ctx.isMobile) return "mobile";
     const { maximizedId, states } = this.ctx.wm;
     if (maximizedId != null && states[maximizedId]?.isOpen) return "maximized";
-    return "tiling";
+    return "desktop";
   }
 
   get maximizedConfig(): WindowConfig {

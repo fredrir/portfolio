@@ -94,7 +94,7 @@ export function WindowManager({
         </Shell>
       );
 
-    case "tiling":
+    case "desktop":
       return (
         <Shell background={bg.current}>
           {!view.tutorialIsFullscreen && (

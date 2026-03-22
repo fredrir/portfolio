@@ -175,7 +175,6 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
                   <ImageDetail
                     image={selectedImage}
                     onSwipe={handleSwipe}
-                    narrow={narrow}
                     currentIndex={
                       currentCategory
                         ? currentCategory.images.findIndex(

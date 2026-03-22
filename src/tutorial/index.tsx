@@ -15,7 +15,6 @@ import { StepResize } from "./components/step-resize";
 import { StepDone } from "./components/step-done";
 import type { TutorialStrings, UiStrings } from "@/i18n/types";
 import type { BackgroundConfig } from "@/window-manager/types";
-import type { TutorialChoices } from "./types";
 import type { useTutorial } from "./use-tutorial";
 
 interface Props {
@@ -102,7 +101,10 @@ export function TutorialOverlay({
         );
       case "theme":
         return (
-          <StepTheme t={t} onSelectTheme={(id) => tutorial.setChoice("theme", id)} />
+          <StepTheme
+            t={t}
+            onSelectTheme={(id) => tutorial.setChoice("theme", id)}
+          />
         );
       case "wallpaper":
         return (
