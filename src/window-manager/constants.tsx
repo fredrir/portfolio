@@ -99,9 +99,18 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
     defaultOpen: false,
     order: 10,
     isExternal: true,
-    href: { en: "/cv-en.pdf", fr: "/cv-en.pdf", nb: "/cv-nb.pdf", nn: "/cv-nb.pdf" },
+    href: {
+      en: "/cv-en.pdf",
+      fr: "/cv-en.pdf",
+      nb: "/cv-nb.pdf",
+      nn: "/cv-nb.pdf",
+    },
   },
 ];
+
+export const configMap = Object.fromEntries(
+  WINDOW_CONFIGS.map((c) => [c.id, c]),
+);
 
 export const BACKGROUND_PRESETS: BackgroundConfig[] = [
   { id: "starfield", name: "Starfield", type: "animated-dots" },
