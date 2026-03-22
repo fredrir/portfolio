@@ -19,7 +19,7 @@ export function AboutPane({ landing }: Props) {
             <div className="w-1.5 h-1.5 bg-overlay-medium border border-border rounded-full" />
             <div className="w-2 h-2 bg-overlay-medium border border-border rounded-full" />
           </div>
-          <div className="bg-overlay-medium border border-border rounded-2xl px-3 py-1.5 @xl:px-4 @xl:py-2 text-sm font-bold text-foreground">
+          <div className="bg-glass-heavy border border-border rounded-2xl px-3 py-1.5 @xl:px-4 @xl:py-2 text-sm font-bold text-foreground">
             {landing.title}
             <span className="text-primary">{" <Fredrik/>"}</span>
           </div>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRecaptcha } from "@/shared/components/recaptcha-provider";
 import { sendContactForm } from "@/app/actions/contact";
-import toast from "react-hot-toast";
+import { useNotification } from "@/shared/notification";
 import { delay, genQueueId } from "./utils";
 import type { ContactProps } from "@/i18n/types";
 
@@ -12,6 +12,7 @@ type VimMode = "normal" | "insert";
 
 export function ContactPane({ contact }: ContactProps) {
   const { executeRecaptcha } = useRecaptcha();
+  const notification = useNotification();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -144,7 +145,7 @@ export function ContactPane({ contact }: ContactProps) {
     e.preventDefault();
 
     if (!executeRecaptcha) {
-      toast.error(contact.recaptchaError);
+      notification.error(contact.recaptchaError);
       return;
     }
 
@@ -167,7 +168,7 @@ export function ContactPane({ contact }: ContactProps) {
       appendLog("CAPTCHA verification .............. [FAILED]");
       setSendState("error");
       console.error(error);
-      toast.error(contact.recaptchaError);
+      notification.error(contact.recaptchaError);
       return;
     }
 
@@ -189,7 +190,7 @@ export function ContactPane({ contact }: ContactProps) {
         appendLog("");
         appendLog("Mail sent successfully. Queue ID: " + genQueueId());
         setSendState("success");
-        toast.success(contact.submitSuccess);
+        notification.success(contact.submitSuccess);
         setTimeout(() => {
           setFormData({ name: "", email: "", phone: "", message: "" });
           setSendState("idle");
@@ -199,13 +200,13 @@ export function ContactPane({ contact }: ContactProps) {
         appendLog("Message delivery ................... [FAILED]");
         appendLog("Error: " + (result.error ?? "unknown"));
         setSendState("error");
-        toast.error(contact.submitError);
+        notification.error(contact.submitError);
       }
     } catch (error) {
       console.error(contact.submitError + ": ", error);
       appendLog("Connection error: ETIMEDOUT");
       setSendState("error");
-      toast.error(contact.submitError);
+      notification.error(contact.submitError);
       setTimeout(() => {
         setSendState("idle");
         setSendLog([]);

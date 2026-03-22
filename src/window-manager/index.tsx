@@ -9,7 +9,8 @@ import { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
 import { useMobileApp } from "./mobile/hooks/use-mobile-app";
 import { useFocus } from "./shell/hooks/use-focus";
 import { WindowManagerView } from "./window-manager-view";
-import { Shell, ContentArea, TipBar, Window } from "./shell";
+import { Shell, ContentArea, Window } from "./shell";
+import { useTipNotification } from "./shell/hooks/use-tip-notification";
 import { MobileLayout, MobileDock } from "./mobile";
 import type { GitHubData, SpotifyData } from "@/shared/types";
 import type { DictType, Locale } from "@/i18n/types";
@@ -38,6 +39,7 @@ export function WindowManager({
   const focus = useFocus(wm);
 
   useTutorialSync(tutorial, wm);
+  useTipNotification(tutorial.isActive, ui);
 
   const view = new WindowManagerView({
     dict,
@@ -120,7 +122,6 @@ export function WindowManager({
             </ContentArea>
           )}
 
-          {!tutorial.isActive && <TipBar ui={ui} />}
           {!view.tutorialIsFullscreen && view.statusBar}
 
           {view.appLauncher}

@@ -495,6 +495,15 @@
   animation: avatarFlip 0.8s ease-in-out;
 }
 
+@keyframes notif-progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
