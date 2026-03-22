@@ -1,4 +1,4 @@
-import { MY_NAME } from "@/lib/constants";
+import { MY_NAME, MY_EMAIL } from "@/lib/constants";
 import type { FileSystemNode, FileSystemConfig } from "./types";
 
 function toFileName(s: string): string {
@@ -99,7 +99,7 @@ export function createFileSystem(config?: FileSystemConfig): FileSystemNode {
                 type: "file",
                 content:
                   `${MY_NAME} - Developer of FredrikOS\n` +
-                  "Contact: fhansteen@gmail.com",
+                  `Contact: ${MY_EMAIL}`,
               },
               ".bashrc": {
                 name: ".bashrc",

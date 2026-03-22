@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MY_NAME } from "@/lib/constants";
+import { MY_NAME, MY_EMAIL } from "@/lib/constants";
 import { useAnalyticsConsent } from "./analytics-consent-provider";
 import Neofetch, {
   type NeofetchInfoLine,
@@ -20,7 +20,7 @@ const content = {
     info: "[i] info",
     gdprTitle: "GDPR / Privacy Information",
     gdprLines: [
-      `Data controller: ${MY_NAME} (fhansteen@gmail.com)`,
+      `Data controller: ${MY_NAME} (${MY_EMAIL})`,
       "Data collected: anonymous page views, web vitals, and referrer data",
       "Provider: Vercel Inc. (San Francisco, CA)",
       "No personal identifiers, IP addresses, or tracking cookies are stored",
@@ -40,7 +40,7 @@ const content = {
     info: "[i] info",
     gdprTitle: "GDPR / Personverninformasjon",
     gdprLines: [
-      `Behandlingsansvarlig: ${MY_NAME} (fhansteen@gmail.com)`,
+      `Behandlingsansvarlig: ${MY_NAME} (${MY_EMAIL})`,
       "Data som samles inn: anonyme sidevisninger, web vitals og referansedata",
       "Leverandør: Vercel Inc. (San Francisco, CA)",
       "Ingen personlige identifikatorer, IP-adresser eller sporingskapsler lagres",
@@ -60,7 +60,7 @@ const content = {
     info: "[i] info",
     gdprTitle: "GDPR / Personverninformasjon",
     gdprLines: [
-      `Behandlingsansvarleg: ${MY_NAME} (fhansteen@gmail.com)`,
+      `Behandlingsansvarleg: ${MY_NAME} (${MY_EMAIL})`,
       "Data som vert samla inn: anonyme sidevisingar, web vitals og referansedata",
       "Leverandør: Vercel Inc. (San Francisco, CA)",
       "Ingen personlege identifikatorar, IP-adresser eller sporingskapslar vert lagra",
@@ -80,7 +80,7 @@ const content = {
     info: "[i] info",
     gdprTitle: "RGPD / Confidentialité",
     gdprLines: [
-      `Responsable du traitement : ${MY_NAME} (fhansteen@gmail.com)`,
+      `Responsable du traitement : ${MY_NAME} (${MY_EMAIL})`,
       "Données collectées : pages vues anonymes, web vitals et données de référence",
       "Fournisseur : Vercel Inc. (San Francisco, CA)",
       "Aucun identifiant personnel, adresse IP ou cookie de suivi n'est stocké",

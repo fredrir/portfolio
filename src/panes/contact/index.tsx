@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRecaptcha } from "@/shared/components/recaptcha-provider";
 import { sendContactForm } from "@/app/actions/contact";
 import { useNotification } from "@/shared/notification";
+import { MY_EMAIL } from "@/lib/constants";
 import { delay, genQueueId } from "./utils";
 import type { ContactProps } from "@/i18n/types";
 
@@ -155,7 +156,7 @@ export function ContactPane({ contact }: ContactProps) {
     setSendState("sending");
     setSendLog([]);
 
-    appendLog("$ sendmail -t fhansteen@gmail.com");
+    appendLog(`$ sendmail -t ${MY_EMAIL}`);
     await delay(400);
     appendLog("Resolving MX record for hansteen.dev...");
     await delay(300);
@@ -233,7 +234,7 @@ export function ContactPane({ contact }: ContactProps) {
             <span className="text-yellow-600 dark:text-vim-label w-10 shrink-0">
               To:
             </span>
-            <span className="text-muted-foreground">fhansteen@gmail.com</span>
+            <span className="text-muted-foreground">{MY_EMAIL}</span>
           </div>
           <div className="flex items-center border-b border-border-faint pb-1.5">
             <label
