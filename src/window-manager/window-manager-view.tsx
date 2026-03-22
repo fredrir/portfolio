@@ -1,8 +1,7 @@
 import { TutorialOverlay } from "@/tutorial";
-import { StatusBar } from "./components/status-bar";
-import { AppLauncher } from "./components/app-launcher";
-import { FloatingDetail } from "./components/floating-detail";
-import { DragGhost } from "./components/drag-ghost";
+import { AppLauncher } from "./launcher/components/app-launcher";
+import { FloatingDetail } from "./overlays/components/floating-detail";
+import { DragGhost } from "./overlays/components/drag-ghost";
 import { AboutPane } from "@/panes/about";
 import { GitHubPane } from "@/panes/github";
 import { SpotifyPane } from "@/panes/spotify";
@@ -13,21 +12,22 @@ import { SettingsPane } from "@/panes/settings";
 import { TerminalPane } from "@/terminal";
 import { ImagePane } from "@/panes/gallery";
 import { WINDOW_CONFIGS, configMap } from "./constants";
-import type { WindowConfig, WindowState } from "./types";
+import type { WindowConfig } from "./types";
 import type { useTutorial } from "@/tutorial/use-tutorial";
-import type { useWindowManager } from "./hooks/use-window-manager";
-import type { useBackground } from "./hooks/use-background";
-import type { useFocus } from "./hooks/use-focus";
-import type { useFloatingDetail } from "./hooks/use-floating-detail";
+import type { useTiling } from "./tiling/hooks/use-tiling";
+import type { useBackground } from "./background/hooks/use-background";
+import type { useFocus } from "./shell/hooks/use-focus";
+import type { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
 import type { GitHubData, SpotifyData } from "@/shared/types";
 import type { DictType, Locale } from "@/i18n/types";
+import { StatusBar } from "./status-bar";
 
 interface ViewContext {
   dict: DictType;
   locale: Locale;
   isMobile: boolean | null;
   tutorial: ReturnType<typeof useTutorial>;
-  wm: ReturnType<typeof useWindowManager>;
+  wm: ReturnType<typeof useTiling>;
   bg: ReturnType<typeof useBackground>;
   focus: ReturnType<typeof useFocus>;
   floating: ReturnType<typeof useFloatingDetail>;
@@ -67,22 +67,14 @@ export class WindowManagerView {
     return configMap[this.ctx.wm.maximizedId!];
   }
 
-  get maximizedState(): WindowState {
-    return this.ctx.wm.states[this.ctx.wm.maximizedId!];
-  }
-
-  statusBar(focusedWindowId: string | null): React.ReactNode {
+  get statusBar(): React.ReactNode {
     const { wm, locale, focus } = this.ctx;
     return (
       <StatusBar
-        states={wm.states}
-        allConfigs={WINDOW_CONFIGS}
         locale={locale}
         ui={this.ctx.dict.ui}
-        focusedWindowId={focusedWindowId}
         onOpenLauncher={() => wm.setLauncherOpen(true)}
         onOpenSettings={focus.openSettings}
-        onFocusWindow={focus.focus}
       />
     );
   }

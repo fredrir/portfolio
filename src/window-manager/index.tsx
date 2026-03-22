@@ -1,21 +1,16 @@
 "use client";
 
-import { useWindowManager } from "./hooks/use-window-manager";
-import { useBackground } from "./hooks/use-background";
+import { useTiling, TilingGrid, TilingProvider } from "./tiling";
+import { useBackground } from "./background/hooks/use-background";
 import { useIsMobile } from "@/shared/hooks/use-is-mobile";
 import { useTutorial } from "@/tutorial/use-tutorial";
-import { useTutorialSync } from "./hooks/use-tutorial-sync";
-import { useFloatingDetail } from "./hooks/use-floating-detail";
-import { useMobileApp } from "./hooks/use-mobile-app";
-import { useFocus } from "./hooks/use-focus";
+import { useTutorialSync } from "./overlays/hooks/use-tutorial-sync";
+import { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
+import { useMobileApp } from "./mobile/hooks/use-mobile-app";
+import { useFocus } from "./shell/hooks/use-focus";
 import { WindowManagerView } from "./window-manager-view";
-import { Shell } from "./components/shell";
-import { ContentArea } from "./components/content-area";
-import { TipBar } from "./components/tip-bar";
-import { MobileLayout } from "./components/mobile-layout";
-import { MobileDock } from "./components/mobile-dock";
-import { TilingGrid } from "./components/tiling-grid";
-import { Window } from "./components/window";
+import { Shell, ContentArea, TipBar, Window } from "./shell";
+import { MobileLayout, MobileDock } from "./mobile";
 import type { GitHubData, SpotifyData } from "@/shared/types";
 import type { DictType, Locale } from "@/i18n/types";
 
@@ -36,7 +31,7 @@ export function WindowManager({
 
   const isMobile = useIsMobile();
   const tutorial = useTutorial(currentLocale);
-  const wm = useWindowManager(tutorial.isActive);
+  const wm = useTiling(tutorial.isActive);
   const bg = useBackground();
   const mobile = useMobileApp();
   const floating = useFloatingDetail(dict);
@@ -86,7 +81,6 @@ export function WindowManager({
           <ContentArea>
             <Window
               config={view.maximizedConfig}
-              state={view.maximizedState}
               isFocused
               onClose={() => wm.closeWindow(wm.maximizedId!)}
               onMaximize={() => wm.toggleMaximize(wm.maximizedId!)}
@@ -94,7 +88,7 @@ export function WindowManager({
               {view.paneContent[wm.maximizedId!]}
             </Window>
           </ContentArea>
-          {view.statusBar(wm.maximizedId)}
+          {view.statusBar}
           {view.appLauncher}
           {view.floatingDetail}
         </Shell>
@@ -105,24 +99,29 @@ export function WindowManager({
         <Shell background={bg.current}>
           {!view.tutorialIsFullscreen && (
             <ContentArea>
-              <TilingGrid
-                visibleLayout={wm.visibleLayout}
-                rowHeights={wm.rowHeights}
-                colWidths={wm.colWidths}
-                states={wm.states}
-                focusedId={focus.focusedId}
-                paneContent={view.paneContent}
-                drag={wm.drag}
-                resize={wm.resize}
-                onClose={wm.closeWindow}
-                onMaximize={wm.toggleMaximize}
-                onFocus={focus.focus}
-              />
+              <TilingProvider
+                value={{
+                  states: wm.states,
+                  focusedId: focus.focusedId,
+                  paneContent: view.paneContent,
+                  drag: wm.drag,
+                  resize: wm.resize,
+                  onClose: wm.closeWindow,
+                  onMaximize: wm.toggleMaximize,
+                  onFocus: focus.focus,
+                }}
+              >
+                <TilingGrid
+                  visibleLayout={wm.visibleLayout}
+                  rowHeights={wm.rowHeights}
+                  colWidths={wm.colWidths}
+                />
+              </TilingProvider>
             </ContentArea>
           )}
 
           {!tutorial.isActive && <TipBar ui={ui} />}
-          {!view.tutorialIsFullscreen && view.statusBar(focus.focusedId)}
+          {!view.tutorialIsFullscreen && view.statusBar}
 
           {view.appLauncher}
           {view.tutorialOverlay}

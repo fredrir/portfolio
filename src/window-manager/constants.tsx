@@ -10,10 +10,30 @@ import {
   Images,
   FileText,
 } from "@phosphor-icons/react";
-import type { WindowConfig, BackgroundConfig } from "./types";
+import type { WindowConfig } from "./types";
+import type { BackgroundConfig } from "./background/types";
 
 export const GAP = 10;
 export const STATUS_BAR_HEIGHT = 28;
+
+export const STORAGE_KEYS = {
+  openPanes: "wm-open-panes",
+  background: "wm-background",
+  backgroundImage: "wm-background-image",
+  mobileActiveApp: "mobileActiveApp",
+  tipDismissed: "wm-tip-dismissed",
+  weather: "wm-weather",
+  visited: "wm-visited",
+} as const;
+
+export function openExternalWindow(config: WindowConfig, locale: string): void {
+  if (!config.href) return;
+  const url =
+    typeof config.href === "string"
+      ? config.href
+      : (config.href[locale] ?? config.href.en);
+  window.open(url, "_blank", "noopener,noreferrer");
+}
 
 const S = 14;
 const W = "bold" as const;
