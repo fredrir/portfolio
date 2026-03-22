@@ -11,8 +11,8 @@ interface Props {
   showResizeGrip?: boolean;
   onClose: () => void;
   onMaximize: () => void;
-  onFocus: () => void;
-  onTitleMouseDown: (id: string, e: React.MouseEvent) => void;
+  onFocus?: () => void;
+  onTitleMouseDown?: (id: string, e: React.MouseEvent) => void;
   onCornerResize?: (e: React.MouseEvent) => void;
   children: React.ReactNode;
 }
@@ -43,12 +43,12 @@ export function Window({
               ? "border-wm-border-focus shadow-lg shadow-wm-shadow"
               : "border-wm-border shadow-md shadow-wm-shadow-soft"
       }`}
-      onMouseDown={onFocus}
+      onMouseDown={onFocus ?? undefined}
     >
       <div
         className="flex items-center justify-between px-3 py-0.5 border-b border-wm-border bg-surface-faint shrink-0 cursor-grab active:cursor-grabbing select-none"
         onMouseDown={(e) => {
-          if (e.button !== 0) return;
+          if (e.button !== 0 || !onTitleMouseDown) return;
           onTitleMouseDown(config.id, e);
         }}
         onDoubleClick={onMaximize}

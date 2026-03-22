@@ -1,4 +1,5 @@
 import { TutorialOverlay } from "@/tutorial";
+import { StatusBar } from "./components/status-bar";
 import { AppLauncher } from "./components/app-launcher";
 import { FloatingDetail } from "./components/floating-detail";
 import { DragGhost } from "./components/drag-ghost";
@@ -12,6 +13,7 @@ import { SettingsPane } from "@/panes/settings";
 import { TerminalPane } from "@/terminal";
 import { ImagePane } from "@/panes/gallery";
 import { WINDOW_CONFIGS, configMap } from "./constants";
+import type { WindowConfig, WindowState } from "./types";
 import type { useTutorial } from "@/tutorial/use-tutorial";
 import type { useWindowManager } from "./hooks/use-window-manager";
 import type { useBackground } from "./hooks/use-background";
@@ -35,6 +37,8 @@ interface ViewContext {
 
 const POST_PANE_STEPS = new Set(["launcher", "drag", "resize"]);
 
+export type LayoutMode = "loading" | "mobile" | "maximized" | "tiling";
+
 export class WindowManagerView {
   readonly paneContent: Record<string, React.ReactNode>;
   readonly tutorialIsFloating: boolean;
@@ -49,6 +53,38 @@ export class WindowManagerView {
       POST_PANE_STEPS.has(ctx.tutorial.step.id);
     this.tutorialIsFullscreen =
       ctx.tutorial.isActive && !this.tutorialIsFloating;
+  }
+
+  get layoutMode(): LayoutMode {
+    if (this.ctx.isMobile === null) return "loading";
+    if (this.ctx.isMobile) return "mobile";
+    const { maximizedId, states } = this.ctx.wm;
+    if (maximizedId != null && states[maximizedId]?.isOpen) return "maximized";
+    return "tiling";
+  }
+
+  get maximizedConfig(): WindowConfig {
+    return configMap[this.ctx.wm.maximizedId!];
+  }
+
+  get maximizedState(): WindowState {
+    return this.ctx.wm.states[this.ctx.wm.maximizedId!];
+  }
+
+  statusBar(focusedWindowId: string | null): React.ReactNode {
+    const { wm, locale, focus } = this.ctx;
+    return (
+      <StatusBar
+        states={wm.states}
+        allConfigs={WINDOW_CONFIGS}
+        locale={locale}
+        ui={this.ctx.dict.ui}
+        focusedWindowId={focusedWindowId}
+        onOpenLauncher={() => wm.setLauncherOpen(true)}
+        onOpenSettings={focus.openSettings}
+        onFocusWindow={focus.focus}
+      />
+    );
   }
 
   private buildPaneContent(): Record<string, React.ReactNode> {
