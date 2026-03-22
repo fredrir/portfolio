@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { cn } from "@/shared/utils/cn";
-import { AvatarModel } from "@/panes/about/fredvatar/components/avatar-model";
+import { AvatarModel } from "@/shared/fredvatar/components/avatar-model";
 
 export function TutorialFredVatar({
   reaction,

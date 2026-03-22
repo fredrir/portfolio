@@ -24,26 +24,36 @@ export function useDrag(tiling: TilingState): DragResult {
         rect ? { w: rect.width, h: rect.height } : { w: 300, h: 200 },
       );
 
+      let rafId: number | null = null;
+      const lastMouse = { x: 0, y: 0 };
+
       const onMouseMove = (ev: MouseEvent) => {
         setDragPos({ x: ev.clientX - offsetX, y: ev.clientY - offsetY });
+        lastMouse.x = ev.clientX;
+        lastMouse.y = ev.clientY;
 
-        const els = document.elementsFromPoint(ev.clientX, ev.clientY);
-        let targetId: string | null = null;
-        for (const el of els) {
-          const pane = el.closest("[data-pane-id]");
-          const id = pane?.getAttribute("data-pane-id");
-          if (id && id !== paneId) {
-            targetId = id;
-            break;
+        if (rafId !== null) return;
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          const els = document.elementsFromPoint(lastMouse.x, lastMouse.y);
+          let targetId: string | null = null;
+          for (const el of els) {
+            const pane = el.closest("[data-pane-id]");
+            const id = pane?.getAttribute("data-pane-id");
+            if (id && id !== paneId) {
+              targetId = id;
+              break;
+            }
           }
-        }
-        swapTargetRef.current = targetId;
-        setSwapTarget(targetId);
+          swapTargetRef.current = targetId;
+          setSwapTarget(targetId);
+        });
       };
 
       const onMouseUp = () => {
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("mouseup", onMouseUp);
+        if (rafId !== null) cancelAnimationFrame(rafId);
 
         const dropTarget = swapTargetRef.current;
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useContainerSize } from "@/shared/hooks/use-container-size";
 import { SPOTIFY_POLL_INTERVAL } from "./constants";
 import { CavaVisualizer } from "./components/cava-visualizer";
 import { TopArtists } from "./components/top-artists";
@@ -24,20 +25,9 @@ export function SpotifyPane({
   const [data, setData] = useState<SpotifyData>(initialData);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastKnownRef = useRef<SpotifyData>(initialData);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [compact, setCompact] = useState(false);
+  const { ref: containerRef, height } = useContainerSize();
+  const compact = height > 0 && height < 200;
   const { executeRecaptcha } = useRecaptcha();
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setCompact(entry.contentRect.height < 200);
-      }
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   useEffect(() => {
     if (data?.title) {

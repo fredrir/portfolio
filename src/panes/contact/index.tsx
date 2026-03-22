@@ -6,39 +6,33 @@ import { sendContactForm } from "@/app/actions/contact";
 import { useNotification } from "@/shared/notification";
 import { MY_EMAIL } from "@/lib/constants";
 import { delay, genQueueId } from "./utils";
+import { useVimMode } from "./hooks/use-vim-mode";
+import { SendLog } from "./components/send-log";
 import type { ContactProps } from "@/i18n/types";
 
 type SendState = "idle" | "sending" | "success" | "error";
-type VimMode = "normal" | "insert";
+
+const EMPTY_FORM = { name: "", email: "", phone: "", message: "" };
 
 export function ContactPane({ contact }: ContactProps) {
   const { executeRecaptcha } = useRecaptcha();
   const notification = useNotification();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState(EMPTY_FORM);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [sendState, setSendState] = useState<SendState>("idle");
   const [sendLog, setSendLog] = useState<string[]>([]);
-  const [vimMode, setVimMode] = useState<VimMode>("normal");
-  const [cmdBuffer, setCmdBuffer] = useState("");
-  const [showCmd, setShowCmd] = useState(false);
   const logEndRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const messageRef = useRef<HTMLTextAreaElement>(null);
 
-  const vimModeRef = useRef(vimMode);
-  const showCmdRef = useRef(showCmd);
-  const cmdBufferRef = useRef(cmdBuffer);
-  const sendStateRef = useRef(sendState);
-  vimModeRef.current = vimMode;
-  showCmdRef.current = showCmd;
-  cmdBufferRef.current = cmdBuffer;
-  sendStateRef.current = sendState;
+  const isSending = sendState === "sending";
+
+  const vim = useVimMode(containerRef, isSending, {
+    onSubmit: () => formRef.current?.requestSubmit(),
+    onReset: () => {
+      setFormData(EMPTY_FORM);
+    },
+  });
 
   const messageLines = formData.message.split("\n");
 
@@ -47,84 +41,6 @@ export function ContactPane({ contact }: ContactProps) {
       logEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [sendLog]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (sendStateRef.current === "sending") return;
-
-      if (showCmdRef.current) {
-        if (e.key === "Escape") {
-          e.preventDefault();
-          setCmdBuffer("");
-          setShowCmd(false);
-          return;
-        }
-        if (e.key === "Enter") {
-          e.preventDefault();
-          const cmd = cmdBufferRef.current.trim();
-          if (cmd === "wq" || cmd === "wq!" || cmd === "x") {
-            formRef.current?.requestSubmit();
-          } else if (cmd === "q" || cmd === "q!") {
-            setFormData({ name: "", email: "", phone: "", message: "" });
-            setVimMode("normal");
-          }
-          setCmdBuffer("");
-          setShowCmd(false);
-          return;
-        }
-        if (e.key === "Backspace") {
-          e.preventDefault();
-          setCmdBuffer((prev) => {
-            if (prev.length <= 1) {
-              setShowCmd(false);
-              return "";
-            }
-            return prev.slice(0, -1);
-          });
-          return;
-        }
-        if (e.key.length === 1) {
-          e.preventDefault();
-          setCmdBuffer((prev) => prev + e.key);
-          return;
-        }
-        return;
-      }
-
-      if (vimModeRef.current === "normal") {
-        if (e.key === ":") {
-          e.preventDefault();
-          setShowCmd(true);
-          setCmdBuffer("");
-          return;
-        }
-        if (e.key === "i" || e.key === "a") {
-          e.preventDefault();
-          setVimMode("insert");
-          const firstInput = container.querySelector(
-            "input:not([disabled]), textarea:not([disabled])",
-          ) as HTMLElement;
-          firstInput?.focus();
-          return;
-        }
-      }
-
-      if (vimModeRef.current === "insert" && e.key === "Escape") {
-        e.preventDefault();
-        setVimMode("normal");
-        setFocusedField(null);
-        (document.activeElement as HTMLElement)?.blur();
-        container.focus();
-        return;
-      }
-    };
-
-    container.addEventListener("keydown", handleKeyDown);
-    return () => container.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -135,7 +51,7 @@ export function ContactPane({ contact }: ContactProps) {
 
   const handleFocus = (field: string) => {
     setFocusedField(field);
-    if (vimMode === "normal") setVimMode("insert");
+    if (vim.vimMode === "normal") vim.setVimMode("insert");
   };
 
   const appendLog = (line: string) => {
@@ -150,7 +66,7 @@ export function ContactPane({ contact }: ContactProps) {
       return;
     }
 
-    setVimMode("normal");
+    vim.setVimMode("normal");
     setFocusedField(null);
     (document.activeElement as HTMLElement)?.blur();
     setSendState("sending");
@@ -193,7 +109,7 @@ export function ContactPane({ contact }: ContactProps) {
         setSendState("success");
         notification.success(contact.submitSuccess);
         setTimeout(() => {
-          setFormData({ name: "", email: "", phone: "", message: "" });
+          setFormData(EMPTY_FORM);
           setSendState("idle");
           setSendLog([]);
         }, 4000);
@@ -215,9 +131,6 @@ export function ContactPane({ contact }: ContactProps) {
     }
   };
 
-  const isSending = sendState === "sending";
-  const showLog = sendLog.length > 0;
-
   return (
     <div
       ref={containerRef}
@@ -231,15 +144,13 @@ export function ContactPane({ contact }: ContactProps) {
       >
         <div className="border-b border-border-faint px-3 py-2 space-y-1.5">
           <div className="flex items-center border-b border-border-faint pb-1.5">
-            <span className="text-yellow-600 dark:text-vim-label w-10 shrink-0">
-              To:
-            </span>
+            <span className="text-vim-label w-10 shrink-0">To:</span>
             <span className="text-muted-foreground">{MY_EMAIL}</span>
           </div>
           <div className="flex items-center border-b border-border-faint pb-1.5">
             <label
               htmlFor="contact-name"
-              className="text-yellow-600 dark:text-vim-label w-10 shrink-0"
+              className="text-vim-label w-10 shrink-0"
             >
               From:
             </label>
@@ -254,7 +165,7 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs 
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs
                   placeholder:text-placeholder disabled:opacity-50"
                 placeholder={contact.name}
                 autoComplete="off"
@@ -267,7 +178,7 @@ export function ContactPane({ contact }: ContactProps) {
           <div className="flex items-center border-b border-border-faint pb-1.5">
             <label
               htmlFor="contact-email"
-              className="text-yellow-600 dark:text-vim-label w-10 shrink-0"
+              className="text-vim-label w-10 shrink-0"
             >
               Mail:
             </label>
@@ -282,7 +193,8 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs                   placeholder:text-placeholder disabled:opacity-50"
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs
+                  placeholder:text-placeholder disabled:opacity-50"
                 placeholder={contact.email}
                 autoComplete="off"
               />
@@ -294,7 +206,7 @@ export function ContactPane({ contact }: ContactProps) {
           <div className="flex items-center pb-1.5">
             <label
               htmlFor="contact-phone"
-              className="text-yellow-600 dark:text-vim-label w-10 shrink-0"
+              className="text-vim-label w-10 shrink-0"
             >
               Tel:
             </label>
@@ -308,7 +220,8 @@ export function ContactPane({ contact }: ContactProps) {
                 onFocus={() => handleFocus("phone")}
                 onBlur={() => setFocusedField(null)}
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs                   placeholder:text-placeholder disabled:opacity-50"
+                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs
+                  placeholder:text-placeholder disabled:opacity-50"
                 placeholder={`${contact.phone} (${contact.optional})`}
                 autoComplete="off"
               />
@@ -326,7 +239,7 @@ export function ContactPane({ contact }: ContactProps) {
                 (_, i) => (
                   <span
                     key={i}
-                    className="text-2xs leading-editor text-yellow-600/40 dark:text-vim-line-number"
+                    className="text-2xs leading-editor text-vim-line-number"
                   >
                     {i + 1}
                   </span>
@@ -338,7 +251,7 @@ export function ContactPane({ contact }: ContactProps) {
                 }).map((_, i) => (
                   <span
                     key={`tilde-${i}`}
-                    className="text-2xs leading-editor text-blue-500/40 dark:text-vim-tilde"
+                    className="text-2xs leading-editor text-vim-tilde"
                   >
                     ~
                   </span>
@@ -347,7 +260,7 @@ export function ContactPane({ contact }: ContactProps) {
                 Array.from({ length: 7 }).map((_, i) => (
                   <span
                     key={`tilde-${i}`}
-                    className="text-2xs leading-editor text-blue-500/40 dark:text-vim-tilde"
+                    className="text-2xs leading-editor text-vim-tilde"
                   >
                     ~
                   </span>
@@ -355,7 +268,6 @@ export function ContactPane({ contact }: ContactProps) {
             </div>
             <div className="flex-1 relative">
               <textarea
-                ref={messageRef}
                 id="contact-message"
                 name="message"
                 value={formData.message}
@@ -364,10 +276,10 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="w-full h-full min-h-36 bg-transparent text-foreground outline-hidden font-mono text-xs 
+                className="w-full h-full min-h-36 bg-transparent text-foreground outline-hidden font-mono text-xs
                   resize-none p-2 leading-editor placeholder:text-placeholder disabled:opacity-50"
                 placeholder={
-                  vimMode === "normal"
+                  vim.vimMode === "normal"
                     ? contact.vimHintNormal
                     : contact.message + "..."
                 }
@@ -377,48 +289,17 @@ export function ContactPane({ contact }: ContactProps) {
           </div>
         </div>
 
-        {showLog && (
-          <div className="border-t border-border-faint bg-muted/50 dark:bg-black/20 px-3 py-2 max-h-32 overflow-y-auto">
-            {sendLog.map((line, i) => (
-              <div key={i} className="leading-relaxed">
-                {line.includes("[  OK  ]") ? (
-                  <span>
-                    {line.replace("[  OK  ]", "")}
-                    <span className="text-green-400">[ OK ]</span>
-                  </span>
-                ) : line.includes("[FAILED]") ? (
-                  <span>
-                    {line.replace("[FAILED]", "")}
-                    <span className="text-red-400">[FAILED]</span>
-                  </span>
-                ) : line.startsWith("$") ? (
-                  <span>
-                    <span className="text-primary">$</span>
-                    {line.slice(1)}
-                  </span>
-                ) : line.startsWith("Mail sent") ? (
-                  <span className="text-green-400">{line}</span>
-                ) : line.startsWith("Error:") ||
-                  line.startsWith("Connection error:") ? (
-                  <span className="text-red-400">{line}</span>
-                ) : (
-                  <span className="text-muted-hover">{line}</span>
-                )}
-              </div>
-            ))}
-            <div ref={logEndRef} />
-          </div>
-        )}
+        <SendLog lines={sendLog} logEndRef={logEndRef} />
 
         <div className="flex items-center justify-between px-3 py-1 border-t border-wm-border bg-surface-faint">
           <div className="flex-1 min-w-0">
-            {showCmd ? (
+            {vim.showCmd ? (
               <div className="flex items-center text-xs">
                 <span className="text-foreground">:</span>
-                <span className="text-foreground">{cmdBuffer}</span>
+                <span className="text-foreground">{vim.cmdBuffer}</span>
                 <span className="text-primary-soft animate-pulse">█</span>
               </div>
-            ) : vimMode === "insert" ? (
+            ) : vim.vimMode === "insert" ? (
               <span className="text-xs font-bold text-foreground">
                 -- INSERT --
               </span>

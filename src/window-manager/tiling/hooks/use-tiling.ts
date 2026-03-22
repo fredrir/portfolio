@@ -156,15 +156,9 @@ export function useTiling(initialAllClosed = false) {
       .filter(([, s]) => s.isOpen)
       .map(([id]) => id);
     writeJson(KEYS.openPanes, openIds);
-  }, [states]);
-
-  useEffect(() => {
     writeJson(KEYS.rowHeights, rowHeights);
-  }, [rowHeights]);
-
-  useEffect(() => {
     writeJson(KEYS.colWidths, colWidths);
-  }, [colWidths]);
+  }, [states, rowHeights, colWidths]);
 
   const visibleLayout = LayoutEngine.getVisibleLayout(layout, states);
 

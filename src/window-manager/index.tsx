@@ -8,7 +8,7 @@ import { useTutorialSync } from "./overlays/hooks/use-tutorial-sync";
 import { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
 import { useMobileApp } from "./mobile/hooks/use-mobile-app";
 import { useFocus } from "./shell/hooks/use-focus";
-import { WindowManagerView } from "./window-manager-view";
+import { useWindowManagerView } from "./window-manager-view";
 import { Shell, ContentArea, Window } from "./shell";
 import { useTipNotification } from "./shell/hooks/use-tip-notification";
 import { MobileLayout, MobileDock } from "./mobile";
@@ -41,7 +41,7 @@ export function WindowManager({
   useTutorialSync(tutorial, wm);
   useTipNotification(tutorial.isActive, ui);
 
-  const view = new WindowManagerView({
+  const view = useWindowManagerView({
     dict,
     locale: currentLocale,
     isMobile,

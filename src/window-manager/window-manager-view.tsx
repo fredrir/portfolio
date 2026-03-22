@@ -1,8 +1,14 @@
+import { useMemo } from "react";
 import { TutorialOverlay } from "@/tutorial";
 import { AppLauncher } from "./launcher/components/app-launcher";
 import { FloatingDetail } from "./overlays/components/floating-detail";
 import { DragGhost } from "./overlays/components/drag-ghost";
-import { AboutPane } from "@/panes/about";
+import dynamic from "next/dynamic";
+
+const AboutPane = dynamic(
+  () => import("@/panes/about").then((m) => ({ default: m.AboutPane })),
+  { ssr: false },
+);
 import { GitHubPane } from "@/panes/github";
 import { SpotifyPane } from "@/panes/spotify";
 import { JourneyPane } from "@/panes/journey";
@@ -39,57 +45,42 @@ const POST_PANE_STEPS = new Set(["launcher", "drag", "resize"]);
 
 export type LayoutMode = "loading" | "mobile" | "maximized" | "desktop";
 
-export class WindowManagerView {
-  readonly paneContent: Record<string, React.ReactNode>;
-  readonly tutorialIsFloating: boolean;
-  readonly tutorialIsFullscreen: boolean;
+export function useWindowManagerView(ctx: ViewContext) {
+  const {
+    dict,
+    locale,
+    isMobile,
+    tutorial,
+    wm,
+    bg,
+    focus,
+    floating,
+    githubData,
+    spotifyData,
+  } = ctx;
+  const { ui, tutorial: tutorialStrings, landing, journey, project, contact, navbar } = dict;
 
-  constructor(private ctx: ViewContext) {
-    this.paneContent = this.buildPaneContent();
+  const tutorialIsFloating =
+    tutorial.isActive &&
+    tutorial.step != null &&
+    POST_PANE_STEPS.has(tutorial.step.id);
+  const tutorialIsFullscreen = tutorial.isActive && !tutorialIsFloating;
 
-    this.tutorialIsFloating =
-      ctx.tutorial.isActive &&
-      ctx.tutorial.step != null &&
-      POST_PANE_STEPS.has(ctx.tutorial.step.id);
-    this.tutorialIsFullscreen =
-      ctx.tutorial.isActive && !this.tutorialIsFloating;
-  }
-
-  get layoutMode(): LayoutMode {
-    if (this.ctx.isMobile === null) return "loading";
-    if (this.ctx.isMobile) return "mobile";
-    const { maximizedId, states } = this.ctx.wm;
+  const layoutMode: LayoutMode = (() => {
+    if (isMobile === null) return "loading";
+    if (isMobile) return "mobile";
+    const { maximizedId, states } = wm;
     if (maximizedId != null && states[maximizedId]?.isOpen) return "maximized";
     return "desktop";
-  }
+  })();
 
-  get maximizedConfig(): WindowConfig {
-    return configMap[this.ctx.wm.maximizedId!];
-  }
+  const maximizedConfig: WindowConfig = configMap[wm.maximizedId!];
 
-  get statusBar(): React.ReactNode {
-    const { wm, locale, focus } = this.ctx;
-    return (
-      <StatusBar
-        locale={locale}
-        ui={this.ctx.dict.ui}
-        onOpenLauncher={() => wm.setLauncherOpen(true)}
-        onOpenSettings={focus.openSettings}
-      />
-    );
-  }
-
-  private buildPaneContent(): Record<string, React.ReactNode> {
-    const { dict, locale, githubData, spotifyData, bg, focus, wm, floating } =
-      this.ctx;
-    const { ui, tutorial, landing, journey, project, contact, navbar } = dict;
-
-    return {
+  const paneContent = useMemo<Record<string, React.ReactNode>>(
+    () => ({
       about: <AboutPane landing={landing} />,
       github: <GitHubPane initialData={githubData} ui={ui} />,
-      spotify: (
-        <SpotifyPane initialData={spotifyData} ui={ui} locale={locale} />
-      ),
+      spotify: <SpotifyPane initialData={spotifyData} ui={ui} locale={locale} />,
       journey: (
         <JourneyPane
           journey={journey}
@@ -113,7 +104,7 @@ export class WindowManagerView {
           currentBackground={bg.current}
           onSelectBackground={bg.setBackground}
           ui={ui}
-          tutorial={tutorial}
+          tutorial={tutorialStrings}
         />
       ),
       terminal: (
@@ -130,59 +121,79 @@ export class WindowManagerView {
         />
       ),
       gallery: <ImagePane ui={ui} />,
-    };
-  }
+    }),
+    [
+      dict,
+      locale,
+      githubData,
+      spotifyData,
+      bg.current,
+      bg.setBackground,
+      floating.openJourneyDetail,
+      floating.openProjectDetail,
+      focus.openPane,
+      wm.closeWindow,
+    ],
+  );
 
-  get tutorialOverlay(): React.ReactNode {
-    const { tutorial, wm, bg, dict, locale, isMobile } = this.ctx;
-    if (!tutorial.isActive || !tutorial.step) return null;
-    return (
+  const statusBar = (
+    <StatusBar
+      locale={locale}
+      ui={ui}
+      onOpenLauncher={() => wm.setLauncherOpen(true)}
+      onOpenSettings={focus.openSettings}
+    />
+  );
+
+  const tutorialOverlay =
+    tutorial.isActive && tutorial.step ? (
       <TutorialOverlay
-        t={dict.tutorial}
-        ui={dict.ui}
+        t={tutorialStrings}
+        ui={ui}
         currentLocale={locale}
         tutorial={tutorial}
-        floating={this.tutorialIsFloating}
+        floating={tutorialIsFloating}
         isMobile={isMobile === true}
         launcherOpen={wm.launcherOpen}
         background={bg}
       />
-    );
-  }
+    ) : null;
 
-  get floatingDetail(): React.ReactNode {
-    const { floating } = this.ctx;
-    if (!floating.detail) return null;
-    return (
-      <FloatingDetail title={floating.detail.title} onClose={floating.close}>
-        {floating.detail.content}
-      </FloatingDetail>
-    );
-  }
+  const floatingDetail = floating.detail ? (
+    <FloatingDetail title={floating.detail.title} onClose={floating.close}>
+      {floating.detail.content}
+    </FloatingDetail>
+  ) : null;
 
-  get appLauncher(): React.ReactNode {
-    const { wm, dict, locale, focus } = this.ctx;
-    if (!wm.launcherOpen) return null;
-    return (
-      <AppLauncher
-        states={wm.states}
-        ui={dict.ui}
-        locale={locale}
-        onOpen={focus.openPane}
-        onStop={wm.closeWindow}
-        onClose={() => wm.setLauncherOpen(false)}
-      />
-    );
-  }
+  const appLauncher = wm.launcherOpen ? (
+    <AppLauncher
+      states={wm.states}
+      ui={ui}
+      locale={locale}
+      onOpen={focus.openPane}
+      onStop={wm.closeWindow}
+      onClose={() => wm.setLauncherOpen(false)}
+    />
+  ) : null;
 
-  get dragGhost(): React.ReactNode {
-    const { dragTarget, dragPos, dragSize } = this.ctx.wm.drag;
-    if (!dragTarget || !dragPos || !dragSize || !configMap[dragTarget])
-      return null;
-    return (
+  const { dragTarget, dragPos, dragSize } = wm.drag;
+  const dragGhost =
+    dragTarget && dragPos && dragSize && configMap[dragTarget] ? (
       <DragGhost config={configMap[dragTarget]} pos={dragPos} size={dragSize}>
-        {this.paneContent[dragTarget]}
+        {paneContent[dragTarget]}
       </DragGhost>
-    );
-  }
+    ) : null;
+
+  return {
+    paneContent,
+    layoutMode,
+    maximizedConfig,
+    tutorialIsFloating,
+    tutorialIsFullscreen,
+    statusBar,
+    tutorialOverlay,
+    floatingDetail,
+    appLauncher,
+    dragGhost,
+  };
 }

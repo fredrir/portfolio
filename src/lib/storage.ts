@@ -10,7 +10,7 @@ export const KEYS = {
   tipDismissed: "wm-tip-dismissed",
   visited: "wm-visited",
   weather: "wm-weather",
-  mobileActiveApp: "mobileActiveApp",
+  mobileActiveApp: "wm-mobile-active-app",
 } as const;
 
 function resolve(session: boolean): Storage | null {

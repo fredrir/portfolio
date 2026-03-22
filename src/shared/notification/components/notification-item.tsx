@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { AvatarModel } from "@/panes/about/fredvatar/components/avatar-model";
+import { AvatarModel } from "@/shared/fredvatar/components/avatar-model";
 import type { Notification, NotificationType } from "../types";
 
 const ACCENT: Record<NotificationType, string> = {

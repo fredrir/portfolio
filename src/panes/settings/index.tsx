@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useTransition } from "react";
+import { useRef, useTransition } from "react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { BACKGROUND_PRESETS } from "@/window-manager/constants";
@@ -8,6 +8,7 @@ import { THEMES } from "@/lib/themes";
 import { KEYS, remove } from "@/lib/storage";
 import { ThemeSwatch } from "./components/theme-swatch";
 import { BackgroundPreview } from "./components/background-preview";
+import { useContainerSize } from "@/shared/hooks/use-container-size";
 import { languages } from "./constants";
 import type { BackgroundConfig } from "@/window-manager/types";
 import type { NavbarType, UiStrings, TutorialStrings, Locale } from "@/i18n/types";
@@ -32,20 +33,8 @@ export function SettingsPane({
   const router = useRouter();
   const [, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [compact, setCompact] = useState(false);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setCompact(entry.contentRect.height < 220);
-      }
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+  const { ref: containerRef, height } = useContainerSize();
+  const compact = height > 0 && height < 220;
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

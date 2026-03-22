@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useContainerSize } from "@/shared/hooks/use-container-size";
 import {
   getGalleryData,
   type GalleryCategory,
@@ -19,9 +20,9 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [loading, setLoading] = useState(true);
-  const [compact, setCompact] = useState(false);
-  const [narrow, setNarrow] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const { ref: containerRef, width, height } = useContainerSize();
+  const compact = height > 0 && height < 250;
+  const narrow = width > 0 && width < 400;
 
   useEffect(() => {
     getGalleryData().then((data) => {
@@ -40,19 +41,6 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
       setActiveCategory(categories[0].name);
     }
   }, [narrow, loading, categories, activeCategory]);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setCompact(entry.contentRect.height < 250);
-        setNarrow(entry.contentRect.width < 400);
-      }
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   const currentCategory = categories.find((c) => c.name === activeCategory);
 
