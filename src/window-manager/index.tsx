@@ -51,7 +51,15 @@ export function WindowManager({
   githubData,
   spotifyData,
 }: Props) {
-  const { ui, landing, journey, project, contact, navbar } = dict;
+  const {
+    ui,
+    tutorial: dictTutorial,
+    landing,
+    journey,
+    project,
+    contact,
+    navbar,
+  } = dict;
 
   const isMobile = useIsMobile();
   const tutorial = useTutorial(currentLocale);
@@ -98,7 +106,6 @@ export function WindowManager({
     if (tutorial.step.id === "pane-selection") {
       wm.setOpenPanes(tutorial.choices.openPanes);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tutorial.isActive, tutorial.step?.id, openPanesKey]);
 
   useEffect(() => {
@@ -165,7 +172,7 @@ export function WindowManager({
         currentBackground={bg.current}
         onSelectBackground={bg.setBackground}
         ui={ui}
-        tutorial={dict.tutorial}
+        tutorial={dictTutorial}
       />
     ),
     terminal: (
@@ -256,7 +263,7 @@ export function WindowManager({
 
   const tutorialOverlay = tutorial.isActive && tutorial.step && (
     <TutorialOverlay
-      t={dict.tutorial}
+      t={dictTutorial}
       ui={ui}
       currentLocale={currentLocale}
       stepId={tutorial.step.id}
@@ -416,10 +423,10 @@ export function WindowManager({
                         </div>
                         {ci < row.length - 1 && (
                           <div
-                            className="w-[10px] shrink-0 cursor-col-resize relative z-10 group"
+                            className="w-2.5 shrink-0 cursor-col-resize relative z-10 group"
                             onMouseDown={(e) => wm.startColResize(ri, ci, e)}
                           >
-                            <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
+                            <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-0.5 rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
                           </div>
                         )}
                       </div>
@@ -428,10 +435,10 @@ export function WindowManager({
                 </div>
                 {ri < wm.visibleLayout.length - 1 && (
                   <div
-                    className="h-[10px] shrink-0 cursor-row-resize relative z-10 group"
+                    className="h-2.5 shrink-0 cursor-row-resize relative z-10 group"
                     onMouseDown={(e) => wm.startRowResize(ri, e)}
                   >
-                    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
+                    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 rounded-full opacity-0 group-hover:opacity-100 bg-control-border-hover transition-opacity" />
                   </div>
                 )}
               </div>
@@ -488,7 +495,7 @@ export function WindowManager({
           if (!dragConfig) return null;
           return (
             <div
-              className="fixed z-[9990] pointer-events-none rounded-xl border border-chart-fill bg-glass-faint backdrop-blur-md shadow-2xl shadow-surface-selected overflow-hidden flex flex-col"
+              className="fixed z-9990 pointer-events-none rounded-xl border border-chart-fill bg-glass-faint backdrop-blur-md shadow-2xl shadow-surface-selected overflow-hidden flex flex-col"
               style={{
                 left: wm.dragPos.x,
                 top: wm.dragPos.y,
