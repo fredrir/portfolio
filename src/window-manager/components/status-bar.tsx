@@ -8,7 +8,7 @@ import { isDarkTheme } from "@/lib/themes";
 import { STATUS_BAR_HEIGHT } from "../constants";
 import type { WindowConfig, WindowStates } from "../types";
 import type { UiStrings } from "@/i18n/types";
-import { computeUptime } from "@/shared/components/neofetch";
+import { computeUptime } from "@/terminal/neofetch";
 import { Clock } from "./clock";
 import { Weather } from "./weather";
 import { VisitorCount } from "./visitor-count";
@@ -25,14 +25,10 @@ interface Props {
 }
 
 export function StatusBar({
-  states,
-  allConfigs = [],
   locale,
   ui,
-  focusedWindowId,
   onOpenLauncher,
   onOpenSettings,
-  onFocusWindow,
 }: Props) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import Neofetch from "@/shared/components/neofetch";
 import { CommandProcessor } from "./command-processor";
 import { useAutocomplete } from "./hooks/use-autocomplete";
 import { createGame } from "./games";
 import { getTerminalStrings } from "./translations";
 import type { CommandOutput, TerminalGame, FileSystemConfig } from "./types";
+import Neofetch from "./neofetch";
 
 const terminalStore: {
   commandHistory: CommandOutput[];

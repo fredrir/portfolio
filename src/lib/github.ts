@@ -1,5 +1,6 @@
 "use server";
-const GITHUB_USERNAME = "fredrir";
+
+import { GITHUB_USERNAME } from "./constants";
 
 interface ContributionDay {
   count: number;

@@ -1,9 +1,6 @@
 import { FileSystemManager } from "./file-system";
-import {
-  computeUptime,
-  getNeofetchPlainText,
-} from "@/shared/components/neofetch";
-import { PORTFOLIO_VERSION } from "@/lib/version";
+import { computeUptime, getNeofetchPlainText } from "@/terminal/neofetch";
+import { PORTFOLIO_VERSION } from "@/lib/constants";
 import type { CommandResult, FileSystemConfig } from "./types";
 import { getTerminalStrings, type TerminalStrings } from "./translations";
 

@@ -5,7 +5,7 @@ import { useAnalyticsConsent } from "./analytics-consent-provider";
 import Neofetch, {
   type NeofetchInfoLine,
   getDefaultInfo,
-} from "@/shared/components/neofetch";
+} from "@/terminal/neofetch";
 
 interface CookieConsentBannerProps {
   locale?: string;

@@ -8,7 +8,7 @@ import {
   PORTFOLIO_VERSION,
   NEXT_VERSION,
   TAILWIND_VERSION,
-} from "@/lib/version";
+} from "@/lib/constants";
 import { WINDOW_CONFIGS } from "@/window-manager/constants";
 
 export const LOGO_LINES = [

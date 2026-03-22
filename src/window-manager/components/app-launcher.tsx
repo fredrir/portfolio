@@ -14,7 +14,14 @@ interface Props {
   onClose: () => void;
 }
 
-export function AppLauncher({ states, ui, locale, onOpen, onStop, onClose }: Props) {
+export function AppLauncher({
+  states,
+  ui,
+  locale,
+  onOpen,
+  onStop,
+  onClose,
+}: Props) {
   const [query, setQuery] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -42,7 +49,10 @@ export function AppLauncher({ states, ui, locale, onOpen, onStop, onClose }: Pro
     (id: string) => {
       const config = WINDOW_CONFIGS.find((c) => c.id === id);
       if (config?.isExternal && config.href) {
-        const url = typeof config.href === "string" ? config.href : (config.href[locale] ?? config.href.en);
+        const url =
+          typeof config.href === "string"
+            ? config.href
+            : (config.href[locale] ?? config.href.en);
         window.open(url, "_blank", "noopener,noreferrer");
         onClose();
         return;
