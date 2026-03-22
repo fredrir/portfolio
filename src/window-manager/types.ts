@@ -1,3 +1,5 @@
+export type { BackgroundConfig } from "./background/types";
+
 export interface Rect {
   x: number;
   y: number;
@@ -8,7 +10,6 @@ export interface Rect {
 export interface WindowConfig {
   id: string;
   title: string;
-  shortTitle: string;
   icon: React.ReactNode;
   defaultOpen: boolean;
   order: number;
@@ -24,16 +25,3 @@ export interface WindowState {
 }
 
 export type WindowStates = Record<string, WindowState>;
-
-export interface BackgroundConfig {
-  id: string;
-  name: string;
-  type:
-    | "animated-dots"
-    | "matrix"
-    | "grid"
-    | "plain"
-    | "gradient"
-    | "custom-image";
-  value?: string;
-}

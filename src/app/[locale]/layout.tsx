@@ -1,6 +1,6 @@
 import type React from "react";
 import "../globals.css";
-import { Toaster } from "react-hot-toast";
+import { NotificationProvider } from "@/shared/notification";
 import { Roboto } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ThemeProvider } from "next-themes";
@@ -47,15 +47,15 @@ export default async function RootLayout({
         >
           <AnalyticsConsentProvider>
             <RecaptchaProvider>
-              <Suspense fallback={null}>
-                <Toaster />
+              <NotificationProvider>
+                <Suspense fallback={null}>
+                  {children}
 
-                {children}
+                  <CookieConsentBanner locale={locale} />
 
-                <CookieConsentBanner locale={locale} />
-
-                <SpeedInsights />
-              </Suspense>
+                  <SpeedInsights />
+                </Suspense>
+              </NotificationProvider>
             </RecaptchaProvider>
             <ConditionalAnalytics />
           </AnalyticsConsentProvider>

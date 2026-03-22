@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { AnimatedAscii } from "./components/animated-ascii";
+import { useContainerSize } from "@/shared/hooks/use-container-size";
 import { TypedLine } from "./components/typed-line";
 import { BarChart } from "./components/bar-chart";
 import { ContributionGraph } from "./components/contribution-graph";
@@ -16,22 +17,8 @@ export function GitHubPane({
   ui: UiStrings;
 }) {
   const [selectedYear, setSelectedYear] = useState("last");
-  const [compact, setCompact] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setCompact(
-          entry.contentRect.height < 250 || entry.contentRect.width < 300,
-        );
-      }
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+  const { ref: containerRef, width, height } = useContainerSize();
+  const compact = height > 0 && (height < 250 || width < 300);
 
   const data = initialData;
   const currentContributions = data?.contributionsByYear.find(

@@ -3,7 +3,8 @@
 import { EnvelopeIcon } from "@phosphor-icons/react";
 import { PhoneIcon } from "@phosphor-icons/react/dist/ssr";
 import type { Landing } from "@/i18n/types";
-import { FredVatar } from "./fredvatar";
+import { FredVatar } from "@/shared/fredvatar";
+import { MY_EMAIL, MY_PHONE } from "@/lib/constants";
 
 interface Props {
   landing: Landing;
@@ -19,7 +20,7 @@ export function AboutPane({ landing }: Props) {
             <div className="w-1.5 h-1.5 bg-overlay-medium border border-border rounded-full" />
             <div className="w-2 h-2 bg-overlay-medium border border-border rounded-full" />
           </div>
-          <div className="bg-overlay-medium border border-border rounded-2xl px-3 py-1.5 @xl:px-4 @xl:py-2 text-sm font-bold text-foreground">
+          <div className="bg-glass-heavy border border-border rounded-2xl px-3 py-1.5 @xl:px-4 @xl:py-2 text-sm font-bold text-foreground">
             {landing.title}
             <span className="text-primary">{" <Fredrik/>"}</span>
           </div>
@@ -30,7 +31,7 @@ export function AboutPane({ landing }: Props) {
           </p>
           <div className="pt-1.5 space-y-2 @xl:space-y-2.5 mt-auto text-xs">
             <a
-              href="mailto:fhansteen@gmail.com"
+              href={`mailto:${MY_EMAIL}`}
               className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors group/link"
             >
               <EnvelopeIcon
@@ -38,10 +39,10 @@ export function AboutPane({ landing }: Props) {
                 className="w-3 h-3 text-primary opacity-60 group-hover/link:opacity-100 transition-opacity"
               />
               <span className="text-primary/70">~</span>
-              fhansteen@gmail.com
+              {MY_EMAIL}
             </a>
             <a
-              href="tel:+4747630231"
+              href={`tel:${MY_PHONE.replace(/\s/g, "")}`}
               className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors group/link"
             >
               <PhoneIcon
@@ -49,7 +50,7 @@ export function AboutPane({ landing }: Props) {
                 className="w-3 h-3 text-primary opacity-60 group-hover/link:opacity-100 transition-opacity"
               />
               <span className="text-primary/70">~</span>
-              +47 476 30 231
+              {MY_PHONE}
             </a>
           </div>
         </div>

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { MY_NAME, MY_EMAIL } from "@/lib/constants";
+import { KEYS, read } from "@/lib/storage";
 import { useAnalyticsConsent } from "./analytics-consent-provider";
 import Neofetch, {
   type NeofetchInfoLine,
   getDefaultInfo,
-} from "@/shared/components/neofetch";
+} from "@/terminal/neofetch";
 
 interface CookieConsentBannerProps {
   locale?: string;
@@ -13,13 +15,13 @@ interface CookieConsentBannerProps {
 
 const content = {
   en: {
-    prompt: "Fredrik Carsten Hansteen wants your cookies",
+    prompt: `${MY_NAME} wants your cookies`,
     accept: "[Y] accept",
     decline: "[n] decline",
     info: "[i] info",
     gdprTitle: "GDPR / Privacy Information",
     gdprLines: [
-      "Data controller: Fredrik Carsten Hansteen (fhansteen@gmail.com)",
+      `Data controller: ${MY_NAME} (${MY_EMAIL})`,
       "Data collected: anonymous page views, web vitals, and referrer data",
       "Provider: Vercel Inc. (San Francisco, CA)",
       "No personal identifiers, IP addresses, or tracking cookies are stored",
@@ -33,13 +35,13 @@ const content = {
     cookieLine: "pending...",
   },
   nb: {
-    prompt: "Fredrik Carsten Hansteen har lyst på dine informasjonskapsler",
+    prompt: `${MY_NAME} har lyst på dine informasjonskapsler`,
     accept: "[Y] godta",
     decline: "[n] avslå",
     info: "[i] info",
     gdprTitle: "GDPR / Personverninformasjon",
     gdprLines: [
-      "Behandlingsansvarlig: Fredrik Carsten Hansteen (fhansteen@gmail.com)",
+      `Behandlingsansvarlig: ${MY_NAME} (${MY_EMAIL})`,
       "Data som samles inn: anonyme sidevisninger, web vitals og referansedata",
       "Leverandør: Vercel Inc. (San Francisco, CA)",
       "Ingen personlige identifikatorer, IP-adresser eller sporingskapsler lagres",
@@ -53,13 +55,13 @@ const content = {
     cookieLine: "venter...",
   },
   nn: {
-    prompt: "Fredrik Carsten Hansteen treng dine informasjonskapslar",
+    prompt: `${MY_NAME} treng dine informasjonskapslar`,
     accept: "[Y] godta",
     decline: "[n] avslå",
     info: "[i] info",
     gdprTitle: "GDPR / Personverninformasjon",
     gdprLines: [
-      "Behandlingsansvarleg: Fredrik Carsten Hansteen (fhansteen@gmail.com)",
+      `Behandlingsansvarleg: ${MY_NAME} (${MY_EMAIL})`,
       "Data som vert samla inn: anonyme sidevisingar, web vitals og referansedata",
       "Leverandør: Vercel Inc. (San Francisco, CA)",
       "Ingen personlege identifikatorar, IP-adresser eller sporingskapslar vert lagra",
@@ -73,13 +75,13 @@ const content = {
     cookieLine: "ventar...",
   },
   fr: {
-    prompt: "Fredrik Carsten Hansteen a besoin de vos cookies",
+    prompt: `${MY_NAME} a besoin de vos cookies`,
     accept: "[Y] accepter",
     decline: "[n] refuser",
     info: "[i] info",
     gdprTitle: "RGPD / Confidentialité",
     gdprLines: [
-      "Responsable du traitement : Fredrik Carsten Hansteen (fhansteen@gmail.com)",
+      `Responsable du traitement : ${MY_NAME} (${MY_EMAIL})`,
       "Données collectées : pages vues anonymes, web vitals et données de référence",
       "Fournisseur : Vercel Inc. (San Francisco, CA)",
       "Aucun identifiant personnel, adresse IP ou cookie de suivi n'est stocké",
@@ -115,8 +117,7 @@ export function CookieConsentBanner({
   const fullPrompt = text.prompt;
 
   useEffect(() => {
-    const consent = localStorage.getItem("vercel-analytics-consent");
-    if (!consent) {
+    if (!read(KEYS.analyticsConsent)) {
       setTimeout(() => setIsVisible(true), 800);
     }
   }, []);
@@ -162,7 +163,6 @@ export function CookieConsentBanner({
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, doneTyping, showGdpr]);
 
   const handleAccept = () => {

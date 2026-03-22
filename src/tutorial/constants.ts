@@ -11,6 +11,3 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   { id: "done" },
 ];
 
-export const LS_TUTORIAL_COMPLETED = "tutorial-completed";
-export const LS_OPEN_PANES = "wm-open-panes";
-export const SS_TUTORIAL_STATE = "tutorial-state";

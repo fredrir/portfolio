@@ -27,14 +27,12 @@ const variants = {
 export function ImageDetail({
   image,
   onSwipe,
-  narrow,
   currentIndex,
   totalCount,
   adjacentSrcs,
 }: {
   image: GalleryImage;
   onSwipe?: (dir: "left" | "right") => void;
-  narrow: boolean;
   currentIndex: number;
   totalCount: number;
   adjacentSrcs?: string[];

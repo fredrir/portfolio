@@ -1,9 +1,6 @@
 import { FileSystemManager } from "./file-system";
-import {
-  computeUptime,
-  getNeofetchPlainText,
-} from "@/shared/components/neofetch";
-import { PORTFOLIO_VERSION } from "@/lib/version";
+import { computeUptime, getNeofetchPlainText } from "@/terminal/neofetch";
+import { PORTFOLIO_VERSION, MY_NAME } from "@/lib/constants";
 import type { CommandResult, FileSystemConfig } from "./types";
 import { getTerminalStrings, type TerminalStrings } from "./translations";
 
@@ -126,7 +123,7 @@ export class CommandProcessor {
 Built with Next.js + Tailwind
 Type 'help' for available commands
 Repository: https://github.com/fredrir/portfolio
-Author: Fredrik Carsten Hansteen`,
+Author: ${MY_NAME}`,
           },
         };
 
