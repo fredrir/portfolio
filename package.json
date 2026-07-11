@@ -11,5 +11,8 @@
     "dev": "bun run --filter @portfolio/web dev",
     "build": "bun run --filter @portfolio/web build",
     "lint": "bun run --filter '*' lint"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.110.2"
   }
 }

@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "portfolio",
+      "devDependencies": {
+        "@supabase/supabase-js": "^2.110.2",
+      },
     },
     "apps/web": {
       "name": "@portfolio/web",
