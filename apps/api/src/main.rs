@@ -17,7 +17,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .connect(&database_url)
         .await?;
 
-    sqlx::migrate!().run(&pool).await?;
+    // ignore_missing lets an older binary (blue-green rollback) start against
+    // a database that already has newer backward-compatible migrations.
+    let mut migrator = sqlx::migrate!();
+    migrator.set_ignore_missing(true);
+    migrator.run(&pool).await?;
 
     let aws_config = aws_config::defaults(aws_config::BehaviorVersion::latest())
         .load()
