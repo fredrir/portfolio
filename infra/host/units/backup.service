@@ -1,0 +1,6 @@
+[Unit]
+Description=PostgreSQL backup to S3
+
+[Service]
+Type=oneshot
+ExecStart=/home/portfolio/bin/backup.sh

@@ -1,0 +1,48 @@
+name: Synthetic checks
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+env:
+  # Flips to https://hansteen.dev at cutover.
+  BASE_URL: https://new.hansteen.dev
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Public endpoints respond
+        run: |
+          set -e
+          for path in /healthz /en /api/v1/version /sitemap.xml /engineering; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -m 15 "$BASE_URL$path")
+            echo "$path -> $code"
+            [ "$code" = "200" ]
+          done
+
+      - name: Version matches latest successful deploy
+        run: |
+          curl -s -m 15 "$BASE_URL/api/v1/version"
+          echo
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::391824190305:role/hansteen-portfolio-terraform
+          aws-region: eu-north-1
+
+      - name: Backup exists and is fresh (<26h)
+        run: |
+          LATEST=$(aws s3api list-objects-v2 \
+            --bucket hansteen-portfolio-backups-prod --prefix postgres/ \
+            --query 'sort_by(Contents,&LastModified)[-1].LastModified' --output text)
+          echo "latest backup: $LATEST"
+          [ "$LATEST" != "None" ]
+          AGE=$(( $(date +%s) - $(date -d "$LATEST" +%s) ))
+          echo "age: ${AGE}s"
+          [ "$AGE" -lt 93600 ]

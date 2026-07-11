@@ -62,7 +62,7 @@ systemctl --user daemon-reload
 systemctl --user restart "api-$TARGET.service" "web-$TARGET.service" worker.service
 
 probe() {
-    podman run --rm --network portfolio docker.io/curlimages/curl:8 \
+    podman run --rm --network portfolio docker.io/curlimages/curl:latest \
         -sf -o /dev/null -m 5 "$1" 2>/dev/null
 }
 
