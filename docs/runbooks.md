@@ -84,3 +84,15 @@ counts; logs to `/home/portfolio/.config/portfolio/backups.log`.
 Manual: `ssh letzner 'sudo -u portfolio /home/portfolio/bin/restore-test.sh'`.
 Backup freshness (<26h) is also asserted every 30 minutes by the synthetic
 workflow, which emails on failure.
+
+## Apex rollback to Vercel (post-cutover escape hatch)
+
+The pre-cutover Vercel deployment still exists. To send apex traffic back:
+
+1. Delete the proxied `hansteen.dev` AAAA record (Terraform: remove
+   `"hansteen.dev"` from `edge_hostnames` in `envs/prod/terraform.tfvars`
+   and apply, or via the dashboard in an emergency).
+2. Recreate the CNAME: `hansteen.dev` → `d29e6cc7a4c437d4.vercel-dns-016.com`,
+   DNS-only (grey cloud).
+3. Propagation is near-immediate (TTL auto). The new platform keeps serving
+   on `new.hansteen.dev` for debugging.
