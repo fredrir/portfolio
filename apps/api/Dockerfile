@@ -1,8 +1,9 @@
 # Build from the repository root: docker build -f apps/api/Dockerfile .
-FROM rust:1.96-slim AS build
+FROM rust:1.96-slim-bookworm AS build
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY apps/api ./apps/api
+COPY apps/worker ./apps/worker
 # Compiled into the /api/v1/version response.
 ARG GIT_SHA
 ENV GIT_SHA=${GIT_SHA}

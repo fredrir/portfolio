@@ -21,6 +21,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List processed media with their generated variants. */
+        get: operations["list_media"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Authorize a direct-to-S3 media upload (administration). */
+        post: operations["create_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/version": {
         parameters: {
             query?: never;
@@ -123,6 +157,49 @@ export interface components {
             name: string;
             phone?: string | null;
         };
+        CreateUploadRequest: {
+            /** @description Must be one of image/jpeg, image/png, image/webp. */
+            content_type: string;
+            filename: string;
+            /** Format: int64 */
+            size_bytes: number;
+        };
+        CreateUploadResponse: {
+            /** Format: int64 */
+            expires_in_seconds: number;
+            /** @description Headers the client must send with the PUT exactly as given. */
+            headers: {
+                [key: string]: string;
+            };
+            /** Format: uuid */
+            media_id: string;
+            /** @description Presigned S3 PUT URL for the original object. */
+            upload_url: string;
+        };
+        MediaItem: {
+            content_hash?: string | null;
+            content_type: string;
+            filename: string;
+            /** Format: int32 */
+            height?: number | null;
+            /** Format: uuid */
+            id: string;
+            variants: components["schemas"]["MediaVariant"][];
+            /** Format: int32 */
+            width?: number | null;
+        };
+        MediaVariant: {
+            format: string;
+            /** Format: int32 */
+            height: number;
+            key: string;
+            /** Format: int64 */
+            size_bytes: number;
+            /** @description Absolute URL when a public media base URL is configured. */
+            url?: string | null;
+            /** Format: int32 */
+            width: number;
+        };
         /** @description RFC 9457 problem details body. */
         Problem: {
             detail?: string | null;
@@ -183,6 +260,75 @@ export interface operations {
             };
             /** @description Validation failed */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_media: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaItem"][];
+                };
+            };
+        };
+    };
+    create_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUploadRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateUploadResponse"];
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Administration API disabled */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

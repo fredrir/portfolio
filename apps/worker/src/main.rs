@@ -46,7 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .init();
 
-    let database_url = std::env::var("DATABASE_URL")?;
+    let database_url = std::env::var("DATABASE_URL").map_err(|_| "DATABASE_URL is not set")?;
     let pool = PgPoolOptions::new()
         .max_connections(3)
         .connect(&database_url)
@@ -65,7 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         s3: aws_sdk_s3::Client::from_conf(s3_builder.build()),
         sqs: aws_sdk_sqs::Client::new(&aws_config),
         bucket: std::env::var("MEDIA_BUCKET").unwrap_or_else(|_| "portfolio-media-dev".into()),
-        queue_url: std::env::var("MEDIA_QUEUE_URL")?,
+        queue_url: std::env::var("MEDIA_QUEUE_URL").map_err(|_| "MEDIA_QUEUE_URL is not set")?,
     };
 
     tracing::info!(queue = %ctx.queue_url, bucket = %ctx.bucket, "worker started");

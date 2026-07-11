@@ -1,6 +1,7 @@
 [package]
 name = "portfolio-api"
 version = "0.1.0"
+default-run = "portfolio-api"
 edition.workspace = true
 license.workspace = true
 

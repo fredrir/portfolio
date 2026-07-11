@@ -41,10 +41,40 @@ services:
     environment:
       DATABASE_URL: postgres://portfolio:portfolio@db:5432/portfolio
       API_ADDR: 0.0.0.0:8080
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: eu-north-1
+      AWS_ENDPOINT_URL: http://localstack:4566
+      MEDIA_BUCKET: portfolio-media-dev
+      ADMIN_TOKEN: dev-admin-token
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
       db:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    profiles: ["app"]
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    environment:
+      DATABASE_URL: postgres://portfolio:portfolio@db:5432/portfolio
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: eu-north-1
+      AWS_ENDPOINT_URL: http://localstack:4566
+      MEDIA_BUCKET: portfolio-media-dev
+      MEDIA_QUEUE_URL: http://localstack:4566/000000000000/media-processing
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
         condition: service_healthy
     read_only: true
     security_opt:
