@@ -6,6 +6,10 @@
   "routes": [
     { "pattern": "new.hansteen.dev/*", "zone_name": "hansteen.dev" }
   ],
+  "vars": {
+    "MEDIA_BUCKET": "hansteen-portfolio-media-prod",
+    "AWS_REGION": "eu-north-1"
+  },
   "observability": {
     "enabled": true
   }

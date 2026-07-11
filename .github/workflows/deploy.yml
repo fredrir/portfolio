@@ -82,6 +82,9 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - name: Deploy via forced-command SSH
         env:
@@ -98,3 +101,17 @@ jobs:
             -o UserKnownHostsFile=known_hosts \
             -o IdentitiesOnly=yes \
             "portfolio@$DEPLOY_HOST" "deploy $GITHUB_SHA"
+
+      - name: Record GitHub deployment
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ID=$(gh api "repos/$GITHUB_REPOSITORY/deployments" --input - --jq .id <<EOF
+          {"ref":"$GITHUB_SHA","environment":"production","auto_merge":false,"required_contexts":[]}
+          EOF
+          )
+          gh api "repos/$GITHUB_REPOSITORY/deployments/$ID/statuses" \
+            -f state=success \
+            -f environment=production \
+            -f log_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"

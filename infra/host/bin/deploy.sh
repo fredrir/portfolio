@@ -86,12 +86,14 @@ systemctl --user is-active --quiet worker.service \
 write_slot() {
     cat > "$SLOTS/active.caddy" <<CADDY
 handle /api/* {
+	header +x-origin-slot $1
 	reverse_proxy api-$1:8080
 }
 handle /readyz {
 	reverse_proxy api-$1:8080
 }
 handle {
+	header +x-origin-slot $1
 	reverse_proxy web-$1:3000
 }
 CADDY

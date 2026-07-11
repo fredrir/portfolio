@@ -1,8 +1,11 @@
 # Build from the repository root: docker build -f apps/web/Dockerfile .
 FROM oven/bun:1.3-slim AS build
 WORKDIR /app
+# Every workspace member's package.json must be present or the frozen
+# install fails — update this list when adding workspace packages.
 COPY package.json bun.lock ./
 COPY apps/web/package.json apps/web/package.json
+COPY apps/edge/package.json apps/edge/package.json
 COPY packages/api-client/package.json packages/api-client/package.json
 RUN bun install --frozen-lockfile
 COPY packages/api-client packages/api-client

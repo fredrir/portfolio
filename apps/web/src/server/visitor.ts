@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 
 import { verifyCaptcha } from "@/lib/captcha";
-import { api } from "@/server/api";
+import { api, traceHeaders } from "@/server/api";
 
 interface VisitorResult {
   success: boolean;
@@ -28,6 +28,7 @@ export const recordVisit = createServerFn({ method: "POST" })
     const { data, error } = await api.POST("/api/v1/visits", {
       body: { page: "/", referrer },
       headers: {
+        ...traceHeaders(),
         ...(userAgent ? { "user-agent": userAgent } : {}),
         ...(forwarded ? { "x-forwarded-for": forwarded } : {}),
       },
@@ -42,7 +43,7 @@ export const recordVisit = createServerFn({ method: "POST" })
 
 export const getVisitorCount = createServerFn().handler(
   async (): Promise<number> => {
-    const { data } = await api.GET("/api/v1/visits/count");
+    const { data } = await api.GET("/api/v1/visits/count", { headers: traceHeaders() });
     return data?.count ?? 0;
   },
 );
