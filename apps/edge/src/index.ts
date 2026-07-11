@@ -58,11 +58,38 @@ function decorate(response: Response, ctx: EdgeContext): Response {
   headers.set("x-edge-colo", ctx.colo);
   headers.set("x-edge-cache", response.headers.get("cf-cache-status") ?? "NONE");
   headers.append("server-timing", `edge;dur=${Date.now() - ctx.start}`);
+
+  // The Access exchange with the private origin issues CF_* cookies; never
+  // leak them to the browser or they poison this hostname's later requests.
+  const setCookies =
+    (response.headers as unknown as { getSetCookie?: () => string[] }).getSetCookie?.() ??
+    [];
+  if (setCookies.length > 0) {
+    headers.delete("set-cookie");
+    for (const cookie of setCookies) {
+      if (!/^\s*CF_/i.test(cookie)) headers.append("set-cookie", cookie);
+    }
+  }
+
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
     headers,
   });
+}
+
+/** Drop Cloudflare Access cookies so origin auth relies only on the service token. */
+function stripAccessCookies(request: Request): void {
+  const cookie = request.headers.get("cookie");
+  if (!cookie) return;
+  const kept = cookie
+    .split(/;\s*/)
+    .filter((pair) => pair && !/^CF_/i.test(pair));
+  if (kept.length > 0) {
+    request.headers.set("cookie", kept.join("; "));
+  } else {
+    request.headers.delete("cookie");
+  }
 }
 
 /** Globally-consistent sliding-window limit per client IP; fails open. */
@@ -156,6 +183,9 @@ async function proxyOrigin(request: Request, url: URL, env: Env, ctx: EdgeContex
   const originHost = env.ORIGIN_HOST ?? "origin.hansteen.dev";
   const originUrl = new URL(url.pathname + url.search, `https://${originHost}`);
   const originRequest = new Request(originUrl.toString(), request);
+  // A CF_Authorization cookie from an SSO sibling (e.g. admin.hansteen.dev)
+  // would be evaluated against the wrong Access app and rejected.
+  stripAccessCookies(originRequest);
   originRequest.headers.set("CF-Access-Client-Id", env.CF_ACCESS_CLIENT_ID.trim());
   originRequest.headers.set(
     "CF-Access-Client-Secret",

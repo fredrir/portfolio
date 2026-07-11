@@ -7,6 +7,7 @@ CONF=$HOME/.config/portfolio
 BUCKET=$(grep '^BACKUP_BUCKET=' "$CONF/backup.env" | cut -d= -f2)
 
 podman exec postgres psql -q -U portfolio -d portfolio -c "select pg_switch_wal();" >/dev/null
+sleep 5  # let pg_receivewal finalize the switched segment before syncing
 
 podman run --rm -v waldata:/wal:ro --env-file "$CONF/backup.env" \
     docker.io/amazon/aws-cli:latest s3 sync /wal "s3://$BUCKET/wal/" \

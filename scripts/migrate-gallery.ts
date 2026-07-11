@@ -16,7 +16,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const FOLDERS = ["Arkiv", "Interrail", "Krageroe", "Oslo", "Trondheim"];
 const PROJECTS_DIR = "apps/web/public/gallery/projects";
-const THROTTLE_MS = 4000;
+const THROTTLE_MS = Number(process.env.THROTTLE_MS ?? 4000);
 const UA = "portfolio-gallery-migration/1.0";
 
 const dryRun = process.argv.includes("--dry-run");
@@ -55,7 +55,11 @@ async function existing(): Promise<Set<string>> {
   });
   if (!res.ok) throw new Error(`media list failed: ${res.status}`);
   const items = (await res.json()) as { filename: string; category?: string | null }[];
-  return new Set(items.map((m) => `${m.category ?? ""}/${m.filename}`));
+  // Match the key the upload path checks: the API stores an already-sanitized
+  // filename, so sanitize both sides or re-runs create duplicates.
+  return new Set(
+    items.map((m) => `${m.category ?? ""}/${sanitizeFilename(m.filename)}`),
+  );
 }
 
 function sanitizeFilename(name: string): string {
@@ -77,21 +81,28 @@ async function upload(
     return "uploaded";
   }
 
-  const auth = await apiFetch("/api/v1/media/uploads", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${adminToken}`,
-    },
-    body: JSON.stringify({
-      filename,
-      content_type: contentType,
-      size_bytes: bytes.length,
-      category,
-    }),
-  });
-  if (!auth.ok) {
-    console.error(`  authorize failed for ${filename}: ${auth.status}`);
+  let auth: Response | null = null;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    auth = await apiFetch("/api/v1/media/uploads", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({
+        filename,
+        content_type: contentType,
+        size_bytes: bytes.length,
+        category,
+      }),
+    });
+    if (auth.status !== 429) break;
+    const wait = Number(auth.headers.get("retry-after") ?? "30") + 2;
+    console.log(`  rate limited; retrying ${filename} in ${wait}s`);
+    await new Promise((r) => setTimeout(r, wait * 1000));
+  }
+  if (!auth?.ok) {
+    console.error(`  authorize failed for ${filename}: ${auth?.status}`);
     return "failed";
   }
   const { upload_url, headers } = (await auth.json()) as {
@@ -134,21 +145,41 @@ for (const folder of FOLDERS) {
   console.log(`${folder}: ${data?.length ?? 0} objects`);
   for (const file of data ?? []) {
     if (!file.name || file.name.startsWith(".")) continue;
-    if (!contentTypeFor(file.name)) {
+
+    let name = file.name;
+    let bytes: Uint8Array;
+    if (/\.heic$/i.test(file.name)) {
+      // The pipeline takes jpeg/png/webp only; Supabase's render endpoint
+      // converts HEIC on the fly (the old site relied on the same trick).
+      name = file.name.replace(/\.heic$/i, ".jpg");
+      const renderUrl =
+        `${supabaseUrl}/storage/v1/render/image/public/Portfolio/` +
+        `${encodeURIComponent(folder)}/${encodeURIComponent(file.name)}` +
+        `?quality=90`;
+      const resp = await fetch(renderUrl, { headers: { "user-agent": UA } });
+      if (!resp.ok || !resp.headers.get("content-type")?.includes("image/")) {
+        console.error(`  heic render ${file.name}: ${resp.status}`);
+        failed++;
+        continue;
+      }
+      bytes = new Uint8Array(await resp.arrayBuffer());
+    } else if (contentTypeFor(file.name)) {
+      const dl = await supabase.storage
+        .from("Portfolio")
+        .download(`${folder}/${file.name}`);
+      if (dl.error || !dl.data) {
+        console.error(`  download ${file.name}: ${dl.error?.message}`);
+        failed++;
+        continue;
+      }
+      bytes = new Uint8Array(await dl.data.arrayBuffer());
+    } else {
       console.log(`  skipping unsupported: ${file.name}`);
       skipped++;
       continue;
     }
-    const dl = await supabase.storage
-      .from("Portfolio")
-      .download(`${folder}/${file.name}`);
-    if (dl.error || !dl.data) {
-      console.error(`  download ${file.name}: ${dl.error?.message}`);
-      failed++;
-      continue;
-    }
-    const bytes = new Uint8Array(await dl.data.arrayBuffer());
-    const result = await upload(category, file.name, bytes, seen);
+
+    const result = await upload(category, name, bytes, seen);
     if (result === "uploaded") uploaded++;
     else if (result === "skipped") skipped++;
     else failed++;

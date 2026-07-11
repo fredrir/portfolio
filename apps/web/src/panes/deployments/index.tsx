@@ -2,69 +2,145 @@
 
 import type { components } from "@portfolio/api-client";
 
-import { PaneSection, PaneStatus } from "@/panes/shared";
+import {
+  Badge,
+  Hint,
+  Instrument,
+  PaneShell,
+  Readout,
+  relativeTime,
+  StatusDot,
+  type Tone,
+} from "@/panes/platform-ui";
 import { useApiData } from "@/shared/hooks/use-api-data";
 import { useContainerSize } from "@/shared/hooks/use-container-size";
+import { cn } from "@/shared/utils/cn";
 
 type Deployment = components["schemas"]["Deployment"];
 
+function toneFor(conclusion: string | null | undefined): Tone {
+  if (conclusion === "success") return "ok";
+  if (conclusion == null) return "warn";
+  return "fail";
+}
+
 export function DeploymentsPane() {
-  const { data, loading, error } = useApiData<Deployment[]>(
-    "/api/v1/deployments",
-  );
-  const { ref: containerRef, width } = useContainerSize();
+  const { data, loading, error } = useApiData<Deployment[]>("/api/v1/deployments");
+  const { ref, width } = useContainerSize();
   const narrow = width > 0 && width < 380;
 
+  const runs = data ?? [];
+  const finished = runs.filter((r) => r.conclusion != null);
+  const successes = finished.filter((r) => r.conclusion === "success").length;
+  const successRate = finished.length
+    ? Math.round((successes / finished.length) * 100)
+    : null;
+  const durations = finished
+    .map((r) => r.duration_seconds)
+    .filter((d): d is number => typeof d === "number")
+    .sort((a, b) => a - b);
+  const median = durations.length
+    ? durations[Math.floor(durations.length / 2)]
+    : null;
+  const liveSha = runs.find((r) => r.conclusion === "success")?.sha;
+  const maxDuration = Math.max(1, ...durations);
+
   return (
-    <div className="p-2 @sm:p-3 h-full overflow-y-auto">
-      <div ref={containerRef}>
-        <PaneSection title="production deployments (main)">
-          {loading && <PaneStatus text="loading…" />}
-          {error && <PaneStatus text="deployment history unavailable" />}
-          {data && (
-            <div className="space-y-0.5">
-              {data.map((run) => (
+    <PaneShell>
+      <div ref={ref}>
+        <div className="mb-2.5 grid grid-cols-3 gap-2">
+          <Instrument label="health">
+            <Readout
+              value={successRate != null ? `${successRate}%` : "··"}
+              label="last 10 runs"
+              tone="primary"
+            />
+          </Instrument>
+          <Instrument label="median">
+            <Readout value={median != null ? `${median}s` : "··"} label="build→live" />
+          </Instrument>
+          <Instrument label="live">
+            <Readout
+              value={liveSha ? liveSha.slice(0, 7) : "··"}
+              label="serving now"
+            />
+          </Instrument>
+        </div>
+
+        <Instrument
+          label="release ledger · main"
+          right={
+            <span className="flex items-center gap-1 text-muted-foreground">
+              <StatusDot tone={error ? "fail" : "ok"} pulse={!error} />
+              {runs.length} runs
+            </span>
+          }
+        >
+          {loading && (
+            <p className="py-2 text-xs text-muted-foreground">Reading run history…</p>
+          )}
+          {error && (
+            <p className="py-2 text-xs text-muted-foreground">
+              Deployment history is momentarily unavailable.
+            </p>
+          )}
+          <div className="space-y-px">
+            {runs.map((run, i) => {
+              const tone = toneFor(run.conclusion);
+              const isLive = run.sha === liveSha && i === runs.findIndex((r) => r.sha === liveSha);
+              const durPct = run.duration_seconds
+                ? Math.max(4, (run.duration_seconds / maxDuration) * 100)
+                : 0;
+              return (
                 <div
                   key={run.sha + run.started_at}
-                  className="flex items-center gap-2 py-1 border-b border-border-faint text-xs"
+                  className={cn(
+                    "flex items-center gap-2 rounded px-1.5 py-1 text-xs",
+                    isLive ? "bg-surface-soft" : "hover:bg-surface-dim",
+                  )}
                 >
+                  <StatusDot tone={tone} pulse={run.conclusion == null} />
                   <a
                     href={run.html_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary underline font-mono shrink-0"
+                    className="shrink-0 font-mono text-primary hover:underline"
                   >
-                    {run.sha.slice(0, 8)}
+                    {run.sha.slice(0, 7)}
                   </a>
                   {!narrow && (
-                    <span className="truncate flex-1 text-muted-foreground">
+                    <span className="min-w-0 flex-1 truncate text-muted-foreground">
                       {run.title}
                     </span>
                   )}
-                  <span className="font-mono shrink-0">
-                    {run.duration_seconds}s
+                  {!narrow && run.duration_seconds != null && (
+                    <div className="hidden h-1.5 w-12 shrink-0 overflow-hidden rounded-sm bg-chart-track @sm:block">
+                      <div className="h-full bg-chart-fill" style={{ width: `${durPct}%` }} />
+                    </div>
+                  )}
+                  <span className="shrink-0 font-mono tabular-nums text-readable">
+                    {run.duration_seconds != null ? `${run.duration_seconds}s` : "—"}
                   </span>
-                  <span
-                    className={
-                      run.conclusion === "success"
-                        ? "text-primary shrink-0"
-                        : "text-destructive shrink-0"
-                    }
-                  >
-                    {run.conclusion ?? "running"}
-                  </span>
+                  {narrow ? (
+                    <StatusDot tone={tone} />
+                  ) : (
+                    <span className="w-14 shrink-0 text-right text-3xs text-muted-foreground">
+                      {relativeTime(run.started_at)}
+                    </span>
+                  )}
+                  {isLive && <Badge tone="ok">live</Badge>}
                 </div>
-              ))}
-            </div>
-          )}
-        </PaneSection>
-        <p className="text-2xs text-muted-foreground">
+              );
+            })}
+          </div>
+        </Instrument>
+
+        <Hint>
           Each release deploys to the inactive blue/green slot behind a health
-          gate; traffic switches only after public smoke tests pass. A failed
-          release never reaches visitors — the drill postmortem is in the
-          repository.
-        </p>
+          gate. Traffic switches only after public smoke tests pass, so a failed
+          release never reaches visitors — the drill postmortem is in the repo.
+        </Hint>
       </div>
-    </div>
+    </PaneShell>
   );
 }
