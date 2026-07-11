@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 
-import { verifyCaptcha } from "@/lib/captcha";
 import { api, traceHeaders } from "@/server/api";
 
 interface VisitorResult {
@@ -10,27 +9,23 @@ interface VisitorResult {
   error?: string;
 }
 
+// Captcha verification happens in the API (action `record_visit`); this
+// function only forwards the token and request metadata.
 export const recordVisit = createServerFn({ method: "POST" })
   .validator((captchaToken: string) => captchaToken)
   .handler(async ({ data: captchaToken }): Promise<VisitorResult> => {
-    const captcha = await verifyCaptcha({
-      token: captchaToken,
-      expectedAction: "record_visit",
-    });
-    if (!captcha.ok) {
-      return { success: false, error: "captcha_failed" };
-    }
-
     const userAgent = getRequestHeader("user-agent");
     const forwarded = getRequestHeader("x-forwarded-for");
     const referrer = getRequestHeader("referer");
+    const country = getRequestHeader("x-visitor-country");
 
     const { data, error } = await api.POST("/api/v1/visits", {
-      body: { page: "/", referrer },
+      body: { page: "/", referrer, recaptcha_token: captchaToken },
       headers: {
         ...traceHeaders(),
         ...(userAgent ? { "user-agent": userAgent } : {}),
         ...(forwarded ? { "x-forwarded-for": forwarded } : {}),
+        ...(country ? { "x-visitor-country": country } : {}),
       },
     });
 
@@ -43,7 +38,9 @@ export const recordVisit = createServerFn({ method: "POST" })
 
 export const getVisitorCount = createServerFn().handler(
   async (): Promise<number> => {
-    const { data } = await api.GET("/api/v1/visits/count", { headers: traceHeaders() });
+    const { data } = await api.GET("/api/v1/visits/count", {
+      headers: traceHeaders(),
+    });
     return data?.count ?? 0;
   },
 );

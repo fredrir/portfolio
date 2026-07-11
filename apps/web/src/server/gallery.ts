@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import { getSupabase } from "@/lib/supabase";
+import { api, traceHeaders } from "@/server/api";
 
 export interface GalleryImage {
   src: string;
@@ -14,37 +14,29 @@ export interface GalleryCategory {
   images: GalleryImage[];
 }
 
-const SUPABASE_FOLDERS = [
-  "Arkiv",
-  "Interrail",
-  "Krageroe",
-  "Oslo",
-  "Trondheim",
-];
-
-const STATIC_CATEGORIES: GalleryCategory[] = [
-  {
-    name: "Projects",
-    images: [
-      "/gallery/projects/appkom.png",
-      "/gallery/projects/app-picture.png",
-      "/gallery/projects/app-picture-2.jpg",
-      "/gallery/projects/app-picture-3.jpg",
-      "/gallery/projects/movie-tracker.png",
-      "/gallery/projects/norges-tilstand.png",
-      "/gallery/projects/onlinefondet.png",
-      "/gallery/projects/online-opptak.png",
-      "/gallery/projects/onlove.webp",
-      "/gallery/projects/rif.png",
-      "/gallery/projects/seniorbank.png",
-      "/gallery/projects/y.png",
-    ].map((src) => ({
-      src,
-      originalSrc: src,
-      filename: src.split("/").pop() ?? "",
-    })),
-  },
-];
+// Bundled project screenshots; superseded automatically once a "projects"
+// category exists in the media pipeline (post gallery migration).
+const STATIC_PROJECTS: GalleryCategory = {
+  name: "projects",
+  images: [
+    "/gallery/projects/appkom.png",
+    "/gallery/projects/app-picture.png",
+    "/gallery/projects/app-picture-2.jpg",
+    "/gallery/projects/app-picture-3.jpg",
+    "/gallery/projects/movie-tracker.png",
+    "/gallery/projects/norges-tilstand.png",
+    "/gallery/projects/onlinefondet.png",
+    "/gallery/projects/online-opptak.png",
+    "/gallery/projects/onlove.webp",
+    "/gallery/projects/rif.png",
+    "/gallery/projects/seniorbank.png",
+    "/gallery/projects/y.png",
+  ].map((src) => ({
+    src,
+    originalSrc: src,
+    filename: src.split("/").pop() ?? "",
+  })),
+};
 
 function parseDateFromFilename(filename: string): string | undefined {
   const match = filename.match(/^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})/);
@@ -53,60 +45,42 @@ function parseDateFromFilename(filename: string): string | undefined {
   return `${y}-${m}-${d}T${h}:${min}:${s}`;
 }
 
-function toRenderUrl(publicUrl: string): string {
-  return publicUrl.replace(
-    "/storage/v1/object/public/",
-    "/storage/v1/render/image/public/",
-  );
-}
-
-async function getSupabaseCategories(): Promise<GalleryCategory[]> {
-  const supabase = getSupabase();
-  if (!supabase) return [];
-
-  const results = await Promise.all(
-    SUPABASE_FOLDERS.map(async (folder) => {
-      const { data } = await supabase.storage
-        .from("Portfolio")
-        .list(folder, { limit: 1000 });
-      if (!data || data.length === 0) return null;
-
-      const images: GalleryImage[] = data
-        .filter((file) => file.name && !file.name.startsWith("."))
-        .map((file) => {
-          const { data: urlData } = supabase.storage
-            .from("Portfolio")
-            .getPublicUrl(`${folder}/${file.name}`);
-          const publicUrl = urlData.publicUrl;
-          const isHeic = file.name.toLowerCase().endsWith(".heic");
-
-          return {
-            src: isHeic ? toRenderUrl(publicUrl) : publicUrl,
-            originalSrc: publicUrl,
-            filename: file.name,
-            date: parseDateFromFilename(file.name),
-          };
-        });
-
-      if (images.length === 0) return null;
-
-      images.sort((a, b) => {
-        if (a.date && b.date) return b.date.localeCompare(a.date);
-        return a.filename.localeCompare(b.filename);
-      });
-
-      return { name: folder, images };
-    }),
-  );
-
-  return results.filter((r): r is GalleryCategory => r !== null);
-}
-
+/** Gallery content from the media pipeline, grouped by category. */
 export const getGalleryData = createServerFn().handler(
   async (): Promise<GalleryCategory[]> => {
-    const supabaseCategories = await getSupabaseCategories();
-    return [...supabaseCategories, ...STATIC_CATEGORIES].sort((a, b) =>
-      a.name.localeCompare(b.name),
+    const { data } = await api
+      .GET("/api/v1/media", { headers: traceHeaders() })
+      .catch(() => ({ data: null }));
+
+    const byCategory = new Map<string, GalleryImage[]>();
+    for (const item of data ?? []) {
+      const variant =
+        item.variants.find((v) => v.format === "webp") ?? item.variants[0];
+      if (!variant?.url) continue;
+      const category = item.category ?? "uncategorized";
+      const images = byCategory.get(category) ?? [];
+      images.push({
+        src: variant.url,
+        originalSrc: variant.url,
+        filename: item.filename,
+        date: parseDateFromFilename(item.filename),
+      });
+      byCategory.set(category, images);
+    }
+
+    const categories: GalleryCategory[] = Array.from(byCategory.entries()).map(
+      ([name, images]) => {
+        images.sort((a, b) => {
+          if (a.date && b.date) return b.date.localeCompare(a.date);
+          return a.filename.localeCompare(b.filename);
+        });
+        return { name, images };
+      },
     );
+
+    if (!byCategory.has(STATIC_PROJECTS.name)) {
+      categories.push(STATIC_PROJECTS);
+    }
+    return categories.sort((a, b) => a.name.localeCompare(b.name));
   },
 );

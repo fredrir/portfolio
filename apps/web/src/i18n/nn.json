@@ -33,7 +33,11 @@
       "contact": "Send meg ei melding",
       "settings": "Tema, språk, bakgrunn",
       "terminal": "Interaktiv terminal",
-      "gallery": "Fotogalleri"
+      "gallery": "Fotogalleri",
+      "engineering": "Sanntidsinnblikk i plattforma bak sida",
+      "deployments": "Blågrøne utrullingar med signerte images",
+      "medialab": "AVIF/WebP-resultat side om side",
+      "analytics": "Besøksstatistikk, førstepart og PostHog"
     }
   },
   "navbar": {
@@ -119,7 +123,7 @@
         "id": 7,
         "jobTitle": "Læringsassistent i KJ2095",
         "company": "NTNU",
-        "description": "Læringsassistent i faget \u201cEkspertar i team - Miljøpåverknad og tålegrenser\u201d. Tilrettelagde for tverrfagleg samarbeid og rettleidde studentar i problemløysing basert på verkelege utfordringar.",
+        "description": "Læringsassistent i faget “Ekspertar i team - Miljøpåverknad og tålegrenser”. Tilrettelagde for tverrfagleg samarbeid og rettleidde studentar i problemløysing basert på verkelege utfordringar.",
         "date": "Januar 2024 - Nåverande",
         "lightModeImageUri": "/ntnu-logo.svg",
         "darkModeImageUri": "/ntnu-logo-dark.svg",
@@ -359,7 +363,11 @@
       "terminal": "Terminal",
       "gallery": "Galleri",
       "home": "Heim",
-      "resume": "CV"
+      "resume": "CV",
+      "engineering": "Teknisk",
+      "deployments": "Utrullingar",
+      "medialab": "Medielab",
+      "analytics": "Statistikk"
     },
     "shortTitles": {
       "about": "whoami",
@@ -371,7 +379,11 @@
       "settings": "innstillingar",
       "terminal": "terminal",
       "gallery": "galleri",
-      "resume": "cv"
+      "resume": "cv",
+      "engineering": "engineering",
+      "deployments": "deploys",
+      "medialab": "medialab",
+      "analytics": "analytics"
     }
   }
 }

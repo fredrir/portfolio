@@ -5,7 +5,14 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  server: { port: 3000 },
+  server: {
+    port: 3000,
+    // Same-origin API calls in dev (prod routes these through Caddy).
+    proxy: {
+      "/api": "http://localhost:8080",
+      "/healthz": "http://localhost:8080",
+    },
+  },
   resolve: { tsconfigPaths: true },
   plugins: [
     tailwindcss(),

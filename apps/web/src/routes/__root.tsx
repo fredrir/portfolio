@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { ThemeProvider } from "next-themes";
 
+import { PosthogGate } from "@/shared/analytics/posthog-gate";
 import { AnalyticsConsentProvider } from "@/shared/components/analytics/analytics-consent-provider";
 import { CookieConsentBanner } from "@/shared/components/analytics/cookie-consent";
 import { RecaptchaProvider } from "@/shared/components/recaptcha-provider";
@@ -67,6 +68,7 @@ function RootComponent() {
               <NotificationProvider>
                 <Outlet />
                 <CookieConsentBanner locale={locale} />
+                <PosthogGate />
               </NotificationProvider>
             </RecaptchaProvider>
           </AnalyticsConsentProvider>

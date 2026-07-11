@@ -185,6 +185,30 @@ export function TerminalPane({
             setGameFrame(game.render());
             break;
           }
+          case "wasmPlugin": {
+            const [plugin, ...rest] = result.action.payload.split(" ");
+            import("./plugins/registry")
+              .then(({ runWasmCommand }) =>
+                runWasmCommand(plugin, rest.join(" ")),
+              )
+              .then((output) => {
+                setCommandHistory((prev) => [
+                  ...prev,
+                  { command: "", output },
+                ]);
+              })
+              .catch(() => {
+                setCommandHistory((prev) => [
+                  ...prev,
+                  {
+                    command: "",
+                    output: "wasm plugin failed to load",
+                    isError: true,
+                  },
+                ]);
+              });
+            break;
+          }
         }
       }
 

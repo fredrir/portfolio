@@ -12,6 +12,10 @@ import {
   Terminal,
   Images,
   FileText,
+  Cpu,
+  RocketLaunch,
+  Flask,
+  ChartLine,
 } from "@phosphor-icons/react";
 import { WINDOW_CONFIGS, openExternalWindow } from "../../constants";
 import type { UiStrings } from "@/i18n/types";
@@ -27,6 +31,10 @@ const GRID_ICONS: Record<string, React.ReactNode> = {
   terminal: <Terminal size={28} weight="duotone" />,
   gallery: <Images size={28} weight="duotone" />,
   resume: <FileText size={28} weight="duotone" />,
+  engineering: <Cpu size={28} weight="duotone" />,
+  deployments: <RocketLaunch size={28} weight="duotone" />,
+  medialab: <Flask size={28} weight="duotone" />,
+  analytics: <ChartLine size={28} weight="duotone" />,
 };
 
 interface Props {

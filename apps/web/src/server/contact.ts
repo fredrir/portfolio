@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { verifyCaptcha } from "@/lib/captcha";
 import { api, traceHeaders } from "@/server/api";
 
 const contactSchema = z.object({
@@ -41,23 +40,19 @@ export const sendContactForm = createServerFn({ method: "POST" })
 
     const { name, email, phone, message, recaptchaToken } = parsed.data;
 
-    const captcha = await verifyCaptcha({
-      token: recaptchaToken,
-      expectedAction: "contact_form",
-    });
-
-    if (!captcha.ok) {
-      return { success: false, error: "reCAPTCHA verification failed" };
-    }
-
-    // Persist in our own database; delivery moves to the queue worker in
-    // Phase 2. Until then Formspree remains the delivery path of record,
-    // so an API failure must not fail the submission.
+    // Captcha verification happens in the API (action `contact_form`).
+    // Persist in our own database; delivery moves to the queue worker later,
+    // so Formspree remains the delivery path of record and an API failure
+    // must not fail the submission — except captcha rejection (403), which
+    // fails it deliberately.
     try {
-      await api.POST("/api/v1/contact", {
+      const { response } = await api.POST("/api/v1/contact", {
         headers: traceHeaders(),
-        body: { name, email, phone: phone || null, message },
+        body: { name, email, phone: phone || null, message, recaptcha_token: recaptchaToken },
       });
+      if (response.status === 403) {
+        return { success: false, error: "reCAPTCHA verification failed" };
+      }
     } catch (error) {
       console.error("Failed to store contact message:", error);
     }

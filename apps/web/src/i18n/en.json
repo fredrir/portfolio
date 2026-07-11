@@ -33,7 +33,11 @@
       "contact": "Send me a message",
       "settings": "Theme, language, wallpaper",
       "terminal": "Interactive terminal",
-      "gallery": "Photo gallery"
+      "gallery": "Photo gallery",
+      "engineering": "Live look at the platform serving this site",
+      "deployments": "Blue-green releases with signed images",
+      "medialab": "AVIF/WebP pipeline results side by side",
+      "analytics": "Visitor analytics, first-party and PostHog"
     }
   },
   "navbar": {
@@ -359,7 +363,11 @@
       "terminal": "Terminal",
       "gallery": "Gallery",
       "home": "Home",
-      "resume": "Resume"
+      "resume": "Resume",
+      "engineering": "Engineering",
+      "deployments": "Deployments",
+      "medialab": "Media Lab",
+      "analytics": "Analytics"
     },
     "shortTitles": {
       "about": "whoami",
@@ -371,7 +379,11 @@
       "settings": "settings",
       "terminal": "terminal",
       "gallery": "gallery",
-      "resume": "resume"
+      "resume": "resume",
+      "engineering": "engineering",
+      "deployments": "deploys",
+      "medialab": "medialab",
+      "analytics": "analytics"
     }
   }
 }

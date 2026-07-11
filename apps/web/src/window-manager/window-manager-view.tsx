@@ -34,6 +34,11 @@ import { ContactPane } from "@/panes/contact";
 import { SettingsPane } from "@/panes/settings";
 import { TerminalPane } from "@/terminal";
 import { ImagePane } from "@/panes/gallery";
+import { EngineeringPane } from "@/panes/engineering";
+import { DeploymentsPane } from "@/panes/deployments";
+import { MediaLabPane } from "@/panes/medialab";
+import { AnalyticsPane } from "@/panes/analytics";
+import { PaneHost } from "@/shared/components/pane-host";
 import { WINDOW_CONFIGS, configMap } from "./constants";
 import type { WindowConfig } from "./types";
 import type { useTutorial } from "@/tutorial/use-tutorial";
@@ -55,7 +60,7 @@ interface ViewContext {
   focus: ReturnType<typeof useFocus>;
   floating: ReturnType<typeof useFloatingDetail>;
   githubData: GitHubData | null;
-  spotifyData: SpotifyData;
+  spotifyData: SpotifyData | null;
 }
 
 const POST_PANE_STEPS = new Set(["launcher", "drag", "resize"]);
@@ -138,6 +143,26 @@ export function useWindowManagerView(ctx: ViewContext) {
         />
       ),
       gallery: <ImagePane ui={ui} />,
+      engineering: (
+        <PaneHost>
+          <EngineeringPane />
+        </PaneHost>
+      ),
+      deployments: (
+        <PaneHost>
+          <DeploymentsPane />
+        </PaneHost>
+      ),
+      medialab: (
+        <PaneHost>
+          <MediaLabPane />
+        </PaneHost>
+      ),
+      analytics: (
+        <PaneHost>
+          <AnalyticsPane />
+        </PaneHost>
+      ),
     }),
     [
       dict,

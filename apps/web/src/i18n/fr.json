@@ -2,38 +2,42 @@
   "tutorial": {
     "welcomeTitle": "Bienvenue !",
     "welcomeBody": "Je suis Fredrik, laissez-moi vous faire visiter mon bureau. Choisissez d'abord votre langue.",
-    "themeTitle": "Choisissez un th\u00e8me",
+    "themeTitle": "Choisissez un thème",
     "themeBody": "Choisissez une palette de couleurs qui vous convient.",
-    "wallpaperTitle": "Choisissez un fond d'\u00e9cran",
-    "wallpaperBody": "Choisissez un arri\u00e8re-plan pour votre bureau.",
+    "wallpaperTitle": "Choisissez un fond d'écran",
+    "wallpaperBody": "Choisissez un arrière-plan pour votre bureau.",
     "paneSelectionTitle": "Choisissez vos panneaux",
-    "paneSelectionBody": "S\u00e9lectionnez les fen\u00eatres que vous souhaitez ouvrir.",
+    "paneSelectionBody": "Sélectionnez les fenêtres que vous souhaitez ouvrir.",
     "launcherTitle": "Lanceur d'apps",
     "launcherBody": "Appuyez sur Ctrl+K pour ouvrir le lanceur. Essayez maintenant !",
     "launcherWaiting": "En attente de Ctrl+K...",
-    "dragTitle": "Glisser pour \u00e9changer",
-    "dragBody": "Glissez la barre de titre d'une fen\u00eatre sur une autre pour \u00e9changer leurs positions.",
-    "dragWaiting": "Essayez d'\u00e9changer deux fen\u00eatres...",
+    "dragTitle": "Glisser pour échanger",
+    "dragBody": "Glissez la barre de titre d'une fenêtre sur une autre pour échanger leurs positions.",
+    "dragWaiting": "Essayez d'échanger deux fenêtres...",
     "resizeTitle": "Redimensionner",
-    "resizeBody": "Glissez les bordures entre les fen\u00eatres pour les redimensionner.",
+    "resizeBody": "Glissez les bordures entre les fenêtres pour les redimensionner.",
     "resizeWaiting": "Essayez de redimensionner une bordure...",
-    "doneTitle": "Vous \u00eates pr\u00eat !",
-    "doneBody": "Bonne exploration ! Vous pouvez relancer ce tutoriel depuis les Param\u00e8tres.",
+    "doneTitle": "Vous êtes prêt !",
+    "doneBody": "Bonne exploration ! Vous pouvez relancer ce tutoriel depuis les Paramètres.",
     "skip": "Passer",
     "next": "Suivant",
     "back": "Retour",
     "startExploring": "Commencer l'exploration",
     "restartTutorial": "Relancer le tutoriel",
     "paneDescriptions": {
-      "about": "\u00c0 propos de moi",
+      "about": "À propos de moi",
       "github": "Statistiques et contributions GitHub",
-      "spotify": "Ce que j'\u00e9coute",
+      "spotify": "Ce que j'écoute",
       "journey": "Mon parcours professionnel",
-      "projects": "Mes r\u00e9alisations",
+      "projects": "Mes réalisations",
       "contact": "Envoyez-moi un message",
-      "settings": "Th\u00e8me, langue, fond d'\u00e9cran",
+      "settings": "Thème, langue, fond d'écran",
       "terminal": "Terminal interactif",
-      "gallery": "Galerie photo"
+      "gallery": "Galerie photo",
+      "engineering": "Vue en direct de la plateforme derrière ce site",
+      "deployments": "Déploiements bleu-vert avec images signées",
+      "medialab": "Résultats du pipeline AVIF/WebP côte à côte",
+      "analytics": "Statistiques de visite, first-party et PostHog"
     }
   },
   "navbar": {
@@ -359,7 +363,11 @@
       "terminal": "Terminal",
       "gallery": "Galerie",
       "home": "Accueil",
-      "resume": "CV"
+      "resume": "CV",
+      "engineering": "Ingénierie",
+      "deployments": "Déploiements",
+      "medialab": "Labo média",
+      "analytics": "Statistiques"
     },
     "shortTitles": {
       "about": "whoami",
@@ -371,7 +379,11 @@
       "settings": "paramètres",
       "terminal": "terminal",
       "gallery": "galerie",
-      "resume": "cv"
+      "resume": "cv",
+      "engineering": "engineering",
+      "deployments": "deploys",
+      "medialab": "medialab",
+      "analytics": "analytics"
     }
   }
 }

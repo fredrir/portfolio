@@ -9,6 +9,10 @@ import {
   Terminal,
   Images,
   FileText,
+  Cpu,
+  RocketLaunch,
+  Flask,
+  ChartLine,
 } from "@phosphor-icons/react";
 import type { WindowConfig } from "./types";
 import type { BackgroundConfig } from "./background/types";
@@ -105,6 +109,34 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
       nb: "/cv-nb.pdf",
       nn: "/cv-nb.pdf",
     },
+  },
+  {
+    id: "engineering",
+    title: "cat /proc/engineering",
+    icon: <Cpu size={S} weight={W} />,
+    defaultOpen: false,
+    order: 10,
+  },
+  {
+    id: "deployments",
+    title: "tail -f /var/log/deploys",
+    icon: <RocketLaunch size={S} weight={W} />,
+    defaultOpen: false,
+    order: 11,
+  },
+  {
+    id: "medialab",
+    title: "ls /srv/media",
+    icon: <Flask size={S} weight={W} />,
+    defaultOpen: false,
+    order: 12,
+  },
+  {
+    id: "analytics",
+    title: "vnstat --visitors",
+    icon: <ChartLine size={S} weight={W} />,
+    defaultOpen: false,
+    order: 13,
   },
 ];
 
