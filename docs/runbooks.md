@@ -85,17 +85,17 @@ Manual: `ssh letzner 'sudo -u portfolio /home/portfolio/bin/restore-test.sh'`.
 Backup freshness (<26h) is also asserted every 30 minutes by the synthetic
 workflow, which emails on failure.
 
-## Apex rollback to Vercel (post-cutover escape hatch)
+## Release rollback
 
-The pre-cutover Vercel deployment still exists. To send apex traffic back:
+The old Vercel deployment has been decommissioned; rollback is
+slot-and-tunnel only, which is faster than DNS anyway:
 
-1. Delete the proxied `hansteen.dev` AAAA record (Terraform: remove
-   `"hansteen.dev"` from `edge_hostnames` in `envs/prod/terraform.tfvars`
-   and apply, or via the dashboard in an emergency).
-2. Recreate the CNAME: `hansteen.dev` → `d29e6cc7a4c437d4.vercel-dns-016.com`,
-   DNS-only (grey cloud).
-3. Propagation is near-immediate (TTL auto). The new platform keeps serving
-   on `new.hansteen.dev` for debugging.
+1. `ssh portfolio@<host> rollback` (forced command) flips Caddy back to the
+   previous blue/green slot, which still runs the prior release. Traffic
+   returns immediately; no image pull, no DNS wait.
+2. For a bad edge deploy, `cd apps/edge && bunx wrangler rollback`.
+3. `new.hansteen.dev` and the apex both flow through the same Worker →
+   origin path, so there is no separate fallback host to maintain.
 
 ## Point-in-time recovery (PITR)
 
