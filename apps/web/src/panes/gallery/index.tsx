@@ -6,7 +6,7 @@ import {
   getGalleryData,
   type GalleryCategory,
   type GalleryImage,
-} from "@/app/actions/gallery";
+} from "@/server/gallery";
 import { ArrowLeft, FolderOpen } from "@phosphor-icons/react";
 import type { UiStrings } from "@/i18n/types";
 import { useMobileBack } from "@/shared/hooks/use-mobile-back";

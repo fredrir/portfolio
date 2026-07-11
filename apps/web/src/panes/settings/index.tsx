@@ -2,7 +2,7 @@
 
 import { useRef, useTransition } from "react";
 import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@tanstack/react-router";
 import { BACKGROUND_PRESETS } from "@/window-manager/constants";
 import { THEMES } from "@/lib/themes";
 import { KEYS, remove } from "@/lib/storage";
@@ -110,7 +110,11 @@ export function SettingsPane({
                     onClick={() => {
                       if (!isActive) {
                         startTransition(() => {
-                          router.replace(`/${lang.code}`);
+                          router.navigate({
+                            to: "/$locale",
+                            params: { locale: lang.code },
+                            replace: true,
+                          });
                         });
                       }
                     }}
@@ -173,7 +177,6 @@ export function SettingsPane({
             >
               <div className="w-full aspect-[3/2] rounded-sm overflow-hidden border border-control-border flex items-center justify-center">
                 {isCustomActive && currentBackground.value ? (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={currentBackground.value}
                     alt=""

@@ -29,7 +29,7 @@ declare global {
   }
 }
 
-const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
+const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? "";
 
 export function RecaptchaProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);

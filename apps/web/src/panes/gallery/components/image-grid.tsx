@@ -1,4 +1,4 @@
-import type { GalleryImage } from "@/app/actions/gallery";
+import type { GalleryImage } from "@/server/gallery";
 import { Thumbnail } from "./thumbnail";
 import { formatDate } from "../utils";
 

@@ -1,4 +1,3 @@
-import "server-only";
 
 import { locales, type Locale } from "./types";
 

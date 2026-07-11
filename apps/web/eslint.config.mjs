@@ -1,19 +1,22 @@
-import nextPlugin from "@next/eslint-plugin-next";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: [".next/", "node_modules/", "build/", "out/"],
+    ignores: [
+      "node_modules/",
+      ".output/",
+      ".nitro/",
+      ".tanstack/",
+      "src/routeTree.gen.ts",
+    ],
   },
   ...tseslint.configs.recommended,
   {
-    files: ["**/*.{js,mjs,cjs,ts,tsx,jsx}"],
-    plugins: {
-      "@next/next": nextPlugin,
-    },
     rules: {
-      ...nextPlugin.configs.recommended.rules,
-      ...nextPlugin.configs["core-web-vitals"].rules,
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
     },
   },
 );

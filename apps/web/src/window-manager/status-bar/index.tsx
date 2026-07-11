@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import Image from "@/shared/components/image";
 import { useTheme } from "next-themes";
 import { isDarkTheme } from "@/lib/themes";
 import type { UiStrings } from "@/i18n/types";
@@ -62,7 +61,7 @@ export function StatusBar({
         <VisitorCount label={ui.visitors} />
 
         <div className="flex items-center gap-1.5">
-          <Link
+          <a
             href="https://www.linkedin.com/in/fredrir"
             target="_blank"
             rel="noopener noreferrer"
@@ -74,8 +73,8 @@ export function StatusBar({
               height={12}
               className="opacity-50 hover:opacity-100 transition-opacity"
             />
-          </Link>
-          <Link
+          </a>
+          <a
             href="https://www.github.com/fredrir"
             target="_blank"
             rel="noopener noreferrer"
@@ -87,7 +86,7 @@ export function StatusBar({
               height={12}
               className="opacity-50 hover:opacity-100 transition-opacity"
             />
-          </Link>
+          </a>
         </div>
 
         <button

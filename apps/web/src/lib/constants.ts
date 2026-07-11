@@ -1,5 +1,4 @@
 import pkg from "../../package.json";
-import nextPkg from "next/package.json";
 import tailwindPkg from "tailwindcss/package.json";
 
 export const MY_NAME = "Fredrik Carsten Hansteen";
@@ -11,5 +10,8 @@ export const USER_HOST = "fredrik@hansteen";
 export const GITHUB_USERNAME = "fredrir";
 
 export const PORTFOLIO_VERSION = pkg.version;
-export const NEXT_VERSION = nextPkg.version;
+export const START_VERSION = pkg.dependencies["@tanstack/react-start"].replace(
+  /^[\^~]/,
+  "",
+);
 export const TAILWIND_VERSION = tailwindPkg.version;

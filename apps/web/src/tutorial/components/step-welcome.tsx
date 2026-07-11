@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "@tanstack/react-router";
 import { useTransition } from "react";
 import { languages } from "@/panes/settings/constants";
 import { StepLayout } from "./step-layout";
@@ -35,7 +35,11 @@ export function StepWelcome({
                   onSelectLocale(lang.code);
                   onSaveState(0);
                   startTransition(() => {
-                    router.replace(`/${lang.code}`);
+                    router.navigate({
+                      to: "/$locale",
+                      params: { locale: lang.code },
+                      replace: true,
+                    });
                   });
                 }
               }}

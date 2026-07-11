@@ -1,5 +1,5 @@
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
-import Image from "next/image";
+import Image from "@/shared/components/image";
 
 type ImageVisual = { imageSrc?: string };
 type CustomVisual = { custom: React.ReactNode };

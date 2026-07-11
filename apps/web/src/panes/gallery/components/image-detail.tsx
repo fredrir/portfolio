@@ -1,7 +1,7 @@
 import { useRef, useCallback, useEffect } from "react";
-import Image from "next/image";
+import Image from "@/shared/components/image";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
-import type { GalleryImage } from "@/app/actions/gallery";
+import type { GalleryImage } from "@/server/gallery";
 import { CaretLeft, CaretRight, MapPin } from "@phosphor-icons/react";
 import { useExifData } from "../hooks/use-exif";
 import { formatDate } from "../utils";

@@ -49,7 +49,7 @@ export function useTutorial(locale: string) {
   }, []);
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "development") return;
+    if (!import.meta.env.DEV) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "T") {
         e.preventDefault();

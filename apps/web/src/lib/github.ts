@@ -1,5 +1,3 @@
-"use server";
-
 import { GITHUB_USERNAME } from "./constants";
 
 interface ContributionDay {
@@ -15,7 +13,7 @@ async function fetchContributions(
     const url = year
       ? `https://github.com/users/${GITHUB_USERNAME}/contributions?from=${year}-01-01&to=${year}-12-31`
       : `https://github.com/users/${GITHUB_USERNAME}/contributions`;
-    const res = await fetch(url, { next: { revalidate: 3600 } });
+    const res = await fetch(url);
     if (!res.ok) return { days: [], total: 0 };
     const html = await res.text();
 
@@ -57,18 +55,32 @@ async function fetchContributions(
   }
 }
 
+type GitHubData = Awaited<ReturnType<typeof loadGitHubData>>;
+
+const CACHE_TTL_MS = 3600_000;
+let cache: { data: GitHubData; fetchedAt: number } | null = null;
+
 export async function fetchGitHubData() {
+  if (cache && Date.now() - cache.fetchedAt < CACHE_TTL_MS) {
+    return cache.data;
+  }
+  const data = await loadGitHubData();
+  if (data) {
+    cache = { data, fetchedAt: Date.now() };
+  }
+  return data;
+}
+
+async function loadGitHubData() {
   try {
     const [userRes, reposRes] = await Promise.all([
       fetch(`https://api.github.com/users/${GITHUB_USERNAME}`, {
         headers: { Accept: "application/vnd.github.v3+json" },
-        next: { revalidate: 3600 },
       }),
       fetch(
         `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`,
         {
           headers: { Accept: "application/vnd.github.v3+json" },
-          next: { revalidate: 3600 },
         },
       ),
     ]);

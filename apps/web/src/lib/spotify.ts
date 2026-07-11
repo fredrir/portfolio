@@ -1,4 +1,3 @@
-import "server-only";
 
 import { getSupabase } from "@/lib/supabase";
 import type { SpotifyData, SpotifyArtist, SpotifyTrack } from "@/shared/types";

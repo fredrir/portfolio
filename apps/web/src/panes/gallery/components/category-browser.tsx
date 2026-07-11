@@ -1,4 +1,4 @@
-import type { GalleryCategory } from "@/app/actions/gallery";
+import type { GalleryCategory } from "@/server/gallery";
 import { Thumbnail } from "./thumbnail";
 
 export function CategoryBrowser({

@@ -6,7 +6,7 @@ import { BIRTHDAY, USER_HOST } from "@/lib/constants";
 import { THEMES } from "@/lib/themes";
 import {
   PORTFOLIO_VERSION,
-  NEXT_VERSION,
+  START_VERSION,
   TAILWIND_VERSION,
 } from "@/lib/constants";
 import { WINDOW_CONFIGS } from "@/window-manager/constants";
@@ -70,7 +70,7 @@ export function getDefaultInfo(
         "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
     },
     { label: "OS", value: `fredrir ${PORTFOLIO_VERSION}` },
-    { label: "Kernel", value: `Next.js ${NEXT_VERSION}` },
+    { label: "Kernel", value: `TanStack Start ${START_VERSION}` },
     { label: "Uptime", value: computeUptime() },
     { label: "Shell", value: "zsh 5.9" },
     { label: "WM", value: `Tailwind CSS v${TAILWIND_VERSION}` },

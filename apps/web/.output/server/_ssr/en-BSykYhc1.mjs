@@ -1,0 +1,380 @@
+//#region node_modules/.nitro/vite/services/ssr/assets/en-BSykYhc1.js
+var en_default = {
+	tutorial: {
+		"welcomeTitle": "Welcome!",
+		"welcomeBody": "I'm Fredrik, let me show you around my desktop. Pick your language first.",
+		"themeTitle": "Pick a theme",
+		"themeBody": "Choose a color palette that suits you.",
+		"wallpaperTitle": "Set your wallpaper",
+		"wallpaperBody": "Pick a background for your desktop.",
+		"paneSelectionTitle": "Choose your panes",
+		"paneSelectionBody": "Toggle which windows you want open.",
+		"launcherTitle": "App Launcher",
+		"launcherBody": "Press Ctrl+K to open the launcher. Try it now!",
+		"launcherWaiting": "Waiting for Ctrl+K...",
+		"dragTitle": "Drag to swap",
+		"dragBody": "Drag a window title bar onto another to swap their positions.",
+		"dragWaiting": "Try swapping two windows...",
+		"resizeTitle": "Resize panes",
+		"resizeBody": "Drag the borders between windows to resize them.",
+		"resizeWaiting": "Try resizing a border...",
+		"doneTitle": "You're all set!",
+		"doneBody": "Enjoy exploring. You can restart this tutorial from Settings anytime.",
+		"skip": "Skip",
+		"next": "Next",
+		"back": "Back",
+		"startExploring": "Start exploring",
+		"restartTutorial": "Restart tutorial",
+		"paneDescriptions": {
+			"about": "About me and my background",
+			"github": "GitHub stats and contributions",
+			"spotify": "What I'm listening to",
+			"journey": "My career timeline",
+			"projects": "Things I've built",
+			"contact": "Send me a message",
+			"settings": "Theme, language, wallpaper",
+			"terminal": "Interactive terminal",
+			"gallery": "Photo gallery"
+		}
+	},
+	navbar: {
+		"home": "Home",
+		"projects": "Projects",
+		"journey": "Journey",
+		"contact": "Contact",
+		"lightMode": "Light Mode",
+		"darkMode": "Dark Mode",
+		"language": "Language",
+		"toggleTheme": "Toggle Theme",
+		"openMenu": "Open Menu",
+		"closeMenu": "Close Menu"
+	},
+	landing: {
+		"title": "Hi, I'm",
+		"mainText": "I'm currently pursuing a master's degree in Computer Science at NTNU in Trondheim. You're more than welcome to have a look around or get in touch."
+	},
+	journey: {
+		"title": "My Journey",
+		"journeys": [
+			{
+				"id": 10,
+				"jobTitle": "Teaching Assistant in IT2901",
+				"company": "NTNU",
+				"description": "Responsible for supervising bachelor’s thesis groups, providing academic guidance, and evaluating midterm progress throughout the semester.",
+				"date": "January 2026 - June 2026",
+				"lightModeImageUri": "/ntnu-logo.svg",
+				"darkModeImageUri": "/ntnu-logo-dark.svg",
+				"isCurrent": true
+			},
+			{
+				"id": 11,
+				"jobTitle": "Teaching Assistant in KJ2095",
+				"company": "NTNU",
+				"description": "Teaching assistant in the course Experts in Teamwork – Environmental Impact and Tipping Points. Facilitated interdisciplinary collaboration and guided students in solving real-world challenges",
+				"date": "January 2026 - June 2026",
+				"lightModeImageUri": "/ntnu-logo.svg",
+				"darkModeImageUri": "/ntnu-logo-dark.svg",
+				"isCurrent": true
+			},
+			{
+				"id": 12,
+				"jobTitle": "Teaching Assistant in TDT4140",
+				"company": "NTNU",
+				"description": "Tasks related to supervision, group leadership (including exercises, study groups, and seminars), and evaluation.",
+				"date": "January 2026 - June 2026",
+				"lightModeImageUri": "/ntnu-logo.svg",
+				"darkModeImageUri": "/ntnu-logo-dark.svg",
+				"isCurrent": true
+			},
+			{
+				"id": 9,
+				"jobTitle": "Teaching Assistant in IT3212",
+				"company": "NTNU",
+				"description": "Teaching assistant in the course Data-Driven Software. Tasks related to guidance, group leadership (including exercises, study groups, and seminars), and evaluation.",
+				"date": "August 2025 - December 2025",
+				"lightModeImageUri": "/ntnu-logo.svg",
+				"darkModeImageUri": "/ntnu-logo-dark.svg",
+				"isCurrent": false
+			},
+			{
+				"id": 8,
+				"jobTitle": "Technical Teaching Assistant in IT1901",
+				"company": "NTNU",
+				"description": "Provided technical guidance in the course Informatics Project Work I. Conducted three weekly exercise sessions where I assisted students with development and problem-solving related to Java- and Maven-based projects.",
+				"date": "August 2025 - December 2025",
+				"lightModeImageUri": "/ntnu-logo.svg",
+				"darkModeImageUri": "/ntnu-logo-dark.svg",
+				"isCurrent": false
+			},
+			{
+				"id": 5,
+				"jobTitle": "Developer",
+				"company": "RIF - Consulting Engineers’ Association",
+				"description": "Responsible for developing the website (rif.no), an internal form panel for surveys and event registrations, and an external dashboard for expert groups to manage advisors and surveys.",
+				"date": "August 2024 - Present",
+				"lightModeImageUri": "/rif-logo.svg",
+				"darkModeImageUri": "/rif-logo-dark.svg",
+				"isCurrent": true
+			},
+			{
+				"id": 7,
+				"jobTitle": "Teaching Assistant in KJ2095",
+				"company": "NTNU",
+				"description": "Teaching assistant in the course Experts in Teamwork – Environmental Impact and Tipping Points. Facilitated interdisciplinary collaboration and guided students in solving real-world challenges",
+				"date": "January 2024 - June 2024",
+				"lightModeImageUri": "/ntnu-logo.svg",
+				"darkModeImageUri": "/ntnu-logo-dark.svg",
+				"isCurrent": false
+			},
+			{
+				"id": 6,
+				"jobTitle": "Teaching Assistant in IT1901",
+				"company": "NTNU",
+				"description": "Provided technical guidance in the course Informatics Project Work I. Led three weekly lab sessions, assisting students with development and problem-solving related to Java and Maven-based projects",
+				"date": "August 2024 - December 2024",
+				"lightModeImageUri": "/ntnu-logo.svg",
+				"darkModeImageUri": "/ntnu-logo-dark.svg",
+				"isCurrent": false
+			},
+			{
+				"id": 1,
+				"jobTitle": "Test Developer",
+				"company": "Maritime Optima",
+				"description": "Developed end-to-end tests, increasing test coverage of the software. Created regression test documents and performed manual regression testing. Participated in daily standups and sprint planning in a SCRUM team.",
+				"date": "June 2024 - July 2024",
+				"lightModeImageUri": "/maritime-optima.svg",
+				"darkModeImageUri": "/maritime-optima-dark.svg",
+				"isCurrent": false
+			},
+			{
+				"id": 2,
+				"jobTitle": "Head of the Application Committee",
+				"company": "Online - Student Organization",
+				"description": "Responsible for leading a team of 19 developers, divided into various projects. Main responsibility for administrative work and leading weekly meetings. Responsible for organizing weekly work sessions and onboarding new members.",
+				"date": "February 2024 - March 2025",
+				"lightModeImageUri": "/appkom.svg",
+				"darkModeImageUri": "/appkom-dark.svg",
+				"isCurrent": false
+			},
+			{
+				"id": 3,
+				"jobTitle": "Teaching Assistant in MA0001",
+				"company": "NTNU",
+				"description": "Led weekly exercise sessions, graded assignments and provided feedback to students.",
+				"date": "August 2023 - December 2023",
+				"lightModeImageUri": "/ntnu-logo.svg",
+				"darkModeImageUri": "/ntnu-logo-dark.svg",
+				"isCurrent": false
+			},
+			{
+				"id": 4,
+				"jobTitle": "Chartering Agent Intern",
+				"company": "Nordic American Tankers",
+				"description": "Created detailed reports on the impact of the war in Ukraine and compiled an overview of vessels suspected of illegally transporting Russian oil. Analyzed global developments and identified new opportunities in the tanker sector. Assisted in the chartering of the company's fleet.",
+				"date": "June 2023 - July 2023",
+				"lightModeImageUri": "/nat-logo.png",
+				"darkModeImageUri": "/nat-logo.png",
+				"isCurrent": false
+			}
+		]
+	},
+	project: {
+		"title": "Projects",
+		"viewCode": "View Code",
+		"projects": [
+			{
+				"id": 6,
+				"title": "Rif.no",
+				"description": "rif.no is a monorepo combining multiple applications and services in one unified platform. The solution consists of the main application (rif.no), built with Next.js App Router, fetching and rendering content from a Sanity-based CMS. The platform is structured around a dynamic content block system enabling great flexibility in how pages are built and published. It also includes an internal administration dashboard. The architecture supports incremental revalidation via webhooks from Sanity so content is statically rendered. Additionally, a form panel for creating, managing and displaying results from surveys and event registrations is included.",
+				"languages": "Next.js / PostgreSQL / Tailwind / Sanity",
+				"desktopImage": "/rif.png",
+				"websiteLink": "https://rif.no/"
+			},
+			{
+				"id": 10,
+				"title": "Seniorbank",
+				"description": "SeniorBank is a prototype designed to enhance digital banking security for elderly users and vulnerable groups who are increasingly targeted by online fraud. The project focused on designing a conceptual banking prototype from scratch that combines user-friendly design with fraud prevention concepts, serving as a foundation for more secure digital banking experiences tailored to elderly users. This initiative was developed in collaboration with SpareBank 1 Utvikling which provides digital banking solutions for multiple Norwegian banks.",
+				"languages": "Auth0 / Docker / Prisma / PostgreSQL / React / ShadCN / Tailwind",
+				"desktopImage": "/seniorbank.png",
+				"githubLink": "https://github.com/fredrir/seniorbank",
+				"websiteLink": "https://seniorbank.vercel.app/"
+			},
+			{
+				"id": 1,
+				"title": "Admission Page",
+				"description": "Developed a web application with 4 co-developers to make the process of applying to committees at Online easier for both applicants and committees. The platform helps organize applications and automate interview scheduling, making the process simpler and more transparent for everyone.",
+				"languages": "Auth0 / Next.js / MongoDB / Tailwind",
+				"desktopImage": "/online-opptak.png",
+				"githubLink": "https://github.com/appKom/online-opptak/",
+				"websiteLink": "https://opptak.online.ntnu.no/"
+			},
+			{
+				"id": 7,
+				"title": "Charity Auction - Onlove",
+				"description": "A web app for a charity auction, where users can view auctions, bid on items, donate to charity and view results. A total of 66,796 NOK was raised.",
+				"languages": "Auth0 / Next.js / PostgreSQL / Prisma / Tailwind",
+				"desktopImage": "/onlove.webp",
+				"githubLink": "https://github.com/appKom/maccaroni",
+				"websiteLink": "https://onlove.no/"
+			},
+			{
+				"id": 8,
+				"title": "Norges tilstand",
+				"description": "A campaign website for the report Norges tilstand. The report is produced by RIF and is a summary of the state of the Norwegian economy. The website is built with Next.js and has a custom CMS built with Prisma and PostgreSQL.",
+				"languages": "Next.js / PostgreSQL / Prisma / Tailwind",
+				"desktopImage": "/norges-tilstand.png",
+				"websiteLink": "https://norgestilstand.no/"
+			},
+			{
+				"id": 5,
+				"title": "Y - Social Media",
+				"description": "A social platform where you can share posts, like posts and follow other users. Built with Vite, MongoDB and Express, with a focus on performance and scalability. Hosted on a Linux server with Apache2 and PM2.",
+				"languages": "Vite / MongoDB / Express / Apache2 / Tailwind",
+				"desktopImage": "/y.png",
+				"githubLink": "https://github.com/fredrir/Y",
+				"websiteLink": "https://yeeter.no/"
+			},
+			{
+				"id": 9,
+				"title": "Appkom - Website",
+				"description": "A website for the student committee AppKom, with information about the committee, news, members and projects. Built with Next.js and a custom CMS with Prisma and PostgreSQL.",
+				"languages": "Next.js / PostgreSQL / Prisma / Tailwind",
+				"desktopImage": "/appkom.png",
+				"githubLink": "https://github.com/appkom/home",
+				"websiteLink": "https://appkom.no/"
+			},
+			{
+				"id": 2,
+				"title": "Online Events",
+				"description": "A mobile app for students where they can sign up for events, get notifications and play games.",
+				"languages": "Auth0 / Flutter / Firebase / Go / Google Cloud Platform",
+				"mobileImages": [
+					"/app-picture.png",
+					"/app-picture-2.jpg",
+					"/app-picture-3.jpg"
+				],
+				"githubLink": "https://github.com/appKom/online_events",
+				"websiteLink": "https://apps.apple.com/no/app/online/id6476830274",
+				"websiteAlias": "App Store"
+			},
+			{
+				"id": 3,
+				"title": "Movie Tracker",
+				"description": "A web app where you can keep track of movies you've watched and want to watch. Created as a project in web development in collaboration with 5 other students.",
+				"languages": "Next.js / PostgreSQL / Tailwind",
+				"desktopImage": "/movie-tracker.png",
+				"githubLink": "https://github.com/fredrir/MovieTracker",
+				"websiteLink": "https://film-bice.vercel.app/"
+			},
+			{
+				"id": 4,
+				"title": "The Online Fond",
+				"description": "A web app showcasing the student organization's fund, how it's used and its performance. Also shows the fund's members and projects that have received funding. The website has an admin panel built with Prisma and PostgreSQL, allowing fund members to manage the site, portfolio and applications.",
+				"languages": "Next.js / OAuth 2.0 / Prisma / PostgreSQL / Tailwind",
+				"desktopImage": "/onlinefondet.png",
+				"githubLink": "https://github.com/appkom/onlinefondet",
+				"websiteLink": "https://onlinefondet.no"
+			}
+		]
+	},
+	contact: {
+		"title": "Contact Me",
+		"name": "Name",
+		"email": "Email",
+		"phone": "Phone",
+		"message": "Message",
+		"submit": "Submit",
+		"submitSuccess": "Your message has been sent successfully. I will get back to you as soon as possible.",
+		"submitError": "An error occurred while sending your message. Please try again later.",
+		"submitLoading": "Sending...",
+		"recaptchaError": "Please complete the reCAPTCHA.",
+		"optional": "optional",
+		"vimHintNormal": "Press \"i\" to start typing...",
+		"vimHintStatus": "Type {i} to edit, {wq} to send"
+	},
+	footer: {
+		"license1": "All rights reserved.",
+		"license2": "Licensed under the MIT License."
+	},
+	ui: {
+		"theme": "Theme",
+		"language": "Language",
+		"wallpaper": "Wallpaper",
+		"customImage": "Choose custom image...",
+		"nowPlaying": "NOW PLAYING",
+		"lastPlayed": "LAST PLAYED",
+		"track": "Track",
+		"artist": "Artist",
+		"album": "Album",
+		"playInBrowser": "play in browser",
+		"hidePlayer": "hide player",
+		"about": "Synopsis",
+		"techStack": "Dependencies",
+		"links": "See Also",
+		"visitors": "visitors",
+		"uptime": "uptime",
+		"searchApps": "Search applications...",
+		"noMatching": "No matching windows",
+		"navigate": "navigate",
+		"open": "open",
+		"close": "close",
+		"apps": "apps",
+		"tipLauncher": "app launcher",
+		"tipDrag": "Drag titles to swap",
+		"tipResize": "Drag borders to resize",
+		"entries": "entries",
+		"projects": "projects",
+		"images": "images",
+		"clickToOpen": "click to open",
+		"active": "active",
+		"stop": "stop",
+		"start": "start",
+		"lastYear": "Last year",
+		"searchingGallery": "searching gallery...",
+		"emptyGallery": "~/gallery/ is empty",
+		"githubRepos": "Repos",
+		"githubStars": "Stars",
+		"githubFollowers": "Followers",
+		"githubFollowing": "Following",
+		"githubSince": "Since",
+		"githubApiError": "error: could not reach github api",
+		"githubContributions": "contributions",
+		"githubCommand": "cat /proc/github",
+		"backgrounds": {
+			"starfield": "Starfield",
+			"matrix": "Matrix",
+			"grid": "Grid",
+			"gradient": "Gradient",
+			"plain": "Minimal",
+			"custom": "Custom"
+		},
+		"viewResume": "View Resume",
+		"localeTitles": {
+			"about": "About Me",
+			"github": "GitHub",
+			"spotify": "Spotify",
+			"journey": "Career",
+			"projects": "Projects",
+			"contact": "Contact",
+			"settings": "Settings",
+			"terminal": "Terminal",
+			"gallery": "Gallery",
+			"home": "Home",
+			"resume": "Resume"
+		},
+		"shortTitles": {
+			"about": "whoami",
+			"github": "github",
+			"spotify": "spotify",
+			"journey": "log",
+			"projects": "projects",
+			"contact": "mail",
+			"settings": "settings",
+			"terminal": "terminal",
+			"gallery": "gallery",
+			"resume": "resume"
+		}
+	}
+};
+//#endregion
+export { en_default as default };

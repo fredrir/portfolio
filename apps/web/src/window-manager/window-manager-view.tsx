@@ -1,14 +1,31 @@
-import { useMemo } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useMemo,
+  useState,
+  type ComponentProps,
+} from "react";
 import { TutorialOverlay } from "@/tutorial";
 import { AppLauncher } from "./launcher/components/app-launcher";
 import { FloatingDetail } from "./overlays/components/floating-detail";
 import { DragGhost } from "./overlays/components/drag-ghost";
-import dynamic from "next/dynamic";
 
-const AboutPane = dynamic(
-  () => import("@/panes/about").then((m) => ({ default: m.AboutPane })),
-  { ssr: false },
+const AboutPaneLazy = lazy(() =>
+  import("@/panes/about").then((m) => ({ default: m.AboutPane })),
 );
+
+// Client-only: the about pane renders a three.js canvas that must not SSR.
+function AboutPane(props: ComponentProps<typeof AboutPaneLazy>) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return (
+    <Suspense fallback={null}>
+      <AboutPaneLazy {...props} />
+    </Suspense>
+  );
+}
 import { GitHubPane } from "@/panes/github";
 import { SpotifyPane } from "@/panes/spotify";
 import { JourneyPane } from "@/panes/journey";

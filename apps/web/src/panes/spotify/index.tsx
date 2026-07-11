@@ -6,7 +6,7 @@ import { SPOTIFY_POLL_INTERVAL } from "./constants";
 import { CavaVisualizer } from "./components/cava-visualizer";
 import { TopArtists } from "./components/top-artists";
 import { RecentTracks } from "./components/recent-tracks";
-import { getSpotifyData } from "@/app/actions/spotify";
+import { getSpotifyData } from "@/server/spotify";
 import type { SpotifyData } from "@/shared/types";
 import type { UiStrings } from "@/i18n/types";
 import { useRecaptcha } from "@/shared/components/recaptcha-provider";
@@ -47,7 +47,7 @@ export function SpotifyPane({
       }
 
       const captchaToken = await executeRecaptcha("spotify_data");
-      const d = await getSpotifyData(captchaToken);
+      const d = await getSpotifyData({ data: captchaToken });
       if (d?.title) {
         setData(d);
       } else if (lastKnownRef.current?.title) {

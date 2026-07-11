@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/shared/components/image";
 import type { SpotifyTrack } from "@/shared/types";
 
 export function RecentTracks({ tracks }: { tracks: SpotifyTrack[] }) {

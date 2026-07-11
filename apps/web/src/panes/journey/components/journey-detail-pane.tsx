@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import Image from "@/shared/components/image";
 import { useTheme } from "next-themes";
 import { isDarkTheme } from "@/lib/themes";
 import type { journeyType } from "@/shared/types";

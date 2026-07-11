@@ -1,4 +1,3 @@
-import "server-only";
 
 export async function verifyCaptcha({
   token,

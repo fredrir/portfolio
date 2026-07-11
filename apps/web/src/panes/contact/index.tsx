@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRecaptcha } from "@/shared/components/recaptcha-provider";
-import { sendContactForm } from "@/app/actions/contact";
+import { sendContactForm } from "@/server/contact";
 import { useNotification } from "@/shared/notification";
 import { MY_EMAIL } from "@/lib/constants";
 import { delay, genQueueId } from "./utils";
@@ -98,8 +98,7 @@ export function ContactPane({ contact }: ContactProps) {
 
     try {
       const result = await sendContactForm({
-        ...formData,
-        recaptchaToken: token,
+        data: { ...formData, recaptchaToken: token },
       });
 
       if (result.success) {

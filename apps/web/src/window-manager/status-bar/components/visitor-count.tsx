@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRecaptcha } from "@/shared/components/recaptcha-provider";
-import { recordVisit, getVisitorCount } from "@/app/actions/visitor";
+import { recordVisit, getVisitorCount } from "@/server/visitor";
 import { KEYS, read, write } from "@/lib/storage";
 
 interface Props {
@@ -20,8 +20,8 @@ export function VisitorCount({ label }: Props) {
   useEffect(() => {
     if (read(KEYS.visited, true) || !executeRecaptcha) return;
 
-    executeRecaptcha("page_visit")
-      .then((token) => recordVisit(token))
+    executeRecaptcha("record_visit")
+      .then((token) => recordVisit({ data: token }))
       .then((result) => {
         if (result.success) {
           write(KEYS.visited, "1", true);

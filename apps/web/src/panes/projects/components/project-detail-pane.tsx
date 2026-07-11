@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import Image from "@/shared/components/image";
 import type { projectType } from "@/shared/types";
 import type { UiStrings } from "@/i18n/types";
 import { GithubLogoIcon, LinkIcon } from "@phosphor-icons/react/dist/ssr";
@@ -141,7 +140,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
             </div>
             <div className="space-y-1.5">
               {project.websiteLink && (
-                <Link
+                <a
                   href={project.websiteLink}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -156,10 +155,10 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
                         .replace(/https?:\/\//, "")
                         .replace(/\/$/, "")}
                   </span>
-                </Link>
+                </a>
               )}
               {project.githubLink && (
-                <Link
+                <a
                   href={project.githubLink}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -171,7 +170,7 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
                   <span className="text-muted-hover group-hover:text-primary transition-colors text-xs">
                     {viewCode}
                   </span>
-                </Link>
+                </a>
               )}
             </div>
           </div>

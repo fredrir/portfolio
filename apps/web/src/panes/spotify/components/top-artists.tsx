@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/shared/components/image";
 import type { SpotifyArtist } from "@/shared/types";
 
 export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {

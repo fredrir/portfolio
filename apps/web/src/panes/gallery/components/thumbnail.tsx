@@ -1,5 +1,5 @@
-import Image from "next/image";
-import type { GalleryImage } from "@/app/actions/gallery";
+import Image from "@/shared/components/image";
+import type { GalleryImage } from "@/server/gallery";
 import { isSvg } from "../utils";
 
 export function Thumbnail({
@@ -10,7 +10,6 @@ export function Thumbnail({
   className?: string;
 }) {
   if (isSvg(image.src)) {
-    // eslint-disable-next-line @next/next/no-img-element
     return (
       <img
         src={image.src}
