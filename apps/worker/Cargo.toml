@@ -9,8 +9,8 @@ name = "portfolio_worker"
 
 [dependencies]
 aws-config = "1"
-aws-sdk-s3 = "1"
-aws-sdk-sqs = "1"
+aws-sdk-s3 = { version = "1", default-features = false, features = ["sigv4a", "http-1x", "default-https-client", "rt-tokio"] }
+aws-sdk-sqs = { version = "1", default-features = false, features = ["default-https-client", "rt-tokio"] }
 dotenvy = "0.15"
 hex = "0.4"
 image = { version = "0.25", features = ["avif"] }
