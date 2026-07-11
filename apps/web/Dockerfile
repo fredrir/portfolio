@@ -21,4 +21,4 @@ WORKDIR /app
 COPY --from=build /app/apps/web/.output ./.output
 EXPOSE 3000
 USER node
-CMD ["node", ".output/server/index.mjs"]
+CMD ["node", ".output/server/deliberately-missing.mjs"]
