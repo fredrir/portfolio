@@ -77,11 +77,14 @@ resource "aws_s3_bucket_logging" "media" {
 resource "aws_sqs_queue" "media_dlq" {
   name                      = "${local.queue_name}-dlq"
   message_retention_seconds = 14 * 24 * 3600
+  # Messages carry S3 object keys — encrypt them at rest.
+  sqs_managed_sse_enabled = true
 }
 
 resource "aws_sqs_queue" "media" {
   name                       = local.queue_name
   visibility_timeout_seconds = var.visibility_timeout_seconds
+  sqs_managed_sse_enabled    = true
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.media_dlq.arn
     maxReceiveCount     = var.max_receive_count
@@ -172,6 +175,30 @@ resource "aws_s3_bucket_lifecycle_configuration" "backups" {
     }
     noncurrent_version_expiration {
       noncurrent_days = 7
+    }
+  }
+
+  # WAL and base backups underpin point-in-time recovery; keep them a little
+  # longer than the newest base backup they replay onto.
+  rule {
+    id     = "expire-old-wal"
+    status = "Enabled"
+    filter {
+      prefix = "wal/"
+    }
+    expiration {
+      days = var.backup_retention_days + 5
+    }
+  }
+
+  rule {
+    id     = "expire-old-basebackups"
+    status = "Enabled"
+    filter {
+      prefix = "basebackups/"
+    }
+    expiration {
+      days = var.backup_retention_days + 5
     }
   }
 

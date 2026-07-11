@@ -9,12 +9,14 @@ SHA=${1:?usage: deploy.sh <git-sha>}
 REGISTRY=ghcr.io/fredrir
 IDENTITY_RE='^https://github.com/fredrir/portfolio/'
 ISSUER=https://token.actions.githubusercontent.com
-PUBLIC_BASE=${PUBLIC_BASE:-https://new.hansteen.dev}
+PUBLIC_BASE=${PUBLIC_BASE:-https://hansteen.dev}
 CONF=$HOME/.config/portfolio
 SLOTS=$HOME/caddy/slots
 QUADLET=$HOME/.config/containers/systemd
 export DOCKER_CONFIG=$HOME/.docker
 export REGISTRY_AUTH_FILE=$HOME/.docker/config.json
+# shellcheck source=slot-lib.sh
+source "$(dirname "$0")/slot-lib.sh"
 
 log() { echo "[deploy] $(date -u +%FT%TZ) $*"; }
 record() {
@@ -47,6 +49,10 @@ digest_of() {
     podman image inspect --format '{{index .RepoDigests 0}}' "$REGISTRY/portfolio-$1:$SHA"
 }
 
+# Snapshot the shared worker's current image so a failed release can restore it
+# (the worker isn't slotted, so a Caddy flip alone wouldn't revert it).
+PREV_WORKER=$(cat "$QUADLET/worker.container.d/image.conf" 2>/dev/null || true)
+
 for unit in "api-$TARGET" "web-$TARGET" worker; do
     case $unit in
         api-*) img=api ;;
@@ -59,6 +65,9 @@ done
 
 "$HOME/bin/render-env.sh" >/dev/null
 systemctl --user daemon-reload
+# Clear any prior failed state on the target slot so its NRestarts baseline
+# starts at zero for this deploy's crash-loop check.
+systemctl --user reset-failed "api-$TARGET.service" "web-$TARGET.service" 2>/dev/null || true
 systemctl --user restart "api-$TARGET.service" "web-$TARGET.service" worker.service
 
 probe() {
@@ -92,36 +101,6 @@ fi
 systemctl --user is-active --quiet worker.service \
     || { record failed-worker; log "worker not running, aborting"; exit 1; }
 
-write_slot() {
-    cat > "$SLOTS/active.caddy" <<CADDY
-handle /api/* {
-	header +x-origin-slot $1
-	reverse_proxy api-$1:8080 {
-		header_up -x-admin-origin
-	}
-}
-handle /readyz {
-	reverse_proxy api-$1:8080
-}
-handle {
-	header +x-origin-slot $1
-	reverse_proxy web-$1:3000 {
-		header_up -x-admin-origin
-	}
-}
-CADDY
-    cat > "$SLOTS/admin.caddy" <<CADDY
-@root path /
-redir @root /admin
-handle {
-	reverse_proxy web-$1:3000 {
-		header_up x-admin-origin 1
-	}
-}
-CADDY
-    podman exec caddy caddy reload --config /etc/caddy/Caddyfile 2>/dev/null
-}
-
 log "switching traffic to $TARGET"
 write_slot "$TARGET"
 
@@ -141,6 +120,13 @@ if [ -z "$ok" ]; then
     log "SMOKE FAILED — rolling back to $ACTIVE"
     if [ "$ACTIVE" != "none" ]; then
         write_slot "$ACTIVE"
+    fi
+    # Restore the worker to its pre-deploy image too (it isn't reverted by the
+    # Caddy flip).
+    if [ -n "$PREV_WORKER" ]; then
+        printf '%s\n' "$PREV_WORKER" > "$QUADLET/worker.container.d/image.conf"
+        systemctl --user daemon-reload
+        systemctl --user restart worker.service || true
     fi
     record rolled-back
     exit 1

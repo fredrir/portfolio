@@ -6,8 +6,8 @@ a metrics stack (see the observability deviation note at the bottom).
 
 | Objective | Target | Measured by |
 |---|---|---|
-| Public availability | 99.9% monthly (~43 min error budget) | Synthetic workflow every 30 min probes `/healthz`, `/en`, `/api/v1/version`, `/sitemap.xml`, `/engineering`; any failure emails immediately and is visible in the public Actions history |
-| Cached page latency (p95) | < 300 ms at the edge | `server-timing: edge;dur=…` + `x-edge-cache` headers on every response; spot-checked from the Engineering Mode page |
+| Public availability | 99.9% monthly (~43 min error budget) | Synthetic workflow every 30 min probes `/healthz`, `/en`, `/api/v1/version`, `/sitemap.xml`; any failure emails immediately and is visible in the public Actions history |
+| Cached page latency (p95) | < 300 ms at the edge | `server-timing: edge;dur=…` + `x-edge-cache` headers on every response; spot-checked from the Engineering pane |
 | API latency (p95) | < 500 ms end to end | Same headers on `/api/*` responses through the edge |
 | Undetected failed backups | zero | Freshness assertion (<26h) every 30 min via the OIDC AWS role; weekly restore test into a disposable database validates content, not just existence |
 | Health-gated releases | 100% | `deploy.sh` refuses to switch traffic without slot health + public smoke incl. version match; failures auto-rollback and are red in GitHub |

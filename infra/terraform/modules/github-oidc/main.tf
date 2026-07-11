@@ -11,12 +11,13 @@ data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}
 
 locals {
-  # Plans run from any branch/PR of the repo; applies only from the
-  # protected production environment.
+  # This role carries destructive AWS power (s3/sqs/iam), so only the protected
+  # `production` environment may assume it. PRs must NOT be able to (a
+  # pull_request or branch sub would let any same-repo PR job with id-token
+  # run destructive AWS directly, bypassing the environment gate). Offline
+  # `terraform validate` in CI needs no AWS credentials.
   allowed_subs = coalesce(var.allowed_subs, [
     "repo:${var.github_repository}:environment:production",
-    "repo:${var.github_repository}:ref:refs/heads/main",
-    "repo:${var.github_repository}:pull_request",
   ])
 }
 
@@ -129,4 +130,54 @@ resource "aws_iam_role_policy" "terraform" {
   name   = "terraform"
   role   = aws_iam_role.terraform.id
   policy = data.aws_iam_policy_document.terraform.json
+}
+
+# Separate least-privilege role for read-only CI checks (the scheduled synthetic
+# backup-freshness probe). Trusted by branch/schedule OIDC subs, NOT the
+# environment — so ordinary workflows never touch the destructive terraform role.
+data "aws_iam_policy_document" "reader_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    principals {
+      type        = "Federated"
+      identifiers = [local.oidc_provider_arn]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = ["repo:${var.github_repository}:ref:refs/heads/main"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "reader" {
+  statement {
+    sid       = "ListBackups"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${var.project}-backups-prod"]
+  }
+  statement {
+    sid       = "ReadBackups"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${var.project}-backups-prod/*"]
+  }
+}
+
+resource "aws_iam_role" "reader" {
+  name               = "${var.project}-ci-reader"
+  assume_role_policy = data.aws_iam_policy_document.reader_assume.json
+}
+
+resource "aws_iam_role_policy" "reader" {
+  name   = "reader"
+  role   = aws_iam_role.reader.id
+  policy = data.aws_iam_policy_document.reader.json
 }

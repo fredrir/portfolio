@@ -1,12 +1,22 @@
 //! Tamper-evident administration audit log.
 //!
-//! Every entry stores `entry_hash = sha256(prev_hash || rfc3339(at) || action
-//! || detail_text)`, where `detail_text` is the JSONB value exactly as
-//! Postgres renders it (`detail::text`), so verification recomputes over the
-//! stored representation rather than the caller's input formatting. Inserts
-//! serialize on an advisory lock; any later mutation of a row breaks every
-//! subsequent hash.
+//! Every entry stores `entry_hash = MAC(prev_hash || rfc3339(at) || action ||
+//! detail_text)`, where `detail_text` is the JSONB value exactly as Postgres
+//! renders it (`detail::text`), so verification recomputes over the stored
+//! representation rather than the caller's input formatting. When
+//! `AUDIT_HMAC_KEY` is set the MAC is HMAC-SHA256 keyed with a secret held
+//! outside the database, so an attacker with DB write access cannot forge a
+//! valid chain by editing a row and recomputing later hashes. Without the key
+//! it degrades to a keyless SHA-256 (dev). Inserts serialize on an advisory
+//! lock; any later mutation of a row breaks every subsequent hash.
+//!
+//! Note: this detects edits, not truncation of the newest rows or a full wipe
+//! (the remaining prefix still verifies). Detecting those needs an external
+//! append-only anchor of the head hash + count — a future addition.
 
+use std::sync::OnceLock;
+
+use hmac::{Hmac, Mac};
 use sha2::{Digest, Sha256};
 use sqlx::{PgConnection, Row};
 use time::OffsetDateTime;
@@ -14,14 +24,42 @@ use time::format_description::well_known::Rfc3339;
 
 pub const GENESIS: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 
+fn audit_key() -> Option<&'static [u8]> {
+    static KEY: OnceLock<Option<Vec<u8>>> = OnceLock::new();
+    KEY.get_or_init(|| {
+        std::env::var("AUDIT_HMAC_KEY")
+            .ok()
+            .filter(|k| !k.is_empty())
+            .map(String::into_bytes)
+    })
+    .as_deref()
+}
+
 fn entry_hash(prev: &str, at: &OffsetDateTime, action: &str, detail_text: &str) -> String {
     let at_text = at.format(&Rfc3339).expect("timestamptz formats as rfc3339");
-    let mut hasher = Sha256::new();
-    hasher.update(prev.as_bytes());
-    hasher.update(at_text.as_bytes());
-    hasher.update(action.as_bytes());
-    hasher.update(detail_text.as_bytes());
-    hex::encode(hasher.finalize())
+    let parts = [
+        prev.as_bytes(),
+        at_text.as_bytes(),
+        action.as_bytes(),
+        detail_text.as_bytes(),
+    ];
+    match audit_key() {
+        Some(key) => {
+            let mut mac =
+                Hmac::<Sha256>::new_from_slice(key).expect("HMAC accepts any key length");
+            for part in parts {
+                mac.update(part);
+            }
+            hex::encode(mac.finalize().into_bytes())
+        }
+        None => {
+            let mut hasher = Sha256::new();
+            for part in parts {
+                hasher.update(part);
+            }
+            hex::encode(hasher.finalize())
+        }
+    }
 }
 
 /// Append an entry inside the caller's transaction.

@@ -23,8 +23,14 @@ export function useBackground() {
   const setBackground = useCallback((config: BackgroundConfig) => {
     setCurrent(config);
     if (config.type === "custom-image" && config.value) {
-      write(KEYS.backgroundImage, config.value);
-      writeJson(KEYS.background, { ...config, value: undefined });
+      // A large data-URL can exceed the storage quota; only record it as the
+      // persisted background if the image itself actually saved, otherwise a
+      // reload would restore a custom-image config with no image.
+      if (write(KEYS.backgroundImage, config.value)) {
+        writeJson(KEYS.background, { ...config, value: undefined });
+      } else {
+        remove(KEYS.background);
+      }
     } else {
       remove(KEYS.backgroundImage);
       writeJson(KEYS.background, config);

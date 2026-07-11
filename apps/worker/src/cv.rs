@@ -143,8 +143,13 @@ async fn sync_once(sync: &CvSync, client: &reqwest::Client) -> Result<u32, Strin
             "insert into cv_versions \
              (lang, release_tag, asset_id, asset_updated_at, s3_key, size_bytes, sha256, active) \
              values ($1, $2, $3, $4::timestamptz, $5, $6, $7, true) \
-             on conflict (lang, asset_id) do update \
-             set active = true, s3_key = excluded.s3_key, sha256 = excluded.sha256",
+             on conflict (lang, asset_id) do update set \
+                 active = true, \
+                 s3_key = excluded.s3_key, \
+                 sha256 = excluded.sha256, \
+                 release_tag = excluded.release_tag, \
+                 asset_updated_at = excluded.asset_updated_at, \
+                 size_bytes = excluded.size_bytes",
         )
         .bind(lang)
         .bind(&release.tag_name)

@@ -36,6 +36,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 utoipa = { version = "5", features = ["axum_extras", "uuid"] }
 utoipa-axum = "0.2"
 uuid = { version = "1", features = ["v4", "serde"] }
+hmac = "0.12"
 
 [dev-dependencies]
 http-body-util = "0.1"

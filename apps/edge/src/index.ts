@@ -30,7 +30,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     // Spotify album art, GitHub avatars, media variants.
     "img-src 'self' data: https:",
     "connect-src 'self' https://eu.i.posthog.com https://api.github.com",
-    "frame-src https://www.google.com",
+    "frame-src https://www.google.com https://open.spotify.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -241,9 +241,16 @@ export default {
       return decorate(new Response("not found", { status: 404 }), ctx);
     }
 
-    const limited = await rateLimited(request, url, env, ctx);
-    if (limited) {
-      return limited;
+    // Immutable, content-hashed assets and media are cache-friendly and
+    // subresource-heavy (a gallery load pulls dozens); rate-limiting them would
+    // 429 legitimate page loads and cost a Durable Object round-trip per hit.
+    const isCacheable =
+      IMMUTABLE_PATH.test(url.pathname) || url.pathname.startsWith("/media/");
+    if (!isCacheable) {
+      const limited = await rateLimited(request, url, env, ctx);
+      if (limited) {
+        return limited;
+      }
     }
 
     if (url.pathname.startsWith("/media/")) {

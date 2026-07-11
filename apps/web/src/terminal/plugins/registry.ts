@@ -14,12 +14,24 @@ interface PluginExports {
 
 let instancePromise: Promise<PluginExports> | null = null;
 
+async function instantiate(): Promise<PluginExports> {
+  const response = await fetch("/wasm/terminal-plugins.wasm");
+  if (!response.ok) throw new Error(`wasm fetch failed: ${response.status}`);
+  try {
+    const result = await WebAssembly.instantiateStreaming(response.clone(), {});
+    return result.instance.exports as unknown as PluginExports;
+  } catch {
+    // instantiateStreaming rejects when the server sends the wrong MIME type;
+    // fall back to buffering the bytes and compiling from an ArrayBuffer.
+    const bytes = await response.arrayBuffer();
+    const result = await WebAssembly.instantiate(bytes, {});
+    return result.instance.exports as unknown as PluginExports;
+  }
+}
+
 async function loadPlugins(): Promise<PluginExports> {
   if (!instancePromise) {
-    instancePromise = WebAssembly.instantiateStreaming(
-      fetch("/wasm/terminal-plugins.wasm"),
-      {},
-    ).then((result) => result.instance.exports as unknown as PluginExports);
+    instancePromise = instantiate();
     instancePromise.catch(() => {
       instancePromise = null;
     });

@@ -78,6 +78,9 @@ pub struct Caches {
     pub github: Cached<routes::github::GitHubData>,
     pub deployments: Cached<Vec<routes::deployments::Deployment>>,
     pub posthog: Cached<routes::analytics::PosthogStats>,
+    /// Short TTL: throttles Spotify's OAuth-refresh + 3-call fetch when the
+    /// pane polls, without making now-playing noticeably stale.
+    pub spotify: Cached<routes::spotify::SpotifyData>,
 }
 
 #[derive(Clone)]

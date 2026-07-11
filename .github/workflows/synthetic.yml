@@ -32,7 +32,7 @@ jobs:
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::391824190305:role/hansteen-portfolio-terraform
+          role-to-assume: arn:aws:iam::391824190305:role/hansteen-portfolio-ci-reader
           aws-region: eu-north-1
 
       - name: Backup exists and is fresh (<26h)

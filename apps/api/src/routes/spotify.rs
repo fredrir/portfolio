@@ -389,5 +389,14 @@ pub async fn spotify(
         });
     }
 
-    Json(fetch_fresh(&state).await)
+    const SPOTIFY_TTL: std::time::Duration = std::time::Duration::from_secs(15);
+    if let Some((at, data)) = state.caches.spotify.read().await.as_ref()
+        && at.elapsed() < SPOTIFY_TTL
+    {
+        return Json(data.clone());
+    }
+
+    let fresh = fetch_fresh(&state).await;
+    *state.caches.spotify.write().await = Some((std::time::Instant::now(), fresh.clone()));
+    Json(fresh)
 }

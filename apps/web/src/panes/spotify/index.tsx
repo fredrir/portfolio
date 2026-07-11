@@ -42,7 +42,6 @@ export function SpotifyPane({
   const fetchSpotify = useCallback(async () => {
     try {
       if (!executeRecaptcha) {
-        console.error("reCAPTCHA not available");
         return;
       }
 
