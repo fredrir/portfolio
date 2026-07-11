@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "doppler run --preserve-env=API_URL,VITE_RECAPTCHA_SITE_KEY -- vite dev",
+    "dev": "doppler run --preserve-env=API_URL,ADMIN_TOKEN,VITE_RECAPTCHA_SITE_KEY -- vite dev",
     "build": "vite build",
     "start": "node .output/server/index.mjs",
     "lint": "biome ci .",
