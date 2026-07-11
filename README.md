@@ -12,7 +12,8 @@ The full architecture and delivery plan live in [docs/ARCHITECTURE.md](docs/ARCH
 | `apps/api` | Axum API (SQLx, utoipa OpenAPI, RFC 9457 errors) |
 | `apps/worker` | Rust SQS consumer: validates uploads, generates AVIF/WebP variants |
 | `packages/api-client` | TypeScript client generated from the API's OpenAPI document |
-| `docs/` | Architecture plan and decisions |
+| `infra/terraform` | AWS (S3/SQS/IAM/OIDC) and Cloudflare (Tunnel/DNS/Access) provisioning |
+| `docs/` | Architecture plan, decisions, and the shared-VPS audit |
 | `scripts/` | One-off tooling (e.g. Supabase → Postgres visitor migration) |
 
 ## Development

@@ -33,3 +33,9 @@ npm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars

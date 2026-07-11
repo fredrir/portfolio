@@ -1,0 +1,4 @@
+# Copy to terraform.tfvars (gitignored) and fill in.
+cloudflare_account_id = "..."
+cloudflare_zone_id    = "..."
+# enable_workers_vpc  = true   # once availability is confirmed on the plan
