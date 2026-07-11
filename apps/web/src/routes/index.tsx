@@ -21,7 +21,13 @@ export const Route = createFileRoute("/")({
     handlers: {
       GET: async ({ request }) => {
         const locale = negotiateLocale(request);
-        return Response.redirect(new URL(`/${locale}`, request.url), 307);
+        // Relative Location: an absolute URL from request.url would carry the
+        // private origin host (origin.hansteen.dev) and send the browser to a
+        // hostname it cannot reach.
+        return new Response(null, {
+          status: 307,
+          headers: { location: `/${locale}` },
+        });
       },
     },
   },

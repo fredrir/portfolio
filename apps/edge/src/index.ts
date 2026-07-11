@@ -206,6 +206,23 @@ async function proxyOrigin(request: Request, url: URL, env: Env, ctx: EdgeContex
       ? { cf: { cacheEverything: true, cacheTtl: 31536000 } }
       : undefined,
   );
+
+  // A redirect built from the origin's own URL would point the browser at the
+  // private origin host; rewrite it back to the public hostname.
+  const location = response.headers.get("location");
+  if (location && location.includes(originHost)) {
+    const fixed = location.split(originHost).join(url.hostname);
+    const headers = new Headers(response.headers);
+    headers.set("location", fixed);
+    return decorate(
+      new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      }),
+      ctx,
+    );
+  }
   return decorate(response, ctx);
 }
 
