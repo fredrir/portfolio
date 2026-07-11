@@ -12,7 +12,7 @@ fn test_state(pool: PgPool) -> AppState {
     let credentials = aws_sdk_s3::config::Credentials::new("test", "test", None, None, "test");
     let config = aws_sdk_s3::config::Builder::new()
         .behavior_version(aws_sdk_s3::config::BehaviorVersion::latest())
-        .region(aws_sdk_s3::config::Region::new("us-east-1"))
+        .region(aws_sdk_s3::config::Region::new("eu-north-1"))
         .credentials_provider(credentials)
         .endpoint_url("http://localhost:4566")
         .force_path_style(true)

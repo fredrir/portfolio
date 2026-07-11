@@ -15,6 +15,22 @@ services:
       timeout: 3s
       retries: 10
 
+  # Local S3 + SQS for the media pipeline.
+  localstack:
+    image: localstack/localstack:4
+    environment:
+      SERVICES: s3,sqs
+      AWS_DEFAULT_REGION: eu-north-1
+    ports:
+      - "127.0.0.1:4566:4566"
+    volumes:
+      - ./scripts/localstack-init.sh:/etc/localstack/init/ready.d/init-aws.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "awslocal sqs get-queue-url --queue-name media-processing"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   # Production-like app containers; start with: docker compose --profile app up --build
   api:
     build:
