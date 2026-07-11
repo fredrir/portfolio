@@ -1,0 +1,10 @@
+# Origin entrypoint behind the Cloudflare tunnel. Phase 4 replaces the
+# placeholder with blue-green upstream selection.
+:8080 {
+	handle /healthz {
+		respond "origin alive" 200
+	}
+	handle {
+		respond "no application deployed yet" 503
+	}
+}

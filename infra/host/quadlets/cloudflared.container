@@ -1,0 +1,22 @@
+[Unit]
+Description=Cloudflare tunnel connector (portfolio origin)
+After=network-online.target
+
+[Container]
+Image=docker.io/cloudflare/cloudflared:latest
+ContainerName=cloudflared
+Network=portfolio.network
+Exec=tunnel --no-autoupdate run
+# TUNNEL_TOKEN, fetched from the Cloudflare API at install time (mode 600).
+EnvironmentFile=%h/.config/portfolio/cloudflared.env
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=all
+PodmanArgs=--memory=256m --pids-limit=256
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

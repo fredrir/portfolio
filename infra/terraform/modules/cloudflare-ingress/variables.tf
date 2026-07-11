@@ -16,6 +16,12 @@ variable "tunnel_name" {
   type = string
 }
 
+variable "origin_service" {
+  description = "Service URL cloudflared forwards to (container-network address of Caddy)"
+  type        = string
+  default     = "http://caddy:8080"
+}
+
 variable "enable_workers_vpc" {
   description = "Use Workers VPC private origins instead of the Access service-token fallback (pending plan verification)"
   type        = bool

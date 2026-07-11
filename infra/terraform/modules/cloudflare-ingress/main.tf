@@ -16,6 +16,22 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "origin" {
   config_src = "cloudflare"
 }
 
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "origin" {
+  account_id = var.account_id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.origin.id
+  config = {
+    ingress = [
+      {
+        hostname = var.hostname
+        service  = var.origin_service
+      },
+      {
+        service = "http_status:404"
+      },
+    ]
+  }
+}
+
 resource "cloudflare_dns_record" "origin" {
   zone_id = var.zone_id
   name    = var.hostname
