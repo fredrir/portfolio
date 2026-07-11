@@ -10,6 +10,7 @@ The full architecture and delivery plan live in [docs/ARCHITECTURE.md](docs/ARCH
 |---|---|
 | `apps/web` | TanStack Start app (Vite, React 19, Tailwind v4) |
 | `apps/api` | Axum API (SQLx, utoipa OpenAPI, RFC 9457 errors) |
+| `apps/worker` | Rust SQS consumer: validates uploads, generates AVIF/WebP variants |
 | `packages/api-client` | TypeScript client generated from the API's OpenAPI document |
 | `docs/` | Architecture plan and decisions |
 | `scripts/` | One-off tooling (e.g. Supabase → Postgres visitor migration) |
@@ -19,13 +20,18 @@ The full architecture and delivery plan live in [docs/ARCHITECTURE.md](docs/ARCH
 Requirements: [Bun](https://bun.sh), Rust (stable), Docker with compose.
 
 ```bash
-cp .env.example .env        # adjust if needed
-docker compose up -d db     # local Postgres 17 on localhost:5432
+cp .env.example .env           # adjust if needed
+docker compose up -d           # Postgres 17 (5432) + LocalStack S3/SQS (4566)
 bun install
 
-bun run dev                 # web app on http://localhost:3000
-cargo run -p portfolio-api  # API on http://localhost:8080
+bun run dev                    # web app on http://localhost:3000
+cargo run -p portfolio-api     # API on http://localhost:8080
+cargo run -p portfolio-worker  # media worker (SQS consumer)
 ```
+
+The media flow runs fully locally: `POST /api/v1/media/uploads` (bearer
+`ADMIN_TOKEN`) returns a presigned S3 PUT; the S3 event fans through SQS to the
+worker, which produces AVIF/WebP variants and flips the record to `ready`.
 
 ### Checks
 
