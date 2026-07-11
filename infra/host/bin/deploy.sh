@@ -111,6 +111,8 @@ handle {
 }
 CADDY
     cat > "$SLOTS/admin.caddy" <<CADDY
+@root path /
+redir @root /admin
 handle {
 	reverse_proxy web-$1:3000 {
 		header_up x-admin-origin 1
