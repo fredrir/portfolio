@@ -59,11 +59,19 @@ function useWindowDrop(onDrop: (files: File[]) => void) {
   return dragging;
 }
 
-export function AdminConsole() {
-  const [media, setMedia] = useState<MediaItem[]>([]);
-  const [audit, setAudit] = useState<AdminAuditEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [apiDown, setApiDown] = useState(false);
+export function AdminConsole({
+  initialMedia = [],
+  initialAudit = [],
+  initialApiDown = false,
+}: {
+  initialMedia?: MediaItem[];
+  initialAudit?: AdminAuditEntry[];
+  initialApiDown?: boolean;
+}) {
+  const [media, setMedia] = useState<MediaItem[]>(initialMedia);
+  const [audit, setAudit] = useState<AdminAuditEntry[]>(initialAudit);
+  const [loading, setLoading] = useState(initialMedia.length === 0 && !initialApiDown);
+  const [apiDown, setApiDown] = useState(initialApiDown);
   const [category, setCategory] = useState("");
 
   const refresh = useCallback(() => {
