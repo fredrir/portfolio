@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import { getDictionary } from "@/i18n/dictionaries";
+import { getDictionary } from "@/i18n/dictionaries.server";
 import { type Locale, locales } from "@/i18n/types";
 import { api, traceHeaders } from "@/server/api";
 import type { GitHubData } from "@/shared/types";

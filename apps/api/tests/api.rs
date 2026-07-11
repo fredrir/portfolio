@@ -9,6 +9,10 @@ use tower::ServiceExt;
 const TEST_ADMIN_TOKEN: &str = "test-admin-token";
 
 fn test_state(pool: PgPool) -> AppState {
+    test_state_with_public_base(pool, None)
+}
+
+fn test_state_with_public_base(pool: PgPool, public_base_url: Option<String>) -> AppState {
     let credentials = aws_sdk_s3::config::Credentials::new("test", "test", None, None, "test");
     let config = aws_sdk_s3::config::Builder::new()
         .behavior_version(aws_sdk_s3::config::BehaviorVersion::latest())
@@ -41,7 +45,7 @@ fn test_state(pool: PgPool) -> AppState {
         media: MediaConfig {
             bucket: "test-media".into(),
             admin_token: Some(TEST_ADMIN_TOKEN.into()),
-            public_base_url: None,
+            public_base_url,
         },
         http: reqwest::Client::builder()
             .timeout(std::time::Duration::from_secs(2))
@@ -493,4 +497,67 @@ async fn media_list_groups_variants_per_item(pool: PgPool) {
     for item in items {
         assert_eq!(item["variants"].as_array().unwrap().len(), 2);
     }
+}
+
+#[sqlx::test]
+async fn gallery_groups_ready_media_with_public_urls(pool: PgPool) {
+    let first_id: uuid::Uuid = sqlx::query_scalar(
+        "insert into media (original_key, filename, content_type, size_bytes, state, \
+                            width, height, content_hash, category) \
+         values ('originals/first.jpg', '20260711_123456_First.jpg', 'image/jpeg', 100, \
+                 'ready', 32, 32, 'first-hash', 'travel') returning id",
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    let second_id: uuid::Uuid = sqlx::query_scalar(
+        "insert into media (original_key, filename, content_type, size_bytes, state, \
+                            width, height, content_hash) \
+         values ('originals/second.jpg', 'plain.jpg', 'image/jpeg', 100, \
+                 'ready', 32, 32, 'second-hash') returning id",
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+
+    for (id, format, key) in [
+        (first_id, "avif", "variants/first.avif"),
+        (first_id, "webp", "variants/first.webp"),
+        (second_id, "webp", "variants/second.webp"),
+    ] {
+        sqlx::query(
+            "insert into media_variants (media_id, format, key, width, height, size_bytes) \
+             values ($1, $2, $3, 32, 32, 50)",
+        )
+        .bind(id)
+        .bind(format)
+        .bind(key)
+        .execute(&pool)
+        .await
+        .unwrap();
+    }
+
+    let response = app(test_state_with_public_base(
+        pool,
+        Some("https://media.example.test/assets/".into()),
+    ))
+    .oneshot(Request::get("/api/v1/gallery").body(Body::empty()).unwrap())
+    .await
+    .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let bytes = response.into_body().collect().await.unwrap().to_bytes();
+    let body: Value = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(body.as_array().unwrap().len(), 2);
+    assert_eq!(body[0]["name"], "travel");
+    assert_eq!(
+        body[0]["images"][0]["src"],
+        "https://media.example.test/assets/variants/first.webp"
+    );
+    assert_eq!(
+        body[0]["images"][0]["originalSrc"],
+        body[0]["images"][0]["src"]
+    );
+    assert_eq!(body[0]["images"][0]["date"], "2026-07-11T12:34:56");
+    assert_eq!(body[1]["name"], "uncategorized");
 }

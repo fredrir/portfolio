@@ -3,7 +3,6 @@ import {
   Cpu,
   EnvelopeSimple,
   FileText,
-  Flask,
   FolderSimple,
   GearSix,
   GithubLogo,
@@ -123,18 +122,11 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
     order: 11,
   },
   {
-    id: "medialab",
-    title: "ls /srv/media",
-    icon: <Flask size={S} weight={W} />,
-    defaultOpen: false,
-    order: 12,
-  },
-  {
     id: "analytics",
     title: "vnstat --visitors",
     icon: <ChartLine size={S} weight={W} />,
     defaultOpen: false,
-    order: 13,
+    order: 12,
   },
 ];
 

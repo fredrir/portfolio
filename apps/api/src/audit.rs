@@ -45,8 +45,7 @@ fn entry_hash(prev: &str, at: &OffsetDateTime, action: &str, detail_text: &str) 
     ];
     match audit_key() {
         Some(key) => {
-            let mut mac =
-                Hmac::<Sha256>::new_from_slice(key).expect("HMAC accepts any key length");
+            let mut mac = Hmac::<Sha256>::new_from_slice(key).expect("HMAC accepts any key length");
             for part in parts {
                 mac.update(part);
             }

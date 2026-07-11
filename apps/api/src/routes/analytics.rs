@@ -38,30 +38,23 @@ pub struct AnalyticsResponse {
 #[utoipa::path(get, path = "/api/v1/analytics", tag = "analytics",
     responses((status = 200, body = AnalyticsResponse)))]
 pub async fn analytics(State(state): State<AppState>) -> Result<Json<AnalyticsResponse>, ApiError> {
-    let (total,): (i64,) = sqlx::query_as("select count(*) from visitors")
-        .fetch_one(&state.pool)
-        .await?;
-
-    let daily: Vec<DailyCount> = sqlx::query_as(
+    let total = sqlx::query_as::<_, (i64,)>("select count(*) from visitors").fetch_one(&state.pool);
+    let daily = sqlx::query_as::<_, DailyCount>(
         "select d::date::text as day, count(v.id) as count \
          from generate_series(current_date - interval '29 days', current_date, '1 day') d \
          left join visitors v on v.created_at::date = d::date \
          group by d order by d",
     )
-    .fetch_all(&state.pool)
-    .await?;
-
-    let referrers: Vec<KeyCount> = sqlx::query_as(
+    .fetch_all(&state.pool);
+    let referrers = sqlx::query_as::<_, KeyCount>(
         "select rtrim(regexp_replace(referrer, '^https?://', ''), '/') as key, \
                 count(*) as count \
          from visitors \
          where referrer is not null and referrer <> '' \
          group by 1 order by count desc, key limit 10",
     )
-    .fetch_all(&state.pool)
-    .await?;
-
-    let browsers: Vec<KeyCount> = sqlx::query_as(
+    .fetch_all(&state.pool);
+    let browsers = sqlx::query_as::<_, KeyCount>(
         "select case \
             when user_agent ilike '%edg%' then 'Edge' \
             when user_agent ilike '%firefox%' then 'Firefox' \
@@ -73,16 +66,16 @@ pub async fn analytics(State(state): State<AppState>) -> Result<Json<AnalyticsRe
          from visitors where user_agent is not null \
          group by 1 order by count desc",
     )
-    .fetch_all(&state.pool)
-    .await?;
-
-    let countries: Vec<KeyCount> = sqlx::query_as(
+    .fetch_all(&state.pool);
+    let countries = sqlx::query_as::<_, KeyCount>(
         "select country_code as key, count(*) as count \
          from visitors where country_code is not null \
          group by 1 order by count desc, key limit 20",
     )
-    .fetch_all(&state.pool)
-    .await?;
+    .fetch_all(&state.pool);
+
+    let ((total,), daily, referrers, browsers, countries) =
+        tokio::try_join!(total, daily, referrers, browsers, countries)?;
 
     Ok(Json(AnalyticsResponse {
         total,
@@ -146,24 +139,24 @@ pub async fn posthog_stats(State(state): State<AppState>) -> Response {
         return Json(stats.clone()).into_response();
     }
 
-    let daily = hogql(
-        &state,
-        &project,
-        &key,
-        "select toDate(timestamp) as day, count() as views, count(distinct distinct_id) as uniques \
-         from events where event = '$pageview' and timestamp >= now() - interval 30 day \
-         group by day order by day",
-    )
-    .await;
-    let pages = hogql(
-        &state,
-        &project,
-        &key,
-        "select properties.$pathname as path, count() as views \
-         from events where event = '$pageview' and timestamp >= now() - interval 30 day \
-         group by path order by views desc limit 10",
-    )
-    .await;
+    let (daily, pages) = tokio::join!(
+        hogql(
+            &state,
+            &project,
+            &key,
+            "select toDate(timestamp) as day, count() as views, count(distinct distinct_id) as uniques \
+             from events where event = '$pageview' and timestamp >= now() - interval 30 day \
+             group by day order by day",
+        ),
+        hogql(
+            &state,
+            &project,
+            &key,
+            "select properties.$pathname as path, count() as views \
+             from events where event = '$pageview' and timestamp >= now() - interval 30 day \
+             group by path order by views desc limit 10",
+        )
+    );
 
     match (daily, pages) {
         (Ok(daily), Ok(pages)) => {

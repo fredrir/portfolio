@@ -167,7 +167,6 @@
       "gallery": "Photo gallery",
       "engineering": "Live look at the platform serving this site",
       "deployments": "Blue-green releases with signed images",
-      "medialab": "AVIF/WebP pipeline results side by side",
       "analytics": "Visitor analytics, first-party and PostHog"
     }
   },
@@ -521,7 +520,6 @@
       "resume": "Resume",
       "engineering": "Engineering",
       "deployments": "Deployments",
-      "medialab": "Media Lab",
       "analytics": "Analytics"
     },
     "shortTitles": {
@@ -537,7 +535,6 @@
       "resume": "resume",
       "engineering": "engineering",
       "deployments": "deploys",
-      "medialab": "medialab",
       "analytics": "analytics"
     },
     "loading": "loading...",
@@ -597,20 +594,6 @@
         "runs": "runs",
         "readingHistory": "Reading run history...",
         "historyUnavailable": "Deployment history is momentarily unavailable."
-      },
-      "medialab": {
-        "variantAlt": "{format} variant",
-        "smallest": "smallest",
-        "processed": "processed",
-        "images": "images",
-        "variants": "variants",
-        "avifWebp": "avif + webp",
-        "avgSaving": "avg saving",
-        "bestVsLargest": "best vs largest",
-        "loading": "Loading the codec bench...",
-        "unavailable": "The media pipeline is momentarily unavailable.",
-        "empty": "No processed media yet. Uploads become variants within seconds.",
-        "hint": "An upload flows through a presigned S3 PUT, an SQS event and a Rust worker that strips metadata and encodes AVIF and WebP under content-hashed keys. The edge signs and caches the reads."
       },
       "analytics": {
         "aggregating": "Aggregating visits...",

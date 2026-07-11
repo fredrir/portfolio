@@ -167,7 +167,6 @@
       "gallery": "Galerie photo",
       "engineering": "Vue en direct de la plateforme derrière ce site",
       "deployments": "Déploiements bleu-vert avec images signées",
-      "medialab": "Résultats du pipeline AVIF/WebP côte à côte",
       "analytics": "Statistiques de visite, first-party et PostHog"
     }
   },
@@ -521,7 +520,6 @@
       "resume": "CV",
       "engineering": "Ingénierie",
       "deployments": "Déploiements",
-      "medialab": "Labo média",
       "analytics": "Statistiques"
     },
     "shortTitles": {
@@ -537,7 +535,6 @@
       "resume": "cv",
       "engineering": "engineering",
       "deployments": "deploys",
-      "medialab": "medialab",
       "analytics": "analytics"
     },
     "loading": "chargement...",
@@ -597,20 +594,6 @@
         "runs": "exécutions",
         "readingHistory": "Lecture de l'historique...",
         "historyUnavailable": "L'historique des déploiements est momentanément indisponible."
-      },
-      "medialab": {
-        "variantAlt": "variante {format}",
-        "smallest": "plus petit",
-        "processed": "traitées",
-        "images": "images",
-        "variants": "variantes",
-        "avifWebp": "avif + webp",
-        "avgSaving": "gain moyen",
-        "bestVsLargest": "meilleur vs plus grand",
-        "loading": "Chargement du banc codec...",
-        "unavailable": "Le pipeline média est momentanément indisponible.",
-        "empty": "Aucun média traité pour le moment. Les téléversements deviennent des variantes en quelques secondes.",
-        "hint": "Un téléversement passe par un S3 PUT présigné, un événement SQS et un worker Rust qui supprime les métadonnées et encode AVIF et WebP sous des clés hashées par contenu. L'edge signe et met les lectures en cache."
       },
       "analytics": {
         "aggregating": "Agrégation des visites...",

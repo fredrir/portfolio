@@ -167,7 +167,6 @@
       "gallery": "Fotogalleri",
       "engineering": "Sanntidsinnblikk i plattformen bak siden",
       "deployments": "Blågrønne utrullinger med signerte images",
-      "medialab": "AVIF/WebP-resultater side om side",
       "analytics": "Besøksstatistikk, førstepart og PostHog"
     }
   },
@@ -521,7 +520,6 @@
       "resume": "CV",
       "engineering": "Teknisk",
       "deployments": "Utrullinger",
-      "medialab": "Medielab",
       "analytics": "Statistikk"
     },
     "shortTitles": {
@@ -537,7 +535,6 @@
       "resume": "cv",
       "engineering": "engineering",
       "deployments": "deploys",
-      "medialab": "medialab",
       "analytics": "analytics"
     },
     "loading": "laster...",
@@ -597,20 +594,6 @@
         "runs": "kjøringer",
         "readingHistory": "Leser kjøringshistorikk...",
         "historyUnavailable": "Utrullingshistorikken er midlertidig utilgjengelig."
-      },
-      "medialab": {
-        "variantAlt": "{format}-variant",
-        "smallest": "minst",
-        "processed": "behandlet",
-        "images": "bilder",
-        "variants": "varianter",
-        "avifWebp": "avif + webp",
-        "avgSaving": "snitt spart",
-        "bestVsLargest": "best mot størst",
-        "loading": "Laster kodekbenken...",
-        "unavailable": "Mediepipelinen er midlertidig utilgjengelig.",
-        "empty": "Ingen behandlete medier ennå. Opplastinger blir varianter i løpet av sekunder.",
-        "hint": "En opplasting går gjennom en forhåndssignert S3 PUT, en SQS-hendelse og en Rust-worker som fjerner metadata og koder AVIF og WebP under innholdshashede nøkler. Edge signerer og cacher lesingene."
       },
       "analytics": {
         "aggregating": "Aggregerer besøk...",

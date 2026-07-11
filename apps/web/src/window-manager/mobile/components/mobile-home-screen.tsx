@@ -5,7 +5,6 @@ import {
   Cpu,
   EnvelopeSimple,
   FileText,
-  Flask,
   FolderSimple,
   GearSix,
   GithubLogo,
@@ -33,7 +32,6 @@ const GRID_ICONS: Record<string, React.ReactNode> = {
   resume: <FileText size={28} weight="duotone" />,
   engineering: <Cpu size={28} weight="duotone" />,
   deployments: <RocketLaunch size={28} weight="duotone" />,
-  medialab: <Flask size={28} weight="duotone" />,
   analytics: <ChartLine size={28} weight="duotone" />,
 };
 

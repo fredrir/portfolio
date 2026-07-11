@@ -38,45 +38,34 @@ const STATIC_PROJECTS: GalleryCategory = {
   })),
 };
 
-function parseDateFromFilename(filename: string): string | undefined {
-  const match = filename.match(/^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})/);
-  if (!match) return undefined;
-  const [, y, m, d, h, min, s] = match;
-  return `${y}-${m}-${d}T${h}:${min}:${s}`;
-}
-
 /** Gallery content from the media pipeline, grouped by category. */
 export const getGalleryData = createServerFn()
   .validator((data: { uncategorized: string; projects: string }) => data)
   .handler(async ({ data: labels }): Promise<GalleryCategory[]> => {
     const { data } = await api
-      .GET("/api/v1/media", { headers: traceHeaders() })
+      .GET("/api/v1/gallery", { headers: traceHeaders() })
       .catch(() => ({ data: null }));
 
-    const byCategory = new Map<string, GalleryImage[]>();
-    for (const item of data ?? []) {
-      const variant = item.variants.find((v) => v.format === "webp") ?? item.variants[0];
-      if (!variant?.url) continue;
-      const category = item.category ?? labels.uncategorized;
-      const images = byCategory.get(category) ?? [];
-      images.push({
-        src: variant.url,
-        originalSrc: variant.url,
-        filename: item.filename,
-        date: parseDateFromFilename(item.filename),
-      });
-      byCategory.set(category, images);
-    }
+    const hasDynamicProjects = (data ?? []).some(
+      (category) => category.name === STATIC_PROJECTS.name,
+    );
+    const dynamicCategories: GalleryCategory[] = (data ?? []).map((category) => ({
+      name:
+        category.name === "uncategorized"
+          ? labels.uncategorized
+          : category.name === STATIC_PROJECTS.name
+            ? labels.projects
+            : category.name,
+      images: category.images.map((image) => ({
+        src: image.src,
+        originalSrc: image.originalSrc,
+        filename: image.filename,
+        date: image.date ?? undefined,
+      })),
+    }));
 
-    const categories: GalleryCategory[] = Array.from(byCategory.entries()).map(([name, images]) => {
-      images.sort((a, b) => {
-        if (a.date && b.date) return b.date.localeCompare(a.date);
-        return a.filename.localeCompare(b.filename);
-      });
-      return { name, images };
-    });
-
-    if (!byCategory.has(STATIC_PROJECTS.name)) {
+    const categories = [...dynamicCategories];
+    if (!hasDynamicProjects) {
       categories.push({ ...STATIC_PROJECTS, name: labels.projects });
     }
     return categories.sort((a, b) => a.name.localeCompare(b.name));

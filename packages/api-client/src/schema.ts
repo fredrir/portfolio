@@ -126,6 +126,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/gallery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gallery-ready media grouped and sorted for direct UI consumption. */
+        get: operations["gallery"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/github": {
         parameters: {
             query?: never;
@@ -385,6 +402,16 @@ export interface components {
             sha: string;
             started_at: string;
             title: string;
+        };
+        GalleryCategory: {
+            images: components["schemas"]["GalleryImage"][];
+            name: string;
+        };
+        GalleryImage: {
+            date?: string | null;
+            filename: string;
+            originalSrc: string;
+            src: string;
         };
         /** @description Mirrors the shape the frontend consumed from the old TypeScript fetcher. */
         GitHubData: {
@@ -695,6 +722,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    gallery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GalleryCategory"][];
                 };
             };
         };

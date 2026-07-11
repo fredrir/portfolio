@@ -108,6 +108,7 @@ fn openapi_router() -> OpenApiRouter<AppState> {
         .routes(routes!(routes::contact::submit_contact))
         .routes(routes!(routes::media::create_upload))
         .routes(routes!(routes::media::list_media))
+        .routes(routes!(routes::media::gallery))
         .routes(routes!(routes::cv::active_cv))
         .routes(routes!(routes::github::github))
         .routes(routes!(routes::spotify::spotify))

@@ -218,6 +218,30 @@
         }
       }
     },
+    "/api/v1/gallery": {
+      "get": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Gallery-ready media grouped and sorted for direct UI consumption.",
+        "operationId": "gallery",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GalleryCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/github": {
       "get": {
         "tags": [
@@ -834,6 +858,49 @@
             "type": "string"
           },
           "title": {
+            "type": "string"
+          }
+        }
+      },
+      "GalleryCategory": {
+        "type": "object",
+        "required": [
+          "name",
+          "images"
+        ],
+        "properties": {
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GalleryImage"
+            }
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "GalleryImage": {
+        "type": "object",
+        "required": [
+          "src",
+          "originalSrc",
+          "filename"
+        ],
+        "properties": {
+          "date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "filename": {
+            "type": "string"
+          },
+          "originalSrc": {
+            "type": "string"
+          },
+          "src": {
             "type": "string"
           }
         }

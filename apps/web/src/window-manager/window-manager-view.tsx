@@ -1,10 +1,66 @@
-import { type ComponentProps, lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { TutorialOverlay } from "@/tutorial";
+import {
+  type ComponentProps,
+  lazy,
+  type ReactNode,
+  Suspense,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import type { DictType, Locale } from "@/i18n/types";
+import { PaneHost } from "@/shared/components/pane-host";
+import type { GitHubData, SpotifyData } from "@/shared/types";
+import type { useTutorial } from "@/tutorial/use-tutorial";
+import type { useBackground } from "./background/hooks/use-background";
+import { configMap, WINDOW_CONFIGS } from "./constants";
 import { AppLauncher } from "./launcher/components/app-launcher";
 import { DragGhost } from "./overlays/components/drag-ghost";
 import { FloatingDetail } from "./overlays/components/floating-detail";
+import type { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
+import type { useFocus } from "./shell/hooks/use-focus";
+import { StatusBar } from "./status-bar";
+import type { useTiling } from "./tiling/hooks/use-tiling";
+import type { WindowConfig } from "./types";
 
 const AboutPaneLazy = lazy(() => import("@/panes/about").then((m) => ({ default: m.AboutPane })));
+const AnalyticsPaneLazy = lazy(() =>
+  import("@/panes/analytics").then((m) => ({ default: m.AnalyticsPane })),
+);
+const ContactPaneLazy = lazy(() =>
+  import("@/panes/contact").then((m) => ({ default: m.ContactPane })),
+);
+const DeploymentsPaneLazy = lazy(() =>
+  import("@/panes/deployments").then((m) => ({ default: m.DeploymentsPane })),
+);
+const EngineeringPaneLazy = lazy(() =>
+  import("@/panes/engineering").then((m) => ({ default: m.EngineeringPane })),
+);
+const GitHubPaneLazy = lazy(() =>
+  import("@/panes/github").then((m) => ({ default: m.GitHubPane })),
+);
+const ImagePaneLazy = lazy(() => import("@/panes/gallery").then((m) => ({ default: m.ImagePane })));
+const JourneyPaneLazy = lazy(() =>
+  import("@/panes/journey").then((m) => ({ default: m.JourneyPane })),
+);
+const ProjectsPaneLazy = lazy(() =>
+  import("@/panes/projects").then((m) => ({ default: m.ProjectsPane })),
+);
+const SettingsPaneLazy = lazy(() =>
+  import("@/panes/settings").then((m) => ({ default: m.SettingsPane })),
+);
+const SpotifyPaneLazy = lazy(() =>
+  import("@/panes/spotify").then((m) => ({ default: m.SpotifyPane })),
+);
+const TerminalPaneLazy = lazy(() =>
+  import("@/terminal").then((m) => ({ default: m.TerminalPane })),
+);
+const TutorialOverlayLazy = lazy(() =>
+  import("@/tutorial").then((m) => ({ default: m.TutorialOverlay })),
+);
+
+function SuspendedPane({ children }: { children: ReactNode }) {
+  return <Suspense fallback={null}>{children}</Suspense>;
+}
 
 // Client-only: the about pane renders a three.js canvas that must not SSR.
 function AboutPane(props: ComponentProps<typeof AboutPaneLazy>) {
@@ -12,35 +68,11 @@ function AboutPane(props: ComponentProps<typeof AboutPaneLazy>) {
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
   return (
-    <Suspense fallback={null}>
+    <SuspendedPane>
       <AboutPaneLazy {...props} />
-    </Suspense>
+    </SuspendedPane>
   );
 }
-
-import type { DictType, Locale } from "@/i18n/types";
-import { AnalyticsPane } from "@/panes/analytics";
-import { ContactPane } from "@/panes/contact";
-import { DeploymentsPane } from "@/panes/deployments";
-import { EngineeringPane } from "@/panes/engineering";
-import { ImagePane } from "@/panes/gallery";
-import { GitHubPane } from "@/panes/github";
-import { JourneyPane } from "@/panes/journey";
-import { MediaLabPane } from "@/panes/medialab";
-import { ProjectsPane } from "@/panes/projects";
-import { SettingsPane } from "@/panes/settings";
-import { SpotifyPane } from "@/panes/spotify";
-import { PaneHost } from "@/shared/components/pane-host";
-import type { GitHubData, SpotifyData } from "@/shared/types";
-import { TerminalPane } from "@/terminal";
-import type { useTutorial } from "@/tutorial/use-tutorial";
-import type { useBackground } from "./background/hooks/use-background";
-import { configMap, WINDOW_CONFIGS } from "./constants";
-import type { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
-import type { useFocus } from "./shell/hooks/use-focus";
-import { StatusBar } from "./status-bar";
-import type { useTiling } from "./tiling/hooks/use-tiling";
-import type { WindowConfig } from "./types";
 
 interface ViewContext {
   dict: DictType;
@@ -78,63 +110,90 @@ export function useWindowManagerView(ctx: ViewContext) {
 
   const maximizedConfig: WindowConfig = configMap[wm.maximizedId!];
 
-  const paneContent = useMemo<Record<string, React.ReactNode>>(
+  const paneContent = useMemo<Record<string, ReactNode>>(
     () => ({
       about: <AboutPane landing={landing} />,
-      github: <GitHubPane initialData={githubData} ui={ui} />,
-      spotify: <SpotifyPane initialData={spotifyData} ui={ui} locale={locale} />,
-      journey: <JourneyPane journey={journey} onOpenDetail={floating.openJourneyDetail} ui={ui} />,
-      projects: (
-        <ProjectsPane
-          title={project.title}
-          projects={project.projects}
-          onOpenDetail={floating.openProjectDetail}
-          ui={ui}
-        />
+      github: (
+        <SuspendedPane>
+          <GitHubPaneLazy initialData={githubData} ui={ui} />
+        </SuspendedPane>
       ),
-      contact: <ContactPane contact={contact} />,
+      spotify: (
+        <SuspendedPane>
+          <SpotifyPaneLazy initialData={spotifyData} ui={ui} locale={locale} />
+        </SuspendedPane>
+      ),
+      journey: (
+        <SuspendedPane>
+          <JourneyPaneLazy journey={journey} onOpenDetail={floating.openJourneyDetail} ui={ui} />
+        </SuspendedPane>
+      ),
+      projects: (
+        <SuspendedPane>
+          <ProjectsPaneLazy
+            title={project.title}
+            projects={project.projects}
+            onOpenDetail={floating.openProjectDetail}
+            ui={ui}
+          />
+        </SuspendedPane>
+      ),
+      contact: (
+        <SuspendedPane>
+          <ContactPaneLazy contact={contact} />
+        </SuspendedPane>
+      ),
       settings: (
-        <SettingsPane
-          navbar={navbar}
-          currentLocale={locale}
-          currentBackground={bg.current}
-          onSelectBackground={bg.setBackground}
-          ui={ui}
-          tutorial={tutorialStrings}
-        />
+        <SuspendedPane>
+          <SettingsPaneLazy
+            navbar={navbar}
+            currentLocale={locale}
+            currentBackground={bg.current}
+            onSelectBackground={bg.setBackground}
+            ui={ui}
+            tutorial={tutorialStrings}
+          />
+        </SuspendedPane>
       ),
       terminal: (
-        <TerminalPane
-          locale={locale}
-          paneIds={WINDOW_CONFIGS.map((c) => c.id)}
-          projects={project.projects.map((p) => ({ title: p.title }))}
-          careers={journey.journeys.map((j) => ({
-            jobTitle: j.jobTitle,
-            company: j.company,
-          }))}
-          onOpenPane={focus.openPane}
-          onClosePane={wm.closeWindow}
-        />
+        <SuspendedPane>
+          <TerminalPaneLazy
+            locale={locale}
+            paneIds={WINDOW_CONFIGS.map((c) => c.id)}
+            projects={project.projects.map((p) => ({ title: p.title }))}
+            careers={journey.journeys.map((j) => ({
+              jobTitle: j.jobTitle,
+              company: j.company,
+            }))}
+            onOpenPane={focus.openPane}
+            onClosePane={wm.closeWindow}
+          />
+        </SuspendedPane>
       ),
-      gallery: <ImagePane ui={ui} />,
+      gallery: (
+        <SuspendedPane>
+          <ImagePaneLazy ui={ui} />
+        </SuspendedPane>
+      ),
       engineering: (
         <PaneHost>
-          <EngineeringPane ui={ui} />
+          <SuspendedPane>
+            <EngineeringPaneLazy ui={ui} />
+          </SuspendedPane>
         </PaneHost>
       ),
       deployments: (
         <PaneHost>
-          <DeploymentsPane ui={ui} />
-        </PaneHost>
-      ),
-      medialab: (
-        <PaneHost>
-          <MediaLabPane ui={ui} />
+          <SuspendedPane>
+            <DeploymentsPaneLazy ui={ui} />
+          </SuspendedPane>
         </PaneHost>
       ),
       analytics: (
         <PaneHost>
-          <AnalyticsPane ui={ui} />
+          <SuspendedPane>
+            <AnalyticsPaneLazy ui={ui} />
+          </SuspendedPane>
         </PaneHost>
       ),
     }),
@@ -163,16 +222,18 @@ export function useWindowManagerView(ctx: ViewContext) {
 
   const tutorialOverlay =
     tutorial.isActive && tutorial.step ? (
-      <TutorialOverlay
-        t={tutorialStrings}
-        ui={ui}
-        currentLocale={locale}
-        tutorial={tutorial}
-        floating={tutorialIsFloating}
-        isMobile={isMobile === true}
-        launcherOpen={wm.launcherOpen}
-        background={bg}
-      />
+      <SuspendedPane>
+        <TutorialOverlayLazy
+          t={tutorialStrings}
+          ui={ui}
+          currentLocale={locale}
+          tutorial={tutorial}
+          floating={tutorialIsFloating}
+          isMobile={isMobile === true}
+          launcherOpen={wm.launcherOpen}
+          background={bg}
+        />
+      </SuspendedPane>
     ) : null;
 
   const floatingDetail = floating.detail ? (

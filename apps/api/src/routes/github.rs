@@ -1,14 +1,30 @@
+use std::collections::HashMap;
+use std::sync::{Arc, LazyLock};
 use std::time::{Duration, Instant};
 
 use axum::Json;
 use axum::extract::State;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use tokio::task::JoinSet;
 use utoipa::ToSchema;
 
 use crate::{AppState, Upstreams};
 
 const CACHE_TTL: Duration = Duration::from_secs(3600);
+
+static CONTRIBUTION_DAY_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"<td[^>]*data-date="([^"]*)"[^>]*id="([^"]*)"[^>]*data-level="(\d)""#)
+        .expect("static regex")
+});
+static CONTRIBUTION_TOOLTIP_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"<tool-tip[^>]*for="([^"]*)"[^>]*>([^<]*)"#).expect("static regex")
+});
+static CONTRIBUTION_COUNT_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(\d[\d,]*)\s+contributions?").expect("static regex"));
+static CONTRIBUTION_TOTAL_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(\d[\d,]*)\s+contributions?\s+in\s+(?:the last year|\d{4})").expect("static regex")
+});
 
 #[derive(Clone, Serialize, ToSchema)]
 pub struct ContributionDay {
@@ -68,26 +84,23 @@ struct GhRepo {
 
 /// Parse GitHub's contribution-calendar HTML into per-day counts.
 pub fn parse_contributions(html: &str) -> (Vec<ContributionDay>, u64) {
-    let td_re = Regex::new(r#"<td[^>]*data-date="([^"]*)"[^>]*id="([^"]*)"[^>]*data-level="(\d)""#)
-        .expect("static regex");
-    let num_re = Regex::new(r"(\d+)").expect("static regex");
+    let tooltip_counts: HashMap<String, u32> = CONTRIBUTION_TOOLTIP_RE
+        .captures_iter(html)
+        .filter_map(|cap| {
+            let count = CONTRIBUTION_COUNT_RE
+                .captures(&cap[2])
+                .and_then(|count| count[1].replace(',', "").parse::<u32>().ok())?;
+            Some((cap[1].to_owned(), count))
+        })
+        .collect();
+
     let mut days = Vec::new();
-    for cap in td_re.captures_iter(html) {
+    for cap in CONTRIBUTION_DAY_RE.captures_iter(html) {
         let date = cap[1].to_owned();
         let id = &cap[2];
         let level: u32 = cap[3].parse().unwrap_or(0);
 
-        let mut count = 0u32;
-        let tooltip_re = Regex::new(&format!(
-            r#"<tool-tip[^>]*for="{}"[^>]*>([^<]*)"#,
-            regex::escape(id)
-        ))
-        .expect("escaped regex");
-        if let Some(tip) = tooltip_re.captures(html)
-            && let Some(num) = num_re.captures(&tip[1])
-        {
-            count = num[1].parse().unwrap_or(0);
-        }
+        let mut count = tooltip_counts.get(id).copied().unwrap_or(0);
         if count == 0 && level > 0 {
             count = level;
         }
@@ -95,9 +108,7 @@ pub fn parse_contributions(html: &str) -> (Vec<ContributionDay>, u64) {
     }
 
     let mut total: u64 = days.iter().map(|d| d.count as u64).sum();
-    let total_re = Regex::new(r"(\d[\d,]*)\s+contributions?\s+in\s+(?:the last year|\d{4})")
-        .expect("static regex");
-    if let Some(cap) = total_re.captures(html) {
+    if let Some(cap) = CONTRIBUTION_TOTAL_RE.captures(html) {
         total = cap[1].replace(',', "").parse().unwrap_or(total);
     }
     (days, total)
@@ -129,7 +140,35 @@ async fn fetch_contributions(
     }
 }
 
-async fn load(http: &reqwest::Client, upstreams: &Upstreams) -> Option<GitHubData> {
+async fn fetch_contributions_by_year(
+    http: &reqwest::Client,
+    upstreams: Arc<Upstreams>,
+    year_keys: Vec<Option<String>>,
+) -> Vec<ContributionYear> {
+    let year_count = year_keys.len();
+    let mut tasks = JoinSet::new();
+    for (idx, key) in year_keys.into_iter().enumerate() {
+        let http = http.clone();
+        let upstreams = upstreams.clone();
+        tasks.spawn(async move {
+            (
+                idx,
+                fetch_contributions(&http, &upstreams, key.as_deref()).await,
+            )
+        });
+    }
+
+    let mut contributions_by_year = vec![None; year_count];
+    while let Some(result) = tasks.join_next().await {
+        match result {
+            Ok((idx, contribution_year)) => contributions_by_year[idx] = Some(contribution_year),
+            Err(error) => tracing::warn!(%error, "github contribution fetch task failed"),
+        }
+    }
+    contributions_by_year.into_iter().flatten().collect()
+}
+
+async fn load(http: &reqwest::Client, upstreams: Arc<Upstreams>) -> Option<GitHubData> {
     let username = &upstreams.github_username;
     let accept = ("Accept", "application/vnd.github.v3+json");
 
@@ -166,10 +205,8 @@ async fn load(http: &reqwest::Client, upstreams: &Upstreams) -> Option<GitHubDat
         year_keys.push(Some(y.to_string()));
     }
 
-    let mut contributions_by_year = Vec::with_capacity(year_keys.len());
-    for key in &year_keys {
-        contributions_by_year.push(fetch_contributions(http, upstreams, key.as_deref()).await);
-    }
+    let contributions_by_year =
+        fetch_contributions_by_year(http, upstreams.clone(), year_keys).await;
 
     Some(GitHubData {
         username: user.login,
@@ -198,7 +235,7 @@ pub async fn github(State(state): State<AppState>) -> Json<Option<GitHubData>> {
         return Json(Some(data.clone()));
     }
 
-    match load(&state.http, &state.upstreams).await {
+    match load(&state.http, state.upstreams.clone()).await {
         Some(data) => {
             *state.caches.github.write().await = Some((Instant::now(), data.clone()));
             Json(Some(data))
@@ -215,5 +252,40 @@ pub async fn github(State(state): State<AppState>) -> Json<Option<GitHubData>> {
                     .map(|(_, d)| d.clone()),
             )
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_contributions;
+
+    #[test]
+    fn parses_contribution_counts_from_tooltips_once() {
+        let html = r#"
+            <td data-date="2026-07-10" id="contribution-day-1" data-level="0"></td>
+            <td data-date="2026-07-11" id="contribution-day-2" data-level="4"></td>
+            <tool-tip for="contribution-day-1">No contributions on July 10.</tool-tip>
+            <tool-tip for="contribution-day-2">1,234 contributions on July 11.</tool-tip>
+            <h2>1,234 contributions in 2026</h2>
+        "#;
+
+        let (days, total) = parse_contributions(html);
+
+        assert_eq!(total, 1234);
+        assert_eq!(days.len(), 2);
+        assert_eq!(days[0].count, 0);
+        assert_eq!(days[1].date, "2026-07-11");
+        assert_eq!(days[1].count, 1234);
+        assert_eq!(days[1].level, 4);
+    }
+
+    #[test]
+    fn falls_back_to_level_when_tooltip_count_is_missing() {
+        let html = r#"<td data-date="2026-07-11" id="contribution-day-2" data-level="3"></td>"#;
+
+        let (days, total) = parse_contributions(html);
+
+        assert_eq!(total, 3);
+        assert_eq!(days[0].count, 3);
     }
 }

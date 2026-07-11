@@ -232,6 +232,21 @@ pub struct MediaItem {
     pub variants: Vec<MediaVariant>,
 }
 
+#[derive(Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct GalleryImage {
+    pub src: String,
+    pub original_src: String,
+    pub filename: String,
+    pub date: Option<String>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct GalleryCategory {
+    pub name: String,
+    pub images: Vec<GalleryImage>,
+}
+
 #[derive(Deserialize, utoipa::IntoParams)]
 pub struct ListMediaParams {
     /// Restrict to one gallery category.
@@ -255,6 +270,44 @@ struct MediaListRow {
     v_width: Option<i32>,
     v_height: Option<i32>,
     v_size_bytes: Option<i64>,
+}
+
+#[derive(sqlx::FromRow)]
+struct GalleryRow {
+    filename: String,
+    category: String,
+    variant_key: String,
+}
+
+fn parse_date_from_filename(filename: &str) -> Option<String> {
+    let bytes = filename.as_bytes();
+    if bytes.len() < 15 || bytes[8] != b'_' {
+        return None;
+    }
+    let date_time = [
+        &bytes[0..4],
+        &bytes[4..6],
+        &bytes[6..8],
+        &bytes[9..11],
+        &bytes[11..13],
+        &bytes[13..15],
+    ];
+    if date_time
+        .iter()
+        .flat_map(|part| part.iter())
+        .any(|b| !b.is_ascii_digit())
+    {
+        return None;
+    }
+    Some(format!(
+        "{}-{}-{}T{}:{}:{}",
+        std::str::from_utf8(date_time[0]).ok()?,
+        std::str::from_utf8(date_time[1]).ok()?,
+        std::str::from_utf8(date_time[2]).ok()?,
+        std::str::from_utf8(date_time[3]).ok()?,
+        std::str::from_utf8(date_time[4]).ok()?,
+        std::str::from_utf8(date_time[5]).ok()?,
+    ))
 }
 
 /// List processed media with their generated variants.
@@ -335,6 +388,61 @@ pub async fn list_media(
         }
     }
     Ok(Json(items))
+}
+
+/// Gallery-ready media grouped and sorted for direct UI consumption.
+#[utoipa::path(get, path = "/api/v1/gallery", tag = "media",
+    responses((status = 200, body = [GalleryCategory])))]
+pub async fn gallery(
+    State(state): State<AppState>,
+) -> Result<Json<Vec<GalleryCategory>>, ApiError> {
+    let Some(public_base_url) = state.media.public_base_url.as_deref() else {
+        return Ok(Json(Vec::new()));
+    };
+    let public_base_url = public_base_url.trim_end_matches('/');
+
+    let rows: Vec<GalleryRow> = sqlx::query_as(
+        "select m.filename, coalesce(m.category, 'uncategorized') as category, \
+                v.key as variant_key \
+         from media m \
+         join lateral ( \
+             select format, key \
+             from media_variants \
+             where media_id = m.id \
+             order by case format when 'webp' then 0 when 'avif' then 1 else 2 end \
+             limit 1 \
+         ) v on true \
+         where m.state = 'ready'",
+    )
+    .fetch_all(&state.pool)
+    .await?;
+
+    let mut by_category = BTreeMap::<String, Vec<GalleryImage>>::new();
+    for row in rows {
+        let src = format!("{public_base_url}/{}", row.variant_key);
+        by_category
+            .entry(row.category)
+            .or_default()
+            .push(GalleryImage {
+                src: src.clone(),
+                original_src: src,
+                filename: row.filename.clone(),
+                date: parse_date_from_filename(&row.filename),
+            });
+    }
+
+    Ok(Json(
+        by_category
+            .into_iter()
+            .map(|(name, mut images)| {
+                images.sort_by(|a, b| match (&a.date, &b.date) {
+                    (Some(a_date), Some(b_date)) => b_date.cmp(a_date),
+                    _ => a.filename.cmp(&b.filename),
+                });
+                GalleryCategory { name, images }
+            })
+            .collect(),
+    ))
 }
 
 #[cfg(test)]
