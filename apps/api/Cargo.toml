@@ -13,6 +13,10 @@ aws-config = "1"
 aws-sdk-s3 = { version = "1", default-features = false, features = ["sigv4a", "http-1x", "default-https-client", "rt-tokio"] }
 axum = "0.8"
 dotenvy = "0.15"
+hex = "0.4"
+regex = "1"
+reqwest = { version = "0.13.4", default-features = false, features = ["rustls", "json", "form"] }
+sha2 = "0.10"
 subtle = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -35,4 +39,5 @@ uuid = { version = "1", features = ["v4", "serde"] }
 
 [dev-dependencies]
 http-body-util = "0.1"
+proptest = "1"
 tower = { version = "0.5", features = ["util"] }

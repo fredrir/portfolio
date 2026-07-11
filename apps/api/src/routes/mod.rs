@@ -1,6 +1,11 @@
+pub mod analytics;
+pub mod audit;
 pub mod contact;
 pub mod cv;
+pub mod deployments;
+pub mod github;
 pub mod health;
 pub mod media;
+pub mod spotify;
 pub mod version;
 pub mod visits;

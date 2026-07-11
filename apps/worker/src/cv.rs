@@ -182,3 +182,26 @@ mod tests {
         assert_eq!(lang_for_asset("CV_fr.pdf"), None);
     }
 }
+
+#[cfg(test)]
+mod props {
+    use proptest::prelude::*;
+
+    use super::lang_for_asset;
+
+    proptest! {
+        #[test]
+        fn language_only_for_pdf_suffixes(name in ".{0,60}") {
+            let lang = lang_for_asset(&name);
+            let lower = name.to_lowercase();
+            match lang {
+                Some("en") => prop_assert!(lower.ends_with("_en.pdf")),
+                Some("nb") => prop_assert!(lower.ends_with("_nb.pdf")),
+                Some(_) => prop_assert!(false, "unexpected language"),
+                None => prop_assert!(
+                    !lower.ends_with("_en.pdf") && !lower.ends_with("_nb.pdf")
+                ),
+            }
+        }
+    }
+}

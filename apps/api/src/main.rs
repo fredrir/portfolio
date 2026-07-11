@@ -1,4 +1,4 @@
-use portfolio_api::{AppState, MediaConfig, app};
+use portfolio_api::{AppState, Caches, MediaConfig, Upstreams, app};
 use sqlx::postgres::PgPoolOptions;
 
 #[tokio::main]
@@ -41,15 +41,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .filter(|u| !u.is_empty()),
     };
 
+    let upstreams = Upstreams::from_env();
+    if upstreams.recaptcha_secret.is_none() {
+        tracing::warn!("RECAPTCHA_SECRET_KEY unset: captcha verification is DISABLED");
+    }
+    let http = reqwest::Client::builder()
+        .user_agent("portfolio-api (+https://hansteen.dev)")
+        .timeout(std::time::Duration::from_secs(20))
+        .build()?;
+
     let addr = std::env::var("API_ADDR").unwrap_or_else(|_| "127.0.0.1:8080".into());
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     tracing::info!(%addr, "listening");
 
-    axum::serve(listener, app(AppState { pool, s3, media }))
-        .with_graceful_shutdown(async {
-            tokio::signal::ctrl_c().await.ok();
-        })
-        .await?;
+    axum::serve(
+        listener,
+        app(AppState {
+            pool,
+            s3,
+            media,
+            http,
+            upstreams: std::sync::Arc::new(upstreams),
+            caches: Caches::default(),
+        }),
+    )
+    .with_graceful_shutdown(async {
+        tokio::signal::ctrl_c().await.ok();
+    })
+    .await?;
 
     Ok(())
 }

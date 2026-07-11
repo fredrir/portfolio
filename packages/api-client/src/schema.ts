@@ -4,6 +4,77 @@
  */
 
 export interface paths {
+    "/api/v1/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** First-party visitor analytics, aggregated in SQL. */
+        get: operations["analytics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/posthog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * PostHog-derived stats (pageviews, uniques, top pages) queried server-side.
+         *     204 when PostHog is not configured.
+         */
+        get: operations["posthog_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Most recent administration audit entries (admin bearer token). */
+        get: operations["list_audit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recompute the full hash chain; any tampered row breaks it (admin bearer). */
+        get: operations["verify_audit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/contact": {
         parameters: {
             query?: never;
@@ -30,6 +101,44 @@ export interface paths {
         };
         /** Active CV versions per language, mirrored from the CV repository releases. */
         get: operations["active_cv"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deployments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Production deployment history (GitHub Actions runs, cached server-side). */
+        get: operations["deployments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/github": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GitHub profile, stars, languages and contribution calendar (cached 1h).
+         *     Returns null when the upstream is unavailable and nothing is cached,
+         *     matching the old frontend fetcher's contract.
+         */
+        get: operations["github"];
         put?: never;
         post?: never;
         delete?: never;
@@ -66,6 +175,27 @@ export interface paths {
         put?: never;
         /** Authorize a direct-to-S3 media upload (administration). */
         post: operations["create_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/spotify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Current/recent playback and top artists (captcha-gated like the old
+         *     server action; credentials-missing and upstream failures degrade to the
+         *     database cache).
+         */
+        get: operations["spotify"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -161,6 +291,29 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AnalyticsResponse: {
+            browsers: components["schemas"]["KeyCount"][];
+            countries: components["schemas"]["KeyCount"][];
+            daily: components["schemas"]["DailyCount"][];
+            referrers: components["schemas"]["KeyCount"][];
+            /** Format: int64 */
+            total: number;
+        };
+        AuditEntry: {
+            action: string;
+            at: string;
+            detail: unknown;
+            entry_hash: string;
+            /** Format: int64 */
+            id: number;
+        };
+        AuditVerification: {
+            /** Format: int64 */
+            entries: number;
+            /** Format: int64 */
+            first_invalid_id?: number | null;
+            valid: boolean;
+        };
         ContactAccepted: {
             /**
              * Format: uuid
@@ -173,8 +326,25 @@ export interface components {
             message: string;
             name: string;
             phone?: string | null;
+            /** @description reCAPTCHA v3 token for the `contact_form` action. */
+            recaptcha_token: string;
+        };
+        ContributionDay: {
+            /** Format: int32 */
+            count: number;
+            date: string;
+            /** Format: int32 */
+            level: number;
+        };
+        ContributionYear: {
+            days: components["schemas"]["ContributionDay"][];
+            /** Format: int64 */
+            total: number;
+            year: string;
         };
         CreateUploadRequest: {
+            /** @description Gallery grouping key, e.g. an album name (sanitized, lowercased). */
+            category?: string | null;
             /** @description Must be one of image/jpeg, image/png, image/webp. */
             content_type: string;
             filename: string;
@@ -202,7 +372,50 @@ export interface components {
             updated_at: string;
             url?: string | null;
         };
+        DailyCount: {
+            /** Format: int64 */
+            count: number;
+            day: string;
+        };
+        Deployment: {
+            conclusion?: string | null;
+            /** Format: int64 */
+            duration_seconds: number;
+            html_url: string;
+            sha: string;
+            started_at: string;
+            title: string;
+        };
+        /** @description Mirrors the shape the frontend consumed from the old TypeScript fetcher. */
+        GitHubData: {
+            bio: string;
+            contributionsByYear: components["schemas"]["ContributionYear"][];
+            createdAt: string;
+            /** Format: int32 */
+            followers: number;
+            /** Format: int32 */
+            following: number;
+            name: string;
+            profileUrl: string;
+            /** Format: int32 */
+            publicRepos: number;
+            topLanguages: components["schemas"]["LanguageCount"][];
+            /** Format: int64 */
+            totalStars: number;
+            username: string;
+        };
+        KeyCount: {
+            /** Format: int64 */
+            count: number;
+            key: string;
+        };
+        LanguageCount: {
+            /** Format: int32 */
+            count: number;
+            lang: string;
+        };
         MediaItem: {
+            category?: string | null;
             content_hash?: string | null;
             content_type: string;
             filename: string;
@@ -210,6 +423,7 @@ export interface components {
             height?: number | null;
             /** Format: uuid */
             id: string;
+            state: string;
             variants: components["schemas"]["MediaVariant"][];
             /** Format: int32 */
             width?: number | null;
@@ -226,6 +440,11 @@ export interface components {
             /** Format: int32 */
             width: number;
         };
+        PosthogStats: {
+            daily_pageviews: components["schemas"]["DailyCount"][];
+            daily_uniques: components["schemas"]["DailyCount"][];
+            top_pages: components["schemas"]["KeyCount"][];
+        };
         /** @description RFC 9457 problem details body. */
         Problem: {
             detail?: string | null;
@@ -241,8 +460,45 @@ export interface components {
         RecordVisitRequest: {
             /** @description Page that was visited. */
             page?: string | null;
+            /** @description reCAPTCHA v3 token for the `record_visit` action. */
+            recaptcha_token: string;
             /** @description Referrer reported by the browser. */
             referrer?: string | null;
+        };
+        SpotifyArtist: {
+            genres?: string[] | null;
+            imageUrl?: string | null;
+            name: string;
+            url?: string | null;
+        };
+        /** @description Mirrors the shape the frontend consumed from the old TypeScript fetcher. */
+        SpotifyData: {
+            album?: string | null;
+            albumArt?: string | null;
+            artist?: string | null;
+            /** Format: int64 */
+            durationMs?: number | null;
+            error?: string | null;
+            isPlaying?: boolean | null;
+            lastPlayedAt?: string | null;
+            ok?: boolean | null;
+            previewUrl?: string | null;
+            /** Format: int64 */
+            progressMs?: number | null;
+            recentTracks?: components["schemas"]["SpotifyTrack"][] | null;
+            songUrl?: string | null;
+            title?: string | null;
+            topArtists?: components["schemas"]["SpotifyArtist"][] | null;
+            trackId?: string | null;
+        };
+        SpotifyTrack: {
+            album: string;
+            albumArt?: string | null;
+            artist: string;
+            previewUrl?: string | null;
+            songUrl?: string | null;
+            title: string;
+            trackId?: string | null;
         };
         VersionInfo: {
             /** @description Git commit the binary was built from. */
@@ -263,6 +519,107 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    analytics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalyticsResponse"];
+                };
+            };
+        };
+    };
+    posthog_stats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PosthogStats"];
+                };
+            };
+            /** @description PostHog not configured */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_audit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEntry"][];
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    verify_audit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditVerification"];
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     submit_contact: {
         parameters: {
             query?: never;
@@ -314,7 +671,7 @@ export interface operations {
             };
         };
     };
-    list_media: {
+    deployments: {
         parameters: {
             query?: never;
             header?: never;
@@ -328,7 +685,68 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    "application/json": components["schemas"]["Deployment"][];
+                };
+            };
+            /** @description Upstream unavailable and no cache */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    github: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": null | components["schemas"]["GitHubData"];
+                };
+            };
+        };
+    };
+    list_media: {
+        parameters: {
+            query?: {
+                /** @description Restrict to one gallery category. */
+                category?: string | null;
+                /** @description Include unprocessed items (requires the admin bearer token). */
+                include_pending?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "application/json": components["schemas"]["MediaItem"][];
+                };
+            };
+            /** @description include_pending without admin token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -379,6 +797,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    spotify: {
+        parameters: {
+            query: {
+                /** @description reCAPTCHA v3 token for the `spotify_data` action. */
+                recaptcha_token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpotifyData"];
                 };
             };
         };

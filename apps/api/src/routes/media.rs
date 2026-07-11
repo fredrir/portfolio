@@ -10,14 +10,14 @@ use subtle::ConstantTimeEq;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
-use crate::AppState;
 use crate::problem::{ApiError, Problem};
+use crate::{AppState, audit};
 
 const MAX_UPLOAD_BYTES: i64 = 25 * 1024 * 1024;
 const PRESIGN_EXPIRY: Duration = Duration::from_secs(900);
 const ALLOWED_CONTENT_TYPES: [&str; 3] = ["image/jpeg", "image/png", "image/webp"];
 
-fn require_admin(state: &AppState, headers: &HeaderMap) -> Result<(), Problem> {
+pub fn require_admin(state: &AppState, headers: &HeaderMap) -> Result<(), Problem> {
     let Some(expected) = state.media.admin_token.as_deref() else {
         return Err(Problem::new(
             StatusCode::SERVICE_UNAVAILABLE,
@@ -36,7 +36,25 @@ fn require_admin(state: &AppState, headers: &HeaderMap) -> Result<(), Problem> {
     }
 }
 
-fn sanitize_filename(filename: &str) -> String {
+/// Lowercased, charset-restricted gallery grouping key; None when nothing
+/// usable remains.
+pub fn sanitize_category(raw: &str) -> Option<String> {
+    let cleaned: String = raw
+        .to_lowercase()
+        .chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-') {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect();
+    let trimmed = cleaned.trim_matches(['_', '.']).to_owned();
+    (!trimmed.is_empty() && trimmed.chars().count() <= 64).then_some(trimmed)
+}
+
+pub fn sanitize_filename(filename: &str) -> String {
     let cleaned: String = filename
         .chars()
         .map(|c| {
@@ -61,6 +79,9 @@ pub struct CreateUploadRequest {
     /// Must be one of image/jpeg, image/png, image/webp.
     pub content_type: String,
     pub size_bytes: i64,
+    /// Gallery grouping key, e.g. an album name (sanitized, lowercased).
+    #[serde(default)]
+    pub category: Option<String>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -104,6 +125,19 @@ pub async fn create_upload(
             format!("Must be between 1 and {MAX_UPLOAD_BYTES} bytes"),
         );
     }
+    let category = match body.category.as_deref() {
+        None => None,
+        Some(raw) => match sanitize_category(raw) {
+            Some(c) => Some(c),
+            None => {
+                errors.insert(
+                    "category".to_owned(),
+                    "Must be 1-64 chars of letters, digits, ._-".to_owned(),
+                );
+                None
+            }
+        },
+    };
     if !errors.is_empty() {
         return Err(ApiError::Validation(errors).into_response());
     }
@@ -112,18 +146,40 @@ pub async fn create_upload(
     let media_id = Uuid::new_v4();
     let original_key = format!("originals/{media_id}/{filename}");
 
+    let mut tx = state
+        .pool
+        .begin()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
     sqlx::query(
-        "insert into media (id, original_key, filename, content_type, size_bytes) \
-         values ($1, $2, $3, $4, $5)",
+        "insert into media (id, original_key, filename, content_type, size_bytes, category) \
+         values ($1, $2, $3, $4, $5, $6)",
     )
     .bind(media_id)
     .bind(&original_key)
     .bind(&filename)
     .bind(&body.content_type)
     .bind(body.size_bytes)
-    .execute(&state.pool)
+    .bind(&category)
+    .execute(&mut *tx)
     .await
     .map_err(|e| ApiError::from(e).into_response())?;
+    audit::record(
+        &mut tx,
+        "media.upload_authorized",
+        serde_json::json!({
+            "media_id": media_id,
+            "filename": filename,
+            "content_type": body.content_type,
+            "size_bytes": body.size_bytes,
+            "category": category,
+        }),
+    )
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    tx.commit()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
 
     let presigned = state
         .s3
@@ -168,10 +224,20 @@ pub struct MediaItem {
     pub id: Uuid,
     pub filename: String,
     pub content_type: String,
+    pub category: Option<String>,
+    pub state: String,
     pub width: Option<i32>,
     pub height: Option<i32>,
     pub content_hash: Option<String>,
     pub variants: Vec<MediaVariant>,
+}
+
+#[derive(Deserialize, utoipa::IntoParams)]
+pub struct ListMediaParams {
+    /// Restrict to one gallery category.
+    pub category: Option<String>,
+    /// Include unprocessed items (requires the admin bearer token).
+    pub include_pending: Option<bool>,
 }
 
 #[derive(sqlx::FromRow)]
@@ -179,6 +245,8 @@ struct MediaListRow {
     id: Uuid,
     filename: String,
     content_type: String,
+    category: Option<String>,
+    state: String,
     width: Option<i32>,
     height: Option<i32>,
     content_hash: Option<String>,
@@ -191,19 +259,39 @@ struct MediaListRow {
 
 /// List processed media with their generated variants.
 #[utoipa::path(get, path = "/api/v1/media", tag = "media",
-    responses((status = 200, body = [MediaItem])))]
-pub async fn list_media(State(state): State<AppState>) -> Result<Json<Vec<MediaItem>>, ApiError> {
+    params(ListMediaParams),
+    responses(
+        (status = 200, body = [MediaItem]),
+        (status = 401, description = "include_pending without admin token", body = Problem)
+    ))]
+pub async fn list_media(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    axum::extract::Query(params): axum::extract::Query<ListMediaParams>,
+) -> Result<Json<Vec<MediaItem>>, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    let include_pending = params.include_pending.unwrap_or(false);
+    if include_pending {
+        require_admin(&state, &headers).map_err(|p| p.into_response())?;
+    }
+
     let rows: Vec<MediaListRow> = sqlx::query_as(
-        "select m.id, m.filename, m.content_type, m.width, m.height, m.content_hash, \
+        "select m.id, m.filename, m.content_type, m.category, m.state, \
+                m.width, m.height, m.content_hash, \
                 v.format as v_format, v.key as v_key, v.width as v_width, \
                 v.height as v_height, v.size_bytes as v_size_bytes \
          from media m \
          left join media_variants v on v.media_id = m.id \
-         where m.state = 'ready' \
+         where (m.state = 'ready' or $1) \
+           and ($2::text is null or m.category = $2) \
          order by m.created_at desc, v.format",
     )
+    .bind(include_pending)
+    .bind(&params.category)
     .fetch_all(&state.pool)
-    .await?;
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
 
     let mut items: Vec<MediaItem> = Vec::new();
     for row in rows {
@@ -212,6 +300,8 @@ pub async fn list_media(State(state): State<AppState>) -> Result<Json<Vec<MediaI
                 id: row.id,
                 filename: row.filename,
                 content_type: row.content_type,
+                category: row.category,
+                state: row.state,
                 width: row.width,
                 height: row.height,
                 content_hash: row.content_hash,
@@ -245,4 +335,33 @@ pub async fn list_media(State(state): State<AppState>) -> Result<Json<Vec<MediaI
         }
     }
     Ok(Json(items))
+}
+
+#[cfg(test)]
+mod props {
+    use proptest::prelude::*;
+
+    use super::{sanitize_category, sanitize_filename};
+
+    proptest! {
+        #[test]
+        fn filename_sanitization_is_idempotent_and_safe(input in ".{0,80}") {
+            let once = sanitize_filename(&input);
+            prop_assert!(!once.is_empty());
+            prop_assert!(once.chars().all(|c| c.is_ascii_alphanumeric()
+                || matches!(c, '.' | '_' | '-')));
+            prop_assert_eq!(sanitize_filename(&once), once.clone());
+        }
+
+        #[test]
+        fn category_sanitization_bounds(input in ".{0,100}") {
+            if let Some(category) = sanitize_category(&input) {
+                prop_assert!(!category.is_empty());
+                prop_assert!(category.chars().count() <= 64);
+                prop_assert!(category.chars().all(|c| c.is_ascii_alphanumeric()
+                    || matches!(c, '.' | '_' | '-')));
+                prop_assert_eq!(category.to_lowercase(), category.clone());
+            }
+        }
+    }
 }
