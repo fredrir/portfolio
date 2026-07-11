@@ -1,0 +1,296 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Portfolio API",
+    "description": "Public API for the portfolio platform.",
+    "license": {
+      "name": "MIT"
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/contact": {
+      "post": {
+        "tags": [
+          "contact"
+        ],
+        "summary": "Accept a contact-form submission for asynchronous delivery.",
+        "operationId": "submit_contact",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactAccepted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/version": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Build information for the running deployment.",
+        "operationId": "version",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/visits": {
+      "post": {
+        "tags": [
+          "visits"
+        ],
+        "summary": "Record a visit and return the total visit count.",
+        "operationId": "record_visit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordVisitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisitCount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/visits/count": {
+      "get": {
+        "tags": [
+          "visits"
+        ],
+        "summary": "Total number of recorded visits.",
+        "operationId": "visit_count",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisitCount"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Liveness probe; no dependencies are checked.",
+        "operationId": "healthz",
+        "responses": {
+          "200": {
+            "description": "Process is alive"
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Readiness probe; verifies database connectivity.",
+        "operationId": "readyz",
+        "responses": {
+          "200": {
+            "description": "Ready to serve traffic"
+          },
+          "503": {
+            "description": "A dependency is unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ContactAccepted": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Identifier of the stored message; delivery happens asynchronously."
+          }
+        }
+      },
+      "ContactRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "message"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "description": "RFC 9457 problem details body.",
+        "required": [
+          "type",
+          "title",
+          "status"
+        ],
+        "properties": {
+          "detail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "errors": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Per-field validation messages, present on validation failures only.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "RecordVisitRequest": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Page that was visited."
+          },
+          "referrer": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Referrer reported by the browser."
+          }
+        }
+      },
+      "VersionInfo": {
+        "type": "object",
+        "required": [
+          "version",
+          "commit"
+        ],
+        "properties": {
+          "commit": {
+            "type": "string",
+            "description": "Git commit the binary was built from."
+          },
+          "version": {
+            "type": "string",
+            "description": "Crate version of the running binary."
+          }
+        }
+      },
+      "VisitCount": {
+        "type": "object",
+        "required": [
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      }
+    }
+  }
+}

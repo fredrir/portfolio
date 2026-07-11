@@ -1,0 +1,21 @@
+{
+  "name": "@portfolio/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "cargo run -q -p portfolio-api --bin openapi > openapi.json && openapi-typescript openapi.json -o src/schema.ts",
+    "check": "bun run generate && git diff --exit-code -- openapi.json src/schema.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.14.1"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.10.1",
+    "typescript": "^5.9.3"
+  }
+}
