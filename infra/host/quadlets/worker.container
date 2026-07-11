@@ -1,0 +1,21 @@
+[Unit]
+Description=Media worker (SQS consumer)
+After=postgres.service
+Wants=postgres.service
+
+[Container]
+Image=ghcr.io/fredrir/portfolio-worker:latest
+ContainerName=worker
+Network=portfolio.network
+EnvironmentFile=%h/.config/portfolio/worker.env
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=all
+PodmanArgs=--memory=768m --pids-limit=256
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

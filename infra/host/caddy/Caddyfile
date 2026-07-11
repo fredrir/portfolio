@@ -1,10 +1,8 @@
-# Origin entrypoint behind the Cloudflare tunnel. Phase 4 replaces the
-# placeholder with blue-green upstream selection.
+# Origin entrypoint behind the Cloudflare tunnel. The active blue/green
+# routing lives in slots/active.caddy, rewritten by the deploy script.
 :8080 {
 	handle /healthz {
 		respond "origin alive" 200
 	}
-	handle {
-		respond "no application deployed yet" 503
-	}
+	import /etc/caddy/slots/active.caddy
 }

@@ -1,0 +1,21 @@
+[Unit]
+Description=TanStack Start SSR (green slot)
+After=api-green.service
+
+[Container]
+Image=ghcr.io/fredrir/portfolio-web:latest
+ContainerName=web-green
+Network=portfolio.network
+EnvironmentFile=%h/.config/portfolio/web-green.env
+ReadOnly=true
+Tmpfs=/tmp
+NoNewPrivileges=true
+DropCapability=all
+PodmanArgs=--memory=512m --pids-limit=256
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

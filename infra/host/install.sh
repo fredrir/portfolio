@@ -16,13 +16,19 @@ if [[ -z "${CLOUDFLARE_API_TOKEN:-}" ]]; then
   exit 1
 fi
 
-echo "==> syncing quadlets and Caddyfile"
-tar -C "$(dirname "$0")" -cf - quadlets caddy | ssh "$HOST" '
+echo "==> syncing quadlets, Caddyfile and scripts"
+tar -C "$(dirname "$0")" -cf - quadlets caddy bin | ssh "$HOST" '
   set -e
   rm -rf /tmp/portfolio-host && mkdir -p /tmp/portfolio-host
   tar -C /tmp/portfolio-host -xf -
   install -o portfolio -g portfolio -m 600 /tmp/portfolio-host/quadlets/* /home/portfolio/.config/containers/systemd/
+  install -d -o portfolio -g portfolio /home/portfolio/caddy/slots /home/portfolio/bin
   install -o portfolio -g portfolio -m 644 /tmp/portfolio-host/caddy/Caddyfile /home/portfolio/caddy/Caddyfile
+  install -o portfolio -g portfolio -m 755 /tmp/portfolio-host/bin/* /home/portfolio/bin/
+  if [ ! -f /home/portfolio/caddy/slots/active.caddy ]; then
+    printf "handle {\n\trespond \"no application deployed yet\" 503\n}\n" > /home/portfolio/caddy/slots/active.caddy
+    chown portfolio:portfolio /home/portfolio/caddy/slots/active.caddy
+  fi
   rm -rf /tmp/portfolio-host
 '
 

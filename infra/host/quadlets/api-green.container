@@ -1,0 +1,21 @@
+[Unit]
+Description=Axum API (green slot)
+After=postgres.service
+Wants=postgres.service
+
+[Container]
+Image=ghcr.io/fredrir/portfolio-api:latest
+ContainerName=api-green
+Network=portfolio.network
+EnvironmentFile=%h/.config/portfolio/api.env
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=all
+PodmanArgs=--memory=512m --pids-limit=256
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

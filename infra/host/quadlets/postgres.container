@@ -1,0 +1,25 @@
+[Unit]
+Description=PostgreSQL (portfolio application data)
+After=network-online.target
+
+[Container]
+Image=docker.io/library/postgres:17-alpine
+ContainerName=postgres
+Network=portfolio.network
+Volume=pgdata:/var/lib/postgresql/data
+EnvironmentFile=%h/.config/portfolio/postgres.env
+NoNewPrivileges=true
+DropCapability=all
+# Minimal set the official image's init/su-exec requires.
+AddCapability=CHOWN SETUID SETGID FOWNER DAC_OVERRIDE
+HealthCmd=pg_isready -U portfolio -d portfolio
+HealthInterval=10s
+HealthRetries=5
+PodmanArgs=--memory=1g --pids-limit=512
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

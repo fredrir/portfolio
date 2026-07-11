@@ -1,0 +1,21 @@
+[Unit]
+Description=TanStack Start SSR (blue slot)
+After=api-blue.service
+
+[Container]
+Image=ghcr.io/fredrir/portfolio-web:latest
+ContainerName=web-blue
+Network=portfolio.network
+EnvironmentFile=%h/.config/portfolio/web-blue.env
+ReadOnly=true
+Tmpfs=/tmp
+NoNewPrivileges=true
+DropCapability=all
+PodmanArgs=--memory=512m --pids-limit=256
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
