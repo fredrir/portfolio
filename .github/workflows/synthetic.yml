@@ -6,8 +6,7 @@ on:
   workflow_dispatch: {}
 
 env:
-  # Flips to https://hansteen.dev at cutover.
-  BASE_URL: https://new.hansteen.dev
+  BASE_URL: https://hansteen.dev
 
 permissions:
   contents: read

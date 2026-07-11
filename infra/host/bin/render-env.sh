@@ -39,6 +39,7 @@ write("api.env", {
     "AWS_ACCESS_KEY_ID": s["API_AWS_ACCESS_KEY_ID"],
     "AWS_SECRET_ACCESS_KEY": s["API_AWS_SECRET_ACCESS_KEY"],
     "MEDIA_BUCKET": s["MEDIA_BUCKET"],
+    "MEDIA_PUBLIC_BASE_URL": s.get("MEDIA_PUBLIC_BASE_URL"),
     "ADMIN_TOKEN": s["ADMIN_TOKEN"],
     "RUST_LOG": s.get("RUST_LOG", "info"),
 })
