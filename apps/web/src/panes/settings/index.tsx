@@ -208,6 +208,8 @@ export function SettingsPane({
             onClick={() => {
               remove(KEYS.tutorialCompleted);
               remove(KEYS.openPanes);
+              remove(KEYS.tiling);
+              // Legacy keys from before the tiling blob was consolidated.
               remove(KEYS.rowHeights);
               remove(KEYS.colWidths);
               window.location.reload();

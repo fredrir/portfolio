@@ -450,3 +450,47 @@ async fn posthog_stats_no_content_when_unconfigured(pool: PgPool) {
         .unwrap();
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 }
+
+#[sqlx::test]
+async fn media_list_groups_variants_per_item(pool: PgPool) {
+    // Two ready media, each with avif + webp, must come back as two distinct
+    // items with two variants each (regression: shared created_at could
+    // interleave variant rows and split/duplicate items).
+    for n in 0..2 {
+        let id: uuid::Uuid = sqlx::query_scalar(
+            "insert into media (original_key, filename, content_type, size_bytes, state, \
+                                width, height, content_hash) \
+             values ($1, $2, 'image/png', 100, 'ready', 32, 32, $3) returning id",
+        )
+        .bind(format!("originals/{n}/a.png"))
+        .bind(format!("a{n}.png"))
+        .bind(format!("hash{n}"))
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+        for fmt in ["avif", "webp"] {
+            sqlx::query(
+                "insert into media_variants (media_id, format, key, width, height, size_bytes) \
+                 values ($1, $2, $3, 32, 32, 50)",
+            )
+            .bind(id)
+            .bind(fmt)
+            .bind(format!("variants/{id}.{fmt}"))
+            .execute(&pool)
+            .await
+            .unwrap();
+        }
+    }
+
+    let (status, body) = send(
+        pool,
+        Request::get("/api/v1/media").body(Body::empty()).unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    let items = body.as_array().unwrap();
+    assert_eq!(items.len(), 2, "two distinct media items");
+    for item in items {
+        assert_eq!(item["variants"].as_array().unwrap().len(), 2);
+    }
+}

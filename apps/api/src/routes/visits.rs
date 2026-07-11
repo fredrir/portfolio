@@ -45,10 +45,20 @@ pub async fn record_visit(
         return Err(ApiError::Forbidden("reCAPTCHA verification failed"));
     }
 
+    // Cap free-text columns to match the DB check constraints so a hostile or
+    // oversized header can't error (or bloat storage). char_indices keeps the
+    // truncation on a UTF-8 boundary.
+    fn cap(value: &str, max: usize) -> String {
+        match value.char_indices().nth(max) {
+            Some((idx, _)) => value[..idx].to_owned(),
+            None => value.to_owned(),
+        }
+    }
+
     let user_agent = headers
         .get("user-agent")
         .and_then(|v| v.to_str().ok())
-        .map(str::to_owned);
+        .map(|v| cap(v, 1024));
     // Country code from the edge; the raw client IP is intentionally not
     // stored anymore.
     let country_code = headers
@@ -56,13 +66,15 @@ pub async fn record_visit(
         .and_then(|v| v.to_str().ok())
         .map(|v| v.trim().to_uppercase())
         .filter(|v| !v.is_empty() && v.len() <= 8);
+    let page = cap(body.page.as_deref().unwrap_or("/"), 512);
+    let referrer = body.referrer.as_deref().map(|r| cap(r, 2048));
 
     sqlx::query(
         "insert into visitors (page, referrer, user_agent, country, country_code) \
          values ($1, $2, $3, null, $4)",
     )
-    .bind(body.page.as_deref().unwrap_or("/"))
-    .bind(&body.referrer)
+    .bind(&page)
+    .bind(&referrer)
     .bind(&user_agent)
     .bind(&country_code)
     .execute(&state.pool)

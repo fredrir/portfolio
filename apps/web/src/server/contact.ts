@@ -40,21 +40,29 @@ export const sendContactForm = createServerFn({ method: "POST" })
 
     const { name, email, phone, message, recaptchaToken } = parsed.data;
 
-    // Captcha verification happens in the API (action `contact_form`).
-    // Persist in our own database; delivery moves to the queue worker later,
-    // so Formspree remains the delivery path of record and an API failure
-    // must not fail the submission — except captcha rejection (403), which
-    // fails it deliberately.
+    // Captcha is verified server-side by the API (action `contact_form`): 403
+    // means it failed. The API also persists the message. Delivery still goes
+    // through Formspree, but ONLY once the API has evaluated the token — if we
+    // can't reach the API we cannot confirm the captcha, so we must not deliver
+    // (otherwise the spam gate is bypassed exactly when the origin is down).
+    let apiEvaluated = false;
     try {
       const { response } = await api.POST("/api/v1/contact", {
         headers: traceHeaders(),
         body: { name, email, phone: phone || null, message, recaptcha_token: recaptchaToken },
       });
+      apiEvaluated = true;
       if (response.status === 403) {
         return { success: false, error: "reCAPTCHA verification failed" };
       }
     } catch (error) {
-      console.error("Failed to store contact message:", error);
+      console.error("Failed to reach the contact API:", error);
+    }
+    if (!apiEvaluated) {
+      return {
+        success: false,
+        error: "Couldn't verify your submission — please try again in a moment",
+      };
     }
 
     try {

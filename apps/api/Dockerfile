@@ -6,7 +6,8 @@ COPY apps/api ./apps/api
 COPY apps/worker ./apps/worker
 # Compiled into the /api/v1/version response.
 ARG GIT_SHA
-ENV GIT_SHA=${GIT_SHA}
+ARG APP_VERSION
+ENV GIT_SHA=${GIT_SHA} APP_VERSION=${APP_VERSION}
 RUN cargo build --release --locked -p portfolio-api
 
 # Migrations are embedded in the binary via sqlx::migrate! and run at startup.

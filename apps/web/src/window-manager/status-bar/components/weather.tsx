@@ -12,7 +12,7 @@ export function Weather() {
       setWeather(stored);
       return;
     }
-    fetch("https://wttr.in/?format=%t+%C&m")
+    fetch("https://wttr.in/Trondheim?format=%t+%C&m")
       .then((r) => r.text())
       .then((text) => {
         const clean = text.trim().slice(0, 30);

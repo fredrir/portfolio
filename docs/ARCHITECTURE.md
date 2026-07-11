@@ -505,12 +505,13 @@ The platform is complete when:
 Identified while reconciling this plan against the repository state; each needs an explicit
 decision before its phase begins.
 
-### 1. Supabase migration is unstated (blocks Phase 1 completion)
+### 1. Supabase migration is unstated — RESOLVED
 
-The current application stores gallery, visitor and contact data in Supabase
-(`src/lib/supabase.ts`, `src/app/actions/`). The plan implicitly replaces this with
-self-hosted PostgreSQL but never says so. Phase 1 must include: schema recreation in SQLx
-migrations, data export/import from Supabase, and removal of `@supabase/supabase-js`.
+The old app stored gallery/visitor/contact data in Supabase. This is fully
+replaced: visitors/contact/media live in self-hosted PostgreSQL (SQLx
+migrations), the gallery reads the S3 media pipeline, Spotify/GitHub are cached
+in the Axum API (ADR 0009), and `@supabase/supabase-js` is gone from the web
+app — only the one-off `scripts/migrate-*.ts` still use it.
 
 ### 2. Shared VPS constrains hardening, Terraform and DR — RESOLVED 2026-07-11
 

@@ -16,7 +16,9 @@ pub struct VersionInfo {
 ))]
 pub async fn version() -> Json<VersionInfo> {
     Json(VersionInfo {
-        version: env!("CARGO_PKG_VERSION"),
+        // Release version injected at build time by CI's release job; falls
+        // back to the crate version for local/dev builds.
+        version: option_env!("APP_VERSION").unwrap_or(env!("CARGO_PKG_VERSION")),
         commit: option_env!("GIT_SHA").unwrap_or("unknown"),
     })
 }

@@ -10,9 +10,15 @@ COPY packages/api-client/package.json packages/api-client/package.json
 RUN bun install --frozen-lockfile
 COPY packages/api-client packages/api-client
 COPY apps/web apps/web
-# Bundled into the client at build time (reCAPTCHA v3 public site key).
+# Bundled into the client at build time.
 ARG VITE_RECAPTCHA_SITE_KEY
-ENV VITE_RECAPTCHA_SITE_KEY=${VITE_RECAPTCHA_SITE_KEY}
+ARG VITE_POSTHOG_KEY
+ARG VITE_POSTHOG_HOST
+ARG VITE_APP_VERSION
+ENV VITE_RECAPTCHA_SITE_KEY=${VITE_RECAPTCHA_SITE_KEY} \
+    VITE_POSTHOG_KEY=${VITE_POSTHOG_KEY} \
+    VITE_POSTHOG_HOST=${VITE_POSTHOG_HOST} \
+    VITE_APP_VERSION=${VITE_APP_VERSION}
 RUN cd apps/web && bun run build
 
 FROM node:22-slim

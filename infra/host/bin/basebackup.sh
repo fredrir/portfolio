@@ -9,7 +9,7 @@ KEY="basebackups/base-$STAMP.tar.gz"
 
 podman run --rm --network portfolio --env-file "$CONF/wal.env" \
     docker.io/library/postgres:17-alpine \
-    pg_basebackup -h postgres -U replicator -D - -Ft -X none \
+    pg_basebackup -h postgres -U replicator -D - -Ft -X stream \
     | gzip \
     | podman run --rm -i --env-file "$CONF/backup.env" \
         docker.io/amazon/aws-cli:latest s3 cp - "s3://$BUCKET/$KEY" \

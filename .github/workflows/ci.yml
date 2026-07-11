@@ -22,6 +22,7 @@ jobs:
       - run: bun run --filter '@portfolio/web' lint
       - run: bun run --filter '@portfolio/web' typecheck
       - run: bun run --filter '@portfolio/web' build
+      - run: bun run --filter '@portfolio/edge' typecheck
 
   rust:
     runs-on: ubuntu-latest
