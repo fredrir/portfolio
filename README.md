@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# hansteen.dev
 
-## Getting Started
+Personal portfolio built as a small production platform: TanStack Start frontend,
+Rust (Axum) API, PostgreSQL, and a private Hetzner origin behind Cloudflare.
+The full architecture and delivery plan live in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-First, run the development server:
+## Layout
+
+| Path | What it is |
+|---|---|
+| `apps/web` | TanStack Start app (Vite, React 19, Tailwind v4) |
+| `apps/api` | Axum API (SQLx, utoipa OpenAPI, RFC 9457 errors) |
+| `packages/api-client` | TypeScript client generated from the API's OpenAPI document |
+| `docs/` | Architecture plan and decisions |
+| `scripts/` | One-off tooling (e.g. Supabase → Postgres visitor migration) |
+
+## Development
+
+Requirements: [Bun](https://bun.sh), Rust (stable), Docker with compose.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env        # adjust if needed
+docker compose up -d db     # local Postgres 17 on localhost:5432
+bun install
+
+bun run dev                 # web app on http://localhost:3000
+cargo run -p portfolio-api  # API on http://localhost:8080
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Checks
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+bun run --filter '@portfolio/web' lint typecheck build
+cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace      # integration tests use disposable per-test databases
+cd packages/api-client && bun run check   # fails if the generated client drifted
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+The same checks run in CI on every branch push and pull request.
 
-## Learn More
+### Regenerating the API client
 
-To learn more about Next.js, take a look at the following resources:
+After changing API routes or schemas in `apps/api`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cd packages/api-client && bun run generate
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Production-like containers
 
-## Deploy on Vercel
+```bash
+GIT_SHA=$(git rev-parse HEAD) docker compose --profile app up --build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Runs db + api + web with read-only root filesystems. Web serves on
+`localhost:3000`, API on `localhost:8080`; the deployed version is visible at
+`/api/v1/version`.
