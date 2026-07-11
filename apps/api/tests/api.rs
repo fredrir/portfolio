@@ -1,7 +1,7 @@
 use axum::body::Body;
 use axum::http::{Request, StatusCode, header};
 use http_body_util::BodyExt;
-use portfolio_api::{AppState, Caches, MediaConfig, Upstreams, app};
+use portfolio_api::{AppState, Caches, MediaConfig, Upstreams, app, audit};
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use tower::ServiceExt;
@@ -355,6 +355,56 @@ async fn audit_chain_records_and_verifies(pool: PgPool) {
     assert_eq!(status, StatusCode::OK);
     assert_eq!(body["valid"], false);
     assert!(body["first_invalid_id"].is_number());
+}
+
+#[sqlx::test]
+async fn audit_chain_can_be_resealed_for_hash_migrations(pool: PgPool) {
+    for i in 0..2 {
+        let request = Request::post("/api/v1/media/uploads")
+            .header(header::CONTENT_TYPE, "application/json")
+            .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+            .body(Body::from(
+                json!({
+                    "filename": format!("reseal-{i}.png"),
+                    "content_type": "image/png",
+                    "size_bytes": 1000
+                })
+                .to_string(),
+            ))
+            .unwrap();
+        let (status, _) = send(pool.clone(), request).await;
+        assert_eq!(status, StatusCode::CREATED);
+    }
+
+    sqlx::query(
+        "update admin_audit set detail = jsonb_set(detail, '{filename}', '\"legacy.png\"') \
+         where id = 1",
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+
+    let verify = Request::get("/api/v1/audit/verify")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::empty())
+        .unwrap();
+    let (_, body) = send(pool.clone(), verify).await;
+    assert_eq!(body["valid"], false);
+    assert_eq!(body["first_invalid_id"], 1);
+
+    let mut tx = pool.begin().await.unwrap();
+    let status = audit::reseal_chain(&mut tx, true).await.unwrap();
+    tx.commit().await.unwrap();
+    assert_eq!(status.entries, 2);
+    assert_eq!(status.changed, 2);
+    assert_eq!(status.first_changed_id, Some(1));
+
+    let verify = Request::get("/api/v1/audit/verify")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::empty())
+        .unwrap();
+    let (_, body) = send(pool, verify).await;
+    assert_eq!(body["valid"], true);
 }
 
 #[sqlx::test]

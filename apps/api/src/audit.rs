@@ -106,6 +106,13 @@ pub struct ChainStatus {
     pub first_invalid_id: Option<i64>,
 }
 
+pub struct ResealStatus {
+    pub entries: i64,
+    pub changed: i64,
+    pub first_changed_id: Option<i64>,
+    pub write: bool,
+}
+
 /// Re-compute the full chain from genesis.
 pub async fn verify_chain(conn: &mut PgConnection) -> Result<ChainStatus, sqlx::Error> {
     let rows = sqlx::query(
@@ -139,5 +146,58 @@ pub async fn verify_chain(conn: &mut PgConnection) -> Result<ChainStatus, sqlx::
         valid: true,
         entries,
         first_invalid_id: None,
+    })
+}
+
+/// Recompute `prev_hash`/`entry_hash` for the stored rows using the current
+/// audit algorithm and key. This is a maintenance escape hatch for intentional
+/// hash-algorithm/key migrations; running it blesses the current table content.
+pub async fn reseal_chain(
+    conn: &mut PgConnection,
+    write: bool,
+) -> Result<ResealStatus, sqlx::Error> {
+    sqlx::query("select pg_advisory_xact_lock(hashtext('admin_audit'))")
+        .execute(&mut *conn)
+        .await?;
+
+    let rows = sqlx::query(
+        "select id, at, action, detail::text as detail_text, prev_hash, entry_hash \
+         from admin_audit order by id",
+    )
+    .fetch_all(&mut *conn)
+    .await?;
+
+    let mut prev = GENESIS.to_owned();
+    let mut changed = 0;
+    let mut first_changed_id = None;
+    for row in &rows {
+        let id: i64 = row.get("id");
+        let at: OffsetDateTime = row.get("at");
+        let action: String = row.get("action");
+        let detail_text: String = row.get("detail_text");
+        let stored_prev: String = row.get("prev_hash");
+        let stored_hash: String = row.get("entry_hash");
+        let next_hash = entry_hash(&prev, &at, &action, &detail_text);
+
+        if stored_prev != prev || stored_hash != next_hash {
+            changed += 1;
+            first_changed_id.get_or_insert(id);
+            if write {
+                sqlx::query("update admin_audit set prev_hash = $1, entry_hash = $2 where id = $3")
+                    .bind(&prev)
+                    .bind(&next_hash)
+                    .bind(id)
+                    .execute(&mut *conn)
+                    .await?;
+            }
+        }
+        prev = next_hash;
+    }
+
+    Ok(ResealStatus {
+        entries: rows.len() as i64,
+        changed,
+        first_changed_id,
+        write,
     })
 }

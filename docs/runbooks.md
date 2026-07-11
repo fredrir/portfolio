@@ -75,6 +75,24 @@ The shared production host is never the rebuild target for exercises
 - **Doppler service token:** `doppler configs tokens create` a new one,
   replace the host file, revoke the old in Doppler.
 
+## Audit Chain Reseal
+
+Use this only for an intentional audit hash migration, for example promoting
+rows written by the original keyless SHA-256 code to the current
+`AUDIT_HMAC_KEY` scheme. Resealing blesses the current `admin_audit` table
+contents, so inspect/backup first.
+
+```bash
+# dry-run: reports how many rows would change
+doppler run -- bun run audit:reseal
+
+# write: recomputes prev_hash/entry_hash with the current AUDIT_HMAC_KEY
+doppler run -- bun run audit:reseal -- --write
+```
+
+Afterward, click **verify chain** or call `/api/v1/audit/verify`; it should
+return `valid: true`.
+
 ## Backup restore verification
 
 Weekly automatic (`restore-test.timer`, Sundays 05:00 UTC): newest dump
