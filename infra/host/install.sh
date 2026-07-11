@@ -62,13 +62,33 @@ ssh "$HOST" '
   cosign version 2>/dev/null | head -1
 '
 
+echo "==> ensuring replication role, slot and pg_hba for PITR"
+ssh "$HOST" 'cd /tmp && sudo -u portfolio bash -s' <<'INNER'
+set -e
+if podman container exists postgres && [ -f "$HOME/.config/portfolio/wal.env" ]; then
+  RP=$(grep "^PGPASSWORD=" "$HOME/.config/portfolio/wal.env" | cut -d= -f2)
+  # No heredocs here: nested heredocs inside a bash -s stdin script are
+  # unreliable (the body races the script stream and psql reads nothing).
+  podman exec postgres psql -q -U portfolio -d portfolio \
+    -c "create role replicator with replication login password '$RP';" \
+    2>/dev/null || true
+  podman exec postgres psql -q -v ON_ERROR_STOP=1 -U portfolio -d portfolio \
+    -c "alter role replicator with replication login password '$RP';" \
+    -c "select pg_create_physical_replication_slot('portfolio_wal') where not exists (select from pg_replication_slots where slot_name = 'portfolio_wal');"
+  podman exec postgres bash -c 'grep -q "host replication replicator" $PGDATA/pg_hba.conf || { echo "host replication replicator all scram-sha-256" >> $PGDATA/pg_hba.conf; psql -U portfolio -d portfolio -c "select pg_reload_conf();" >/dev/null; }'
+  echo "replication prerequisites ok"
+else
+  echo "postgres not running or wal.env missing; skipping PITR setup"
+fi
+INNER
+
 echo "==> reloading user services"
 ssh "$HOST" '
   set -e
   uid=$(id -u portfolio)
   run_as() { sudo -u portfolio env XDG_RUNTIME_DIR=/run/user/$uid DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$uid/bus "$@"; }
   run_as systemctl --user daemon-reload
-  run_as systemctl --user enable --now backup.timer restore-test.timer
+  run_as systemctl --user enable --now backup.timer restore-test.timer wal-ship.timer basebackup.timer
   run_as systemctl --user restart caddy.service cloudflared.service
   sleep 3
   run_as systemctl --user --no-pager --plain list-units "caddy.service" "cloudflared.service"

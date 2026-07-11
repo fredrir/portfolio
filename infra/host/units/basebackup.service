@@ -1,0 +1,6 @@
+[Unit]
+Description=Weekly physical base backup for PITR
+
+[Service]
+Type=oneshot
+ExecStart=/home/portfolio/bin/basebackup.sh

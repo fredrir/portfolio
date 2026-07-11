@@ -235,12 +235,16 @@ data "aws_iam_policy_document" "media_reader" {
 data "aws_iam_policy_document" "backup_writer" {
   count = var.create_backup_bucket ? 1 : 0
   statement {
-    sid       = "WriteBackups"
-    effect    = "Allow"
-    actions   = ["s3:PutObject", "s3:GetObject"]
-    resources = ["${aws_s3_bucket.backups[0].arn}/postgres/*"]
+    sid     = "WriteBackups"
+    effect  = "Allow"
+    actions = ["s3:PutObject", "s3:GetObject"]
+    resources = [
+      "${aws_s3_bucket.backups[0].arn}/postgres/*",
+      "${aws_s3_bucket.backups[0].arn}/wal/*",
+      "${aws_s3_bucket.backups[0].arn}/basebackups/*",
+    ]
   }
-  # Restoration tests must find the newest dump.
+  # Restoration tests must find the newest dump/WAL/base backup.
   statement {
     sid       = "ListBackups"
     effect    = "Allow"
@@ -249,7 +253,7 @@ data "aws_iam_policy_document" "backup_writer" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["postgres/*"]
+      values   = ["postgres/*", "wal/*", "basebackups/*"]
     }
   }
 }

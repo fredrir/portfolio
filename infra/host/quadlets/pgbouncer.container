@@ -1,0 +1,20 @@
+[Unit]
+Description=PgBouncer connection pooler
+After=postgres.service
+Wants=postgres.service
+
+[Container]
+Image=docker.io/edoburu/pgbouncer:latest
+ContainerName=pgbouncer
+Network=portfolio.network
+EnvironmentFile=%h/.config/portfolio/pgbouncer.env
+NoNewPrivileges=true
+DropCapability=all
+PodmanArgs=--memory=128m --pids-limit=128
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

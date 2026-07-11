@@ -1,0 +1,9 @@
+[Unit]
+Description=WAL shipping every 15 minutes
+
+[Timer]
+OnCalendar=*-*-* *:00/15:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
