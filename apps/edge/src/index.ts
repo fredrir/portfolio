@@ -49,7 +49,7 @@ function decorate(response: Response, ctx: EdgeContext): Response {
 /** SigV4-signed read of processed media variants; content-hashed keys are immutable. */
 async function serveMedia(url: URL, env: Env, ctx: EdgeContext): Promise<Response> {
   const key = url.pathname.slice("/media/".length);
-  if (!key.startsWith("variants/") || key.includes("..")) {
+  if (!(key.startsWith("variants/") || key.startsWith("cv/")) || key.includes("..")) {
     return decorate(new Response("not found", { status: 404 }), ctx);
   }
   const aws = new AwsClient({

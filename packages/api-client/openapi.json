@@ -50,6 +50,30 @@
         }
       }
     },
+    "/api/v1/cv": {
+      "get": {
+        "tags": [
+          "cv"
+        ],
+        "summary": "Active CV versions per language, mirrored from the CV repository releases.",
+        "operationId": "active_cv",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CvVersion"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/media": {
       "get": {
         "tags": [
@@ -339,6 +363,40 @@
           "upload_url": {
             "type": "string",
             "description": "Presigned S3 PUT URL for the original object."
+          }
+        }
+      },
+      "CvVersion": {
+        "type": "object",
+        "required": [
+          "lang",
+          "release_tag",
+          "sha256",
+          "size_bytes",
+          "updated_at"
+        ],
+        "properties": {
+          "lang": {
+            "type": "string"
+          },
+          "release_tag": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },

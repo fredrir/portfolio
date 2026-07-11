@@ -210,19 +210,25 @@ data "aws_iam_policy_document" "worker" {
     resources = ["${aws_s3_bucket.media.arn}/originals/*"]
   }
   statement {
-    sid       = "WriteVariants"
-    effect    = "Allow"
-    actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.media.arn}/variants/*"]
+    sid     = "WriteProcessedArtifacts"
+    effect  = "Allow"
+    actions = ["s3:PutObject"]
+    resources = [
+      "${aws_s3_bucket.media.arn}/variants/*",
+      "${aws_s3_bucket.media.arn}/cv/*",
+    ]
   }
 }
 
 data "aws_iam_policy_document" "media_reader" {
   statement {
-    sid       = "ReadVariants"
-    effect    = "Allow"
-    actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.media.arn}/variants/*"]
+    sid     = "ReadPublishedArtifacts"
+    effect  = "Allow"
+    actions = ["s3:GetObject"]
+    resources = [
+      "${aws_s3_bucket.media.arn}/variants/*",
+      "${aws_s3_bucket.media.arn}/cv/*",
+    ]
   }
 }
 
