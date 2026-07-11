@@ -33,3 +33,15 @@ variable "enable_workers_vpc" {
   type        = bool
   default     = false
 }
+
+variable "admin_hostname" {
+  description = "Access-protected administration hostname (null disables)"
+  type        = string
+  default     = null
+}
+
+variable "admin_emails" {
+  description = "Identities allowed through the admin Access application"
+  type        = list(string)
+  default     = []
+}

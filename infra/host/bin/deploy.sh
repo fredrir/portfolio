@@ -96,14 +96,25 @@ write_slot() {
     cat > "$SLOTS/active.caddy" <<CADDY
 handle /api/* {
 	header +x-origin-slot $1
-	reverse_proxy api-$1:8080
+	reverse_proxy api-$1:8080 {
+		header_up -x-admin-origin
+	}
 }
 handle /readyz {
 	reverse_proxy api-$1:8080
 }
 handle {
 	header +x-origin-slot $1
-	reverse_proxy web-$1:3000
+	reverse_proxy web-$1:3000 {
+		header_up -x-admin-origin
+	}
+}
+CADDY
+    cat > "$SLOTS/admin.caddy" <<CADDY
+handle {
+	reverse_proxy web-$1:3000 {
+		header_up x-admin-origin 1
+	}
 }
 CADDY
     podman exec caddy caddy reload --config /etc/caddy/Caddyfile 2>/dev/null
