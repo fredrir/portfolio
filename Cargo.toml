@@ -1,6 +1,7 @@
 [workspace]
 resolver = "3"
 members = ["apps/api", "apps/worker"]
+exclude = ["apps/api/fuzz", "apps/worker/fuzz", "crates/terminal-plugins"]
 
 [workspace.package]
 edition = "2024"

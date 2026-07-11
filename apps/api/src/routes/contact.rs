@@ -27,7 +27,7 @@ pub struct ContactAccepted {
     pub id: Uuid,
 }
 
-fn validate(body: &ContactRequest) -> BTreeMap<String, String> {
+pub fn validate(body: &ContactRequest) -> BTreeMap<String, String> {
     let mut errors = BTreeMap::new();
     if body.name.is_empty() {
         errors.insert("name".into(), "Name is required".into());
