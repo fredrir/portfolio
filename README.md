@@ -4,7 +4,10 @@ Personal portfolio built as a small production platform: TanStack Start frontend
 Rust (Axum) API, PostgreSQL, and a private Hetzner origin behind a Cloudflare
 Worker, Access and Tunnel — deployed blue-green from signed, attested images.
 The plan lives in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); the platform
-inspects itself live at [/engineering](https://hansteen.dev/engineering).
+inspects itself live in the Engineering, Deployments, Media Lab and Analytics
+panes on the site. Data heavy-lifting (GitHub, Spotify, analytics, captcha,
+deployments, audit) runs in the Rust API; React only renders. Media is
+administered at `admin.hansteen.dev` behind Cloudflare Access.
 
 ## Layout
 
@@ -13,7 +16,8 @@ inspects itself live at [/engineering](https://hansteen.dev/engineering).
 | `apps/web` | TanStack Start app (Vite, React 19, Tailwind v4) |
 | `apps/api` | Axum API (SQLx, utoipa OpenAPI, RFC 9457 errors) |
 | `apps/worker` | Rust SQS consumer: media variants (AVIF/WebP) + CV release sync |
-| `apps/edge` | Cloudflare Worker: routing, security headers, signed S3 media reads |
+| `apps/edge` | Cloudflare Worker: routing, CSP, DO rate limiting, signed S3 media reads |
+| `crates/terminal-plugins` | WASM terminal command (`fract`), loaded on demand in the browser |
 | `packages/api-client` | TypeScript client generated from the API's OpenAPI document |
 | `infra/terraform` | AWS (S3/SQS/IAM/OIDC) and Cloudflare (Tunnel/DNS/Access) provisioning |
 | `infra/host` | Host bootstrap, rootless quadlets, deploy/rollback/backup scripts |
