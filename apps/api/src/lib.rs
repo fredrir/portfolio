@@ -46,6 +46,7 @@ fn openapi_router() -> OpenApiRouter<AppState> {
         .routes(routes!(routes::contact::submit_contact))
         .routes(routes!(routes::media::create_upload))
         .routes(routes!(routes::media::list_media))
+        .routes(routes!(routes::cv::active_cv))
 }
 
 /// The OpenAPI document describing every registered route.

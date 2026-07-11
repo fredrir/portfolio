@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Active CV versions per language, mirrored from the CV repository releases. */
+        get: operations["active_cv"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media": {
         parameters: {
             query?: never;
@@ -176,6 +193,15 @@ export interface components {
             /** @description Presigned S3 PUT URL for the original object. */
             upload_url: string;
         };
+        CvVersion: {
+            lang: string;
+            release_tag: string;
+            sha256: string;
+            /** Format: int64 */
+            size_bytes: number;
+            updated_at: string;
+            url?: string | null;
+        };
         MediaItem: {
             content_hash?: string | null;
             content_type: string;
@@ -265,6 +291,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    active_cv: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CvVersion"][];
                 };
             };
         };

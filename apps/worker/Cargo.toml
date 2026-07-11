@@ -14,6 +14,7 @@ aws-sdk-sqs = { version = "1", default-features = false, features = ["default-ht
 dotenvy = "0.15"
 hex = "0.4"
 image = { version = "0.25", features = ["avif"] }
+reqwest = { version = "0.13.4", default-features = false, features = ["rustls", "json"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10"

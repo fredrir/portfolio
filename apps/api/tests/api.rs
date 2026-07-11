@@ -219,3 +219,14 @@ async fn media_list_is_empty_without_ready_media(pool: PgPool) {
     assert_eq!(status, StatusCode::OK);
     assert_eq!(body, json!([]));
 }
+
+#[sqlx::test]
+async fn cv_endpoint_empty_without_synced_versions(pool: PgPool) {
+    let (status, body) = send(
+        pool,
+        Request::get("/api/v1/cv").body(Body::empty()).unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body, json!([]));
+}

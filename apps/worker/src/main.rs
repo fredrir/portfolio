@@ -70,6 +70,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     tracing::info!(queue = %ctx.queue_url, bucket = %ctx.bucket, "worker started");
 
+    if std::env::var("CV_SYNC_DISABLED").is_err() {
+        let poll = std::env::var("CV_POLL_SECONDS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(21_600);
+        tokio::spawn(portfolio_worker::cv::run(portfolio_worker::cv::CvSync {
+            pool: ctx.pool.clone(),
+            s3: ctx.s3.clone(),
+            bucket: ctx.bucket.clone(),
+            repo: std::env::var("CV_REPO").unwrap_or_else(|_| "fredrir/CV".into()),
+            poll: Duration::from_secs(poll),
+        }));
+    }
+
     let shutdown = tokio::signal::ctrl_c();
     tokio::pin!(shutdown);
 
