@@ -9,6 +9,61 @@ import { useLayoutTier } from "./use-layout-tier";
 import { useDrag } from "./use-drag";
 import { useResize } from "./use-resize";
 
+/** Persisted arrangement, kept shape-consistent (layout ↔ heights ↔ widths). */
+interface PersistedTiling {
+  layout: CellDef[][];
+  rowHeights: number[];
+  colWidths: number[][];
+}
+
+const VALID_PANE_IDS = new Set(WINDOW_CONFIGS.map((c) => c.id));
+
+function defaultTiling(): PersistedTiling {
+  const tier = LayoutEngine.getTier(
+    typeof window !== "undefined" ? window.innerWidth : 1280,
+  );
+  return {
+    layout: LayoutEngine.cloneLayout(LAYOUT_TIERS[tier].layout),
+    rowHeights: [...DEFAULT_ROW_HEIGHTS],
+    colWidths: LAYOUT_TIERS[tier].colWidths.map((r) => [...r]),
+  };
+}
+
+/**
+ * Restore the saved arrangement only when it is internally consistent and
+ * still references known panes — otherwise fall back to the tier default so a
+ * schema change (new pane ids, changed layout shape) never feeds malformed
+ * state to a returning visitor.
+ */
+function loadTiling(): PersistedTiling {
+  const saved = readJson<PersistedTiling>(KEYS.tiling);
+  if (
+    !saved ||
+    !Array.isArray(saved.layout) ||
+    !Array.isArray(saved.rowHeights) ||
+    !Array.isArray(saved.colWidths) ||
+    saved.layout.length === 0 ||
+    saved.rowHeights.length !== saved.layout.length ||
+    saved.colWidths.length !== saved.layout.length
+  ) {
+    return defaultTiling();
+  }
+  for (let r = 0; r < saved.layout.length; r++) {
+    if (!Array.isArray(saved.layout[r]) || saved.layout[r].length === 0) {
+      return defaultTiling();
+    }
+    if (saved.colWidths[r]?.length !== saved.layout[r].length) {
+      return defaultTiling();
+    }
+    for (const cell of saved.layout[r]) {
+      if (LayoutEngine.getCellPanes(cell).some((id) => !VALID_PANE_IDS.has(id))) {
+        return defaultTiling();
+      }
+    }
+  }
+  return saved;
+}
+
 function getInitialStates(allClosed: boolean): WindowStates {
   const states: WindowStates = {};
 
@@ -33,30 +88,16 @@ export function useTiling(initialAllClosed = false) {
   const [states, setStates] = useState<WindowStates>(() =>
     getInitialStates(initialAllClosed),
   );
-  const [layout, setLayout] = useState<CellDef[][]>(() =>
-    LayoutEngine.cloneLayout(
-      LAYOUT_TIERS[
-        LayoutEngine.getTier(
-          typeof window !== "undefined" ? window.innerWidth : 1280,
-        )
-      ].layout,
-    ),
+  // Layout, row heights and column widths are restored together so their
+  // shapes always match (they are meaningless independently).
+  const initialTiling = useMemo(() => loadTiling(), []);
+  const [layout, setLayout] = useState<CellDef[][]>(initialTiling.layout);
+  const [rowHeights, setRowHeights] = useState<number[]>(
+    initialTiling.rowHeights,
   );
-  const [rowHeights, setRowHeights] = useState<number[]>(() => {
-    const saved = readJson<number[]>(KEYS.rowHeights);
-    return saved ?? [...DEFAULT_ROW_HEIGHTS];
-  });
-  const [colWidths, setColWidths] = useState<number[][]>(() => {
-    const saved = readJson<number[][]>(KEYS.colWidths);
-    return (
-      saved ??
-      LAYOUT_TIERS[
-        LayoutEngine.getTier(
-          typeof window !== "undefined" ? window.innerWidth : 1280,
-        )
-      ].colWidths.map((r) => [...r])
-    );
-  });
+  const [colWidths, setColWidths] = useState<number[][]>(
+    initialTiling.colWidths,
+  );
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [maximizedId, setMaximizedId] = useState<string | null>(null);
   const maxZRef = useRef(100);
@@ -156,9 +197,14 @@ export function useTiling(initialAllClosed = false) {
       .filter(([, s]) => s.isOpen)
       .map(([id]) => id);
     writeJson(KEYS.openPanes, openIds);
-    writeJson(KEYS.rowHeights, rowHeights);
-    writeJson(KEYS.colWidths, colWidths);
-  }, [states, rowHeights, colWidths]);
+    // Persist the arrangement as one shape-consistent blob so drag-swaps and
+    // resizes both survive a reload (and can't drift out of sync).
+    writeJson(KEYS.tiling, {
+      layout,
+      rowHeights,
+      colWidths,
+    } satisfies PersistedTiling);
+  }, [states, layout, rowHeights, colWidths]);
 
   const visibleLayout = LayoutEngine.getVisibleLayout(layout, states);
 

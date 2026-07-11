@@ -56,7 +56,11 @@ confidential.
    exists (runbooks).
 3. **Formspree third-party contact delivery** — message content leaves our
    trust domain until the queue-worker delivery consumer replaces it.
-4. **Supabase legacy surface** — gallery storage and spotify cache still
-   read with the anon key until gallery media migrates to the S3 pipeline.
-5. **No CSP yet** — the window-manager UI needs an inline-style audit
-   before a policy can be enforced; other security headers are in place.
+4. **CSP relies on `'unsafe-inline'`** — a Content-Security-Policy is enforced
+   at the edge on every response, but script/style still allow `'unsafe-inline'`
+   (the window-manager UI needs an inline audit before nonces/hashes can
+   replace it). All other security headers are in place.
+
+Resolved since the initial model: Supabase is out of every runtime path — the
+gallery and Spotify data now come from the Axum API and S3 (ADR 0009); only the
+one-off `scripts/migrate-*.ts` still reference it.

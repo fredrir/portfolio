@@ -11,9 +11,9 @@ the edge).
 
 Enabling `early_hints` and `0rtt` zone settings requires an API token with
 Zone Settings:Edit, which the current infrastructure token lacks (403 on
-PATCH). One-minute fix: extend the token in the Cloudflare dashboard, restore
-the `cloudflare_zone_setting` resources (git history: commit that removed
-them) and `terraform apply`. Early Hints additionally needs `Link:
+PATCH). One-minute fix: extend the token in the Cloudflare dashboard, add
+`cloudflare_zone_setting` resources for `early_hints`/`0rtt` to the
+`cloudflare-ingress` module and `terraform apply`. Early Hints additionally needs `Link:
 rel=preload` response headers for the hashed CSS/JS bundles — worth wiring in
 the web tier at the same time; measure via `server-timing` cold-load deltas.
 

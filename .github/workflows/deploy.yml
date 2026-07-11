@@ -21,9 +21,9 @@ jobs:
   # feat → minor, otherwise patch. Idempotent: a commit already tagged reuses
   # its tag so re-runs don't inflate the version.
   version:
+    # Only main reaches production (guards manual workflow_dispatch on any ref).
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     outputs:
       version: ${{ steps.compute.outputs.version }}
       tag: ${{ steps.compute.outputs.tag }}
@@ -59,18 +59,8 @@ jobs:
           echo "version=$NEXT" >> "$GITHUB_OUTPUT"
           echo "tag=v$NEXT" >> "$GITHUB_OUTPUT"
           echo "resolved version: v$NEXT"
-      - name: Tag the release commit
-        run: |
-          set -euo pipefail
-          TAG="${{ steps.compute.outputs.tag }}"
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "$TAG already exists; skipping"
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git tag -a "$TAG" -m "Release $TAG"
-            git push origin "$TAG"
-          fi
+          # The tag is created by the release job only after a successful
+          # deploy, so a failed build never burns a version number.
 
   checks:
     runs-on: ubuntu-latest
@@ -99,6 +89,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: bun install --frozen-lockfile
       - run: bun run --filter '@portfolio/web' typecheck
+      - run: bun run --filter '@portfolio/edge' typecheck
+      - run: cargo clippy --workspace --all-targets -- -D warnings
       - run: cargo test --workspace
 
   build:
@@ -204,7 +196,7 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
-      - name: Publish GitHub Release
+      - name: Tag and publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -214,13 +206,16 @@ jobs:
             echo "release $TAG already published"
             exit 0
           fi
+          # Creates the tag at this exact deployed commit AND the release in one
+          # step — the tag only ever exists for a release that reached production.
           gh release create "$TAG" \
+            --target "$GITHUB_SHA" \
             --title "$TAG" \
             --generate-notes \
             --notes "Deployed to production from \`${GITHUB_SHA}\`. Images: \`ghcr.io/fredrir/portfolio-{web,api,worker}:${GITHUB_SHA}\` (SBOM + provenance attested, keyless-Cosign signed, signature-verified on the host)."
 
   edge:
-    needs: [deploy]
+    needs: [checks, deploy]
     runs-on: ubuntu-latest
     # Requires a Cloudflare API token with Workers Scripts:Edit +
     # Workers Routes:Edit stored as CLOUDFLARE_WORKERS_API_TOKEN.
@@ -231,8 +226,16 @@ jobs:
         with:
           bun-version-file: package.json
       - run: bun install --frozen-lockfile
+      - run: bun run --filter '@portfolio/edge' typecheck
       - name: Deploy edge Worker
         working-directory: apps/edge
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_API_TOKEN }}
         run: bunx wrangler deploy
+      - name: Smoke the edge route
+        run: |
+          set -e
+          sleep 5
+          code=$(curl -s -o /dev/null -w '%{http_code}' -m 15 https://hansteen.dev/en)
+          echo "apex /en -> $code"
+          [ "$code" = "200" ]

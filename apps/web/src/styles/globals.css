@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Self-hosted Roboto (fontsource) replaces next/font. */
+/* Self-hosted Roboto via @fontsource. */
 html {
   --font-roboto: "Roboto", ui-sans-serif, system-ui, sans-serif;
 }

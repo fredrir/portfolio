@@ -26,16 +26,24 @@ tar -C "$(dirname "$0")" -cf - quadlets caddy bin units | ssh "$HOST" '
   install -o portfolio -g portfolio -m 644 /tmp/portfolio-host/units/* /home/portfolio/.config/systemd/user/
   install -o portfolio -g portfolio -m 644 /tmp/portfolio-host/caddy/Caddyfile /home/portfolio/caddy/Caddyfile
   install -o portfolio -g portfolio -m 755 /tmp/portfolio-host/bin/* /home/portfolio/bin/
-  if [ ! -f /home/portfolio/caddy/slots/active.caddy ]; then
-    printf "handle {\n\trespond \"no application deployed yet\" 503\n}\n" > /home/portfolio/caddy/slots/active.caddy
-    chown portfolio:portfolio /home/portfolio/caddy/slots/active.caddy
-  fi
+  # Seed both slot fragments the Caddyfile imports so Caddy can start on a
+  # fresh host before the first deploy writes the real routing.
+  for slot in active admin; do
+    if [ ! -f "/home/portfolio/caddy/slots/$slot.caddy" ]; then
+      printf "handle {\n\trespond \"no application deployed yet\" 503\n}\n" > "/home/portfolio/caddy/slots/$slot.caddy"
+      chown portfolio:portfolio "/home/portfolio/caddy/slots/$slot.caddy"
+    fi
+  done
   rm -rf /tmp/portfolio-host
 '
 
 echo "==> installing tunnel connector token"
-TOKEN=$(curl -sf "https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/cfd_tunnel/${TUNNEL_ID}/token" \
-  -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" | python3 -c "import json,sys; print(json.load(sys.stdin)['result'])")
+# Pass the API token via a curl config on stdin so it never appears in argv
+# (visible to other users via ps on a shared host). printf is a shell builtin,
+# so it forks no process that would expose the token either.
+TOKEN=$(printf 'url = "https://api.cloudflare.com/client/v4/accounts/%s/cfd_tunnel/%s/token"\nheader = "Authorization: Bearer %s"\n' \
+    "$ACCOUNT_ID" "$TUNNEL_ID" "$CLOUDFLARE_API_TOKEN" \
+  | curl -sf -K - | python3 -c "import json,sys; print(json.load(sys.stdin)['result'])")
 printf 'TUNNEL_TOKEN=%s\n' "$TOKEN" | ssh "$HOST" '
   umask 077
   cat > /home/portfolio/.config/portfolio/cloudflared.env
@@ -66,15 +74,15 @@ echo "==> ensuring replication role, slot and pg_hba for PITR"
 ssh "$HOST" 'cd /tmp && sudo -u portfolio bash -s' <<'INNER'
 set -e
 if podman container exists postgres && [ -f "$HOME/.config/portfolio/wal.env" ]; then
-  RP=$(grep "^PGPASSWORD=" "$HOME/.config/portfolio/wal.env" | cut -d= -f2)
-  # No heredocs here: nested heredocs inside a bash -s stdin script are
-  # unreliable (the body races the script stream and psql reads nothing).
-  podman exec postgres psql -q -U portfolio -d portfolio \
-    -c "create role replicator with replication login password '$RP';" \
-    2>/dev/null || true
-  podman exec postgres psql -q -v ON_ERROR_STOP=1 -U portfolio -d portfolio \
-    -c "alter role replicator with replication login password '$RP';" \
-    -c "select pg_create_physical_replication_slot('portfolio_wal') where not exists (select from pg_replication_slots where slot_name = 'portfolio_wal');"
+  # -f2- keeps everything after the first '=' in case the value contains one.
+  RP=$(grep "^PGPASSWORD=" "$HOME/.config/portfolio/wal.env" | cut -d= -f2-)
+  # Feed SQL over stdin (printf is a shell builtin, podman exec -i reads
+  # stdin) so the password never appears in any process argv — it would be
+  # visible via ps to the other tenant on this shared host otherwise.
+  printf "create role replicator with replication login password '%s';\n" "$RP" \
+    | podman exec -i postgres psql -q -U portfolio -d portfolio 2>/dev/null || true
+  printf "alter role replicator with replication login password '%s';\nselect pg_create_physical_replication_slot('portfolio_wal') where not exists (select from pg_replication_slots where slot_name = 'portfolio_wal');\n" "$RP" \
+    | podman exec -i postgres psql -q -v ON_ERROR_STOP=1 -U portfolio -d portfolio
   podman exec postgres bash -c 'grep -q "host replication replicator" $PGDATA/pg_hba.conf || { echo "host replication replicator all scram-sha-256" >> $PGDATA/pg_hba.conf; psql -U portfolio -d portfolio -c "select pg_reload_conf();" >/dev/null; }'
   echo "replication prerequisites ok"
 else

@@ -5,6 +5,9 @@ use image::{DynamicImage, ImageFormat, ImageReader, Limits};
 use sha2::{Digest, Sha256};
 
 const MAX_DIMENSION: u32 = 12_000;
+/// Upper bound on the image crate's decode allocation (~256 MB), independent of
+/// the per-dimension cap: guards against small files that decode huge.
+const MAX_DECODE_ALLOC: u64 = 256 * 1024 * 1024;
 const AVIF_SPEED: u8 = 8;
 const AVIF_QUALITY: u8 = 62;
 const WEBP_QUALITY: f32 = 82.0;
@@ -60,6 +63,9 @@ pub fn process_image(original: &[u8]) -> Result<Processed, ProcessError> {
     let mut limits = Limits::default();
     limits.max_image_width = Some(MAX_DIMENSION);
     limits.max_image_height = Some(MAX_DIMENSION);
+    // Cap decode allocation so a small file that decodes to a huge canvas
+    // (e.g. 12000×12000 → ~576 MB) cannot OOM the CPU-only host.
+    limits.max_alloc = Some(MAX_DECODE_ALLOC);
     reader.limits(limits);
 
     let decoded = reader

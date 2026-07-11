@@ -121,7 +121,7 @@ export class CommandProcessor {
           output: {
             command,
             output: `fredrir v${PORTFOLIO_VERSION}
-Built with Next.js + Tailwind
+Built with TanStack Start + Rust (Axum) + Tailwind
 Type 'help' for available commands
 Repository: https://github.com/fredrir/portfolio
 Author: ${MY_NAME}`,

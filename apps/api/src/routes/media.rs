@@ -285,7 +285,7 @@ pub async fn list_media(
          left join media_variants v on v.media_id = m.id \
          where (m.state = 'ready' or $1) \
            and ($2::text is null or m.category = $2) \
-         order by m.created_at desc, v.format",
+         order by m.created_at desc, m.id, v.format",
     )
     .bind(include_pending)
     .bind(&params.category)

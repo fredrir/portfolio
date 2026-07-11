@@ -219,6 +219,15 @@ async fn handle_record(ctx: &Ctx, record: &S3Record) -> Result<(), WorkerError> 
         .send()
         .await
         .map_err(|e| WorkerError::Transient(format!("get_object: {e}")))?;
+    // Reject oversized objects from the advertised length before buffering the
+    // whole body into memory.
+    if let Some(len) = object.content_length()
+        && len > MAX_ORIGINAL_BYTES as i64
+    {
+        return Err(WorkerError::Permanent(format!(
+            "original is {len} bytes; limit is {MAX_ORIGINAL_BYTES}"
+        )));
+    }
     let original = object
         .body
         .collect()

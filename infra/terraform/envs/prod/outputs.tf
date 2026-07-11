@@ -25,3 +25,7 @@ output "tunnel_id" {
 output "access_service_token_client_id" {
   value = module.ingress.access_service_token_id
 }
+
+output "ci_reader_role_arn" {
+  value = module.github_oidc.reader_role_arn
+}

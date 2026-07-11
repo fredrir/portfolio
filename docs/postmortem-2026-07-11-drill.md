@@ -37,7 +37,7 @@ the broken slot never received a request.
   end to end under failure conditions.
 - The health gate did its one job: no healthy probes, no switch.
 - Failure is observable: deploy job red, `deploys.log` records the attempt,
-  the engineering page's deployment history shows the failed run publicly.
+  the Deployments pane shows the failed run publicly.
 - The previous release kept running in its slot, making recovery a plain
   redeploy rather than a restore.
 
