@@ -22,6 +22,12 @@ variable "origin_service" {
   default     = "http://caddy:8080"
 }
 
+variable "edge_hostnames" {
+  description = "Hostnames routed to the edge Worker (proxied placeholder records; routes live in wrangler config)"
+  type        = list(string)
+  default     = []
+}
+
 variable "enable_workers_vpc" {
   description = "Use Workers VPC private origins instead of the Access service-token fallback (pending plan verification)"
   type        = bool

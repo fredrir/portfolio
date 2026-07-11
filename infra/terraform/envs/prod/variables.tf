@@ -40,3 +40,8 @@ variable "create_oidc_provider" {
   type    = bool
   default = true
 }
+
+variable "edge_hostnames" {
+  type    = list(string)
+  default = []
+}

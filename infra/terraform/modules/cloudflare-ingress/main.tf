@@ -41,6 +41,17 @@ resource "cloudflare_dns_record" "origin" {
   ttl     = 1
 }
 
+# Proxied placeholder records so Worker routes on these hostnames activate.
+resource "cloudflare_dns_record" "edge" {
+  for_each = toset(var.edge_hostnames)
+  zone_id  = var.zone_id
+  name     = each.value
+  type     = "AAAA"
+  content  = "100::"
+  proxied  = true
+  ttl      = 1
+}
+
 # Fallback ingress control while Workers VPC availability is unverified:
 # the origin hostname is wrapped in an Access application whose only
 # non-interactive path is a service token held by the edge Worker.

@@ -1,0 +1,12 @@
+{
+  "name": "portfolio-edge",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "new.hansteen.dev/*", "zone_name": "hansteen.dev" }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

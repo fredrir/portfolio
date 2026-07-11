@@ -48,5 +48,6 @@ module "ingress" {
   zone_id            = var.cloudflare_zone_id
   hostname           = var.hostname
   tunnel_name        = "${var.project}-origin"
+  edge_hostnames     = var.edge_hostnames
   enable_workers_vpc = var.enable_workers_vpc
 }
