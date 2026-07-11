@@ -35,3 +35,8 @@ variable "enable_workers_vpc" {
   type    = bool
   default = false
 }
+
+variable "create_oidc_provider" {
+  type    = bool
+  default = true
+}

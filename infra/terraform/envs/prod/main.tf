@@ -35,10 +35,11 @@ module "media" {
 }
 
 module "github_oidc" {
-  source            = "../../modules/github-oidc"
-  project           = var.project
-  github_repository = var.github_repository
-  state_bucket      = var.state_bucket
+  source               = "../../modules/github-oidc"
+  project              = var.project
+  github_repository    = var.github_repository
+  state_bucket         = var.state_bucket
+  create_oidc_provider = var.create_oidc_provider
 }
 
 module "ingress" {

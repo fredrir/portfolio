@@ -17,3 +17,9 @@ variable "allowed_subs" {
   type        = list(string)
   default     = null
 }
+
+variable "create_oidc_provider" {
+  description = "Create the account-wide GitHub OIDC provider; false references the existing one (it is a per-account singleton shared with other projects)"
+  type        = bool
+  default     = true
+}
