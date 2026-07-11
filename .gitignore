@@ -6,8 +6,11 @@ node_modules/
 # testing
 coverage/
 
-# next.js
+# build output
 .next/
+.output/
+.nitro/
+.tanstack/
 out/
 
 # rust
