@@ -55,7 +55,11 @@ async function existing(): Promise<Set<string>> {
   });
   if (!res.ok) throw new Error(`media list failed: ${res.status}`);
   const items = (await res.json()) as { filename: string; category?: string | null }[];
-  return new Set(items.map((m) => `${m.category ?? ""}/${m.filename}`));
+  // Match the key the upload path checks: the API stores an already-sanitized
+  // filename, so sanitize both sides or re-runs create duplicates.
+  return new Set(
+    items.map((m) => `${m.category ?? ""}/${sanitizeFilename(m.filename)}`),
+  );
 }
 
 function sanitizeFilename(name: string): string {
