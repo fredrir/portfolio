@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { UiStrings } from "@/i18n/types";
-import { getSpotifyData } from "@/server/spotify";
+import { getSpotifyData } from "@/server/listening";
 import { useRecaptcha } from "@/shared/components/recaptcha-provider";
 import { useContainerSize } from "@/shared/hooks/use-container-size";
 import type { SpotifyData } from "@/shared/types";
 import { CavaVisualizer } from "./components/cava-visualizer";
 import NowPlaying from "./components/now-playing";
+import SpotifyCard from "./components/pane-card";
 import { RecentTracks } from "./components/recent-tracks";
-import SpotifyCard from "./components/spotify-card";
 import { TopArtists } from "./components/top-artists";
 import { SPOTIFY_POLL_INTERVAL } from "./constants";
 

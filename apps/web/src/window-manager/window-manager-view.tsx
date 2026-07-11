@@ -50,7 +50,7 @@ const SettingsPaneLazy = lazy(() =>
   import("@/panes/settings").then((m) => ({ default: m.SettingsPane })),
 );
 const SpotifyPaneLazy = lazy(() =>
-  import("@/panes/spotify").then((m) => ({ default: m.SpotifyPane })),
+  import("@/panes/listening").then((m) => ({ default: m.SpotifyPane })),
 );
 const TerminalPaneLazy = lazy(() =>
   import("@/terminal").then((m) => ({ default: m.TerminalPane })),

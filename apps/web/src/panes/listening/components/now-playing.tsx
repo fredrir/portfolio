@@ -5,7 +5,7 @@ import Image from "@/shared/components/image";
 import type { SpotifyData } from "@/shared/types";
 import { SPOTIFY_ASCII } from "../constants";
 import { formatTime, relativeTime } from "../utils";
-import { SpotifyEmbed } from "./spotify-embed";
+import { SpotifyEmbed } from "./track-embed";
 
 interface Props {
   displayData: SpotifyData;
