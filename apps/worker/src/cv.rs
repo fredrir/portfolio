@@ -31,7 +31,6 @@ struct Asset {
     browser_download_url: String,
 }
 
-/// Language encoded in the CV build's asset naming convention.
 pub fn lang_for_asset(name: &str) -> Option<&'static str> {
     let lower = name.to_lowercase();
     if !lower.ends_with(".pdf") {

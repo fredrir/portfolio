@@ -1,15 +1,12 @@
 import { AwsClient } from "aws4fetch";
 
 export interface Env {
-  /** Access service token pair presented to the private origin. */
   CF_ACCESS_CLIENT_ID: string;
   CF_ACCESS_CLIENT_SECRET: string;
-  /** Read-only credential scoped to GetObject on the variants/ prefix. */
   MEDIA_AWS_ACCESS_KEY_ID: string;
   MEDIA_AWS_SECRET_ACCESS_KEY: string;
   MEDIA_BUCKET: string;
   AWS_REGION: string;
-  /** Overridable for previews; defaults to the production origin. */
   ORIGIN_HOST?: string;
 }
 

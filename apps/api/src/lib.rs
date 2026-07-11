@@ -22,9 +22,7 @@ pub struct AppState {
 #[derive(Clone)]
 pub struct MediaConfig {
     pub bucket: String,
-    /// Bearer token for the administration endpoints; None disables them.
     pub admin_token: Option<String>,
-    /// Public base URL for serving media variants, if configured.
     pub public_base_url: Option<String>,
 }
 
@@ -49,7 +47,6 @@ fn openapi_router() -> OpenApiRouter<AppState> {
         .routes(routes!(routes::cv::active_cv))
 }
 
-/// The OpenAPI document describing every registered route.
 pub fn openapi_spec() -> utoipa::openapi::OpenApi {
     openapi_router().split_for_parts().1
 }
