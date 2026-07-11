@@ -110,17 +110,21 @@ Restore to time T:
 1. Fetch the newest base backup older than T and unpack it into a fresh data
    directory: `aws s3 cp s3://…/basebackups/base-<stamp>.tar.gz - | gunzip |
    tar -x -C /restore` (base.tar contains the cluster; pg_wal is empty).
-2. Fetch WAL: `aws s3 sync s3://…/wal/ /restore-wal/` and rename any
-   `.partial` segment to its final name if it is the last one needed.
+2. Fetch WAL: `aws s3 sync s3://…/wal/ /restore-wal/`.
 3. In the restored data dir create `recovery.signal` and set in
    `postgresql.auto.conf`:
-   `restore_command = 'cp /restore-wal/%f %p'`
+   `restore_command = 'cp /restore-wal/%f %p || cp /restore-wal/%f.partial %p'`
    `recovery_target_time = '<T ISO8601>'`
    `recovery_target_action = 'promote'`
-4. Start a disposable postgres container mounting the data dir; watch logs
-   until "recovery stopping before commit" + promotion; validate row counts.
+   The `.partial` fallback matters: the most recent transactions live in the
+   segment pg_receivewal has not finished, and without the fallback recovery
+   stops early with "recovery ended before configured recovery target".
+4. Start a disposable postgres container mounting the data dir (rootless
+   podman: `podman unshare chown -R 70:70` the data dir first, run with
+   `--user 70:70`); wait for promotion; validate row counts.
 5. For production recovery, follow the DR runbook with this data directory in
    place of the pg_dump restore.
 
-Drill: see the verification section of the batch plan — a row written after
-the base backup must survive replay to a target time after its commit.
+Drilled 2026-07-11: a marker row committed at 20:09:03Z (after the 19:26Z
+base backup) was recovered into a disposable instance via WAL replay,
+including the `.partial` segment.
