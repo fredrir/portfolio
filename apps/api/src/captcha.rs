@@ -7,6 +7,8 @@ struct SiteVerifyResponse {
     success: bool,
     score: Option<f64>,
     action: Option<String>,
+    #[serde(default, rename = "error-codes")]
+    error_codes: Vec<String>,
 }
 
 /// Server-side reCAPTCHA v3 verification.
@@ -55,7 +57,19 @@ pub async fn verify(
         }
     };
 
-    body.success
-        && body.score.map(|s| s >= min_score).unwrap_or(true)
-        && body.action.as_deref() == Some(expected_action)
+    let score_passed = body.score.map(|s| s >= min_score).unwrap_or(true);
+    let action_passed = body.action.as_deref() == Some(expected_action);
+    let passed = body.success && score_passed && action_passed;
+    if !passed {
+        tracing::warn!(
+            expected_action,
+            actual_action = body.action.as_deref(),
+            score = body.score,
+            min_score,
+            error_codes = ?body.error_codes,
+            "captcha verification failed"
+        );
+    }
+
+    passed
 }

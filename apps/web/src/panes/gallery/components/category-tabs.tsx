@@ -14,6 +14,7 @@ export function CategoryTabs({
       {categories.map((cat) => (
         <button
           key={cat.name}
+          type="button"
           onClick={() => onSelect(cat.name)}
           className={`whitespace-nowrap rounded px-2 @sm:py-1 py-0.5 text-2xs transition-all ${
             activeCategory === cat.name

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { GalleryImage } from "@/server/gallery";
 import { formatDate } from "../utils";
 import { Thumbnail } from "./thumbnail";
@@ -6,16 +7,29 @@ export function ImageGrid({
   images,
   narrow,
   compact,
+  activeIndex,
+  onActiveIndexChange,
   onSelect,
 }: {
   images: GalleryImage[];
   narrow: boolean;
   compact: boolean;
+  activeIndex: number;
+  onActiveIndexChange: (index: number) => void;
   onSelect: (image: GalleryImage) => void;
 }) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollerRef.current
+      ?.querySelector<HTMLElement>(`[data-gallery-index="${activeIndex}"]`)
+      ?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
+
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto">
+    <div ref={scrollerRef} className="min-h-0 flex-1 overflow-y-auto">
       <div
+        data-gallery-grid
         className={`grid gap-3 ${
           narrow
             ? "grid-cols-2"
@@ -24,11 +38,19 @@ export function ImageGrid({
               : "@lg:grid-cols-7 @md:grid-cols-6 @sm:grid-cols-5 @xs:grid-cols-4 grid-cols-3"
         }`}
       >
-        {images.map((img) => (
+        {images.map((img, index) => (
           <button
             key={img.src}
+            type="button"
+            data-gallery-index={index}
+            aria-current={activeIndex === index ? "true" : undefined}
             onClick={() => onSelect(img)}
-            className="group relative overflow-hidden rounded border border-control-border bg-black/10 transition-all hover:border-control-border-hover"
+            onFocus={() => onActiveIndexChange(index)}
+            className={`group relative overflow-hidden rounded border bg-black/10 transition-all hover:border-control-border-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-muted ${
+              activeIndex === index
+                ? "border-primary-muted ring-1 ring-primary-hint"
+                : "border-control-border"
+            }`}
           >
             <div className="aspect-[4/3]">
               <Thumbnail

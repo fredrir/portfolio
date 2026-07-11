@@ -239,6 +239,10 @@ pub struct GalleryImage {
     pub original_src: String,
     pub filename: String,
     pub date: Option<String>,
+    pub content_type: String,
+    pub size_bytes: i64,
+    pub width: Option<i32>,
+    pub height: Option<i32>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -275,6 +279,11 @@ struct MediaListRow {
 #[derive(sqlx::FromRow)]
 struct GalleryRow {
     filename: String,
+    original_key: String,
+    content_type: String,
+    size_bytes: i64,
+    width: Option<i32>,
+    height: Option<i32>,
     category: String,
     variant_key: String,
 }
@@ -402,8 +411,8 @@ pub async fn gallery(
     let public_base_url = public_base_url.trim_end_matches('/');
 
     let rows: Vec<GalleryRow> = sqlx::query_as(
-        "select m.filename, coalesce(m.category, 'uncategorized') as category, \
-                v.key as variant_key \
+        "select m.filename, m.original_key, m.content_type, m.size_bytes, m.width, m.height, \
+                coalesce(m.category, 'uncategorized') as category, v.key as variant_key \
          from media m \
          join lateral ( \
              select format, key \
@@ -420,14 +429,19 @@ pub async fn gallery(
     let mut by_category = BTreeMap::<String, Vec<GalleryImage>>::new();
     for row in rows {
         let src = format!("{public_base_url}/{}", row.variant_key);
+        let original_src = format!("{public_base_url}/{}", row.original_key);
         by_category
             .entry(row.category)
             .or_default()
             .push(GalleryImage {
-                src: src.clone(),
-                original_src: src,
+                src,
+                original_src,
                 filename: row.filename.clone(),
                 date: parse_date_from_filename(&row.filename),
+                content_type: row.content_type,
+                size_bytes: row.size_bytes,
+                width: row.width,
+                height: row.height,
             });
     }
 

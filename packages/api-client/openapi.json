@@ -885,9 +885,14 @@
         "required": [
           "src",
           "originalSrc",
-          "filename"
+          "filename",
+          "contentType",
+          "sizeBytes"
         ],
         "properties": {
+          "contentType": {
+            "type": "string"
+          },
           "date": {
             "type": [
               "string",
@@ -897,11 +902,29 @@
           "filename": {
             "type": "string"
           },
+          "height": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
           "originalSrc": {
             "type": "string"
           },
+          "sizeBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
           "src": {
             "type": "string"
+          },
+          "width": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
           }
         }
       },

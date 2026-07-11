@@ -99,8 +99,12 @@ bun install
 bun run dev                                 # db/localstack + API + web
 bun run dev:web                             # web app only, http://localhost:3000
 bun run dev:api                             # API only, http://localhost:8080
+bun run dev:seed                            # idempotent local media seed
 doppler run -- cargo run -p portfolio-worker
 ```
+
+`bun run dev` seeds LocalStack/Postgres with bundled gallery fixtures once the
+API is healthy. Set `DEV_SEED_MEDIA=0` when you need an empty local media table.
 
 ### Checks
 

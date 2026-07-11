@@ -7,6 +7,10 @@ export interface GalleryImage {
   originalSrc: string;
   filename: string;
   date?: string;
+  contentType?: string;
+  sizeBytes?: number;
+  width?: number;
+  height?: number;
 }
 
 export interface GalleryCategory {
@@ -61,6 +65,10 @@ export const getGalleryData = createServerFn()
         originalSrc: image.originalSrc,
         filename: image.filename,
         date: image.date ?? undefined,
+        contentType: image.contentType,
+        sizeBytes: image.sizeBytes,
+        width: image.width ?? undefined,
+        height: image.height ?? undefined,
       })),
     }));
 

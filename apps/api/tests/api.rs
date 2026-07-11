@@ -556,8 +556,12 @@ async fn gallery_groups_ready_media_with_public_urls(pool: PgPool) {
     );
     assert_eq!(
         body[0]["images"][0]["originalSrc"],
-        body[0]["images"][0]["src"]
+        "https://media.example.test/assets/originals/first.jpg"
     );
     assert_eq!(body[0]["images"][0]["date"], "2026-07-11T12:34:56");
+    assert_eq!(body[0]["images"][0]["contentType"], "image/jpeg");
+    assert_eq!(body[0]["images"][0]["sizeBytes"], 100);
+    assert_eq!(body[0]["images"][0]["width"], 32);
+    assert_eq!(body[0]["images"][0]["height"], 32);
     assert_eq!(body[1]["name"], "uncategorized");
 }

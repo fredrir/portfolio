@@ -92,14 +92,7 @@ export function SpotifyPane({
         }
       : data;
   const errorText =
-    displayData?.ok === false
-      ? ui.error.replace(
-          "{error}",
-          displayData.error && displayData.error !== "spotify_unavailable"
-            ? displayData.error
-            : ui.spotifyUnavailable,
-        )
-      : "";
+    displayData?.ok === false ? ui.error.replace("{error}", ui.spotifyUnavailable) : "";
 
   return (
     <div className="h-full overflow-hidden @sm:px-3 px-2 leading-relaxed">

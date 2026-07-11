@@ -14,6 +14,7 @@ const localDefaults: Record<string, string> = {
   AWS_REGION: "eu-north-1",
   AWS_ENDPOINT_URL: "http://127.0.0.1:4566",
   MEDIA_BUCKET: "portfolio-media-dev",
+  MEDIA_PUBLIC_BASE_URL: "http://localhost:4566/portfolio-media-dev",
   ADMIN_TOKEN: "dev-admin-token",
   RECAPTCHA_SECRET_KEY: "",
   VITE_RECAPTCHA_SITE_KEY: "",
@@ -67,6 +68,36 @@ async function apiIsHealthy() {
   } finally {
     clearTimeout(timeout);
   }
+}
+
+function seedDisabled() {
+  return ["0", "false", "no"].includes((process.env.DEV_SEED_MEDIA ?? "").toLowerCase());
+}
+
+async function seedWhenApiIsReady(env: NodeJS.ProcessEnv) {
+  if (seedDisabled()) {
+    console.log("[dev] media seed disabled by DEV_SEED_MEDIA");
+    return;
+  }
+
+  const deadline = Date.now() + 180_000;
+  while (Date.now() < deadline) {
+    if (await apiIsHealthy()) {
+      console.log("[dev] seeding local media fixtures");
+      const result = spawnSync("bun", ["scripts/seed-dev-media.ts"], {
+        cwd: root,
+        env,
+        stdio: "inherit",
+      });
+      if (result.status !== 0) {
+        console.warn(`[dev] media seed failed with code ${result.status ?? 1}; continuing`);
+      }
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+  }
+
+  console.warn("[dev] api did not become healthy before media seed timeout");
 }
 
 function start(name: string, command: string, args: string[], env: NodeJS.ProcessEnv) {
@@ -232,6 +263,8 @@ if (await apiIsHealthy()) {
 } else {
   startWatchedApi(envWithDefaults());
 }
+
+void seedWhenApiIsReady(envWithDefaults());
 
 start(
   "web",

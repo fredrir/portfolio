@@ -408,10 +408,17 @@ export interface components {
             name: string;
         };
         GalleryImage: {
+            contentType: string;
             date?: string | null;
             filename: string;
+            /** Format: int32 */
+            height?: number | null;
             originalSrc: string;
+            /** Format: int64 */
+            sizeBytes: number;
             src: string;
+            /** Format: int32 */
+            width?: number | null;
         };
         /** @description Mirrors the shape the frontend consumed from the old TypeScript fetcher. */
         GitHubData: {

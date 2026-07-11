@@ -46,6 +46,7 @@ services:
       AWS_REGION: eu-north-1
       AWS_ENDPOINT_URL: http://localstack:4566
       MEDIA_BUCKET: portfolio-media-dev
+      MEDIA_PUBLIC_BASE_URL: http://localhost:4566/portfolio-media-dev
       ADMIN_TOKEN: dev-admin-token
     ports:
       - "127.0.0.1:8080:8080"
