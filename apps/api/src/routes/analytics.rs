@@ -106,7 +106,10 @@ async fn hogql(
     key: &str,
     query: &str,
 ) -> Result<Vec<Vec<serde_json::Value>>, String> {
-    let url = format!("{}/api/projects/{project}/query", state.upstreams.posthog);
+    // Trailing slash matters: PostHog 301-redirects "/query" and reqwest
+    // downgrades the redirected POST to a GET (which lists saved queries —
+    // an empty-but-valid "results" that reads as zero events).
+    let url = format!("{}/api/projects/{project}/query/", state.upstreams.posthog);
     let res = state
         .http
         .post(&url)
