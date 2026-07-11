@@ -1,0 +1,8 @@
+# Origin entrypoint behind the Cloudflare tunnel. The active blue/green
+# routing lives in slots/active.caddy, rewritten by the deploy script.
+:8080 {
+	handle /healthz {
+		respond "origin alive" 200
+	}
+	import /etc/caddy/slots/active.caddy
+}

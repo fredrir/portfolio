@@ -1,0 +1,40 @@
+name: Infra
+
+on:
+  push:
+    branches-ignore: [main]
+    paths: ["infra/**", ".github/workflows/infra.yml"]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths: ["infra/**", ".github/workflows/infra.yml"]
+
+concurrency:
+  group: infra-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        root: [bootstrap, envs/prod, envs/preview]
+    defaults:
+      run:
+        working-directory: infra/terraform/${{ matrix.root }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.6"
+      - run: terraform fmt -check -recursive
+        working-directory: infra/terraform
+      - run: terraform init -backend=false
+      - run: terraform validate
+
+  tflint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: terraform-linters/setup-tflint@v4
+      - run: tflint --init && tflint --recursive --minimum-failure-severity=error
+        working-directory: infra/terraform

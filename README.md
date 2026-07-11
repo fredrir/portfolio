@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# hansteen.dev
 
-## Getting Started
+Personal portfolio built as a small production platform: TanStack Start frontend,
+Rust (Axum) API, PostgreSQL, and a private Hetzner origin behind Cloudflare.
+The full architecture and delivery plan live in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-First, run the development server:
+## Layout
+
+| Path | What it is |
+|---|---|
+| `apps/web` | TanStack Start app (Vite, React 19, Tailwind v4) |
+| `apps/api` | Axum API (SQLx, utoipa OpenAPI, RFC 9457 errors) |
+| `apps/worker` | Rust SQS consumer: validates uploads, generates AVIF/WebP variants |
+| `packages/api-client` | TypeScript client generated from the API's OpenAPI document |
+| `infra/terraform` | AWS (S3/SQS/IAM/OIDC) and Cloudflare (Tunnel/DNS/Access) provisioning |
+| `docs/` | Architecture plan, decisions, and the shared-VPS audit |
+| `scripts/` | One-off tooling (e.g. Supabase → Postgres visitor migration) |
+
+## Development
+
+Requirements: [Bun](https://bun.sh), Rust (stable), Docker with compose, and the
+[Doppler CLI](https://docs.doppler.com/docs/cli) (`doppler login`). Configuration
+lives in the Doppler project `portfolio` (`dev`/`preview`/`prd`); `doppler.yaml`
+binds this repo to the `dev` config — there is no `.env` file
+(`.env.example` documents the variable names).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+doppler setup --no-interactive              # once per checkout
+docker compose up -d                        # Postgres 17 (5432) + LocalStack S3/SQS (4566)
+bun install
+
+bun run dev                                 # web app on http://localhost:3000 (wraps `doppler run`)
+doppler run -- cargo run -p portfolio-api   # API on http://localhost:8080
+doppler run -- cargo run -p portfolio-worker
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The web `dev` script invokes `doppler run` internally, so it needs no prefix; the
+Rust binaries still take an explicit `doppler run --`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The media flow runs fully locally: `POST /api/v1/media/uploads` (bearer
+`ADMIN_TOKEN`) returns a presigned S3 PUT; the S3 event fans through SQS to the
+worker, which produces AVIF/WebP variants and flips the record to `ready`.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Checks
 
-## Learn More
+```bash
+bun run --filter '@portfolio/web' lint typecheck build
+cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace      # integration tests use disposable per-test databases
+cd packages/api-client && bun run check   # fails if the generated client drifted
+```
 
-To learn more about Next.js, take a look at the following resources:
+The same checks run in CI on every branch push and pull request.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Regenerating the API client
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+After changing API routes or schemas in `apps/api`:
 
-## Deploy on Vercel
+```bash
+cd packages/api-client && bun run generate
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Production-like containers
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+GIT_SHA=$(git rev-parse HEAD) docker compose --profile app up --build
+```
+
+Runs db + api + web with read-only root filesystems. Web serves on
+`localhost:3000`, API on `localhost:8080`; the deployed version is visible at
+`/api/v1/version`.

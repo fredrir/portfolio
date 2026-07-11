@@ -1,0 +1,6 @@
+[advisories]
+ignore = [
+    # rsa is pinned in the lockfile via sqlx's optional MySQL backend but is
+    # never compiled: this workspace enables only the postgres features.
+    "RUSTSEC-2023-0071",
+]
