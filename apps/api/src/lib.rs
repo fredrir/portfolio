@@ -1,12 +1,16 @@
 pub mod problem;
 pub mod routes;
 
+use axum::http::HeaderName;
 use axum::{Json, Router};
 use sqlx::PgPool;
+use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::trace::TraceLayer;
 use utoipa::OpenApi;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
+
+const REQUEST_ID: HeaderName = HeaderName::from_static("x-request-id");
 
 #[derive(Clone)]
 pub struct AppState {
@@ -51,11 +55,28 @@ pub fn openapi_spec() -> utoipa::openapi::OpenApi {
 
 pub fn app(state: AppState) -> Router {
     let (router, api) = openapi_router().split_for_parts();
+    let trace = TraceLayer::new_for_http().make_span_with(|request: &axum::http::Request<_>| {
+        let request_id = request
+            .headers()
+            .get(REQUEST_ID)
+            .and_then(|v| v.to_str().ok())
+            .unwrap_or("-");
+        tracing::info_span!(
+            "request",
+            method = %request.method(),
+            uri = %request.uri(),
+            request_id = %request_id,
+        )
+    });
     router
         .route(
             "/api/openapi.json",
             axum::routing::get(|| async { Json(api) }),
         )
-        .layer(TraceLayer::new_for_http())
+        // Edge-assigned request id flows into every span and back out on the
+        // response; generated locally when absent (direct/internal calls).
+        .layer(PropagateRequestIdLayer::new(REQUEST_ID))
+        .layer(trace)
+        .layer(SetRequestIdLayer::new(REQUEST_ID, MakeRequestUuid))
         .with_state(state)
 }
