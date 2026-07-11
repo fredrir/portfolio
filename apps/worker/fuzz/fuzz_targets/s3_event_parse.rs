@@ -6,7 +6,7 @@ fuzz_target!(|data: &[u8]| {
     if let Ok(text) = std::str::from_utf8(data) {
         if let Ok(message) = serde_json::from_str::<S3EventMessage>(text) {
             for record in &message.records {
-                let _ = record.s3.object.decoded_key();
+                let _ = record.decoded_key();
             }
         }
     }
