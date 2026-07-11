@@ -512,26 +512,22 @@ The current application stores gallery, visitor and contact data in Supabase
 self-hosted PostgreSQL but never says so. Phase 1 must include: schema recreation in SQLx
 migrations, data export/import from Supabase, and removal of `@supabase/supabase-js`.
 
-### 2. Shared VPS constrains hardening, Terraform and DR (blocks Phase 3)
+### 2. Shared VPS constrains hardening, Terraform and DR — RESOLVED 2026-07-11
 
-The VPS also hosts other projects under user `leploy`. Consequences:
+Audited; see [vps-audit.md](vps-audit.md). Summary: the host already has no public web
+ingress (only sshd on 22; leploy's stack uses its own Cloudflare Tunnel under rootful
+Docker), so there is no firewall conflict. Decisions: keep ufw (no raw nftables rewrite),
+Terraform never manages the shared server resource, DR rebuild exercises use a scratch
+server, and moving SSH behind Cloudflare Access is deferred until coordinated with
+leploy's access needs.
 
-- **Firewall**: "close public 80/443" cannot be applied host-wide until an audit confirms
-  none of leploy's projects serve public HTTP from this host. Hetzner Cloud Firewalls are
-  per-server, not per-user.
-- **Terraform**: the server pre-exists and is shared. Terraform must not manage the server
-  resource itself (or must import it and never plan a destroy). Scope Terraform to
-  additive resources: firewall rules, DNS, Cloudflare, AWS.
-- **Disaster recovery**: the "provision a blank replacement VPS" exercise rebuilds a host
-  that leploy's projects depend on. Either run the exercise on a scratch server, or move
-  this platform to a dedicated VPS.
-
-### 3. Workers VPC availability must be verified (blocks Phase 3)
+### 3. Workers VPC availability must be verified (blocks final Phase 3 routing)
 
 Workers VPC private origins is a recent Cloudflare feature; confirm it is available on the
-account's plan before building routing around it. Fallback that preserves "no public
-origin ports": Tunnel public hostname restricted by a Cloudflare Access service token that
-only the Worker presents.
+account's plan before building routing around it (requires an authenticated wrangler or a
+Cloudflare API token). Until confirmed, the default ingress design is the fallback that
+preserves "no public origin ports": Tunnel public hostname restricted by a Cloudflare
+Access service token that only the Worker presents.
 
 ### 4. Vercel exit
 
