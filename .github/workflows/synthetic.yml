@@ -19,7 +19,7 @@ jobs:
       - name: Public endpoints respond
         run: |
           set -e
-          for path in /healthz /en /api/v1/version /sitemap.xml /engineering; do
+          for path in /healthz /en /api/v1/version /sitemap.xml /api/v1/analytics; do
             code=$(curl -s -o /dev/null -w '%{http_code}' -m 15 "$BASE_URL$path")
             echo "$path -> $code"
             [ "$code" = "200" ]
