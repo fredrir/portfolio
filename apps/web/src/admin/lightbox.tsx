@@ -71,8 +71,7 @@ export function Lightbox({
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const copy = t.lightbox;
-  const stateKey =
-    item.state === "ready" || item.state === "failed" ? item.state : "processing";
+  const stateKey = item.state === "ready" || item.state === "failed" ? item.state : "processing";
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -154,9 +153,7 @@ export function Lightbox({
           </div>
 
           <div className="flex flex-wrap gap-1">
-            <Badge tone={STATE_TONE[item.state] ?? "warn"}>
-              {t.library.filters[stateKey]}
-            </Badge>
+            <Badge tone={STATE_TONE[item.state] ?? "warn"}>{t.library.filters[stateKey]}</Badge>
             <Badge tone="idle">{item.category ?? t.library.uncategorized}</Badge>
           </div>
 

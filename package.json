@@ -8,6 +8,7 @@
     "packages/*"
   ],
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
     "dev": "bun scripts/dev.ts",
     "dev:web": "bun run --filter @portfolio/web dev",
     "dev:api": "doppler run --preserve-env=DATABASE_URL,API_ADDR,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION,AWS_ENDPOINT_URL,MEDIA_BUCKET,ADMIN_TOKEN,RECAPTCHA_SECRET_KEY -- cargo run -p portfolio-api",

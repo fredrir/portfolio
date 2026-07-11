@@ -1,25 +1,29 @@
 import type { RefObject } from "react";
 
 interface LogMarkers {
+  okToken: string;
+  okBadge: string;
+  failedToken: string;
+  failedBadge: string;
   sentPrefix: string;
   errorPrefix: string;
   connectionErrorPrefix: string;
 }
 
 function formatLine(line: string, markers: LogMarkers): React.ReactNode {
-  if (line.includes("[  OK  ]")) {
+  if (line.includes(markers.okToken)) {
     return (
       <span>
-        {line.replace("[  OK  ]", "")}
-        <span className="text-terminal-ok">[ OK ]</span>
+        {line.replace(markers.okToken, "")}
+        <span className="text-terminal-ok">{markers.okBadge}</span>
       </span>
     );
   }
-  if (line.includes("[FAILED]")) {
+  if (line.includes(markers.failedToken)) {
     return (
       <span>
-        {line.replace("[FAILED]", "")}
-        <span className="text-terminal-error">[FAILED]</span>
+        {line.replace(markers.failedToken, "")}
+        <span className="text-terminal-error">{markers.failedBadge}</span>
       </span>
     );
   }

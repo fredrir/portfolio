@@ -1,4 +1,6 @@
 import { type ChildProcess, spawn, spawnSync } from "node:child_process";
+import { readdir, stat } from "node:fs/promises";
+import path from "node:path";
 import process from "node:process";
 
 const root = process.cwd();
@@ -15,11 +17,22 @@ const localDefaults: Record<string, string> = {
   ADMIN_TOKEN: "dev-admin-token",
   RECAPTCHA_SECRET_KEY: "",
   VITE_RECAPTCHA_SITE_KEY: "",
+  VITE_HIDE_COOKIE_CONSENT: "true",
+  VITE_SKIP_TUTORIAL: "true",
 };
 
 const preserveEnv = Object.keys(localDefaults).join(",");
 const children = new Map<string, ChildProcess>();
 let stopping = false;
+const apiWatchPaths = [
+  "Cargo.lock",
+  "Cargo.toml",
+  "apps/api/Cargo.toml",
+  "apps/api/migrations",
+  "apps/api/src",
+  "apps/api/tests",
+];
+const apiWatchExtensions = new Set([".rs", ".sql", ".toml"]);
 
 function envWithDefaults(extra: Record<string, string> = {}) {
   const env = { ...process.env, ...extra };
@@ -89,6 +102,103 @@ function start(name: string, command: string, args: string[], env: NodeJS.Proces
   });
 }
 
+async function latestMtime(relativePath: string): Promise<number> {
+  const absolutePath = path.join(root, relativePath);
+  try {
+    const info = await stat(absolutePath);
+    if (info.isDirectory()) {
+      const entries = await readdir(absolutePath, { withFileTypes: true });
+      const childMtimes = await Promise.all(
+        entries
+          .filter((entry) => !entry.name.startsWith(".") && entry.name !== "target")
+          .map((entry) => latestMtime(path.join(relativePath, entry.name))),
+      );
+      return Math.max(info.mtimeMs, ...childMtimes);
+    }
+    return apiWatchExtensions.has(path.extname(relativePath)) ? info.mtimeMs : 0;
+  } catch {
+    return 0;
+  }
+}
+
+async function apiFingerprint() {
+  const mtimes = await Promise.all(apiWatchPaths.map((watchPath) => latestMtime(watchPath)));
+  return Math.max(0, ...mtimes);
+}
+
+function startWatchedApi(env: NodeJS.ProcessEnv) {
+  let child: ChildProcess | null = null;
+  let restarting = false;
+  let restartTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const launch = () => {
+    console.log("[dev] starting api");
+    child = spawn(
+      "doppler",
+      ["run", `--preserve-env=${preserveEnv}`, "--", "cargo", "run", "-p", "portfolio-api"],
+      {
+        cwd: root,
+        env,
+        stdio: "inherit",
+      },
+    );
+    children.set("api", child);
+
+    child.on("exit", (code, signal) => {
+      children.delete("api");
+      child = null;
+      if (stopping) return;
+      if (restarting) {
+        restarting = false;
+        launch();
+        return;
+      }
+      console.error(
+        `[dev] api exited${signal ? ` from ${signal}` : ` with code ${code}`}; waiting for file changes`,
+      );
+    });
+
+    child.on("error", (error) => {
+      children.delete("api");
+      child = null;
+      console.error("[dev] failed to start api:", error);
+    });
+  };
+
+  const restart = () => {
+    if (stopping) return;
+    if (restartTimer) clearTimeout(restartTimer);
+    restartTimer = setTimeout(() => {
+      console.log("[dev] api change detected; restarting");
+      if (child && child.exitCode === null && !child.killed) {
+        restarting = true;
+        const oldChild = child;
+        oldChild.kill("SIGTERM");
+        setTimeout(() => {
+          if (oldChild.exitCode === null && !oldChild.killed) {
+            oldChild.kill("SIGKILL");
+          }
+        }, 5000).unref();
+      } else {
+        launch();
+      }
+    }, 150);
+  };
+
+  launch();
+
+  void (async () => {
+    let previous = await apiFingerprint();
+    setInterval(async () => {
+      const next = await apiFingerprint();
+      if (next > previous) {
+        previous = next;
+        restart();
+      }
+    }, 1000);
+  })();
+}
+
 function stopChildren(signal: NodeJS.Signals) {
   for (const child of children.values()) {
     if (child.exitCode === null && !child.killed) {
@@ -120,12 +230,7 @@ runSetup();
 if (await apiIsHealthy()) {
   console.log(`[dev] using existing api at ${localDefaults.API_URL}`);
 } else {
-  start(
-    "api",
-    "doppler",
-    ["run", `--preserve-env=${preserveEnv}`, "--", "cargo", "run", "-p", "portfolio-api"],
-    envWithDefaults(),
-  );
+  startWatchedApi(envWithDefaults());
 }
 
 start(

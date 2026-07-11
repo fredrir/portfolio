@@ -102,10 +102,10 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
     order: 10,
     isExternal: true,
     href: {
-      en: "/cv-en.pdf",
-      fr: "/cv-en.pdf",
-      nb: "/cv-nb.pdf",
-      nn: "/cv-nb.pdf",
+      en: "/cv/en",
+      fr: "/cv/en",
+      nb: "/cv/nb",
+      nn: "/cv/nb",
     },
   },
   {

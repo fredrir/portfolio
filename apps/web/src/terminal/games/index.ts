@@ -1,5 +1,5 @@
-import type { TerminalGame } from "../types";
 import type { TerminalStrings } from "../translations";
+import type { TerminalGame } from "../types";
 import { Game2048 } from "./2048";
 import { SnakeGame } from "./snake";
 

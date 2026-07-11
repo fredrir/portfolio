@@ -265,6 +265,10 @@ export function ContactPane({ contact }: ContactProps) {
           lines={sendLog}
           logEndRef={logEndRef}
           markers={{
+            okToken: contact.log.okToken,
+            okBadge: contact.log.okBadge,
+            failedToken: contact.log.failedToken,
+            failedBadge: contact.log.failedBadge,
             sentPrefix: contact.log.sentPrefix,
             errorPrefix: contact.log.errorPrefix,
             connectionErrorPrefix: contact.log.connectionErrorPrefix,

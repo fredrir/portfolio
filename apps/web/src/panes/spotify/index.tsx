@@ -91,6 +91,15 @@ export function SpotifyPane({
           durationMs: undefined,
         }
       : data;
+  const errorText =
+    displayData?.ok === false
+      ? ui.error.replace(
+          "{error}",
+          displayData.error && displayData.error !== "spotify_unavailable"
+            ? displayData.error
+            : ui.spotifyUnavailable,
+        )
+      : "";
 
   return (
     <div className="h-full overflow-hidden @sm:px-3 px-2 leading-relaxed">
@@ -98,9 +107,7 @@ export function SpotifyPane({
         <div className="min-h-0 flex-1 overflow-y-auto">
           <SpotifyCard title="/proc/spotify/recently-played" command="cat ">
             {displayData?.ok === false ? (
-              <p className="py-2 text-muted-foreground text-xs">
-                error: {displayData.error ?? "spotify_unavailable"}
-              </p>
+              <p className="py-2 text-muted-foreground text-xs">{errorText}</p>
             ) : displayData?.title ? (
               <NowPlaying displayData={displayData} ui={ui} locale={locale} compact={compact} />
             ) : (

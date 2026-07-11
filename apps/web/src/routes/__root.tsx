@@ -10,6 +10,8 @@ import { RecaptchaProvider } from "@/shared/components/recaptcha-provider";
 import { NotificationProvider } from "@/shared/notification";
 import globalsCss from "@/styles/globals.css?url";
 
+const SHOW_COOKIE_CONSENT = import.meta.env.VITE_HIDE_COOKIE_CONSENT !== "true";
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -57,7 +59,7 @@ function RootComponent() {
             <RecaptchaProvider>
               <NotificationProvider>
                 <Outlet />
-                <CookieConsentBanner locale={locale} />
+                {SHOW_COOKIE_CONSENT && <CookieConsentBanner locale={locale} />}
                 <PosthogGate />
               </NotificationProvider>
             </RecaptchaProvider>

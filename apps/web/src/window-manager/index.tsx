@@ -34,7 +34,7 @@ export function WindowManager({ currentLocale, dict, githubData, spotifyData }: 
   const focus = useFocus(wm);
 
   useTutorialSync(tutorial, wm);
-  useTipNotification(tutorial.isActive, ui);
+  useTipNotification(tutorial.isActive, ui, isMobile);
 
   const view = useWindowManagerView({
     dict,

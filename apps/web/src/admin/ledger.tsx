@@ -82,9 +82,7 @@ export function Ledger({ audit, t }: { audit: AdminAuditEntry[]; t: AdminStrings
       )}
 
       {audit.length === 0 ? (
-        <p className="py-4 text-center text-muted-foreground text-xs">
-          {t.ledger.empty}
-        </p>
+        <p className="py-4 text-center text-muted-foreground text-xs">{t.ledger.empty}</p>
       ) : (
         <ol>
           {visible.map((entry, i) => {

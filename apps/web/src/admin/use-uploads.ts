@@ -63,10 +63,7 @@ function putWithProgress(
  * S3 PUT with byte progress → poll until the worker settles the item.
  * `onLanded` fires once per job that reaches "ready".
  */
-export function useUploads(
-  onLanded: () => void,
-  errors: AdminStrings["uploadErrors"],
-) {
+export function useUploads(onLanded: () => void, errors: AdminStrings["uploadErrors"]) {
   const [jobs, setJobs] = useState<UploadJob[]>([]);
   const landedRef = useRef(new Set<string>());
   const onLandedRef = useRef(onLanded);

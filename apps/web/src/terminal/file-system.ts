@@ -101,7 +101,8 @@ export function createFileSystem(
               "profile.txt": {
                 name: "profile.txt",
                 type: "file",
-                content: `${MY_NAME} - ${t.profileDeveloperOf}\n` + `${t.profileContact}: ${MY_EMAIL}`,
+                content:
+                  `${MY_NAME} - ${t.profileDeveloperOf}\n` + `${t.profileContact}: ${MY_EMAIL}`,
               },
               ".bashrc": {
                 name: ".bashrc",

@@ -42,6 +42,10 @@ const IMMUTABLE_PATH = /^\/assets\//;
 
 const GENERAL_LIMIT = { bucket: "general", limit: 300, windowMs: 60_000 };
 const API_WRITE_LIMIT = { bucket: "api-write", limit: 20, windowMs: 60_000 };
+const LEGACY_CV_PATHS: Record<string, string> = {
+  "/cv-en.pdf": "/cv/en",
+  "/cv-nb.pdf": "/cv/nb",
+};
 
 interface EdgeContext {
   requestId: string;
@@ -75,6 +79,15 @@ function decorate(response: Response, ctx: EdgeContext): Response {
     statusText: response.statusText,
     headers,
   });
+}
+
+function legacyCvRedirect(url: URL, ctx: EdgeContext): Response | null {
+  const target = LEGACY_CV_PATHS[url.pathname];
+  if (!target) return null;
+
+  const location = new URL(target, url);
+  location.search = url.search;
+  return decorate(Response.redirect(location.toString(), 302), ctx);
 }
 
 /** Drop Cloudflare Access cookies so origin auth relies only on the service token. */
@@ -224,6 +237,11 @@ export default {
     // not pass through this Worker.
     if (url.pathname === "/admin" || url.pathname.startsWith("/admin/")) {
       return decorate(new Response("not found", { status: 404 }), ctx);
+    }
+
+    const cvRedirect = legacyCvRedirect(url, ctx);
+    if (cvRedirect) {
+      return cvRedirect;
     }
 
     // Immutable, content-hashed assets and media are cache-friendly and

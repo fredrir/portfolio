@@ -437,6 +437,10 @@
       "sendingBytes": "Sending {bytes} bytes ...",
       "deliveryOk": "Message delivery ................... [  OK  ]",
       "deliveryFailed": "Message delivery ................... [FAILED]",
+      "okToken": "[  OK  ]",
+      "okBadge": "[ OK ]",
+      "failedToken": "[FAILED]",
+      "failedBadge": "[FAILED]",
       "sent": "Mail sent successfully. Queue ID: {queueId}",
       "sentPrefix": "Mail sent successfully.",
       "error": "Error: {error}",
@@ -537,6 +541,8 @@
       "analytics": "analytics"
     },
     "loading": "loading...",
+    "error": "error: {error}",
+    "spotifyUnavailable": "Spotify is unavailable",
     "albumArt": "Album art",
     "platform": {
       "common": {

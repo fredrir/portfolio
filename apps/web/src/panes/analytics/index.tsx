@@ -78,9 +78,7 @@ export function AnalyticsPane({ ui }: { ui: UiStrings }) {
               ariaLabel={(peak) => `${common.dailySeriesPeak} ${peak}`}
             />
             {data.total === 0 && (
-              <p className="mt-1 text-2xs text-muted-foreground">
-                {t.noVisits}
-              </p>
+              <p className="mt-1 text-2xs text-muted-foreground">{t.noVisits}</p>
             )}
           </Instrument>
 

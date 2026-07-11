@@ -437,6 +437,10 @@
       "sendingBytes": "Envoi de {bytes} octets ...",
       "deliveryOk": "Livraison du message .............. [  OK  ]",
       "deliveryFailed": "Livraison du message .............. [FAILED]",
+      "okToken": "[  OK  ]",
+      "okBadge": "[ OK ]",
+      "failedToken": "[FAILED]",
+      "failedBadge": "[FAILED]",
       "sent": "Message envoyé. ID de file : {queueId}",
       "sentPrefix": "Message envoyé.",
       "error": "Erreur : {error}",
@@ -537,6 +541,8 @@
       "analytics": "analytics"
     },
     "loading": "chargement...",
+    "error": "erreur : {error}",
+    "spotifyUnavailable": "Spotify est indisponible",
     "albumArt": "Pochette d'album",
     "platform": {
       "common": {

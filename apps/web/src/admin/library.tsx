@@ -215,9 +215,7 @@ export function Library({
       ) : visible.length === 0 ? (
         <div className="flex flex-col items-center gap-1.5 py-8 text-muted-foreground">
           <ImageSquare size={22} />
-          <p className="text-xs">
-            {media.length === 0 ? library.empty : library.noMatches}
-          </p>
+          <p className="text-xs">{media.length === 0 ? library.empty : library.noMatches}</p>
         </div>
       ) : (
         <div className="grid gap-1.5 [grid-template-columns:repeat(auto-fill,minmax(8rem,1fr))]">

@@ -5,13 +5,18 @@ import type { UiStrings } from "@/i18n/types";
 import { KEYS, read, write } from "@/lib/storage";
 import { useNotification } from "@/shared/notification";
 
-export function useTipNotification(tutorialActive: boolean, ui: UiStrings) {
+export function useTipNotification(
+  tutorialActive: boolean,
+  ui: UiStrings,
+  isMobile: boolean | null,
+) {
   const notification = useNotification();
   const notifRef = useRef(notification);
   notifRef.current = notification;
   const firedRef = useRef(false);
 
   useEffect(() => {
+    if (isMobile !== false) return;
     if (tutorialActive || firedRef.current) return;
     if (read(KEYS.tipDismissed, true)) return;
     firedRef.current = true;
@@ -31,5 +36,5 @@ export function useTipNotification(tutorialActive: boolean, ui: UiStrings) {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [tutorialActive, ui]);
+  }, [isMobile, tutorialActive, ui]);
 }

@@ -6,6 +6,8 @@ import { useIsMobile } from "@/shared/hooks/use-is-mobile";
 import { TUTORIAL_STEPS } from "./constants";
 import type { TutorialChoices, TutorialStep } from "./types";
 
+const SKIP_TUTORIAL_BY_DEFAULT = import.meta.env.VITE_SKIP_TUTORIAL === "true";
+
 interface SavedState {
   stepIndex: number;
   choices: TutorialChoices;
@@ -31,16 +33,19 @@ function getDefaultChoices(locale: string): TutorialChoices {
 export function useTutorial(locale: string) {
   const isMobile = useIsMobile() === true;
   const [isActive, setIsActive] = useState(() => {
+    if (SKIP_TUTORIAL_BY_DEFAULT) return false;
     const saved = peekSavedState();
     if (saved) return true;
     return shouldShowTutorial();
   });
 
   const [stepIndex, setStepIndex] = useState(() => {
+    if (SKIP_TUTORIAL_BY_DEFAULT) return 0;
     return peekSavedState()?.stepIndex ?? 0;
   });
 
   const [choices, setChoices] = useState<TutorialChoices>(() => {
+    if (SKIP_TUTORIAL_BY_DEFAULT) return getDefaultChoices(locale);
     return peekSavedState()?.choices ?? getDefaultChoices(locale);
   });
 

@@ -71,11 +71,7 @@ export function DeploymentsPane({ ui }: { ui: UiStrings }) {
           }
         >
           {loading && <p className="py-2 text-muted-foreground text-xs">{t.readingHistory}</p>}
-          {error && (
-            <p className="py-2 text-muted-foreground text-xs">
-              {t.historyUnavailable}
-            </p>
-          )}
+          {error && <p className="py-2 text-muted-foreground text-xs">{t.historyUnavailable}</p>}
           <div className="space-y-px">
             {runs.map((run, i) => {
               const tone = toneFor(run.conclusion);
@@ -117,10 +113,7 @@ export function DeploymentsPane({ ui }: { ui: UiStrings }) {
                     <StatusDot tone={tone} />
                   ) : (
                     <span className="w-14 shrink-0 text-right text-3xs text-muted-foreground">
-                      {relativeTimeWithLabels(
-                        run.started_at,
-                        ui.platform.common.relativeTime,
-                      )}
+                      {relativeTimeWithLabels(run.started_at, ui.platform.common.relativeTime)}
                     </span>
                   )}
                   {isLive && <Badge tone="ok">{t.live}</Badge>}

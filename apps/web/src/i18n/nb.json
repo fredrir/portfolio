@@ -437,6 +437,10 @@
       "sendingBytes": "Sender {bytes} byte ...",
       "deliveryOk": "Meldingslevering .................. [  OK  ]",
       "deliveryFailed": "Meldingslevering .................. [FAILED]",
+      "okToken": "[  OK  ]",
+      "okBadge": "[ OK ]",
+      "failedToken": "[FAILED]",
+      "failedBadge": "[FAILED]",
       "sent": "E-post sendt. Kø-ID: {queueId}",
       "sentPrefix": "E-post sendt.",
       "error": "Feil: {error}",
@@ -537,6 +541,8 @@
       "analytics": "analytics"
     },
     "loading": "laster...",
+    "error": "feil: {error}",
+    "spotifyUnavailable": "Spotify er utilgjengelig",
     "albumArt": "Albumomslag",
     "platform": {
       "common": {

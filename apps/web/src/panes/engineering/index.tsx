@@ -124,9 +124,7 @@ export function EngineeringPane({ ui }: { ui: UiStrings }) {
             </div>
           ))}
         </div>
-        <p className="mt-2 text-3xs text-muted-foreground">
-          {t.privatePathNote}
-        </p>
+        <p className="mt-2 text-3xs text-muted-foreground">{t.privatePathNote}</p>
       </Instrument>
 
       <div className="grid grid-cols-3 gap-2">
