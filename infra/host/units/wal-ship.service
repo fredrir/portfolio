@@ -1,0 +1,6 @@
+[Unit]
+Description=Ship WAL segments to S3
+
+[Service]
+Type=oneshot
+ExecStart=/home/portfolio/bin/wal-ship.sh

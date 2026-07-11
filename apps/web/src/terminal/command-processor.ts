@@ -28,6 +28,7 @@ const COMMANDS: CommandDef[] = [
   { name: "close <pane>", descKey: "closeDesc" },
   { name: "snake", descKey: "snakeDesc" },
   { name: "2048", descKey: "game2048Desc" },
+  { name: "fract [zoom]", descKey: "fractDesc" },
 ];
 
 export const COMMAND_NAMES = COMMANDS.map((c) => c.name.split(" ")[0]);
@@ -155,6 +156,13 @@ Author: ${MY_NAME}`,
 
       case "close":
         return this.handleCloseCommand(command, args);
+
+      case "fract": {
+        return {
+          output: { command, output: this.t.runningFract },
+          action: { type: "wasmPlugin", payload: `fract ${args.join(" ")}`.trim() },
+        };
+      }
 
       case "snake":
         if (this.isStandalone) {

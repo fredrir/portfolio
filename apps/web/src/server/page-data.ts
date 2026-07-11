@@ -2,8 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { getDictionary } from "@/i18n/dictionaries";
 import { locales, type Locale } from "@/i18n/types";
-import { fetchGitHubData } from "@/lib/github";
-import { fetchSpotifyData } from "@/lib/spotify";
+import { api, traceHeaders } from "@/server/api";
+import type { GitHubData } from "@/shared/types";
 
 export const getPageData = createServerFn()
   .validator((data: { locale: Locale }) => {
@@ -13,10 +13,17 @@ export const getPageData = createServerFn()
     return data;
   })
   .handler(async ({ data }) => {
-    const [dict, githubData, spotifyData] = await Promise.all([
+    const [dict, github] = await Promise.all([
       getDictionary(data.locale),
-      fetchGitHubData(),
-      fetchSpotifyData(),
+      api
+        .GET("/api/v1/github", { headers: traceHeaders() })
+        .catch(() => ({ data: null })),
     ]);
-    return { locale: data.locale, dict, githubData, spotifyData };
+    // Spotify is captcha-gated and loads client-side in its pane.
+    return {
+      locale: data.locale,
+      dict,
+      githubData: (github.data ?? null) as GitHubData | null,
+      spotifyData: null as null,
+    };
   });

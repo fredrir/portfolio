@@ -1,20 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import { verifyCaptcha } from "@/lib/captcha";
-import { fetchSpotifyData } from "@/lib/spotify";
+import { api, traceHeaders } from "@/server/api";
 import type { SpotifyData } from "@/shared/types";
 
+// Thin pass-through: OAuth, caching and captcha verification live in the API.
 export const getSpotifyData = createServerFn({ method: "POST" })
   .validator((captchaToken: string) => captchaToken)
   .handler(async ({ data: captchaToken }): Promise<SpotifyData> => {
-    const captcha = await verifyCaptcha({
-      minScore: 0.3,
-      token: captchaToken,
-      expectedAction: "spotify_data",
+    const { data, error } = await api.GET("/api/v1/spotify", {
+      params: { query: { recaptcha_token: captchaToken } },
+      headers: traceHeaders(),
     });
-    if (!captcha.ok) {
-      return { ok: false, error: "captcha_failed" };
+    if (error || !data) {
+      return { ok: false, error: "spotify_unavailable" };
     }
-
-    return fetchSpotifyData();
+    return data as SpotifyData;
   });

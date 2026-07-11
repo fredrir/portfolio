@@ -1,8 +1,16 @@
 # Origin entrypoint behind the Cloudflare tunnel. The active blue/green
-# routing lives in slots/active.caddy, rewritten by the deploy script.
+# routing lives in slots/*.caddy, rewritten by the deploy script.
 :8080 {
 	handle /healthz {
 		respond "origin alive" 200
 	}
+
+	# Administration vhost: only reachable through the Access-gated
+	# admin hostname; marks requests so the web tier can verify origin.
+	@admin host admin.hansteen.dev
+	handle @admin {
+		import /etc/caddy/slots/admin.caddy
+	}
+
 	import /etc/caddy/slots/active.caddy
 }

@@ -73,6 +73,8 @@ jobs:
           build-args: |
             GIT_SHA=${{ github.sha }}
             VITE_RECAPTCHA_SITE_KEY=${{ vars.VITE_RECAPTCHA_SITE_KEY }}
+            VITE_POSTHOG_KEY=${{ vars.VITE_POSTHOG_KEY }}
+            VITE_POSTHOG_HOST=${{ vars.VITE_POSTHOG_HOST }}
           provenance: mode=max
           sbom: true
           cache-from: type=gha,scope=${{ matrix.image }}
@@ -105,6 +107,20 @@ jobs:
             -o IdentitiesOnly=yes \
             "portfolio@$DEPLOY_HOST" "deploy $GITHUB_SHA"
 
+      - name: Record failed deployment status
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ID=$(gh api "repos/$GITHUB_REPOSITORY/deployments" --input - --jq .id <<EOF
+          {"ref":"$GITHUB_SHA","environment":"production","auto_merge":false,"required_contexts":[]}
+          EOF
+          )
+          gh api "repos/$GITHUB_REPOSITORY/deployments/$ID/statuses" \
+            -f state=failure \
+            -f environment=production \
+            -f log_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
       - name: Record GitHub deployment
         if: success()
         env:
@@ -118,3 +134,21 @@ jobs:
             -f state=success \
             -f environment=production \
             -f log_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+  edge:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    # Requires a Cloudflare API token with Workers Scripts:Edit +
+    # Workers Routes:Edit stored as CLOUDFLARE_WORKERS_API_TOKEN.
+    if: vars.EDGE_CD_ENABLED == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - run: bun install --frozen-lockfile
+      - name: Deploy edge Worker
+        working-directory: apps/edge
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_API_TOKEN }}
+        run: bunx wrangler deploy

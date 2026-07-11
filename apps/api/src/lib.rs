@@ -1,9 +1,15 @@
+pub mod audit;
+pub mod captcha;
 pub mod problem;
 pub mod routes;
+
+use std::sync::Arc;
+use std::time::Instant;
 
 use axum::http::HeaderName;
 use axum::{Json, Router};
 use sqlx::PgPool;
+use tokio::sync::RwLock;
 use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::trace::TraceLayer;
 use utoipa::OpenApi;
@@ -17,14 +23,67 @@ pub struct AppState {
     pub pool: PgPool,
     pub s3: aws_sdk_s3::Client,
     pub media: MediaConfig,
+    pub http: reqwest::Client,
+    pub upstreams: Arc<Upstreams>,
+    pub caches: Caches,
+}
+
+/// External service locations and credentials. Base URLs are overridable so
+/// tests can point them at unroutable addresses for deterministic failures.
+pub struct Upstreams {
+    pub github_api: String,
+    pub github_html: String,
+    pub spotify_api: String,
+    pub spotify_accounts: String,
+    pub recaptcha: String,
+    pub posthog: String,
+    pub github_username: String,
+    pub github_repo: String,
+    pub recaptcha_secret: Option<String>,
+    pub spotify_client_id: Option<String>,
+    pub spotify_client_secret: Option<String>,
+    pub spotify_refresh_token: Option<String>,
+    pub posthog_api_key: Option<String>,
+    pub posthog_project_id: Option<String>,
+}
+
+impl Upstreams {
+    pub fn from_env() -> Self {
+        let env_or =
+            |key: &str, default: &str| std::env::var(key).unwrap_or_else(|_| default.to_owned());
+        let opt = |key: &str| std::env::var(key).ok().filter(|v| !v.is_empty());
+        Self {
+            github_api: env_or("GITHUB_API_BASE", "https://api.github.com"),
+            github_html: env_or("GITHUB_HTML_BASE", "https://github.com"),
+            spotify_api: env_or("SPOTIFY_API_BASE", "https://api.spotify.com"),
+            spotify_accounts: env_or("SPOTIFY_ACCOUNTS_BASE", "https://accounts.spotify.com"),
+            recaptcha: env_or("RECAPTCHA_BASE", "https://www.google.com"),
+            posthog: env_or("POSTHOG_BASE", "https://eu.posthog.com"),
+            github_username: env_or("GITHUB_USERNAME", "fredrir"),
+            github_repo: env_or("GITHUB_REPO", "fredrir/portfolio"),
+            recaptcha_secret: opt("RECAPTCHA_SECRET_KEY"),
+            spotify_client_id: opt("SPOTIFY_CLIENT_ID"),
+            spotify_client_secret: opt("SPOTIFY_CLIENT_SECRET"),
+            spotify_refresh_token: opt("SPOTIFY_REFRESH_TOKEN"),
+            posthog_api_key: opt("POSTHOG_API_KEY"),
+            posthog_project_id: opt("POSTHOG_PROJECT_ID"),
+        }
+    }
+}
+
+type Cached<T> = Arc<RwLock<Option<(Instant, T)>>>;
+
+#[derive(Clone, Default)]
+pub struct Caches {
+    pub github: Cached<routes::github::GitHubData>,
+    pub deployments: Cached<Vec<routes::deployments::Deployment>>,
+    pub posthog: Cached<routes::analytics::PosthogStats>,
 }
 
 #[derive(Clone)]
 pub struct MediaConfig {
     pub bucket: String,
-    /// Bearer token for the administration endpoints; None disables them.
     pub admin_token: Option<String>,
-    /// Public base URL for serving media variants, if configured.
     pub public_base_url: Option<String>,
 }
 
@@ -47,9 +106,15 @@ fn openapi_router() -> OpenApiRouter<AppState> {
         .routes(routes!(routes::media::create_upload))
         .routes(routes!(routes::media::list_media))
         .routes(routes!(routes::cv::active_cv))
+        .routes(routes!(routes::github::github))
+        .routes(routes!(routes::spotify::spotify))
+        .routes(routes!(routes::analytics::analytics))
+        .routes(routes!(routes::analytics::posthog_stats))
+        .routes(routes!(routes::deployments::deployments))
+        .routes(routes!(routes::audit::list_audit))
+        .routes(routes!(routes::audit::verify_audit))
 }
 
-/// The OpenAPI document describing every registered route.
 pub fn openapi_spec() -> utoipa::openapi::OpenApi {
     openapi_router().split_for_parts().1
 }

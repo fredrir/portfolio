@@ -19,7 +19,6 @@ export const Route = createFileRoute("/cv/$lang")({
             return Response.redirect(active.url, 302);
           }
         } catch {
-          // fall through to the bundled copy
         }
         return Response.redirect(new URL(`/cv-${lang}.pdf`, request.url), 302);
       },

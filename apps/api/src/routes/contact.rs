@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
-use crate::AppState;
 use crate::problem::ApiError;
+use crate::{AppState, captcha};
 
 #[derive(Deserialize, ToSchema)]
 pub struct ContactRequest {
@@ -17,6 +17,8 @@ pub struct ContactRequest {
     #[serde(default)]
     pub phone: Option<String>,
     pub message: String,
+    /// reCAPTCHA v3 token for the `contact_form` action.
+    pub recaptcha_token: String,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -25,7 +27,7 @@ pub struct ContactAccepted {
     pub id: Uuid,
 }
 
-fn validate(body: &ContactRequest) -> BTreeMap<String, String> {
+pub fn validate(body: &ContactRequest) -> BTreeMap<String, String> {
     let mut errors = BTreeMap::new();
     if body.name.is_empty() {
         errors.insert("name".into(), "Name is required".into());
@@ -47,6 +49,9 @@ fn validate(body: &ContactRequest) -> BTreeMap<String, String> {
     } else if body.message.chars().count() > 5000 {
         errors.insert("message".into(), "Message is too long".into());
     }
+    if body.recaptcha_token.is_empty() {
+        errors.insert("recaptcha_token".into(), "reCAPTCHA token missing".into());
+    }
     errors
 }
 
@@ -66,6 +71,18 @@ pub async fn submit_contact(
         return Err(ApiError::Validation(errors));
     }
 
+    let passed = captcha::verify(
+        &state.http,
+        &state.upstreams,
+        &body.recaptcha_token,
+        "contact_form",
+        0.5,
+    )
+    .await;
+    if !passed {
+        return Err(ApiError::Forbidden("reCAPTCHA verification failed"));
+    }
+
     let (id,): (Uuid,) = sqlx::query_as(
         "insert into contact_messages (name, email, phone, message) \
          values ($1, $2, $3, $4) returning id",
@@ -78,4 +95,38 @@ pub async fn submit_contact(
     .await?;
 
     Ok((StatusCode::CREATED, Json(ContactAccepted { id })))
+}
+
+#[cfg(test)]
+mod props {
+    use proptest::prelude::*;
+
+    use super::{ContactRequest, validate};
+
+    proptest! {
+        #[test]
+        fn validation_never_panics_and_is_consistent(
+            name in ".{0,250}",
+            email in ".{0,40}",
+            phone in proptest::option::of(".{0,40}"),
+            message in ".{0,600}",
+            token in ".{0,10}",
+        ) {
+            let request = ContactRequest {
+                name: name.clone(),
+                email: email.clone(),
+                phone: phone.clone(),
+                message: message.clone(),
+                recaptcha_token: token.clone(),
+            };
+            let errors = validate(&request);
+            let name_bad = name.is_empty() || name.chars().count() > 200;
+            prop_assert_eq!(errors.contains_key("name"), name_bad);
+            let message_bad = message.is_empty() || message.chars().count() > 5000;
+            prop_assert_eq!(errors.contains_key("message"), message_bad);
+            prop_assert_eq!(errors.contains_key("recaptcha_token"), token.is_empty());
+            let phone_bad = phone.as_ref().is_some_and(|p| p.chars().count() > 30);
+            prop_assert_eq!(errors.contains_key("phone"), phone_bad);
+        }
+    }
 }

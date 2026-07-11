@@ -49,5 +49,7 @@ module "ingress" {
   hostname           = var.hostname
   tunnel_name        = "${var.project}-origin"
   edge_hostnames     = var.edge_hostnames
+  admin_hostname     = "admin.hansteen.dev"
+  admin_emails       = ["fhansteen@gmail.com"]
   enable_workers_vpc = var.enable_workers_vpc
 }

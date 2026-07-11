@@ -1,6 +1,8 @@
 export interface TerminalStrings {
   availableCommands: string;
   helpDesc: string;
+  fractDesc: string;
+  runningFract: string;
   neofetchDesc: string;
   lsDesc: string;
   cdDesc: string;
@@ -43,6 +45,8 @@ export interface TerminalStrings {
 const en: TerminalStrings = {
   availableCommands: "Available commands:",
   helpDesc: "Show this help message",
+  fractDesc: "ASCII Mandelbrot rendered by a Rust WASM plugin",
+  runningFract: "loading wasm plugin…",
   neofetchDesc: "System information display",
   lsDesc: "List directory contents",
   cdDesc: "Change directory",
@@ -85,6 +89,8 @@ const en: TerminalStrings = {
 const nb: TerminalStrings = {
   availableCommands: "Tilgjengelige kommandoer:",
   helpDesc: "Vis denne hjelpemeldingen",
+  fractDesc: "ASCII-Mandelbrot fra en Rust WASM-plugin",
+  runningFract: "laster wasm-plugin…",
   neofetchDesc: "Vis systeminformasjon",
   lsDesc: "List innholdet i mappen",
   cdDesc: "Bytt mappe",
@@ -127,6 +133,8 @@ const nb: TerminalStrings = {
 const nn: TerminalStrings = {
   availableCommands: "Tilgjengelege kommandoar:",
   helpDesc: "Vis denne hjelpemeldinga",
+  fractDesc: "ASCII-Mandelbrot frå ein Rust WASM-plugin",
+  runningFract: "lastar wasm-plugin…",
   neofetchDesc: "Vis systeminformasjon",
   lsDesc: "List innhaldet i mappa",
   cdDesc: "Byt mappe",
@@ -169,6 +177,8 @@ const nn: TerminalStrings = {
 const fr: TerminalStrings = {
   availableCommands: "Commandes disponibles :",
   helpDesc: "Afficher ce message d'aide",
+  fractDesc: "Mandelbrot ASCII rendu par un plugin WASM Rust",
+  runningFract: "chargement du plugin wasm…",
   neofetchDesc: "Afficher les informations système",
   lsDesc: "Lister le contenu du répertoire",
   cdDesc: "Changer de répertoire",

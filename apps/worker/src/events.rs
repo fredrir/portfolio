@@ -105,3 +105,31 @@ mod tests {
         assert_eq!(record.idempotency_id(), "b/originals/x/a.jpg#s1");
     }
 }
+
+#[cfg(test)]
+mod props {
+    use proptest::prelude::*;
+
+    use super::url_decode_key;
+
+    fn s3_url_encode(input: &str) -> String {
+        let mut out = String::new();
+        for byte in input.as_bytes() {
+            match byte {
+                b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~' | b'/' => {
+                    out.push(*byte as char)
+                }
+                b' ' => out.push('+'),
+                other => out.push_str(&format!("%{other:02X}")),
+            }
+        }
+        out
+    }
+
+    proptest! {
+        #[test]
+        fn decoding_inverts_s3_key_encoding(key in "[a-zA-Z0-9 /._%+()\\-]{0,64}") {
+            prop_assert_eq!(url_decode_key(&s3_url_encode(&key)), key);
+        }
+    }
+}

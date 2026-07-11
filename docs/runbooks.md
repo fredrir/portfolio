@@ -96,3 +96,31 @@ The pre-cutover Vercel deployment still exists. To send apex traffic back:
    DNS-only (grey cloud).
 3. Propagation is near-immediate (TTL auto). The new platform keeps serving
    on `new.hansteen.dev` for debugging.
+
+## Point-in-time recovery (PITR)
+
+Continuous protection on top of the nightly dumps: `wal-receiver` streams WAL
+over a replication slot into the `waldata` volume; `wal-ship.timer` syncs it
+(after `pg_switch_wal`) to `s3://…-backups-prod/wal/` every 15 minutes;
+`basebackup.timer` uploads a weekly `pg_basebackup` tarball under
+`basebackups/`. Effective RPO ≤ 15 minutes.
+
+Restore to time T:
+
+1. Fetch the newest base backup older than T and unpack it into a fresh data
+   directory: `aws s3 cp s3://…/basebackups/base-<stamp>.tar.gz - | gunzip |
+   tar -x -C /restore` (base.tar contains the cluster; pg_wal is empty).
+2. Fetch WAL: `aws s3 sync s3://…/wal/ /restore-wal/` and rename any
+   `.partial` segment to its final name if it is the last one needed.
+3. In the restored data dir create `recovery.signal` and set in
+   `postgresql.auto.conf`:
+   `restore_command = 'cp /restore-wal/%f %p'`
+   `recovery_target_time = '<T ISO8601>'`
+   `recovery_target_action = 'promote'`
+4. Start a disposable postgres container mounting the data dir; watch logs
+   until "recovery stopping before commit" + promotion; validate row counts.
+5. For production recovery, follow the DR runbook with this data directory in
+   place of the pg_dump restore.
+
+Drill: see the verification section of the batch plan — a row written after
+the base backup must survive replay to a target time after its commit.

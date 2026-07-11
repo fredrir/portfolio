@@ -6,7 +6,6 @@ export const api = createApiClient({
   baseUrl: process.env.API_URL ?? "http://localhost:8080",
 });
 
-/** Forward the edge-assigned request id so API spans correlate end to end. */
 export function traceHeaders(): Record<string, string> {
   const requestId = getRequestHeader("x-request-id");
   return requestId ? { "x-request-id": requestId } : {};

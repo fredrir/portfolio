@@ -1,7 +1,7 @@
 use axum::body::Body;
 use axum::http::{Request, StatusCode, header};
 use http_body_util::BodyExt;
-use portfolio_api::{AppState, MediaConfig, app};
+use portfolio_api::{AppState, Caches, MediaConfig, Upstreams, app};
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use tower::ServiceExt;
@@ -17,6 +17,24 @@ fn test_state(pool: PgPool) -> AppState {
         .endpoint_url("http://localhost:4566")
         .force_path_style(true)
         .build();
+    // Unroutable bases make external-service failure paths deterministic;
+    // captcha passes because no secret is configured in tests.
+    let upstreams = Upstreams {
+        github_api: "http://127.0.0.1:9".into(),
+        github_html: "http://127.0.0.1:9".into(),
+        spotify_api: "http://127.0.0.1:9".into(),
+        spotify_accounts: "http://127.0.0.1:9".into(),
+        recaptcha: "http://127.0.0.1:9".into(),
+        posthog: "http://127.0.0.1:9".into(),
+        github_username: "fredrir".into(),
+        github_repo: "fredrir/portfolio".into(),
+        recaptcha_secret: None,
+        spotify_client_id: None,
+        spotify_client_secret: None,
+        spotify_refresh_token: None,
+        posthog_api_key: None,
+        posthog_project_id: None,
+    };
     AppState {
         pool,
         s3: aws_sdk_s3::Client::from_conf(config),
@@ -25,6 +43,12 @@ fn test_state(pool: PgPool) -> AppState {
             admin_token: Some(TEST_ADMIN_TOKEN.into()),
             public_base_url: None,
         },
+        http: reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(2))
+            .build()
+            .expect("http client"),
+        upstreams: std::sync::Arc::new(upstreams),
+        caches: Caches::default(),
     }
 }
 
@@ -91,7 +115,7 @@ async fn recording_a_visit_increments_count(pool: PgPool) {
         pool.clone(),
         post_json(
             "/api/v1/visits",
-            json!({ "page": "/", "referrer": "https://example.com" }),
+            json!({ "page": "/", "referrer": "https://example.com", "recaptcha_token": "test" }),
         ),
     )
     .await;
@@ -118,7 +142,8 @@ async fn valid_contact_submission_is_stored(pool: PgPool) {
             json!({
                 "name": "Ada Lovelace",
                 "email": "ada@example.com",
-                "message": "Hello there"
+                "message": "Hello there",
+                "recaptcha_token": "test"
             }),
         ),
     )
@@ -138,7 +163,7 @@ async fn valid_contact_submission_is_stored(pool: PgPool) {
 async fn invalid_contact_submission_returns_problem_details(pool: PgPool) {
     let request = post_json(
         "/api/v1/contact",
-        json!({ "name": "", "email": "not-an-email", "message": "" }),
+        json!({ "name": "", "email": "not-an-email", "message": "", "recaptcha_token": "test" }),
     );
     let response = app(test_state(pool)).oneshot(request).await.unwrap();
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
@@ -229,4 +254,199 @@ async fn cv_endpoint_empty_without_synced_versions(pool: PgPool) {
     .await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(body, json!([]));
+}
+
+#[sqlx::test]
+async fn analytics_aggregates_have_stable_shape(pool: PgPool) {
+    let (status, _) = send(
+        pool.clone(),
+        post_json(
+            "/api/v1/visits",
+            json!({ "page": "/", "referrer": "https://ref.example/x/", "recaptcha_token": "t" }),
+        ),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+
+    let (status, body) = send(
+        pool,
+        Request::get("/api/v1/analytics")
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["total"], 1);
+    assert_eq!(body["daily"].as_array().unwrap().len(), 30);
+    assert_eq!(body["referrers"][0]["key"], "ref.example/x");
+}
+
+#[sqlx::test]
+async fn visit_stores_country_code_not_ip(pool: PgPool) {
+    let request = Request::post("/api/v1/visits")
+        .header(header::CONTENT_TYPE, "application/json")
+        .header("x-visitor-country", "no")
+        .header("x-forwarded-for", "203.0.113.7")
+        .body(Body::from(json!({ "recaptcha_token": "t" }).to_string()))
+        .unwrap();
+    let (status, _) = send(pool.clone(), request).await;
+    assert_eq!(status, StatusCode::OK);
+
+    let (country, code): (Option<String>, Option<String>) =
+        sqlx::query_as("select country, country_code from visitors")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(country, None);
+    assert_eq!(code.as_deref(), Some("NO"));
+}
+
+#[sqlx::test]
+async fn audit_chain_records_and_verifies(pool: PgPool) {
+    for i in 0..2 {
+        let request = Request::post("/api/v1/media/uploads")
+            .header(header::CONTENT_TYPE, "application/json")
+            .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+            .body(Body::from(
+                json!({
+                    "filename": format!("img-{i}.png"),
+                    "content_type": "image/png",
+                    "size_bytes": 1000,
+                    "category": "Test Album"
+                })
+                .to_string(),
+            ))
+            .unwrap();
+        let (status, _) = send(pool.clone(), request).await;
+        assert_eq!(status, StatusCode::CREATED);
+    }
+
+    let auth = Request::get("/api/v1/audit/verify")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::empty())
+        .unwrap();
+    let (status, body) = send(pool.clone(), auth).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["valid"], true);
+    assert_eq!(body["entries"], 2);
+
+    let unauthorized = Request::get("/api/v1/audit").body(Body::empty()).unwrap();
+    let (status, _) = send(pool.clone(), unauthorized).await;
+    assert_eq!(status, StatusCode::UNAUTHORIZED);
+
+    // Tamper with the first entry: the chain must break there.
+    sqlx::query(
+        "update admin_audit set detail = jsonb_set(detail, '{filename}', '\"evil.png\"') \
+         where id = (select min(id) from admin_audit)",
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+
+    let verify = Request::get("/api/v1/audit/verify")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::empty())
+        .unwrap();
+    let (status, body) = send(pool, verify).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["valid"], false);
+    assert!(body["first_invalid_id"].is_number());
+}
+
+#[sqlx::test]
+async fn media_category_filter_and_pending_gate(pool: PgPool) {
+    let request = Request::post("/api/v1/media/uploads")
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::from(
+            json!({
+                "filename": "trip.png",
+                "content_type": "image/png",
+                "size_bytes": 1000,
+                "category": "Interrail"
+            })
+            .to_string(),
+        ))
+        .unwrap();
+    let (status, _) = send(pool.clone(), request).await;
+    assert_eq!(status, StatusCode::CREATED);
+
+    // Pending item invisible without the flag.
+    let (status, body) = send(
+        pool.clone(),
+        Request::get("/api/v1/media").body(Body::empty()).unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body, json!([]));
+
+    // include_pending requires the admin token.
+    let (status, _) = send(
+        pool.clone(),
+        Request::get("/api/v1/media?include_pending=true")
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::UNAUTHORIZED);
+
+    let request = Request::get("/api/v1/media?include_pending=true&category=interrail")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::empty())
+        .unwrap();
+    let (status, body) = send(pool, request).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body[0]["category"], "interrail");
+    assert_eq!(body[0]["state"], "pending");
+}
+
+#[sqlx::test]
+async fn github_returns_null_when_upstream_unavailable(pool: PgPool) {
+    let (status, body) = send(
+        pool,
+        Request::get("/api/v1/github").body(Body::empty()).unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body, Value::Null);
+}
+
+#[sqlx::test]
+async fn spotify_reports_missing_credentials(pool: PgPool) {
+    let (status, body) = send(
+        pool,
+        Request::get("/api/v1/spotify?recaptcha_token=t")
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["ok"], false);
+    assert_eq!(body["error"], "Spotify credentials not set");
+}
+
+#[sqlx::test]
+async fn deployments_fail_deterministically_without_upstream(pool: PgPool) {
+    let (status, body) = send(
+        pool,
+        Request::get("/api/v1/deployments")
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_GATEWAY);
+    assert_eq!(body["status"], 502);
+}
+
+#[sqlx::test]
+async fn posthog_stats_no_content_when_unconfigured(pool: PgPool) {
+    let response = app(test_state(pool))
+        .oneshot(
+            Request::get("/api/v1/analytics/posthog")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::NO_CONTENT);
 }

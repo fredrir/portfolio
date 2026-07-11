@@ -24,7 +24,7 @@ export interface TerminalState {
 }
 
 export interface CommandAction {
-  type: "openPane" | "closePane" | "startGame";
+  type: "openPane" | "closePane" | "startGame" | "wasmPlugin";
   payload: string;
 }
 

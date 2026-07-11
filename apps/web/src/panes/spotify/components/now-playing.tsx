@@ -131,7 +131,7 @@ const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
         </div>
       </div>
 
-      {showEmbed && displayData.trackId && (
+      {showEmbed && displayData?.trackId && (
         <SpotifyEmbed trackId={displayData.trackId} />
       )}
     </>

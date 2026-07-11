@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as EngineeringRouteImport } from './routes/engineering'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LocaleRouteImport } from './routes/$locale'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CvLangRouteImport } from './routes/cv.$lang'
@@ -20,9 +20,9 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EngineeringRoute = EngineeringRouteImport.update({
-  id: '/engineering',
-  path: '/engineering',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocaleRoute = LocaleRouteImport.update({
@@ -44,14 +44,14 @@ const CvLangRoute = CvLangRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$locale': typeof LocaleRoute
-  '/engineering': typeof EngineeringRoute
+  '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/cv/$lang': typeof CvLangRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$locale': typeof LocaleRoute
-  '/engineering': typeof EngineeringRoute
+  '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/cv/$lang': typeof CvLangRoute
 }
@@ -59,28 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$locale': typeof LocaleRoute
-  '/engineering': typeof EngineeringRoute
+  '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/cv/$lang': typeof CvLangRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$locale' | '/engineering' | '/sitemap.xml' | '/cv/$lang'
+  fullPaths: '/' | '/$locale' | '/admin' | '/sitemap.xml' | '/cv/$lang'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$locale' | '/engineering' | '/sitemap.xml' | '/cv/$lang'
-  id:
-    | '__root__'
-    | '/'
-    | '/$locale'
-    | '/engineering'
-    | '/sitemap.xml'
-    | '/cv/$lang'
+  to: '/' | '/$locale' | '/admin' | '/sitemap.xml' | '/cv/$lang'
+  id: '__root__' | '/' | '/$locale' | '/admin' | '/sitemap.xml' | '/cv/$lang'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LocaleRoute: typeof LocaleRoute
-  EngineeringRoute: typeof EngineeringRoute
+  AdminRoute: typeof AdminRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CvLangRoute: typeof CvLangRoute
 }
@@ -94,11 +88,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/engineering': {
-      id: '/engineering'
-      path: '/engineering'
-      fullPath: '/engineering'
-      preLoaderRoute: typeof EngineeringRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$locale': {
@@ -128,7 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LocaleRoute: LocaleRoute,
-  EngineeringRoute: EngineeringRoute,
+  AdminRoute: AdminRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CvLangRoute: CvLangRoute,
 }

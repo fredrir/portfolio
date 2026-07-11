@@ -18,13 +18,13 @@ export function SpotifyPane({
   ui,
   locale = "en",
 }: {
-  initialData: SpotifyData;
+  initialData: SpotifyData | null;
   ui?: UiStrings;
   locale?: string;
 }) {
-  const [data, setData] = useState<SpotifyData>(initialData);
+  const [data, setData] = useState<SpotifyData | null>(initialData);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const lastKnownRef = useRef<SpotifyData>(initialData);
+  const lastKnownRef = useRef<SpotifyData | null>(initialData);
   const { ref: containerRef, height } = useContainerSize();
   const compact = height > 0 && height < 200;
   const { executeRecaptcha } = useRecaptcha();
@@ -75,6 +75,8 @@ export function SpotifyPane({
   }, [executeRecaptcha]);
 
   useEffect(() => {
+    // Spotify data is captcha-gated and loads client-side only.
+    fetchSpotify();
     const interval = setInterval(fetchSpotify, SPOTIFY_POLL_INTERVAL);
     return () => clearInterval(interval);
   }, [fetchSpotify]);
@@ -94,14 +96,20 @@ export function SpotifyPane({
         <div ref={containerRef} className="h-full flex flex-col">
           <div className="flex-1 overflow-y-auto min-h-0">
             <SpotifyCard title="/proc/spotify/recently-played" command="cat ">
-              <NowPlaying
-                displayData={displayData}
-                ui={ui}
-                locale={locale}
-                compact={compact}
-              />
+              {displayData ? (
+                <NowPlaying
+                  displayData={displayData}
+                  ui={ui}
+                  locale={locale}
+                  compact={compact}
+                />
+              ) : (
+                <p className="text-xs text-muted-foreground py-2">
+                  loading…
+                </p>
+              )}
             </SpotifyCard>
-            {displayData.topArtists && displayData.topArtists.length > 0 && (
+            {displayData?.topArtists && displayData.topArtists.length > 0 && (
               <SpotifyCard
                 title="/proc/spotify/top-artists"
                 command="cat"
@@ -111,7 +119,7 @@ export function SpotifyPane({
               </SpotifyCard>
             )}
 
-            {displayData.recentTracks &&
+            {displayData?.recentTracks &&
               displayData.recentTracks.length > 0 && (
                 <SpotifyCard
                   title="/var/log/spotify/history"

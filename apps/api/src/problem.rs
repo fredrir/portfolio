@@ -52,6 +52,7 @@ impl IntoResponse for Problem {
 #[derive(Debug)]
 pub enum ApiError {
     Validation(BTreeMap<String, String>),
+    Forbidden(&'static str),
     Internal(String),
 }
 
@@ -70,6 +71,7 @@ impl IntoResponse for ApiError {
                 problem.errors = Some(errors);
                 problem.into_response()
             }
+            Self::Forbidden(title) => Problem::new(StatusCode::FORBIDDEN, title).into_response(),
             Self::Internal(detail) => {
                 tracing::error!(detail, "internal error");
                 Problem::new(StatusCode::INTERNAL_SERVER_ERROR, "Internal server error")

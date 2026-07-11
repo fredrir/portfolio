@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly base backup
+
+[Timer]
+OnCalendar=Mon *-*-* 04:00:00 UTC
+Persistent=true
+RandomizedDelaySec=1800
+
+[Install]
+WantedBy=timers.target

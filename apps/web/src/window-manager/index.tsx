@@ -19,7 +19,7 @@ interface Props {
   currentLocale: Locale;
   dict: DictType;
   githubData: GitHubData | null;
-  spotifyData: SpotifyData;
+  spotifyData: SpotifyData | null;
 }
 
 export function WindowManager({

@@ -38,5 +38,14 @@ podman rm -f restore-test >/dev/null
 [ "$VISITORS" -gt 0 ] || fail "visitors-empty"
 [ "$MIGRATIONS" -gt 0 ] || fail "migrations-missing"
 
+# PITR stream freshness: the newest shipped WAL object must be recent.
+NEWEST_WAL=$(podman run --rm --env-file "$CONF/backup.env" \
+    docker.io/amazon/aws-cli:latest s3api list-objects-v2 \
+    --bucket "$BUCKET" --prefix wal/ \
+    --query 'sort_by(Contents,&LastModified)[-1].LastModified' --output text)
+[ "$NEWEST_WAL" != "None" ] || fail "no-wal-shipped"
+WAL_AGE=$(( $(date +%s) - $(date -d "$NEWEST_WAL" +%s) ))
+[ "$WAL_AGE" -lt 2700 ] || fail "wal-stale-${WAL_AGE}s"
+
 echo "$(date -u +%FT%TZ) restore-test backup=$LATEST visitors=$VISITORS migrations=$MIGRATIONS result=success" >> "$CONF/backups.log"
 echo "restore test OK: $LATEST visitors=$VISITORS migrations=$MIGRATIONS"

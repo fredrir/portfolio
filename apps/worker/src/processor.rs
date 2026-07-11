@@ -34,7 +34,6 @@ pub struct Variant {
 pub struct Processed {
     pub width: u32,
     pub height: u32,
-    /// Hex-encoded SHA-256 of the original bytes.
     pub content_hash: String,
     pub variants: Vec<Variant>,
 }

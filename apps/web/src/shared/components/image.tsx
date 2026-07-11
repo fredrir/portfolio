@@ -5,7 +5,6 @@ import { cn } from "@/shared/utils/cn";
 type ImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & {
   src: string;
   alt: string;
-  /** Stretch to fill the nearest positioned ancestor, like next/image fill. */
   fill?: boolean;
   priority?: boolean;
   unoptimized?: boolean;

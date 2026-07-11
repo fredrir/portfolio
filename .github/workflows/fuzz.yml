@@ -1,0 +1,41 @@
+name: Fuzzing
+
+on:
+  schedule:
+    - cron: "0 3 * * 6"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - crate: apps/api/fuzz
+            target: sanitize
+          - crate: apps/api/fuzz
+            target: contact_validate
+          - crate: apps/worker/fuzz
+            target: s3_event_parse
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ matrix.crate }}
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-fuzz
+      - name: Fuzz ${{ matrix.target }} (time-boxed)
+        working-directory: ${{ matrix.crate }}/..
+        run: cargo +nightly fuzz run ${{ matrix.target }} -- -max_total_time=180
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: fuzz-artifacts-${{ matrix.target }}
+          path: ${{ matrix.crate }}/artifacts/

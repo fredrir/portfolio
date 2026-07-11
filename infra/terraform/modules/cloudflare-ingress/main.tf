@@ -20,15 +20,19 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "origin" {
   account_id = var.account_id
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.origin.id
   config = {
-    ingress = [
-      {
+    ingress = concat(
+      [{
         hostname = var.hostname
         service  = var.origin_service
-      },
-      {
+      }],
+      var.admin_hostname != null ? [{
+        hostname = var.admin_hostname
+        service  = var.origin_service
+      }] : [],
+      [{
         service = "http_status:404"
-      },
-    ]
+      }],
+    )
   }
 }
 
@@ -82,6 +86,41 @@ resource "cloudflare_zero_trust_access_application" "origin" {
   session_duration = "24h"
   policies = [{
     id         = cloudflare_zero_trust_access_policy.edge_worker_only[0].id
+    precedence = 1
+  }]
+}
+
+# ------------------------- administration hostname (interactive Access) ----
+
+resource "cloudflare_dns_record" "admin" {
+  count   = var.admin_hostname != null ? 1 : 0
+  zone_id = var.zone_id
+  name    = var.admin_hostname
+  type    = "CNAME"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.origin.id}.cfargotunnel.com"
+  proxied = true
+  ttl     = 1
+}
+
+resource "cloudflare_zero_trust_access_policy" "admin_users" {
+  count      = var.admin_hostname != null ? 1 : 0
+  account_id = var.account_id
+  name       = "admin-users"
+  decision   = "allow"
+  include = [
+    for email in var.admin_emails : { email = { email = email } }
+  ]
+}
+
+resource "cloudflare_zero_trust_access_application" "admin" {
+  count            = var.admin_hostname != null ? 1 : 0
+  zone_id          = var.zone_id
+  name             = "${var.tunnel_name}-admin"
+  domain           = var.admin_hostname
+  type             = "self_hosted"
+  session_duration = "24h"
+  policies = [{
+    id         = cloudflare_zero_trust_access_policy.admin_users[0].id
     precedence = 1
   }]
 }

@@ -4,8 +4,8 @@ use axum::http::HeaderMap;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::AppState;
 use crate::problem::ApiError;
+use crate::{AppState, captcha};
 
 #[derive(Deserialize, ToSchema)]
 pub struct RecordVisitRequest {
@@ -15,6 +15,8 @@ pub struct RecordVisitRequest {
     /// Referrer reported by the browser.
     #[serde(default)]
     pub referrer: Option<String>,
+    /// reCAPTCHA v3 token for the `record_visit` action.
+    pub recaptcha_token: String,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -31,23 +33,38 @@ pub async fn record_visit(
     headers: HeaderMap,
     Json(body): Json<RecordVisitRequest>,
 ) -> Result<Json<VisitCount>, ApiError> {
+    let passed = captcha::verify(
+        &state.http,
+        &state.upstreams,
+        &body.recaptcha_token,
+        "record_visit",
+        0.5,
+    )
+    .await;
+    if !passed {
+        return Err(ApiError::Forbidden("reCAPTCHA verification failed"));
+    }
+
     let user_agent = headers
         .get("user-agent")
         .and_then(|v| v.to_str().ok())
         .map(str::to_owned);
-    let client_ip = headers
-        .get("x-forwarded-for")
+    // Country code from the edge; the raw client IP is intentionally not
+    // stored anymore.
+    let country_code = headers
+        .get("x-visitor-country")
         .and_then(|v| v.to_str().ok())
-        .and_then(|v| v.split(',').next())
-        .map(|v| v.trim().to_owned());
+        .map(|v| v.trim().to_uppercase())
+        .filter(|v| !v.is_empty() && v.len() <= 8);
 
     sqlx::query(
-        "insert into visitors (page, referrer, user_agent, country) values ($1, $2, $3, $4)",
+        "insert into visitors (page, referrer, user_agent, country, country_code) \
+         values ($1, $2, $3, null, $4)",
     )
     .bind(body.page.as_deref().unwrap_or("/"))
     .bind(&body.referrer)
     .bind(&user_agent)
-    .bind(&client_ip)
+    .bind(&country_code)
     .execute(&state.pool)
     .await?;
 

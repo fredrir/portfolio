@@ -73,6 +73,15 @@ for _ in $(seq 1 30); do
         healthy=1
         break
     fi
+    # Crash-looping containers fail fast instead of waiting out the gate.
+    for unit in "api-$TARGET" "web-$TARGET"; do
+        restarts=$(systemctl --user show -p NRestarts --value "$unit.service" 2>/dev/null || echo 0)
+        if [ "${restarts:-0}" -ge 3 ]; then
+            record failed-crashloop
+            log "CRASH LOOP in $unit (restarts=$restarts) — aborting, $ACTIVE untouched"
+            exit 1
+        fi
+    done
     sleep 3
 done
 if [ -z "$healthy" ]; then
@@ -87,14 +96,25 @@ write_slot() {
     cat > "$SLOTS/active.caddy" <<CADDY
 handle /api/* {
 	header +x-origin-slot $1
-	reverse_proxy api-$1:8080
+	reverse_proxy api-$1:8080 {
+		header_up -x-admin-origin
+	}
 }
 handle /readyz {
 	reverse_proxy api-$1:8080
 }
 handle {
 	header +x-origin-slot $1
-	reverse_proxy web-$1:3000
+	reverse_proxy web-$1:3000 {
+		header_up -x-admin-origin
+	}
+}
+CADDY
+    cat > "$SLOTS/admin.caddy" <<CADDY
+handle {
+	reverse_proxy web-$1:3000 {
+		header_up x-admin-origin 1
+	}
 }
 CADDY
     podman exec caddy caddy reload --config /etc/caddy/Caddyfile 2>/dev/null

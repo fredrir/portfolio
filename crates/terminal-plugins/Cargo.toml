@@ -1,0 +1,17 @@
+[package]
+name = "terminal-plugins"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+# Standalone on purpose: built for wasm32-unknown-unknown by `bun run
+# build:wasm`, not by the root workspace.
+[workspace]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true

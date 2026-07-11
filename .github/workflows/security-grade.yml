@@ -1,0 +1,42 @@
+name: Security grade
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  observatory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: MDN HTTP Observatory scan (fail below B)
+        run: |
+          set -e
+          RESULT=$(curl -sf -X POST "https://observatory-api.mdn.mozilla.net/api/v2/scan?host=hansteen.dev")
+          echo "$RESULT" | python3 -c "
+          import json, sys
+          scan = json.load(sys.stdin)
+          grade, score = scan.get('grade'), scan.get('score')
+          print(f'grade={grade} score={score}')
+          order = ['F','E','D-','D','D+','C-','C','C+','B-','B','B+','A-','A','A+']
+          assert grade in order, f'unknown grade {grade}'
+          assert order.index(grade) >= order.index('B'), f'grade {grade} below threshold B'
+          "
+
+      - name: TLS and header spot checks
+        run: |
+          set -e
+          H=$(curl -sI -A synthetic https://hansteen.dev/en)
+          echo "$H" | grep -qi "strict-transport-security"
+          echo "$H" | grep -qi "content-security-policy"
+          echo "$H" | grep -qi "x-content-type-options: nosniff"
+          echo "$H" | grep -qi 'alt-svc: h3'
+          # TLS 1.0/1.1 must be rejected.
+          if curl -s --tls-max 1.1 -o /dev/null https://hansteen.dev/ 2>/dev/null; then
+            echo "legacy TLS accepted" >&2
+            exit 1
+          fi
+          echo "TLS + header checks OK"

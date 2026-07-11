@@ -9,6 +9,116 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/v1/analytics": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "First-party visitor analytics, aggregated in SQL.",
+        "operationId": "analytics",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/posthog": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "PostHog-derived stats (pageviews, uniques, top pages) queried server-side.\n204 when PostHog is not configured.",
+        "operationId": "posthog_stats",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PosthogStats"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "PostHog not configured"
+          }
+        }
+      }
+    },
+    "/api/v1/audit": {
+      "get": {
+        "tags": [
+          "audit"
+        ],
+        "summary": "Most recent administration audit entries (admin bearer token).",
+        "operationId": "list_audit",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditEntry"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/audit/verify": {
+      "get": {
+        "tags": [
+          "audit"
+        ],
+        "summary": "Recompute the full hash chain; any tampered row breaks it (admin bearer).",
+        "operationId": "verify_audit",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditVerification"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/contact": {
       "post": {
         "tags": [
@@ -74,6 +184,68 @@
         }
       }
     },
+    "/api/v1/deployments": {
+      "get": {
+        "tags": [
+          "deployments"
+        ],
+        "summary": "Production deployment history (GitHub Actions runs, cached server-side).",
+        "operationId": "deployments",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Deployment"
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream unavailable and no cache",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/github": {
+      "get": {
+        "tags": [
+          "github"
+        ],
+        "summary": "GitHub profile, stars, languages and contribution calendar (cached 1h).\nReturns null when the upstream is unavailable and nothing is cached,\nmatching the old frontend fetcher's contract.",
+        "operationId": "github",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GitHubData"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/media": {
       "get": {
         "tags": [
@@ -81,6 +253,32 @@
         ],
         "summary": "List processed media with their generated variants.",
         "operationId": "list_media",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Restrict to one gallery category.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "include_pending",
+            "in": "query",
+            "description": "Include unprocessed items (requires the admin bearer token).",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -91,6 +289,16 @@
                   "items": {
                     "$ref": "#/components/schemas/MediaItem"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "include_pending without admin token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
@@ -152,6 +360,38 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/spotify": {
+      "get": {
+        "tags": [
+          "spotify"
+        ],
+        "summary": "Current/recent playback and top artists (captcha-gated like the old\nserver action; credentials-missing and upstream failures degrade to the\ndatabase cache).",
+        "operationId": "spotify",
+        "parameters": [
+          {
+            "name": "recaptcha_token",
+            "in": "query",
+            "description": "reCAPTCHA v3 token for the `spotify_data` action.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotifyData"
                 }
               }
             }
@@ -273,6 +513,95 @@
   },
   "components": {
     "schemas": {
+      "AnalyticsResponse": {
+        "type": "object",
+        "required": [
+          "total",
+          "daily",
+          "referrers",
+          "browsers",
+          "countries"
+        ],
+        "properties": {
+          "browsers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyCount"
+            }
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyCount"
+            }
+          },
+          "daily": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyCount"
+            }
+          },
+          "referrers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyCount"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AuditEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "at",
+          "action",
+          "detail",
+          "entry_hash"
+        ],
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "at": {
+            "type": "string"
+          },
+          "detail": {},
+          "entry_hash": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AuditVerification": {
+        "type": "object",
+        "required": [
+          "valid",
+          "entries"
+        ],
+        "properties": {
+          "entries": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "first_invalid_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "valid": {
+            "type": "boolean"
+          }
+        }
+      },
       "ContactAccepted": {
         "type": "object",
         "required": [
@@ -291,7 +620,8 @@
         "required": [
           "name",
           "email",
-          "message"
+          "message",
+          "recaptcha_token"
         ],
         "properties": {
           "email": {
@@ -308,6 +638,57 @@
               "string",
               "null"
             ]
+          },
+          "recaptcha_token": {
+            "type": "string",
+            "description": "reCAPTCHA v3 token for the `contact_form` action."
+          }
+        }
+      },
+      "ContributionDay": {
+        "type": "object",
+        "required": [
+          "count",
+          "date",
+          "level"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "date": {
+            "type": "string"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "ContributionYear": {
+        "type": "object",
+        "required": [
+          "year",
+          "days",
+          "total"
+        ],
+        "properties": {
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContributionDay"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "year": {
+            "type": "string"
           }
         }
       },
@@ -319,6 +700,13 @@
           "size_bytes"
         ],
         "properties": {
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Gallery grouping key, e.g. an album name (sanitized, lowercased)."
+          },
           "content_type": {
             "type": "string",
             "description": "Must be one of image/jpeg, image/png, image/webp."
@@ -400,15 +788,171 @@
           }
         }
       },
+      "DailyCount": {
+        "type": "object",
+        "required": [
+          "day",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "day": {
+            "type": "string"
+          }
+        }
+      },
+      "Deployment": {
+        "type": "object",
+        "required": [
+          "sha",
+          "title",
+          "started_at",
+          "duration_seconds",
+          "html_url"
+        ],
+        "properties": {
+          "conclusion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "html_url": {
+            "type": "string"
+          },
+          "sha": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "GitHubData": {
+        "type": "object",
+        "description": "Mirrors the shape the frontend consumed from the old TypeScript fetcher.",
+        "required": [
+          "username",
+          "name",
+          "bio",
+          "publicRepos",
+          "followers",
+          "following",
+          "totalStars",
+          "topLanguages",
+          "profileUrl",
+          "createdAt",
+          "contributionsByYear"
+        ],
+        "properties": {
+          "bio": {
+            "type": "string"
+          },
+          "contributionsByYear": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContributionYear"
+            }
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "followers": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "following": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "profileUrl": {
+            "type": "string"
+          },
+          "publicRepos": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "topLanguages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LanguageCount"
+            }
+          },
+          "totalStars": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "KeyCount": {
+        "type": "object",
+        "required": [
+          "key",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "key": {
+            "type": "string"
+          }
+        }
+      },
+      "LanguageCount": {
+        "type": "object",
+        "required": [
+          "lang",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "lang": {
+            "type": "string"
+          }
+        }
+      },
       "MediaItem": {
         "type": "object",
         "required": [
           "id",
           "filename",
           "content_type",
+          "state",
           "variants"
         ],
         "properties": {
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "content_hash": {
             "type": [
               "string",
@@ -431,6 +975,9 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "state": {
+            "type": "string"
           },
           "variants": {
             "type": "array",
@@ -484,6 +1031,34 @@
           }
         }
       },
+      "PosthogStats": {
+        "type": "object",
+        "required": [
+          "daily_pageviews",
+          "daily_uniques",
+          "top_pages"
+        ],
+        "properties": {
+          "daily_pageviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyCount"
+            }
+          },
+          "daily_uniques": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyCount"
+            }
+          },
+          "top_pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyCount"
+            }
+          }
+        }
+      },
       "Problem": {
         "type": "object",
         "description": "RFC 9457 problem details body.",
@@ -527,6 +1102,9 @@
       },
       "RecordVisitRequest": {
         "type": "object",
+        "required": [
+          "recaptcha_token"
+        ],
         "properties": {
           "page": {
             "type": [
@@ -535,12 +1113,197 @@
             ],
             "description": "Page that was visited."
           },
+          "recaptcha_token": {
+            "type": "string",
+            "description": "reCAPTCHA v3 token for the `record_visit` action."
+          },
           "referrer": {
             "type": [
               "string",
               "null"
             ],
             "description": "Referrer reported by the browser."
+          }
+        }
+      },
+      "SpotifyArtist": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "genres": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "imageUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SpotifyData": {
+        "type": "object",
+        "description": "Mirrors the shape the frontend consumed from the old TypeScript fetcher.",
+        "properties": {
+          "album": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "albumArt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "artist": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "durationMs": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "minimum": 0
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "isPlaying": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "lastPlayedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ok": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "previewUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "progressMs": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "minimum": 0
+          },
+          "recentTracks": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/SpotifyTrack"
+            }
+          },
+          "songUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "topArtists": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/SpotifyArtist"
+            }
+          },
+          "trackId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SpotifyTrack": {
+        "type": "object",
+        "required": [
+          "title",
+          "artist",
+          "album"
+        ],
+        "properties": {
+          "album": {
+            "type": "string"
+          },
+          "albumArt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "artist": {
+            "type": "string"
+          },
+          "previewUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "songUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "trackId": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },

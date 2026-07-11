@@ -1,0 +1,22 @@
+[Unit]
+Description=Continuous WAL streaming for point-in-time recovery
+After=postgres.service
+Wants=postgres.service
+
+[Container]
+Image=docker.io/library/postgres:17-alpine
+ContainerName=wal-receiver
+Network=portfolio.network
+Volume=waldata:/wal
+EnvironmentFile=%h/.config/portfolio/wal.env
+Exec=pg_receivewal -h postgres -U replicator -D /wal --slot=portfolio_wal --no-loop
+NoNewPrivileges=true
+DropCapability=all
+PodmanArgs=--memory=128m --pids-limit=128
+
+[Service]
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
