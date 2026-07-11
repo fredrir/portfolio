@@ -10,18 +10,23 @@
  *
  * --dry-run  fetch and count source rows without writing
  * --append   allow inserting into a non-empty target table
+ *
+ * The old site keeps writing to Supabase until cutover: run this again at
+ * cutover after truncating the target table, or the import duplicates rows.
  */
 import { SQL } from "bun";
 import { createClient } from "@supabase/supabase-js";
 
 const PAGE_SIZE = 1000;
 
+// Real Supabase schema (verified 2026-07-11): the timestamp column is
+// visited_at and ids are uuids, so ordering goes by visited_at.
 interface SourceRow {
   page: string | null;
   referrer: string | null;
   user_agent: string | null;
   country: string | null;
-  created_at: string | null;
+  visited_at: string | null;
 }
 
 const dryRun = process.argv.includes("--dry-run");
@@ -49,8 +54,8 @@ const rows: SourceRow[] = [];
 for (let offset = 0; ; offset += PAGE_SIZE) {
   const { data, error } = await supabase
     .from("visitors")
-    .select("page, referrer, user_agent, country, created_at")
-    .order("id", { ascending: true })
+    .select("page, referrer, user_agent, country, visited_at")
+    .order("visited_at", { ascending: true })
     .range(offset, offset + PAGE_SIZE - 1);
   if (error) {
     console.error(`Failed to read visitors (offset ${offset}):`, error.message);
@@ -89,7 +94,7 @@ const values = rows.map((r) => ({
   referrer: r.referrer,
   user_agent: r.user_agent,
   country: r.country,
-  created_at: r.created_at ?? new Date().toISOString(),
+  created_at: r.visited_at ?? new Date().toISOString(),
 }));
 
 let inserted = 0;
