@@ -49,5 +49,5 @@ export function MatrixBackground() {
     };
   }, [primary, bg]);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
+  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />;
 }

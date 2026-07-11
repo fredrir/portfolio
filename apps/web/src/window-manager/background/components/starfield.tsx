@@ -62,8 +62,7 @@ export function StarfieldBackground() {
       });
 
       stars.forEach((star) => {
-        const twinkle =
-          0.3 + 0.7 * ((Math.sin(t * star.speed * 10 + star.phase) + 1) / 2);
+        const twinkle = 0.3 + 0.7 * ((Math.sin(t * star.speed * 10 + star.phase) + 1) / 2);
         const alpha = star.brightness * twinkle * 0.6;
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
@@ -88,5 +87,5 @@ export function StarfieldBackground() {
     };
   }, [primary]);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
+  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />;
 }

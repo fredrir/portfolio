@@ -1,19 +1,10 @@
-import {
-  lazy,
-  Suspense,
-  useEffect,
-  useMemo,
-  useState,
-  type ComponentProps,
-} from "react";
+import { type ComponentProps, lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { TutorialOverlay } from "@/tutorial";
 import { AppLauncher } from "./launcher/components/app-launcher";
-import { FloatingDetail } from "./overlays/components/floating-detail";
 import { DragGhost } from "./overlays/components/drag-ghost";
+import { FloatingDetail } from "./overlays/components/floating-detail";
 
-const AboutPaneLazy = lazy(() =>
-  import("@/panes/about").then((m) => ({ default: m.AboutPane })),
-);
+const AboutPaneLazy = lazy(() => import("@/panes/about").then((m) => ({ default: m.AboutPane })));
 
 // Client-only: the about pane renders a three.js canvas that must not SSR.
 function AboutPane(props: ComponentProps<typeof AboutPaneLazy>) {
@@ -26,29 +17,30 @@ function AboutPane(props: ComponentProps<typeof AboutPaneLazy>) {
     </Suspense>
   );
 }
-import { GitHubPane } from "@/panes/github";
-import { SpotifyPane } from "@/panes/spotify";
-import { JourneyPane } from "@/panes/journey";
-import { ProjectsPane } from "@/panes/projects";
-import { ContactPane } from "@/panes/contact";
-import { SettingsPane } from "@/panes/settings";
-import { TerminalPane } from "@/terminal";
-import { ImagePane } from "@/panes/gallery";
-import { EngineeringPane } from "@/panes/engineering";
-import { DeploymentsPane } from "@/panes/deployments";
-import { MediaLabPane } from "@/panes/medialab";
-import { AnalyticsPane } from "@/panes/analytics";
-import { PaneHost } from "@/shared/components/pane-host";
-import { WINDOW_CONFIGS, configMap } from "./constants";
-import type { WindowConfig } from "./types";
-import type { useTutorial } from "@/tutorial/use-tutorial";
-import type { useTiling } from "./tiling/hooks/use-tiling";
-import type { useBackground } from "./background/hooks/use-background";
-import type { useFocus } from "./shell/hooks/use-focus";
-import type { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
-import type { GitHubData, SpotifyData } from "@/shared/types";
+
 import type { DictType, Locale } from "@/i18n/types";
+import { AnalyticsPane } from "@/panes/analytics";
+import { ContactPane } from "@/panes/contact";
+import { DeploymentsPane } from "@/panes/deployments";
+import { EngineeringPane } from "@/panes/engineering";
+import { ImagePane } from "@/panes/gallery";
+import { GitHubPane } from "@/panes/github";
+import { JourneyPane } from "@/panes/journey";
+import { MediaLabPane } from "@/panes/medialab";
+import { ProjectsPane } from "@/panes/projects";
+import { SettingsPane } from "@/panes/settings";
+import { SpotifyPane } from "@/panes/spotify";
+import { PaneHost } from "@/shared/components/pane-host";
+import type { GitHubData, SpotifyData } from "@/shared/types";
+import { TerminalPane } from "@/terminal";
+import type { useTutorial } from "@/tutorial/use-tutorial";
+import type { useBackground } from "./background/hooks/use-background";
+import { configMap, WINDOW_CONFIGS } from "./constants";
+import type { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
+import type { useFocus } from "./shell/hooks/use-focus";
 import { StatusBar } from "./status-bar";
+import type { useTiling } from "./tiling/hooks/use-tiling";
+import type { WindowConfig } from "./types";
 
 interface ViewContext {
   dict: DictType;
@@ -68,24 +60,12 @@ const POST_PANE_STEPS = new Set(["launcher", "drag", "resize"]);
 export type LayoutMode = "loading" | "mobile" | "maximized" | "desktop";
 
 export function useWindowManagerView(ctx: ViewContext) {
-  const {
-    dict,
-    locale,
-    isMobile,
-    tutorial,
-    wm,
-    bg,
-    focus,
-    floating,
-    githubData,
-    spotifyData,
-  } = ctx;
+  const { dict, locale, isMobile, tutorial, wm, bg, focus, floating, githubData, spotifyData } =
+    ctx;
   const { ui, tutorial: tutorialStrings, landing, journey, project, contact, navbar } = dict;
 
   const tutorialIsFloating =
-    tutorial.isActive &&
-    tutorial.step != null &&
-    POST_PANE_STEPS.has(tutorial.step.id);
+    tutorial.isActive && tutorial.step != null && POST_PANE_STEPS.has(tutorial.step.id);
   const tutorialIsFullscreen = tutorial.isActive && !tutorialIsFloating;
 
   const layoutMode: LayoutMode = (() => {
@@ -103,13 +83,7 @@ export function useWindowManagerView(ctx: ViewContext) {
       about: <AboutPane landing={landing} />,
       github: <GitHubPane initialData={githubData} ui={ui} />,
       spotify: <SpotifyPane initialData={spotifyData} ui={ui} locale={locale} />,
-      journey: (
-        <JourneyPane
-          journey={journey}
-          onOpenDetail={floating.openJourneyDetail}
-          ui={ui}
-        />
-      ),
+      journey: <JourneyPane journey={journey} onOpenDetail={floating.openJourneyDetail} ui={ui} />,
       projects: (
         <ProjectsPane
           title={project.title}
@@ -145,22 +119,22 @@ export function useWindowManagerView(ctx: ViewContext) {
       gallery: <ImagePane ui={ui} />,
       engineering: (
         <PaneHost>
-          <EngineeringPane />
+          <EngineeringPane ui={ui} />
         </PaneHost>
       ),
       deployments: (
         <PaneHost>
-          <DeploymentsPane />
+          <DeploymentsPane ui={ui} />
         </PaneHost>
       ),
       medialab: (
         <PaneHost>
-          <MediaLabPane />
+          <MediaLabPane ui={ui} />
         </PaneHost>
       ),
       analytics: (
         <PaneHost>
-          <AnalyticsPane />
+          <AnalyticsPane ui={ui} />
         </PaneHost>
       ),
     }),

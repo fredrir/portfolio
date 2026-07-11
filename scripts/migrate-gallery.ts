@@ -57,9 +57,7 @@ async function existing(): Promise<Set<string>> {
   const items = (await res.json()) as { filename: string; category?: string | null }[];
   // Match the key the upload path checks: the API stores an already-sanitized
   // filename, so sanitize both sides or re-runs create duplicates.
-  return new Set(
-    items.map((m) => `${m.category ?? ""}/${sanitizeFilename(m.filename)}`),
-  );
+  return new Set(items.map((m) => `${m.category ?? ""}/${sanitizeFilename(m.filename)}`));
 }
 
 function sanitizeFilename(name: string): string {
@@ -133,9 +131,7 @@ let skipped = 0;
 let failed = 0;
 
 for (const folder of FOLDERS) {
-  const { data, error } = await supabase.storage
-    .from("Portfolio")
-    .list(folder, { limit: 1000 });
+  const { data, error } = await supabase.storage.from("Portfolio").list(folder, { limit: 1000 });
   if (error) {
     console.error(`list ${folder}: ${error.message}`);
     failed++;
@@ -155,7 +151,7 @@ for (const folder of FOLDERS) {
       const renderUrl =
         `${supabaseUrl}/storage/v1/render/image/public/Portfolio/` +
         `${encodeURIComponent(folder)}/${encodeURIComponent(file.name)}` +
-        `?quality=90`;
+        "?quality=90";
       const resp = await fetch(renderUrl, { headers: { "user-agent": UA } });
       if (!resp.ok || !resp.headers.get("content-type")?.includes("image/")) {
         console.error(`  heic render ${file.name}: ${resp.status}`);
@@ -164,9 +160,7 @@ for (const folder of FOLDERS) {
       }
       bytes = new Uint8Array(await resp.arrayBuffer());
     } else if (contentTypeFor(file.name)) {
-      const dl = await supabase.storage
-        .from("Portfolio")
-        .download(`${folder}/${file.name}`);
+      const dl = await supabase.storage.from("Portfolio").download(`${folder}/${file.name}`);
       if (dl.error || !dl.data) {
         console.error(`  download ${file.name}: ${dl.error?.message}`);
         failed++;

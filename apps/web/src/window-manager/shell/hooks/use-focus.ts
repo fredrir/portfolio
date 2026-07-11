@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { useTiling } from "../../tiling/hooks/use-tiling";
 
 export function useFocus(wm: ReturnType<typeof useTiling>) {

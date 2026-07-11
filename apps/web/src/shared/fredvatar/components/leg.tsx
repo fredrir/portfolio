@@ -11,11 +11,7 @@ export function Leg({ side }: { side: 1 | -1 }) {
       </mesh>
       <mesh position={[side * 0.1, -1.72, 0]}>
         <capsuleGeometry args={[0.075, 0.3, 16, 32]} />
-        <meshStandardMaterial
-          color={PANTS_DARK}
-          roughness={0.95}
-          metalness={0.02}
-        />
+        <meshStandardMaterial color={PANTS_DARK} roughness={0.95} metalness={0.02} />
       </mesh>
     </group>
   );

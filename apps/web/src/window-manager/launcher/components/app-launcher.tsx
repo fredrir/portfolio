@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { WINDOW_CONFIGS, openExternalWindow } from "../../constants";
-import type { WindowStates } from "../../types";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { UiStrings } from "@/i18n/types";
+import { openExternalWindow, WINDOW_CONFIGS } from "../../constants";
+import type { WindowStates } from "../../types";
 
 interface Props {
   states: WindowStates;
@@ -14,14 +14,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function AppLauncher({
-  states,
-  ui,
-  locale,
-  onOpen,
-  onStop,
-  onClose,
-}: Props) {
+export function AppLauncher({ states, ui, locale, onOpen, onStop, onClose }: Props) {
   const [query, setQuery] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -84,22 +77,20 @@ export function AppLauncher({
   );
 
   useEffect(() => {
-    const el = listRef.current?.children[selectedIdx] as
-      | HTMLElement
-      | undefined;
+    const el = listRef.current?.children[selectedIdx] as HTMLElement | undefined;
     el?.scrollIntoView({ block: "nearest" });
   }, [selectedIdx]);
 
   return (
     <div
-      className="fixed inset-0 z-[10000] flex items-start justify-center pt-[18vh] bg-overlay-heavy backdrop-blur-sm"
+      className="fixed inset-0 z-[10000] flex items-start justify-center bg-overlay-heavy pt-[18vh] backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg rounded-xl border border-border-medium bg-glass-heavy backdrop-blur-md shadow-2xl shadow-wm-shadow overflow-hidden font-mono"
+        className="w-full max-w-lg overflow-hidden rounded-xl border border-border-medium bg-glass-heavy font-mono shadow-2xl shadow-wm-shadow backdrop-blur-md"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-wm-border">
+        <div className="flex items-center gap-3 border-wm-border border-b px-4 py-3">
           <span className="text-primary text-sm">walker</span>
           <input
             ref={inputRef}
@@ -111,14 +102,12 @@ export function AppLauncher({
             placeholder={ui.searchApps}
             autoComplete="off"
           />
-          <span className="text-ghost text-2xs">ctrl+k</span>
+          <span className="text-2xs text-ghost">ctrl+k</span>
         </div>
 
         <div ref={listRef} className="max-h-80 overflow-y-auto">
           {filtered.length === 0 ? (
-            <div className="px-4 py-6 text-center text-subtle text-sm">
-              {ui.noMatching}
-            </div>
+            <div className="px-4 py-6 text-center text-sm text-subtle">{ui.noMatching}</div>
           ) : (
             filtered.map((config, i) => {
               const isOpen = states[config.id]?.isOpen;
@@ -127,15 +116,15 @@ export function AppLauncher({
                 <div
                   key={config.id}
                   onMouseEnter={() => setSelectedIdx(i)}
-                  className={`w-full flex items-center justify-between px-4 py-2.5 transition-colors group ${
+                  className={`group flex w-full items-center justify-between px-4 py-2.5 transition-colors ${
                     isSelected ? "bg-control-active" : "hover:bg-control-hover"
                   }`}
                 >
                   <button
                     onClick={() => handleSelect(config.id)}
-                    className="flex items-center gap-3 flex-1 text-left"
+                    className="flex flex-1 items-center gap-3 text-left"
                   >
-                    <span className="text-primary-soft w-5 text-center text-sm">
+                    <span className="w-5 text-center text-primary-soft text-sm">
                       {config.icon || "·"}
                     </span>
                     <div>
@@ -146,13 +135,13 @@ export function AppLauncher({
                       >
                         {config.title}
                       </span>
-                      <span className="text-2xs text-ghost ml-2">
+                      <span className="ml-2 text-2xs text-ghost">
                         {ui.shortTitles[config.id] ?? config.id}
                       </span>
                     </div>
                   </button>
                   {config.isExternal ? (
-                    <span className="text-2xs px-1.5 py-0.5 rounded bg-launcher-bg text-primary">
+                    <span className="rounded bg-launcher-bg px-1.5 py-0.5 text-2xs text-primary">
                       ↗
                     </span>
                   ) : (
@@ -165,7 +154,7 @@ export function AppLauncher({
                           handleSelect(config.id);
                         }
                       }}
-                      className={`text-2xs px-1.5 py-0.5 rounded transition-colors ${
+                      className={`rounded px-1.5 py-0.5 text-2xs transition-colors ${
                         isOpen
                           ? "bg-badge-stop text-red-400 hover:bg-badge-stop-hover"
                           : "bg-launcher-bg text-primary hover:bg-launcher-hover"
@@ -180,11 +169,11 @@ export function AppLauncher({
           )}
         </div>
 
-        <div className="px-4 py-2 border-t border-border-faint text-2xs text-ghost flex items-center justify-between">
+        <div className="flex items-center justify-between border-border-faint border-t px-4 py-2 text-2xs text-ghost">
           <span>
             <span className="text-primary-dim">↑↓</span> {ui.navigate}
-            <span className="text-primary-dim ml-3">Enter</span> {ui.open}
-            <span className="text-primary-dim ml-3">Esc</span> {ui.close}
+            <span className="ml-3 text-primary-dim">Enter</span> {ui.open}
+            <span className="ml-3 text-primary-dim">Esc</span> {ui.close}
           </span>
           <span>
             {filtered.length} {ui.apps}

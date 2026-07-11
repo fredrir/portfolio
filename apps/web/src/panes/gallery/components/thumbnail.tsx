@@ -1,20 +1,14 @@
-import Image from "@/shared/components/image";
 import type { GalleryImage } from "@/server/gallery";
+import Image from "@/shared/components/image";
 import { isSvg } from "../utils";
 
-export function Thumbnail({
-  image,
-  className,
-}: {
-  image: GalleryImage;
-  className?: string;
-}) {
+export function Thumbnail({ image, className }: { image: GalleryImage; className?: string }) {
   if (isSvg(image.src)) {
     return (
       <img
         src={image.src}
         alt={image.filename}
-        className={`w-full h-full object-contain p-1.5 ${className ?? ""}`}
+        className={`h-full w-full object-contain p-1.5 ${className ?? ""}`}
       />
     );
   }
@@ -24,7 +18,7 @@ export function Thumbnail({
       alt={image.filename}
       width={200}
       height={150}
-      className={`w-full h-full object-cover ${className ?? ""}`}
+      className={`h-full w-full object-cover ${className ?? ""}`}
     />
   );
 }

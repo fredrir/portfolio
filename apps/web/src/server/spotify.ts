@@ -7,12 +7,17 @@ import type { SpotifyData } from "@/shared/types";
 export const getSpotifyData = createServerFn({ method: "POST" })
   .validator((captchaToken: string) => captchaToken)
   .handler(async ({ data: captchaToken }): Promise<SpotifyData> => {
-    const { data, error } = await api.GET("/api/v1/spotify", {
-      params: { query: { recaptcha_token: captchaToken } },
-      headers: traceHeaders(),
-    });
-    if (error || !data) {
+    try {
+      const { data, error } = await api.GET("/api/v1/spotify", {
+        params: { query: { recaptcha_token: captchaToken } },
+        headers: traceHeaders(),
+      });
+      if (error || !data) {
+        return { ok: false, error: "spotify_unavailable" };
+      }
+      return data as SpotifyData;
+    } catch (error) {
+      console.error("Failed to reach the Spotify API:", error);
       return { ok: false, error: "spotify_unavailable" };
     }
-    return data as SpotifyData;
   });

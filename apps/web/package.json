@@ -4,10 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "doppler run -- vite dev",
+    "dev": "doppler run --preserve-env=API_URL,VITE_RECAPTCHA_SITE_KEY -- vite dev",
     "build": "vite build",
     "start": "node .output/server/index.mjs",
-    "lint": "eslint .",
+    "lint": "biome ci .",
+    "format": "biome check --write .",
+    "format:unsafe": "biome check --write --unsafe .",
     "typecheck": "tsc --noEmit",
     "build:wasm": "cd ../../crates/terminal-plugins && cargo build --release --target wasm32-unknown-unknown && cp target/wasm32-unknown-unknown/release/terminal_plugins.wasm ../../apps/web/public/wasm/terminal-plugins.wasm"
   },
@@ -42,11 +44,9 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
-    "eslint": "^10.0.3",
     "nitro": "^3.0.260610-beta",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.57.1",
     "vite": "^8.1.4"
   }
 }

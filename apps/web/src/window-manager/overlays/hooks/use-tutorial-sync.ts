@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import type { useTiling } from "../../tiling/hooks/use-tiling";
 import type { useTutorial } from "@/tutorial/use-tutorial";
+import type { useTiling } from "../../tiling/hooks/use-tiling";
 
 export function useTutorialSync(
   tutorial: ReturnType<typeof useTutorial>,

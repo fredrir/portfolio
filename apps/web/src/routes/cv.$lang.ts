@@ -18,8 +18,7 @@ export const Route = createFileRoute("/cv/$lang")({
           if (active?.url) {
             return Response.redirect(active.url, 302);
           }
-        } catch {
-        }
+        } catch {}
         return Response.redirect(new URL(`/cv-${lang}.pdf`, request.url), 302);
       },
     },

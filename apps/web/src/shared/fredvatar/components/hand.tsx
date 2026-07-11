@@ -30,10 +30,7 @@ export function Hand({ side }: { side: 1 | -1 }) {
         </group>
       ))}
 
-      <group
-        position={[side * -0.04, -0.01, 0.01]}
-        rotation={[0, 0, side * 0.7]}
-      >
+      <group position={[side * -0.04, -0.01, 0.01]} rotation={[0, 0, side * 0.7]}>
         <mesh position={[0, -0.018, 0]}>
           <capsuleGeometry args={[0.013, 0.035, 8, 16]} />
           <meshStandardMaterial color={SKIN} roughness={0.55} />

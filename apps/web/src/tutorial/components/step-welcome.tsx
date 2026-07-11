@@ -2,9 +2,9 @@
 
 import { useRouter } from "@tanstack/react-router";
 import { useTransition } from "react";
+import type { TutorialStrings } from "@/i18n/types";
 import { languages } from "@/panes/settings/constants";
 import { StepLayout } from "./step-layout";
-import type { TutorialStrings } from "@/i18n/types";
 
 interface Props {
   t: TutorialStrings;
@@ -13,12 +13,7 @@ interface Props {
   onSaveState: (nextStep: number) => void;
 }
 
-export function StepWelcome({
-  t,
-  currentLocale,
-  onSelectLocale,
-  onSaveState,
-}: Props) {
+export function StepWelcome({ t, currentLocale, onSelectLocale, onSaveState }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
 
@@ -43,7 +38,7 @@ export function StepWelcome({
                   });
                 }
               }}
-              className={`flex flex-col xs:flex-row items-center gap-2 px-3 py-2 rounded-lg border text-xs sm:text-sm transition-all ${
+              className={`flex xs:flex-row flex-col items-center gap-2 rounded-lg border px-3 py-2 text-xs transition-all sm:text-sm ${
                 isActive
                   ? "border-primary bg-control-active text-primary"
                   : "border-control-border text-muted-foreground hover:border-control-border-hover hover:bg-control-hover"

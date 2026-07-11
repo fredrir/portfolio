@@ -19,7 +19,7 @@ jobs:
         with:
           bun-version-file: package.json
       - run: bun install --frozen-lockfile
-      - run: bun run --filter '@portfolio/web' lint
+      - run: bun run lint
       - run: bun run --filter '@portfolio/web' typecheck
       - run: bun run --filter '@portfolio/web' build
       - run: bun run --filter '@portfolio/edge' typecheck

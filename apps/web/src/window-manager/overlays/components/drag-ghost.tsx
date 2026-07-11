@@ -1,5 +1,5 @@
-import type { WindowConfig } from "../../types";
 import { WindowFrame } from "../../shell/components/window-frame";
+import type { WindowConfig } from "../../types";
 
 interface Props {
   config: WindowConfig;
@@ -11,7 +11,7 @@ interface Props {
 export function DragGhost({ config, pos, size, children }: Props) {
   return (
     <div
-      className="fixed z-9990 pointer-events-none"
+      className="pointer-events-none fixed z-9990"
       style={{
         left: pos.x,
         top: pos.y,

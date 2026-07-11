@@ -30,12 +30,10 @@ export function TilingProvider({
   value: TilingContextValue;
   children: React.ReactNode;
 }) {
-  return (
-    <TilingContext.Provider value={value}>{children}</TilingContext.Provider>
-  );
+  return <TilingContext.Provider value={value}>{children}</TilingContext.Provider>;
 }
 
 export { TilingGrid } from "./components/tiling-grid";
 export { useTiling } from "./hooks/use-tiling";
 export { LayoutEngine } from "./layout-engine";
-export type { CellDef, LayoutTier, DragResult, ResizeResult } from "./types";
+export type { CellDef, DragResult, LayoutTier, ResizeResult } from "./types";

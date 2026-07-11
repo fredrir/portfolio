@@ -12,13 +12,9 @@
     "AWS_REGION": "eu-north-1"
   },
   "durable_objects": {
-    "bindings": [
-      { "name": "RATE_LIMITER", "class_name": "RateLimiter" }
-    ]
+    "bindings": [{ "name": "RATE_LIMITER", "class_name": "RateLimiter" }]
   },
-  "migrations": [
-    { "tag": "v1", "new_sqlite_classes": ["RateLimiter"] }
-  ],
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["RateLimiter"] }],
   "observability": {
     "enabled": true
   }

@@ -1,12 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { KEYS, read, readJson, remove, write, writeJson } from "@/lib/storage";
 import { BACKGROUND_PRESETS } from "../../constants";
-import { KEYS, read, readJson, write, writeJson, remove } from "@/lib/storage";
 import type { BackgroundConfig } from "../types";
 
 export function useBackground() {
-  const [current, setCurrent] = useState<BackgroundConfig>(
-    BACKGROUND_PRESETS[0],
-  );
+  const [current, setCurrent] = useState<BackgroundConfig>(BACKGROUND_PRESETS[0]);
   const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {

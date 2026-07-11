@@ -1,8 +1,8 @@
 "use client";
 
+import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
 
 export function Eye({
   position,
@@ -31,8 +31,7 @@ export function Eye({
       b.next = 4 + Math.random() * 6;
     }
     b.progress = Math.min(b.progress + delta * 4, 1);
-    const openAmount =
-      b.progress < 0.5 ? 1 - b.progress * 2 : (b.progress - 0.5) * 2;
+    const openAmount = b.progress < 0.5 ? 1 - b.progress * 2 : (b.progress - 0.5) * 2;
     groupRef.current.scale.set(1, Math.max(openAmount, 0.05), 1);
   });
 

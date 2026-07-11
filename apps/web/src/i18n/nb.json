@@ -1,4 +1,135 @@
 {
+  "seo": {
+    "description": "Fredrik Carsten Hansteens personlige nettside"
+  },
+  "cookieConsent": {
+    "prompt": "{name} har lyst på dine informasjonskapsler",
+    "accept": "[Y] godta",
+    "decline": "[n] avslå",
+    "info": "[i] info",
+    "gdprTitle": "GDPR / Personverninformasjon",
+    "gdprLines": [
+      "Behandlingsansvarlig: {name} ({email})",
+      "Samles inn etter samtykke: sidevisninger, henvisning, nettleser og land, aggregert",
+      "Produktanalyse: PostHog (EU-region); førsteparts tellinger aggregeres på min egen server",
+      "PostHog lagrer en førsteparts-id i nettstedets lokale lagring; ingen sporingskapsler på tvers av nettsteder",
+      "Ingen IP-adresser lagres - landet ditt utledes på Cloudflare-kanten",
+      "Spamvern: Google reCAPTCHA beskytter kontaktskjemaet og kan sette Google-kapsler",
+      "Rettslig grunnlag: Art. 6(1)(a) GDPR / Personopplysningsloven § 1",
+      "Trekk samtykket tilbake når som helst ved å slette nettstedets lokale lagring",
+      "Klagerett: Datatilsynet - datatilsynet.no"
+    ],
+    "gdprBack": "[q] tilbake",
+    "cookieLine": "venter...",
+    "cookieLabel": "Informasjonskapsler"
+  },
+  "admin": {
+    "pageTitle": "Administrasjon - hansteen.dev",
+    "apiUnreachable": "api utilgjengelig",
+    "subtitle": "mediepipeline · Access-beskyttet",
+    "stats": {
+      "items": "elementer",
+      "live": "live",
+      "stored": "lagret"
+    },
+    "uploadErrors": {
+      "invalidType": "ikke jpeg, png eller webp",
+      "tooLarge": "over 25 MiB",
+      "uploadFailed": "opplasting feilet",
+      "authorizationFailed": "autorisasjon feilet",
+      "processingFailed": "behandling feilet",
+      "networkDuringS3": "nettverksfeil under S3 PUT"
+    },
+    "pipeline": {
+      "stations": [
+        {
+          "label": "autoriser",
+          "sub": "grant + audit"
+        },
+        {
+          "label": "s3 put",
+          "sub": "presigned"
+        },
+        {
+          "label": "worker",
+          "sub": "avif · webp"
+        },
+        {
+          "label": "live",
+          "sub": "galleri"
+        }
+      ],
+      "ingest": "inntak",
+      "clearFinished": "fjern ferdige",
+      "uploadAria": "Last opp bilder: slipp filer hvor som helst eller trykk Enter for å bla",
+      "release": "slipp for å mate pipelinen",
+      "drop": "slipp bilder hvor som helst, eller klikk for å bla",
+      "constraints": "jpeg / png / webp · <= 25 MiB",
+      "category": "kategori",
+      "uncategorized": "ukategorisert",
+      "failed": "feilet",
+      "failedAt": "{detail} · ved {station}",
+      "putProgress": "put {percent}%",
+      "stageLabels": {
+        "authorizing": "autoriserer",
+        "uploading": "laster opp",
+        "processing": "behandler",
+        "ready": "live",
+        "failed": "feilet"
+      }
+    },
+    "library": {
+      "label": "bibliotek",
+      "of": "av",
+      "refreshAria": "Oppdater bibliotek",
+      "openAria": "Åpne {filename}",
+      "filters": {
+        "all": "alle",
+        "ready": "klare",
+        "processing": "behandles",
+        "failed": "feilet"
+      },
+      "filterPlaceholder": "filtrer på filnavn",
+      "filterAria": "Filtrer på filnavn",
+      "reading": "leser biblioteket...",
+      "empty": "biblioteket er tomt - mat pipelinen over",
+      "noMatches": "ingen treff for disse filtrene",
+      "uncategorized": "ukategorisert"
+    },
+    "lightbox": {
+      "copied": "kopiert",
+      "closePreview": "Lukk forhåndsvisning",
+      "noVariant": "ingen variant å forhåndsvise ennå",
+      "previousImage": "Forrige bilde",
+      "nextImage": "Neste bilde",
+      "size": "størrelse",
+      "source": "kilde",
+      "sha256": "sha-256",
+      "copyContentHash": "Kopier innholdshash",
+      "encodedVariants": "kodede varianter",
+      "copyFormatUrl": "Kopier {format}-URL",
+      "openFormatNewTab": "Åpne {format} i ny fane",
+      "of": "av",
+      "moveHint": "for å flytte"
+    },
+    "ledger": {
+      "label": "ledger",
+      "verifying": "verifiserer...",
+      "verifyChain": "verifiser kjede",
+      "chainIntact": "kjeden er intakt - {entries} oppføringer verifisert",
+      "chainBroken": "kjeden er brutt ved oppføring #{id}",
+      "verificationFailed": "verifisering kjørte ikke - prøv igjen",
+      "empty": "ingen oppføringer ennå - første autorisasjon starter kjeden",
+      "collapse": "fold sammen",
+      "showAll": "vis alle {count} oppføringer"
+    },
+    "time": {
+      "secondsAgo": "s siden",
+      "minutesAgo": "m siden",
+      "hoursAgo": "t siden",
+      "daysAgo": "d siden"
+    }
+  },
   "tutorial": {
     "welcomeTitle": "Velkommen!",
     "welcomeBody": "Jeg er Fredrik, la meg vise deg rundt på skrivebordet mitt. Velg språk først.",
@@ -54,7 +185,8 @@
   },
   "landing": {
     "title": "Hei, jeg er",
-    "mainText": "For tiden tar jeg en mastergrad i datateknologi ved NTNU i Trondheim. Du er mer enn velkommen til å ta en titt på siden min eller å ta kontakt."
+    "mainText": "For tiden tar jeg en mastergrad i datateknologi ved NTNU i Trondheim. Du er mer enn velkommen til å ta en titt på siden min eller å ta kontakt.",
+    "avatarLabel": "Interaktiv 3D-avatar av Fredrik"
   },
   "journey": {
     "title": "Min Reise",
@@ -251,11 +383,7 @@
         "title": "Online Events",
         "description": "En mobilapp laget for studenter hvor de kan melde seg på arrangementer, få varslinger og spille spill.",
         "languages": "Auth0 / Flutter / Firebase / Go / Google Cloud Platform",
-        "mobileImages": [
-          "/app-picture.png",
-          "/app-picture-2.jpg",
-          "/app-picture-3.jpg"
-        ],
+        "mobileImages": ["/app-picture.png", "/app-picture-2.jpg", "/app-picture-3.jpg"],
         "githubLink": "https://github.com/appKom/online_events",
         "websiteLink": "https://apps.apple.com/no/app/online/id6476830274",
         "websiteAlias": "App Store"
@@ -293,7 +421,30 @@
     "recaptchaError": "Vennligst fullfør reCAPTCHA.",
     "optional": "valgfritt",
     "vimHintNormal": "Trykk \"i\" for å begynne å skrive...",
-    "vimHintStatus": "Trykk {i} for å redigere, {wq} for å sende"
+    "vimHintStatus": "Trykk {i} for å redigere, {wq} for å sende",
+    "toLabel": "Til:",
+    "fromLabel": "Fra:",
+    "mailLabel": "E-post:",
+    "phoneLabel": "Tlf:",
+    "insertMode": "-- SETT INN --",
+    "submitCommand": ":wq",
+    "log": {
+      "resolvingMx": "Slår opp MX-post for hansteen.dev...",
+      "captchaOk": "CAPTCHA-verifisering .............. [  OK  ]",
+      "captchaFailed": "CAPTCHA-verifisering .............. [FAILED]",
+      "tlsOk": "Oppretter TLS-tilkobling .......... [  OK  ]",
+      "authOk": "Autentiserer avsender ............. [  OK  ]",
+      "sendingBytes": "Sender {bytes} byte ...",
+      "deliveryOk": "Meldingslevering .................. [  OK  ]",
+      "deliveryFailed": "Meldingslevering .................. [FAILED]",
+      "sent": "E-post sendt. Kø-ID: {queueId}",
+      "sentPrefix": "E-post sendt.",
+      "error": "Feil: {error}",
+      "errorPrefix": "Feil:",
+      "unknownError": "ukjent",
+      "connectionError": "Tilkoblingsfeil: ETIMEDOUT",
+      "connectionErrorPrefix": "Tilkoblingsfeil:"
+    }
   },
   "footer": {
     "license1": "Alle rettigheter forbeholdt.",
@@ -384,6 +535,92 @@
       "deployments": "deploys",
       "medialab": "medialab",
       "analytics": "analytics"
-    }
+    },
+    "loading": "laster...",
+    "albumArt": "Albumomslag",
+    "platform": {
+      "common": {
+        "noDataYet": "Ingen data ennå.",
+        "direct": "direkte",
+        "dailySeriesPeak": "Daglig serie, topp",
+        "relativeTime": {
+          "secondsAgo": "s siden",
+          "minutesAgo": "m siden",
+          "hoursAgo": "t siden",
+          "daysAgo": "d siden"
+        }
+      },
+      "engineering": {
+        "browser": "Nettleser",
+        "yourDevice": "din enhet",
+        "cfWorker": "CF Worker",
+        "colo": "colo",
+        "routing": "ruting",
+        "access": "Access",
+        "serviceToken": "servicetoken",
+        "tunnel": "Tunnel",
+        "cloudflared": "cloudflared",
+        "caddy": "Caddy",
+        "reverseProxy": "reverse proxy",
+        "slotSuffix": "slot",
+        "originSlot": "origin-slot",
+        "privateOrigin": "privat origin",
+        "liveRequestPath": "live forespørselsvei",
+        "traced": "sporet",
+        "tracing": "sporer...",
+        "privatePathNote": "Ingen offentlige porter på origin - edge Workeren presenterer en Access-servicetoken, og alt etter den er privat.",
+        "roundTrip": "tur/retur",
+        "roundTripLabel": "ms, nettleser->origin",
+        "edgeTime": "edge-tid",
+        "edgeTimeLabel": "ms i worker",
+        "cache": "cache",
+        "release": "release",
+        "signedVerified": "signert · verifisert",
+        "commit": "commit",
+        "liveSlot": "live slot",
+        "requestId": "request-id"
+      },
+      "deployments": {
+        "health": "helse",
+        "lastRuns": "siste 10 kjøringer",
+        "median": "median",
+        "buildToLive": "bygg->live",
+        "live": "live",
+        "servingNow": "serverer nå",
+        "releaseLedger": "release-ledger · main",
+        "runs": "kjøringer",
+        "readingHistory": "Leser kjøringshistorikk...",
+        "historyUnavailable": "Utrullingshistorikken er midlertidig utilgjengelig."
+      },
+      "medialab": {
+        "variantAlt": "{format}-variant",
+        "smallest": "minst",
+        "processed": "behandlet",
+        "images": "bilder",
+        "variants": "varianter",
+        "avifWebp": "avif + webp",
+        "avgSaving": "snitt spart",
+        "bestVsLargest": "best mot størst",
+        "loading": "Laster kodekbenken...",
+        "unavailable": "Mediepipelinen er midlertidig utilgjengelig.",
+        "empty": "Ingen behandlete medier ennå. Opplastinger blir varianter i løpet av sekunder.",
+        "hint": "En opplasting går gjennom en forhåndssignert S3 PUT, en SQS-hendelse og en Rust-worker som fjerner metadata og koder AVIF og WebP under innholdshashede nøkler. Edge signerer og cacher lesingene."
+      },
+      "analytics": {
+        "aggregating": "Aggregerer besøk...",
+        "visitors30": "besøkende · 30 dager",
+        "inLast7d": "{count} siste 7d",
+        "totalVisits": "besøk totalt",
+        "countries": "land",
+        "browsers": "nettlesere",
+        "referrers": "henvisere",
+        "noVisits": "Ingen besøk registrert ennå - telleren starter når samtykke er gitt.",
+        "productAnalytics": "produktanalyse · posthog",
+        "consented": "samtykket",
+        "pageviews30": "sidevisninger, 30 dager"
+      }
+    },
+    "uncategorized": "ukategorisert",
+    "spotifyPlayer": "Spotify-spiller"
   }
 }

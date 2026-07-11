@@ -1,17 +1,11 @@
 "use client";
 
+import { EnvelopeSimple, GearSix, House, Terminal, UserIcon } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
-import {
-  UserIcon,
-  EnvelopeSimple,
-  Terminal,
-  GearSix,
-  House,
-} from "@phosphor-icons/react";
-import { configMap } from "../../constants";
-import { DockIcon } from "./dock-icon";
-import type { MobileState } from "../types";
 import type { UiStrings } from "@/i18n/types";
+import { configMap } from "../../constants";
+import type { MobileState } from "../types";
+import { DockIcon } from "./dock-icon";
 
 interface Props {
   mobile: MobileState;
@@ -64,22 +58,20 @@ function makeClipPath(center: number, flat: boolean): string {
 export function MobileDock({ mobile, ui }: Props) {
   const { activeApp } = mobile;
   const activeId = activeApp ?? "home";
-  const hasDockActive =
-    activeApp === null || (DOCK_IDS as readonly string[]).includes(activeApp);
+  const hasDockActive = activeApp === null || (DOCK_IDS as readonly string[]).includes(activeApp);
   const bulgeCenter = DOCK_CENTERS[activeId] ?? 50;
   const svgPath = makePath(bulgeCenter, !hasDockActive);
   const clipPath = makeClipPath(bulgeCenter, !hasDockActive);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9999] font-mono">
+    <div className="fixed right-0 bottom-0 left-0 z-[9999] font-mono">
       <div
         className="relative mx-3 mb-3 h-[4.5rem]"
         style={{
-          filter:
-            "drop-shadow(0 4px 12px var(--color-wm-shadow-soft, rgba(0,0,0,0.1)))",
+          filter: "drop-shadow(0 4px 12px var(--color-wm-shadow-soft, rgba(0,0,0,0.1)))",
         }}
       >
-        <svg className="absolute w-0 h-0" aria-hidden>
+        <svg className="absolute h-0 w-0" aria-hidden>
           <defs>
             <clipPath id="dock-clip" clipPathUnits="objectBoundingBox">
               <motion.path
@@ -96,7 +88,7 @@ export function MobileDock({ mobile, ui }: Props) {
         />
 
         <svg
-          className="absolute inset-0 w-full h-full pointer-events-none z-10"
+          className="pointer-events-none absolute inset-0 z-10 h-full w-full"
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
           aria-hidden
@@ -111,13 +103,10 @@ export function MobileDock({ mobile, ui }: Props) {
           />
         </svg>
 
-        <div className="relative z-20 flex items-end justify-around h-full pb-2">
+        <div className="relative z-20 flex h-full items-end justify-around pb-2">
           {DOCK_IDS.map((id) => {
-            const isActive =
-              id === "home" ? activeApp === null : activeApp === id;
-            const label =
-              ui.localeTitles[id] ??
-              (id === "home" ? "Home" : configMap[id].title);
+            const isActive = id === "home" ? activeApp === null : activeApp === id;
+            const label = ui.localeTitles[id] ?? configMap[id].title;
 
             return (
               <DockIcon

@@ -1,19 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { useContainerSize } from "@/shared/hooks/use-container-size";
-import {
-  getGalleryData,
-  type GalleryCategory,
-  type GalleryImage,
-} from "@/server/gallery";
 import { ArrowLeft, FolderOpen } from "@phosphor-icons/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { UiStrings } from "@/i18n/types";
+import { type GalleryCategory, type GalleryImage, getGalleryData } from "@/server/gallery";
+import { useContainerSize } from "@/shared/hooks/use-container-size";
 import { useMobileBack } from "@/shared/hooks/use-mobile-back";
-import { ImageDetail } from "./components/image-detail";
 import { CategoryBrowser } from "./components/category-browser";
-import { ImageGrid } from "./components/image-grid";
 import { CategoryTabs } from "./components/category-tabs";
+import { ImageDetail } from "./components/image-detail";
+import { ImageGrid } from "./components/image-grid";
 
 export function ImagePane({ ui }: { ui: UiStrings }) {
   const [categories, setCategories] = useState<GalleryCategory[]>([]);
@@ -25,19 +21,16 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
   const narrow = width > 0 && width < 400;
 
   useEffect(() => {
-    getGalleryData().then((data) => {
+    getGalleryData({
+      data: { uncategorized: ui.uncategorized, projects: ui.projects },
+    }).then((data) => {
       setCategories(data);
       setLoading(false);
     });
-  }, []);
+  }, [ui.projects, ui.uncategorized]);
 
   useEffect(() => {
-    if (
-      !narrow &&
-      !loading &&
-      categories.length > 0 &&
-      activeCategory === null
-    ) {
+    if (!narrow && !loading && categories.length > 0 && activeCategory === null) {
       setActiveCategory(categories[0].name);
     }
   }, [narrow, loading, categories, activeCategory]);
@@ -100,43 +93,33 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
   const showBrowser = narrow && !activeCategory;
 
   return (
-    <div
-      ref={containerRef}
-      className="p-3 @xs:p-2.5 @sm:p-3 h-full flex flex-col"
-    >
+    <div ref={containerRef} className="flex h-full flex-col @sm:p-3 @xs:p-2.5 p-3">
       {loading ? (
-        <div className="flex-1 flex items-center justify-center">
-          <span className="text-subtle animate-pulse">
-            {ui.searchingGallery}
-          </span>
+        <div className="flex flex-1 items-center justify-center">
+          <span className="animate-pulse text-subtle">{ui.searchingGallery}</span>
         </div>
       ) : categories.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center gap-2 text-subtle">
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 text-subtle">
           <FolderOpen size={28} />
           <span>{ui.emptyGallery}</span>
         </div>
       ) : (
         <>
           {showBrowser ? (
-            <CategoryBrowser
-              categories={categories}
-              onSelect={handleSelectCategory}
-            />
+            <CategoryBrowser categories={categories} onSelect={handleSelectCategory} />
           ) : (
             <>
               {narrow && !selectedImage ? (
                 !inMobileLayout && (
-                  <div className="flex items-center gap-1.5 mb-1.5 shrink-0">
+                  <div className="mb-1.5 flex shrink-0 items-center gap-1.5">
                     <button
                       onClick={handleBack}
-                      className="text-primary-muted hover:text-primary active:text-primary transition-colors text-sm py-0.5 inline-flex items-center gap-1"
+                      className="inline-flex items-center gap-1 py-0.5 text-primary-muted text-sm transition-colors hover:text-primary active:text-primary"
                     >
                       <ArrowLeft size={14} />
                       ~/gallery
                     </button>
-                    <span className="text-ghost text-2xs">
-                      {activeCategory}
-                    </span>
+                    <span className="text-2xs text-ghost">{activeCategory}</span>
                   </div>
                 )
               ) : narrow ? null : (
@@ -148,12 +131,12 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
               )}
 
               {selectedImage ? (
-                <div className="flex-1 flex flex-col min-h-0">
+                <div className="flex min-h-0 flex-1 flex-col">
                   {!inMobileLayout && (
-                    <div className="flex items-center gap-2 mb-1 shrink-0">
+                    <div className="mb-1 flex shrink-0 items-center gap-2">
                       <button
                         onClick={() => setSelectedImage(null)}
-                        className={`text-primary-muted hover:text-primary active:text-primary transition-colors inline-flex items-center gap-1 ${narrow ? "text-sm py-1" : "text-2xs"}`}
+                        className={`inline-flex items-center gap-1 text-primary-muted transition-colors hover:text-primary active:text-primary ${narrow ? "py-1 text-sm" : "text-2xs"}`}
                       >
                         <ArrowLeft size={narrow ? 14 : 12} />
                         {activeCategory}
@@ -165,9 +148,7 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
                     onSwipe={handleSwipe}
                     currentIndex={
                       currentCategory
-                        ? currentCategory.images.findIndex(
-                            (img) => img.src === selectedImage.src,
-                          )
+                        ? currentCategory.images.findIndex((img) => img.src === selectedImage.src)
                         : 0
                     }
                     totalCount={currentCategory?.images.length ?? 0}
@@ -184,11 +165,11 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
               )}
 
               {!compact && !narrow && (
-                <div className="pt-1 border-t border-border-faint text-ghost text-2xs mt-1 flex justify-between shrink-0">
-                  <span>{currentCategory?.images.length ?? 0} images</span>
-                  <span className="text-primary-subtle">
-                    ~/gallery/{activeCategory}/
+                <div className="mt-1 flex shrink-0 justify-between border-border-faint border-t pt-1 text-2xs text-ghost">
+                  <span>
+                    {currentCategory?.images.length ?? 0} {ui.images}
                   </span>
+                  <span className="text-primary-subtle">~/gallery/{activeCategory}/</span>
                 </div>
               )}
             </>

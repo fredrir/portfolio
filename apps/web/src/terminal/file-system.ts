@@ -1,5 +1,6 @@
-import { MY_NAME, MY_EMAIL } from "@/lib/constants";
-import type { FileSystemNode, FileSystemConfig } from "./types";
+import { MY_EMAIL, MY_NAME } from "@/lib/constants";
+import type { TerminalStrings } from "./translations";
+import type { FileSystemConfig, FileSystemNode } from "./types";
 
 function toFileName(s: string): string {
   return s
@@ -8,14 +9,17 @@ function toFileName(s: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
-export function createFileSystem(config?: FileSystemConfig): FileSystemNode {
+export function createFileSystem(
+  config: FileSystemConfig | undefined,
+  t: TerminalStrings,
+): FileSystemNode {
   const appsChildren: Record<string, FileSystemNode> = {};
   if (config?.paneIds) {
     for (const id of config.paneIds) {
       appsChildren[id] = {
         name: id,
         type: "file",
-        content: `Application: ${id}`,
+        content: `${t.application}: ${id}`,
       };
     }
   }
@@ -97,9 +101,7 @@ export function createFileSystem(config?: FileSystemConfig): FileSystemNode {
               "profile.txt": {
                 name: "profile.txt",
                 type: "file",
-                content:
-                  `${MY_NAME} - Developer of FredrikOS\n` +
-                  `Contact: ${MY_EMAIL}`,
+                content: `${MY_NAME} - ${t.profileDeveloperOf}\n` + `${t.profileContact}: ${MY_EMAIL}`,
               },
               ".bashrc": {
                 name: ".bashrc",
@@ -122,7 +124,7 @@ export function createFileSystem(config?: FileSystemConfig): FileSystemNode {
               node: {
                 name: "node",
                 type: "file",
-                content: "Node.js executable",
+                content: t.nodeExecutable,
               },
             },
           },
@@ -151,7 +153,9 @@ export function createFileSystem(config?: FileSystemConfig): FileSystemNode {
                 name: "system.log",
                 type: "file",
                 content:
-                  "[2024-01-15 10:30:15] System started\n[2024-01-15 10:30:16] Terminal initialized\n[2024-01-15 10:30:17] Ready for commands",
+                  `[2024-01-15 10:30:15] ${t.systemStarted}\n` +
+                  `[2024-01-15 10:30:16] ${t.terminalInitialized}\n` +
+                  `[2024-01-15 10:30:17] ${t.readyForCommands}`,
               },
             },
           },
@@ -163,9 +167,11 @@ export function createFileSystem(config?: FileSystemConfig): FileSystemNode {
 
 export class FileSystemManager {
   private fileSystem: FileSystemNode;
+  private t: TerminalStrings;
 
-  constructor(config?: FileSystemConfig) {
-    this.fileSystem = createFileSystem(config);
+  constructor(config: FileSystemConfig | undefined, t: TerminalStrings) {
+    this.t = t;
+    this.fileSystem = createFileSystem(config, t);
   }
 
   getNodeAtPath(path: string): FileSystemNode | null {
@@ -201,8 +207,7 @@ export class FileSystemManager {
       return currentPath;
     }
 
-    const combined =
-      currentPath === "/" ? `/${inputPath}` : `${currentPath}/${inputPath}`;
+    const combined = currentPath === "/" ? `/${inputPath}` : `${currentPath}/${inputPath}`;
     return this.normalizePath(combined);
   }
 
@@ -240,7 +245,7 @@ export class FileSystemManager {
     const node = this.getNodeAtPath(path);
 
     if (!node) {
-      throw new Error(`cannot access '${path}': No such file or directory`);
+      throw new Error(`${this.t.cannotAccess} '${path}': ${this.t.noSuchFileOrDir}`);
     }
 
     if (node.type === "file") {
@@ -250,10 +255,8 @@ export class FileSystemManager {
     const items = node.children ? Object.values(node.children) : [];
     return (
       items
-        .map((item) =>
-          item.type === "directory" ? `📁 ${item.name}` : `📄 ${item.name}`,
-        )
-        .join("\n") || "(empty directory)"
+        .map((item) => (item.type === "directory" ? `📁 ${item.name}` : `📄 ${item.name}`))
+        .join("\n") || this.t.emptyDirectory
     );
   }
 
@@ -261,14 +264,14 @@ export class FileSystemManager {
     const node = this.getNodeAtPath(path);
 
     if (!node) {
-      throw new Error(`${path}: No such file or directory`);
+      throw new Error(`${path}: ${this.t.noSuchFileOrDir}`);
     }
 
     if (node.type === "directory") {
-      throw new Error(`${path}: Is a directory`);
+      throw new Error(`${path}: ${this.t.isADirectory}`);
     }
 
-    return node.content || "(empty file)";
+    return node.content || this.t.emptyFile;
   }
 
   isDirectory(path: string): boolean {
@@ -301,8 +304,7 @@ export class FileSystemManager {
       .map((name) => {
         const child = dirNode.children![name];
         const inputLastSlash = partialPath.lastIndexOf("/");
-        const inputDir =
-          inputLastSlash >= 0 ? partialPath.slice(0, inputLastSlash + 1) : "";
+        const inputDir = inputLastSlash >= 0 ? partialPath.slice(0, inputLastSlash + 1) : "";
         return inputDir + name + (child.type === "directory" ? "/" : "");
       });
   }

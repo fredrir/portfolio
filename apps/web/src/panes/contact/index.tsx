@@ -1,18 +1,25 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRecaptcha } from "@/shared/components/recaptcha-provider";
-import { sendContactForm } from "@/server/contact";
-import { useNotification } from "@/shared/notification";
-import { MY_EMAIL } from "@/lib/constants";
-import { delay, genQueueId } from "./utils";
-import { useVimMode } from "./hooks/use-vim-mode";
-import { SendLog } from "./components/send-log";
+import { useEffect, useRef, useState } from "react";
 import type { ContactProps } from "@/i18n/types";
+import { MY_EMAIL } from "@/lib/constants";
+import { sendContactForm } from "@/server/contact";
+import { useRecaptcha } from "@/shared/components/recaptcha-provider";
+import { useNotification } from "@/shared/notification";
+import { SendLog } from "./components/send-log";
+import { useVimMode } from "./hooks/use-vim-mode";
+import { delay, genQueueId } from "./utils";
 
 type SendState = "idle" | "sending" | "success" | "error";
 
 const EMPTY_FORM = { name: "", email: "", phone: "", message: "" };
+
+function formatCopy(template: string, values: Record<string, string | number>): string {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replaceAll(`{${key}}`, String(value)),
+    template,
+  );
+}
 
 export function ContactPane({ contact }: ContactProps) {
   const { executeRecaptcha } = useRecaptcha();
@@ -42,9 +49,7 @@ export function ContactPane({ contact }: ContactProps) {
     }
   }, [sendLog]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -74,15 +79,15 @@ export function ContactPane({ contact }: ContactProps) {
 
     appendLog(`$ sendmail -t ${MY_EMAIL}`);
     await delay(400);
-    appendLog("Resolving MX record for hansteen.dev...");
+    appendLog(contact.log.resolvingMx);
     await delay(300);
 
     let token: string;
     try {
       token = await executeRecaptcha("contact_form");
-      appendLog("CAPTCHA verification .............. [  OK  ]");
+      appendLog(contact.log.captchaOk);
     } catch (error) {
-      appendLog("CAPTCHA verification .............. [FAILED]");
+      appendLog(contact.log.captchaFailed);
       setSendState("error");
       console.error(error);
       notification.error(contact.recaptchaError);
@@ -90,11 +95,11 @@ export function ContactPane({ contact }: ContactProps) {
     }
 
     await delay(250);
-    appendLog("Establishing TLS connection ........ [  OK  ]");
+    appendLog(contact.log.tlsOk);
     await delay(200);
-    appendLog("Authenticating sender .............. [  OK  ]");
+    appendLog(contact.log.authOk);
     await delay(150);
-    appendLog(`Sending ${formData.message.length} bytes ...`);
+    appendLog(formatCopy(contact.log.sendingBytes, { bytes: formData.message.length }));
 
     try {
       const result = await sendContactForm({
@@ -102,9 +107,9 @@ export function ContactPane({ contact }: ContactProps) {
       });
 
       if (result.success) {
-        appendLog("Message delivery ................... [  OK  ]");
+        appendLog(contact.log.deliveryOk);
         appendLog("");
-        appendLog("Mail sent successfully. Queue ID: " + genQueueId());
+        appendLog(formatCopy(contact.log.sent, { queueId: genQueueId() }));
         setSendState("success");
         notification.success(contact.submitSuccess);
         setTimeout(() => {
@@ -113,14 +118,18 @@ export function ContactPane({ contact }: ContactProps) {
           setSendLog([]);
         }, 4000);
       } else {
-        appendLog("Message delivery ................... [FAILED]");
-        appendLog("Error: " + (result.error ?? "unknown"));
+        appendLog(contact.log.deliveryFailed);
+        appendLog(
+          formatCopy(contact.log.error, {
+            error: result.error ?? contact.log.unknownError,
+          }),
+        );
         setSendState("error");
         notification.error(contact.submitError);
       }
     } catch (error) {
       console.error(contact.submitError + ": ", error);
-      appendLog("Connection error: ETIMEDOUT");
+      appendLog(contact.log.connectionError);
       setSendState("error");
       notification.error(contact.submitError);
       setTimeout(() => {
@@ -134,26 +143,19 @@ export function ContactPane({ contact }: ContactProps) {
     <div
       ref={containerRef}
       tabIndex={0}
-      className="flex-1 overflow-hidden flex flex-col outline-hidden h-full"
+      className="flex h-full flex-1 flex-col overflow-hidden outline-hidden"
     >
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit}
-        className="flex flex-col flex-1"
-      >
-        <div className="border-b border-border-faint px-3 py-2 space-y-1.5">
-          <div className="flex items-center border-b border-border-faint pb-1.5">
-            <span className="text-vim-label w-10 shrink-0">To:</span>
+      <form ref={formRef} onSubmit={handleSubmit} className="flex flex-1 flex-col">
+        <div className="space-y-1.5 border-border-faint border-b px-3 py-2">
+          <div className="flex items-center border-border-faint border-b pb-1.5">
+            <span className="w-10 shrink-0 text-vim-label">{contact.toLabel}</span>
             <span className="text-muted-foreground">{MY_EMAIL}</span>
           </div>
-          <div className="flex items-center border-b border-border-faint pb-1.5">
-            <label
-              htmlFor="contact-name"
-              className="text-vim-label w-10 shrink-0"
-            >
-              From:
+          <div className="flex items-center border-border-faint border-b pb-1.5">
+            <label htmlFor="contact-name" className="w-10 shrink-0 text-vim-label">
+              {contact.fromLabel}
             </label>
-            <div className="flex-1 flex items-center gap-1 min-w-0">
+            <div className="flex min-w-0 flex-1 items-center gap-1">
               <input
                 id="contact-name"
                 type="text"
@@ -164,24 +166,18 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs
-                  placeholder:text-placeholder disabled:opacity-50"
+                className="min-w-0 flex-1 bg-transparent font-mono text-foreground text-xs outline-hidden placeholder:text-placeholder disabled:opacity-50"
                 placeholder={contact.name}
                 autoComplete="off"
               />
-              {focusedField === "name" && (
-                <span className="text-primary animate-pulse">█</span>
-              )}
+              {focusedField === "name" && <span className="animate-pulse text-primary">█</span>}
             </div>
           </div>
-          <div className="flex items-center border-b border-border-faint pb-1.5">
-            <label
-              htmlFor="contact-email"
-              className="text-vim-label w-10 shrink-0"
-            >
-              Mail:
+          <div className="flex items-center border-border-faint border-b pb-1.5">
+            <label htmlFor="contact-email" className="w-10 shrink-0 text-vim-label">
+              {contact.mailLabel}
             </label>
-            <div className="flex-1 flex items-center gap-1 min-w-0">
+            <div className="flex min-w-0 flex-1 items-center gap-1">
               <input
                 id="contact-email"
                 type="email"
@@ -192,24 +188,18 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs
-                  placeholder:text-placeholder disabled:opacity-50"
+                className="min-w-0 flex-1 bg-transparent font-mono text-foreground text-xs outline-hidden placeholder:text-placeholder disabled:opacity-50"
                 placeholder={contact.email}
                 autoComplete="off"
               />
-              {focusedField === "email" && (
-                <span className="text-primary animate-pulse">█</span>
-              )}
+              {focusedField === "email" && <span className="animate-pulse text-primary">█</span>}
             </div>
           </div>
           <div className="flex items-center pb-1.5">
-            <label
-              htmlFor="contact-phone"
-              className="text-vim-label w-10 shrink-0"
-            >
-              Tel:
+            <label htmlFor="contact-phone" className="w-10 shrink-0 text-vim-label">
+              {contact.phoneLabel}
             </label>
-            <div className="flex-1 flex items-center gap-1 min-w-0">
+            <div className="flex min-w-0 flex-1 items-center gap-1">
               <input
                 id="contact-phone"
                 type="tel"
@@ -219,53 +209,39 @@ export function ContactPane({ contact }: ContactProps) {
                 onFocus={() => handleFocus("phone")}
                 onBlur={() => setFocusedField(null)}
                 disabled={isSending}
-                className="flex-1 min-w-0 bg-transparent text-foreground outline-hidden font-mono text-xs
-                  placeholder:text-placeholder disabled:opacity-50"
+                className="min-w-0 flex-1 bg-transparent font-mono text-foreground text-xs outline-hidden placeholder:text-placeholder disabled:opacity-50"
                 placeholder={`${contact.phone} (${contact.optional})`}
                 autoComplete="off"
               />
-              {focusedField === "phone" && (
-                <span className="text-primary animate-pulse">█</span>
-              )}
+              {focusedField === "phone" && <span className="animate-pulse text-primary">█</span>}
             </div>
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 flex min-h-36">
-            <div className="w-8 shrink-0 border-r border-border-faint bg-surface-faint flex flex-col items-end pt-2 pr-1 select-none">
-              {(formData.message.length > 0 ? messageLines : [""]).map(
-                (_, i) => (
-                  <span
-                    key={i}
-                    className="text-2xs leading-editor text-vim-line-number"
-                  >
-                    {i + 1}
-                  </span>
-                ),
-              )}
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex min-h-36 flex-1">
+            <div className="flex w-8 shrink-0 select-none flex-col items-end border-border-faint border-r bg-surface-faint pt-2 pr-1">
+              {(formData.message.length > 0 ? messageLines : [""]).map((_, i) => (
+                <span key={i} className="text-2xs text-vim-line-number leading-editor">
+                  {i + 1}
+                </span>
+              ))}
               {formData.message.length > 0 &&
                 Array.from({
                   length: Math.max(0, 8 - messageLines.length),
                 }).map((_, i) => (
-                  <span
-                    key={`tilde-${i}`}
-                    className="text-2xs leading-editor text-vim-tilde"
-                  >
+                  <span key={`tilde-${i}`} className="text-2xs text-vim-tilde leading-editor">
                     ~
                   </span>
                 ))}
               {formData.message.length === 0 &&
                 Array.from({ length: 7 }).map((_, i) => (
-                  <span
-                    key={`tilde-${i}`}
-                    className="text-2xs leading-editor text-vim-tilde"
-                  >
+                  <span key={`tilde-${i}`} className="text-2xs text-vim-tilde leading-editor">
                     ~
                   </span>
                 ))}
             </div>
-            <div className="flex-1 relative">
+            <div className="relative flex-1">
               <textarea
                 id="contact-message"
                 name="message"
@@ -275,12 +251,9 @@ export function ContactPane({ contact }: ContactProps) {
                 onBlur={() => setFocusedField(null)}
                 required
                 disabled={isSending}
-                className="w-full h-full min-h-36 bg-transparent text-foreground outline-hidden font-mono text-xs
-                  resize-none p-2 leading-editor placeholder:text-placeholder disabled:opacity-50"
+                className="h-full min-h-36 w-full resize-none bg-transparent p-2 font-mono text-foreground text-xs leading-editor outline-hidden placeholder:text-placeholder disabled:opacity-50"
                 placeholder={
-                  vim.vimMode === "normal"
-                    ? contact.vimHintNormal
-                    : contact.message + "..."
+                  vim.vimMode === "normal" ? contact.vimHintNormal : contact.message + "..."
                 }
                 autoComplete="off"
               />
@@ -288,22 +261,28 @@ export function ContactPane({ contact }: ContactProps) {
           </div>
         </div>
 
-        <SendLog lines={sendLog} logEndRef={logEndRef} />
+        <SendLog
+          lines={sendLog}
+          logEndRef={logEndRef}
+          markers={{
+            sentPrefix: contact.log.sentPrefix,
+            errorPrefix: contact.log.errorPrefix,
+            connectionErrorPrefix: contact.log.connectionErrorPrefix,
+          }}
+        />
 
-        <div className="flex items-center justify-between px-3 py-1 border-t border-wm-border bg-surface-faint">
-          <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between border-wm-border border-t bg-surface-faint px-3 py-1">
+          <div className="min-w-0 flex-1">
             {vim.showCmd ? (
               <div className="flex items-center text-xs">
                 <span className="text-foreground">:</span>
                 <span className="text-foreground">{vim.cmdBuffer}</span>
-                <span className="text-primary-soft animate-pulse">█</span>
+                <span className="animate-pulse text-primary-soft">█</span>
               </div>
             ) : vim.vimMode === "insert" ? (
-              <span className="text-xs font-bold text-foreground">
-                -- INSERT --
-              </span>
+              <span className="font-bold text-foreground text-xs">{contact.insertMode}</span>
             ) : sendState === "idle" ? (
-              <span className="text-xs text-subtle">
+              <span className="text-subtle text-xs">
                 {contact.vimHintStatus.split(/\{|\}/).map((part, i) =>
                   part === "i" || part === "wq" ? (
                     <span key={i} className="text-primary-muted">
@@ -317,7 +296,7 @@ export function ContactPane({ contact }: ContactProps) {
             ) : null}
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-ghost text-2xs">
+            <span className="text-2xs text-ghost">
               {messageLines.length},
               {formData.message.length > 0
                 ? (messageLines[messageLines.length - 1]?.length ?? 0) + 1
@@ -326,11 +305,9 @@ export function ContactPane({ contact }: ContactProps) {
             <button
               type="submit"
               disabled={isSending}
-              className="font-mono text-xs px-3 py-0.5 rounded border border-control-border-hover
-                text-primary hover:bg-control-active hover:border-wm-border-swap
-                active:bg-surface-selected transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="rounded border border-control-border-hover px-3 py-0.5 font-mono text-primary text-xs transition-all hover:border-wm-border-swap hover:bg-control-active active:bg-surface-selected disabled:cursor-not-allowed disabled:opacity-30"
             >
-              {isSending ? contact.submitLoading : ":wq"}
+              {isSending ? contact.submitLoading : contact.submitCommand}
             </button>
           </div>
         </div>

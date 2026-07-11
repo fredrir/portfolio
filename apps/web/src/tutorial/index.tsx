@@ -1,20 +1,20 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { TutorialFredVatar } from "./components/tutorial-fredvatar";
-import { SpeechBubble } from "./components/speech-bubble";
-import { ProgressDots } from "./components/progress-dots";
-import { StepWelcome } from "./components/step-welcome";
-import { StepTheme } from "./components/step-theme";
-import { StepWallpaper } from "./components/step-wallpaper";
-import { StepPaneSelection } from "./components/step-pane-selection";
-import { StepLauncher } from "./components/step-launcher";
-import { StepDrag } from "./components/step-drag";
-import { StepResize } from "./components/step-resize";
-import { StepDone } from "./components/step-done";
+import { useEffect, useRef } from "react";
 import type { TutorialStrings, UiStrings } from "@/i18n/types";
 import type { BackgroundConfig } from "@/window-manager/types";
+import { ProgressDots } from "./components/progress-dots";
+import { SpeechBubble } from "./components/speech-bubble";
+import { StepDone } from "./components/step-done";
+import { StepDrag } from "./components/step-drag";
+import { StepLauncher } from "./components/step-launcher";
+import { StepPaneSelection } from "./components/step-pane-selection";
+import { StepResize } from "./components/step-resize";
+import { StepTheme } from "./components/step-theme";
+import { StepWallpaper } from "./components/step-wallpaper";
+import { StepWelcome } from "./components/step-welcome";
+import { TutorialFredVatar } from "./components/tutorial-fredvatar";
 import type { useTutorial } from "./use-tutorial";
 
 interface Props {
@@ -68,23 +68,17 @@ export function TutorialOverlay({
   }, [stepId, launcherOpen, tutorial.next]);
 
   useEffect(() => {
-    if (
-      (stepId === "drag" || stepId === "resize") &&
-      choices.openPanes.length < 2
-    ) {
+    if ((stepId === "drag" || stepId === "resize") && choices.openPanes.length < 2) {
       tutorial.next();
     }
   }, [stepId, choices.openPanes.length, tutorial.next]);
 
   const showNav = !interactiveSteps.has(stepId);
-  const canAdvance =
-    stepId !== "pane-selection" || choices.openPanes.length > 0;
+  const canAdvance = stepId !== "pane-selection" || choices.openPanes.length > 0;
 
   const handleTogglePane = (id: string) => {
     const current = choices.openPanes;
-    const next = current.includes(id)
-      ? current.filter((p) => p !== id)
-      : [...current, id];
+    const next = current.includes(id) ? current.filter((p) => p !== id) : [...current, id];
     tutorial.setChoice("openPanes", next);
   };
 
@@ -100,12 +94,7 @@ export function TutorialOverlay({
           />
         );
       case "theme":
-        return (
-          <StepTheme
-            t={t}
-            onSelectTheme={(id) => tutorial.setChoice("theme", id)}
-          />
-        );
+        return <StepTheme t={t} onSelectTheme={(id) => tutorial.setChoice("theme", id)} />;
       case "wallpaper":
         return (
           <StepWallpaper
@@ -150,7 +139,7 @@ export function TutorialOverlay({
     return (
       <motion.div
         key={stepIndex}
-        className={`fixed ${posClass} z-9995 flex items-end gap-3 max-w-md`}
+        className={`fixed ${posClass} z-9995 flex max-w-md items-end gap-3`}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
@@ -169,13 +158,13 @@ export function TutorialOverlay({
               </motion.div>
             </AnimatePresence>
             {showNav && (
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border-faint">
+              <div className="mt-3 flex items-center justify-between border-border-faint border-t pt-3">
                 <ProgressDots current={stepIndex} total={totalSteps} />
                 <div className="flex gap-2">
                   {stepIndex > 0 && (
                     <button
                       onClick={tutorial.back}
-                      className="px-3 py-1 text-xs rounded-md border border-control-border text-muted-foreground hover:bg-control-hover transition-colors"
+                      className="rounded-md border border-control-border px-3 py-1 text-muted-foreground text-xs transition-colors hover:bg-control-hover"
                     >
                       {t.back}
                     </button>
@@ -183,7 +172,7 @@ export function TutorialOverlay({
                   <button
                     onClick={tutorial.next}
                     disabled={!canAdvance}
-                    className="px-3 py-1 text-xs rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="rounded-md bg-primary px-3 py-1 text-primary-foreground text-xs transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {t.next}
                   </button>
@@ -191,7 +180,7 @@ export function TutorialOverlay({
               </div>
             )}
             {!showNav && stepId !== "done" && (
-              <div className="flex p-4 md:p-6 items-center justify-between mt-3 pt-3 border-t border-border-faint">
+              <div className="mt-3 flex items-center justify-between border-border-faint border-t p-4 pt-3 md:p-6">
                 <ProgressDots current={stepIndex} total={totalSteps} />
                 <div />
               </div>
@@ -202,7 +191,7 @@ export function TutorialOverlay({
         <TutorialFredVatar reaction={getReaction(stepId)} />
         <button
           onClick={tutorial.skip}
-          className="absolute -top-8 right-0 text-xs text-faded hover:text-foreground transition-colors"
+          className="absolute -top-8 right-0 text-faded text-xs transition-colors hover:text-foreground"
         >
           {t.skip}
         </button>
@@ -220,16 +209,11 @@ export function TutorialOverlay({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <TutorialFredVatar
-            reaction="thumbsup"
-            className="w-48 h-64 md:w-64 md:h-80"
-          />
-          <h2 className="text-2xl md:text-3xl font-bold text-primary">
-            {t.doneTitle}
-          </h2>
+          <TutorialFredVatar reaction="thumbsup" className="h-64 w-48 md:h-80 md:w-64" />
+          <h2 className="font-bold text-2xl text-primary md:text-3xl">{t.doneTitle}</h2>
           <button
             onClick={tutorial.complete}
-            className="px-8 py-3 rounded-xl border border-primary-soft text-primary font-semibold text-base hover:text-primary hover:border-primary"
+            className="rounded-xl border border-primary-soft px-8 py-3 font-semibold text-base text-primary hover:border-primary hover:text-primary"
           >
             {t.startExploring}
           </button>
@@ -242,11 +226,11 @@ export function TutorialOverlay({
     <div className="fixed inset-0 z-9995 flex items-center justify-center">
       <div className="absolute inset-0 bg-overlay-medium" />
       {isMobile && (
-        <div className="absolute bottom-0 right-4 z-0">
+        <div className="absolute right-4 bottom-0 z-0">
           <TutorialFredVatar reaction={getReaction(stepId)} />
         </div>
       )}
-      <div className="relative z-10 flex items-end gap-4 max-w-lg w-full mx-4 mb-28 md:mb-0">
+      <div className="relative z-10 mx-4 mb-28 flex w-full max-w-lg items-end gap-4 md:mb-0">
         <div className="flex-1">
           <SpeechBubble>
             <AnimatePresence mode="wait">
@@ -261,13 +245,13 @@ export function TutorialOverlay({
               </motion.div>
             </AnimatePresence>
             {showNav && (
-              <div className="flex p-4 md:p-6 items-center justify-between mt-4 pt-3 border-t border-border-faint">
+              <div className="mt-4 flex items-center justify-between border-border-faint border-t p-4 pt-3 md:p-6">
                 <ProgressDots current={stepIndex} total={totalSteps} />
                 <div className="flex gap-2">
                   {stepIndex > 0 && (
                     <button
                       onClick={tutorial.back}
-                      className="px-3 py-1.5 text-xs rounded-md border border-control-border text-muted-foreground hover:bg-control-hover transition-colors"
+                      className="rounded-md border border-control-border px-3 py-1.5 text-muted-foreground text-xs transition-colors hover:bg-control-hover"
                     >
                       {t.back}
                     </button>
@@ -275,7 +259,7 @@ export function TutorialOverlay({
                   <button
                     onClick={tutorial.next}
                     disabled={!canAdvance}
-                    className="px-3 py-1.5 text-xs font-medium rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="rounded-md bg-primary px-3 py-1.5 font-medium text-primary-foreground text-xs transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {t.next}
                   </button>
@@ -288,7 +272,7 @@ export function TutorialOverlay({
       </div>
       <button
         onClick={tutorial.skip}
-        className="absolute top-4 right-4 text-sm text-faded hover:text-foreground transition-colors z-20"
+        className="absolute top-4 right-4 z-20 text-faded text-sm transition-colors hover:text-foreground"
       >
         {t.skip}
       </button>

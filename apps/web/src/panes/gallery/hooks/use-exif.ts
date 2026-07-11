@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import exifr from "exifr";
+import { useEffect, useState } from "react";
 
 export interface ExifData {
   dateTaken?: string;
@@ -72,16 +72,12 @@ export function useExifData(url: string | null): {
           .trim();
 
         const result: ExifData = {
-          dateTaken:
-            exif.DateTimeOriginal?.toISOString?.() ??
-            exif.CreateDate?.toISOString?.(),
+          dateTaken: exif.DateTimeOriginal?.toISOString?.() ?? exif.CreateDate?.toISOString?.(),
           camera: camera || undefined,
           lens: exif.LensModel || undefined,
           focalLength: exif.FocalLength ? `${exif.FocalLength}mm` : undefined,
           aperture: exif.FNumber ? `f/${exif.FNumber}` : undefined,
-          shutter: exif.ExposureTime
-            ? formatShutter(exif.ExposureTime)
-            : undefined,
+          shutter: exif.ExposureTime ? formatShutter(exif.ExposureTime) : undefined,
           iso: exif.ISO,
           latitude: exif.latitude,
           longitude: exif.longitude,

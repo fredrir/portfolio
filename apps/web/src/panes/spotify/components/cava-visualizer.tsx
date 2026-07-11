@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { CAVA_CHARS, CAVA_BAR_COUNT } from "../constants";
+import { useEffect, useState } from "react";
+import { CAVA_BAR_COUNT, CAVA_CHARS } from "../constants";
 
 export function CavaVisualizer() {
   const [bars, setBars] = useState<number[]>(Array(CAVA_BAR_COUNT).fill(2));
@@ -18,11 +18,11 @@ export function CavaVisualizer() {
   }, []);
 
   return (
-    <div className="flex items-end h-5 font-mono w-full">
+    <div className="flex h-5 w-full items-end font-mono">
       {bars.map((level, i) => (
         <span
           key={i}
-          className="text-primary-soft flex-1 text-center"
+          className="flex-1 text-center text-primary-soft"
           style={{ transition: "all 150ms ease" }}
         >
           {CAVA_CHARS[Math.min(level - 1, CAVA_CHARS.length - 1)]}

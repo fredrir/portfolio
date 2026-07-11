@@ -7,17 +7,14 @@ export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
   return (
     <>
       {artists.map((artist, i) => (
-        <div
-          key={`${artist.name}-${i}`}
-          className="flex items-center gap-2 py-0.5"
-        >
+        <div key={`${artist.name}-${i}`} className="flex items-center gap-2 py-0.5">
           {artist.imageUrl && (
             <Image
               src={artist.imageUrl}
               alt={artist.name}
               width={20}
               height={20}
-              className="w-5 h-5 rounded-full border border-border-faint object-cover"
+              className="h-5 w-5 rounded-full border border-border-faint object-cover"
               unoptimized
             />
           )}
@@ -27,19 +24,15 @@ export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
                 href={artist.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground hover:text-primary hover:underline transition-colors text-xs truncate block"
+                className="block truncate text-foreground text-xs transition-colors hover:text-primary hover:underline"
               >
                 {artist.name}
               </a>
             ) : (
-              <span className="text-foreground text-xs truncate block">
-                {artist.name}
-              </span>
+              <span className="block truncate text-foreground text-xs">{artist.name}</span>
             )}
           </div>
-          <span className="text-primary-dim w-3 text-right text-xs">
-            {i + 1}
-          </span>
+          <span className="w-3 text-right text-primary-dim text-xs">{i + 1}</span>
         </div>
       ))}
     </>

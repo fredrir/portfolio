@@ -2,15 +2,8 @@
 
 import type { components } from "@portfolio/api-client";
 
-import {
-  Hint,
-  Instrument,
-  Meter,
-  PaneShell,
-  Readout,
-  Sparkbars,
-  StatusDot,
-} from "@/panes/platform-ui";
+import type { UiStrings } from "@/i18n/types";
+import { Instrument, Meter, PaneShell, Readout, Sparkbars, StatusDot } from "@/panes/platform-ui";
 import { useApiData } from "@/shared/hooks/use-api-data";
 
 type AnalyticsResponse = components["schemas"]["AnalyticsResponse"];
@@ -21,20 +14,22 @@ type KeyCount = components["schemas"]["KeyCount"];
 function flag(code: string): string {
   const cc = code.toUpperCase();
   if (!/^[A-Z]{2}$/.test(cc)) return "🌐";
-  return String.fromCodePoint(
-    ...[...cc].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65),
-  );
+  return String.fromCodePoint(...[...cc].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
 }
 
 function Meters({
   items,
+  noDataText,
+  directLabel,
   withFlags,
 }: {
   items: KeyCount[];
+  noDataText: string;
+  directLabel: string;
   withFlags?: boolean;
 }) {
   if (items.length === 0) {
-    return <p className="py-1 text-2xs text-muted-foreground">No data yet.</p>;
+    return <p className="py-1 text-2xs text-muted-foreground">{noDataText}</p>;
   }
   const max = Math.max(1, ...items.map((i) => i.count));
   return (
@@ -42,7 +37,7 @@ function Meters({
       {items.slice(0, 6).map((item) => (
         <Meter
           key={item.key}
-          label={item.key || "direct"}
+          label={item.key || directLabel}
           value={item.count}
           max={max}
           leading={withFlags ? <span>{flag(item.key)}</span> : undefined}
@@ -52,85 +47,103 @@ function Meters({
   );
 }
 
-export function AnalyticsPane() {
+export function AnalyticsPane({ ui }: { ui: UiStrings }) {
+  const t = ui.platform.analytics;
+  const common = ui.platform.common;
   const { data, loading } = useApiData<AnalyticsResponse>("/api/v1/analytics");
   const { data: posthog } = useApiData<PosthogStats>("/api/v1/analytics/posthog");
 
-  const recent = data
-    ? data.daily.slice(-7).reduce((n, d) => n + d.count, 0)
-    : 0;
+  const recent = data ? data.daily.slice(-7).reduce((n, d) => n + d.count, 0) : 0;
 
   return (
     <PaneShell>
-      {loading && <p className="text-xs text-muted-foreground">Aggregating visits…</p>}
+      {loading && <p className="text-muted-foreground text-xs">{t.aggregating}</p>}
 
       {data && (
         <>
           <Instrument
-            label="visitors · 30 days"
+            label={t.visitors30}
             right={
               <span className="text-muted-foreground">
-                {recent} in last 7d
+                {t.inLast7d.replace("{count}", String(recent))}
               </span>
             }
           >
             <div className="mb-2 flex items-end justify-between">
-              <Readout value={data.total} label="total visits" tone="primary" />
-              <Readout value={data.countries.length} label="countries" />
+              <Readout value={data.total} label={t.totalVisits} tone="primary" />
+              <Readout value={data.countries.length} label={t.countries} />
             </div>
-            <Sparkbars data={data.daily} />
+            <Sparkbars
+              data={data.daily}
+              ariaLabel={(peak) => `${common.dailySeriesPeak} ${peak}`}
+            />
             {data.total === 0 && (
               <p className="mt-1 text-2xs text-muted-foreground">
-                No visits recorded yet — the counter starts once consent is given.
+                {t.noVisits}
               </p>
             )}
           </Instrument>
 
-          <div className="grid gap-2.5 @md:grid-cols-2">
-            <Instrument label="countries">
-              <Meters items={data.countries} withFlags />
+          <div className="grid @md:grid-cols-2 gap-2.5">
+            <Instrument label={t.countries}>
+              <Meters
+                items={data.countries}
+                noDataText={common.noDataYet}
+                directLabel={common.direct}
+                withFlags
+              />
             </Instrument>
-            <Instrument label="browsers">
-              <Meters items={data.browsers} />
+            <Instrument label={t.browsers}>
+              <Meters
+                items={data.browsers}
+                noDataText={common.noDataYet}
+                directLabel={common.direct}
+              />
             </Instrument>
           </div>
 
-          <Instrument label="referrers">
-            <Meters items={data.referrers} />
+          <Instrument label={t.referrers}>
+            <Meters
+              items={data.referrers}
+              noDataText={common.noDataYet}
+              directLabel={common.direct}
+            />
           </Instrument>
         </>
       )}
 
       {posthog && (
         <Instrument
-          label="product analytics · posthog"
+          label={t.productAnalytics}
           right={
             <span className="flex items-center gap-1 text-muted-foreground">
               <StatusDot tone="info" />
-              consented
+              {t.consented}
             </span>
           }
         >
           <div className="mb-2">
             <Readout
               value={posthog.daily_pageviews.reduce((n, d) => n + d.count, 0)}
-              label="pageviews, 30 days"
+              label={t.pageviews30}
             />
           </div>
-          <Sparkbars data={posthog.daily_pageviews} height={40} />
+          <Sparkbars
+            data={posthog.daily_pageviews}
+            height={40}
+            ariaLabel={(peak) => `${common.dailySeriesPeak} ${peak}`}
+          />
           {posthog.top_pages.length > 0 && (
-            <div className="mt-2 border-t border-border-faint pt-1.5">
-              <Meters items={posthog.top_pages} />
+            <div className="mt-2 border-border-faint border-t pt-1.5">
+              <Meters
+                items={posthog.top_pages}
+                noDataText={common.noDataYet}
+                directLabel={common.direct}
+              />
             </div>
           )}
         </Instrument>
       )}
-
-      <Hint>
-        First-party stats are aggregated in the Rust API from consent-gated
-        visits — country comes from the edge and no IP addresses are stored.
-        PostHog captures product analytics only after explicit consent.
-      </Hint>
     </PaneShell>
   );
 }

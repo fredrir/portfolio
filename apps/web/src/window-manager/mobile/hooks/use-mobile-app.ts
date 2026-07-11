@@ -1,10 +1,10 @@
-import { useState, useCallback } from "react";
-import { KEYS, read, write, remove } from "@/lib/storage";
+import { useCallback, useState } from "react";
+import { KEYS, read, remove, write } from "@/lib/storage";
 import type { MobileState } from "../types";
 
 export function useMobileApp(): MobileState {
-  const [activeApp, _setActiveApp] = useState<string | null>(
-    () => read(KEYS.mobileActiveApp, true),
+  const [activeApp, _setActiveApp] = useState<string | null>(() =>
+    read(KEYS.mobileActiveApp, true),
   );
 
   const setActiveApp = useCallback((app: string | null) => {

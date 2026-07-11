@@ -1,10 +1,10 @@
 "use client";
 
-import { CompanyLogo } from "./components/company-logo";
-import type { journeyType } from "@/shared/types";
 import type { Journey, UiStrings } from "@/i18n/types";
-import ListView from "@/shared/components/list-view";
 import ListItem from "@/shared/components/list-item";
+import ListView from "@/shared/components/list-view";
+import type { journeyType } from "@/shared/types";
+import { CompanyLogo } from "./components/company-logo";
 
 interface Props {
   journey: Journey;
@@ -15,11 +15,9 @@ interface Props {
 function JourneySubtitle({ j }: { j: journeyType }) {
   return (
     <p>
-      <span className="text-foreground/80 text-3xs @sm:text-2xs">
-        {j.company}
-      </span>
-      <span className="text-ghost text-3xs @sm:text-2xs"> • </span>
-      <span className="text-date-accent text-3xs @sm:text-2xs">{j.date}</span>
+      <span className="@sm:text-2xs text-3xs text-foreground/80">{j.company}</span>
+      <span className="@sm:text-2xs text-3xs text-ghost"> • </span>
+      <span className="@sm:text-2xs text-3xs text-date-accent">{j.date}</span>
     </p>
   );
 }
@@ -46,7 +44,7 @@ export function JourneyPane({ journey, onOpenDetail, ui }: Props) {
           onClick={() => onOpenDetail(j)}
           badge={
             j.isCurrent ? (
-              <span className="text-primary-muted text-3xs @sm:text-2xs px-1 @sm:px-1.5 py-0.5 rounded bg-surface-soft shrink-0">
+              <span className="shrink-0 rounded bg-surface-soft @sm:px-1.5 px-1 py-0.5 @sm:text-2xs text-3xs text-primary-muted">
                 {ui.active}
               </span>
             ) : undefined

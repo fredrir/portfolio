@@ -52,16 +52,11 @@ export function Instrument({
   className?: string;
 }) {
   return (
-    <section
-      className={cn(
-        "rounded-md border border-border-faint bg-surface-faint",
-        className,
-      )}
-    >
-      <header className="flex items-center justify-between gap-2 border-b border-border-faint px-2.5 py-1.5">
+    <section className={cn("rounded-md border border-border-faint bg-surface-faint", className)}>
+      <header className="flex items-center justify-between gap-2 border-border-faint border-b px-2.5 py-1.5">
         <div className="flex min-w-0 items-center gap-1.5">
           <span className="text-2xs text-primary-dim">◈</span>
-          <h2 className="truncate text-2xs font-bold uppercase tracking-[0.18em] text-primary">
+          <h2 className="truncate font-bold text-2xs text-primary uppercase tracking-[0.18em]">
             {label}
           </h2>
         </div>
@@ -85,26 +80,18 @@ export function Readout({
     <div className="flex flex-col gap-0.5">
       <span
         className={cn(
-          "font-mono text-xl leading-none tabular-nums",
+          "font-mono text-xl tabular-nums leading-none",
           tone === "primary" ? "text-primary" : "text-foreground",
         )}
       >
         {value}
       </span>
-      <span className="text-3xs uppercase tracking-[0.2em] text-muted-foreground">
-        {label}
-      </span>
+      <span className="text-3xs text-muted-foreground uppercase tracking-[0.2em]">{label}</span>
     </div>
   );
 }
 
-export function Badge({
-  children,
-  tone = "idle",
-}: {
-  children: ReactNode;
-  tone?: Tone;
-}) {
+export function Badge({ children, tone = "idle" }: { children: ReactNode; tone?: Tone }) {
   const toneClass: Record<Tone, string> = {
     ok: "text-primary border-primary-hint bg-surface-soft",
     warn: "text-accent-yellow border-accent-yellow/30 bg-surface-soft",
@@ -142,16 +129,14 @@ export function Meter({
   return (
     <div className="flex items-center gap-2 py-0.5 text-xs">
       {leading != null && <span className="shrink-0">{leading}</span>}
-      <span className="w-16 shrink-0 truncate text-muted-foreground @xs:w-24">
-        {label}
-      </span>
+      <span className="@xs:w-24 w-16 shrink-0 truncate text-muted-foreground">{label}</span>
       <div className="h-2.5 flex-1 overflow-hidden rounded-sm bg-chart-track">
         <div
           className="h-full rounded-sm bg-chart-fill transition-[width] duration-700 ease-out"
           style={{ width: mounted ? `${pct}%` : "0%" }}
         />
       </div>
-      <span className="w-10 shrink-0 text-right font-mono tabular-nums text-readable">
+      <span className="w-10 shrink-0 text-right font-mono text-readable tabular-nums">
         {display ?? value}
       </span>
     </div>
@@ -162,9 +147,11 @@ export function Meter({
 export function Sparkbars({
   data,
   height = 64,
+  ariaLabel,
 }: {
   data: { day: string; count: number }[];
   height?: number;
+  ariaLabel?: (peak: number) => string;
 }) {
   const mounted = useMounted();
   const max = Math.max(1, ...data.map((d) => d.count));
@@ -173,7 +160,7 @@ export function Sparkbars({
       className="flex items-end gap-px"
       style={{ height }}
       role="img"
-      aria-label={`Daily series, peak ${max}`}
+      aria-label={ariaLabel ? ariaLabel(max) : `Daily series, peak ${max}`}
     >
       {data.map((d, i) => {
         const pct = Math.max(3, (d.count / max) * 100);
@@ -181,7 +168,7 @@ export function Sparkbars({
           <div
             key={d.day}
             title={`${d.day}: ${d.count}`}
-            className="group flex-1 self-stretch flex items-end"
+            className="group flex flex-1 items-end self-stretch"
           >
             <div
               className="w-full rounded-t-[1px] bg-primary-soft transition-[height] duration-500 ease-out group-hover:bg-primary"
@@ -208,28 +195,41 @@ export function HashChip({ hash }: { hash: string }) {
 
 export function Hint({ children }: { children: ReactNode }) {
   return (
-    <p className="mt-3 border-t border-border-faint pt-2 text-2xs leading-relaxed text-muted-foreground">
+    <p className="mt-3 border-border-faint border-t pt-2 text-2xs text-muted-foreground leading-relaxed">
       {children}
     </p>
   );
 }
 
 export function PaneShell({ children }: { children: ReactNode }) {
-  return (
-    <div className="h-full space-y-2.5 overflow-y-auto p-2.5 @sm:p-3">
-      {children}
-    </div>
-  );
+  return <div className="h-full space-y-2.5 overflow-y-auto @sm:p-3 p-2.5">{children}</div>;
 }
 
 export function relativeTime(iso: string): string {
+  return relativeTimeWithLabels(iso);
+}
+
+export function relativeTimeWithLabels(
+  iso: string,
+  labels: {
+    secondsAgo: string;
+    minutesAgo: string;
+    hoursAgo: string;
+    daysAgo: string;
+  } = {
+    secondsAgo: "s ago",
+    minutesAgo: "m ago",
+    hoursAgo: "h ago",
+    daysAgo: "d ago",
+  },
+): string {
   const then = new Date(iso).getTime();
   if (Number.isNaN(then)) return "";
   const s = Math.max(0, Math.round((Date.now() - then) / 1000));
-  if (s < 60) return `${s}s ago`;
+  if (s < 60) return `${s}${labels.secondsAgo}`;
   const m = Math.round(s / 60);
-  if (m < 60) return `${m}m ago`;
+  if (m < 60) return `${m}${labels.minutesAgo}`;
   const h = Math.round(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.round(h / 24)}d ago`;
+  if (h < 24) return `${h}${labels.hoursAgo}`;
+  return `${Math.round(h / 24)}${labels.daysAgo}`;
 }

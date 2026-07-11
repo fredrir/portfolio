@@ -10,4 +10,3 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   { id: "resize", desktopOnly: true },
   { id: "done" },
 ];
-

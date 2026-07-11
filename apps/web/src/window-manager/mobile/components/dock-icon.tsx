@@ -21,7 +21,7 @@ export function DockIcon({ icon, label, isActive, onTap }: Props) {
     <motion.button
       whileTap={{ scale: 0.85 }}
       onClick={onTap}
-      className="flex flex-col items-center gap-0.5 w-14 overflow-hidden"
+      className="flex w-14 flex-col items-center gap-0.5 overflow-hidden"
       animate={{ marginBottom: isActive ? 16 : 0 }}
       transition={{ duration: 0.4, ease: "easeInOut" }}
     >
@@ -43,7 +43,7 @@ export function DockIcon({ icon, label, isActive, onTap }: Props) {
         {icon}
       </motion.div>
       <span
-        className={`text-xs truncate w-full text-center transition-colors ${
+        className={`w-full truncate text-center text-xs transition-colors ${
           isActive ? "text-primary-bold" : "text-ghost"
         }`}
       >

@@ -1,24 +1,24 @@
 "use client";
 
-import { motion } from "framer-motion";
 import {
-  UserCircle,
-  GithubLogo,
-  SpotifyLogo,
-  Path,
-  FolderSimple,
-  EnvelopeSimple,
-  GearSix,
-  Terminal,
-  Images,
-  FileText,
-  Cpu,
-  RocketLaunch,
-  Flask,
   ChartLine,
+  Cpu,
+  EnvelopeSimple,
+  FileText,
+  Flask,
+  FolderSimple,
+  GearSix,
+  GithubLogo,
+  Images,
+  Path,
+  RocketLaunch,
+  SpotifyLogo,
+  Terminal,
+  UserCircle,
 } from "@phosphor-icons/react";
-import { WINDOW_CONFIGS, openExternalWindow } from "../../constants";
+import { motion } from "framer-motion";
 import type { UiStrings } from "@/i18n/types";
+import { openExternalWindow, WINDOW_CONFIGS } from "../../constants";
 
 const GRID_ICONS: Record<string, React.ReactNode> = {
   about: <UserCircle size={28} weight="duotone" />,
@@ -45,12 +45,12 @@ interface Props {
 
 export function MobileHomeScreen({ onOpenApp, ui, locale }: Props) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 py-10">
-      <div className="font-mono text-sm text-readable mb-8 tracking-widest uppercase">
+    <div className="flex flex-1 flex-col items-center justify-center px-6 py-10">
+      <div className="mb-8 font-mono text-readable text-sm uppercase tracking-widest">
         fredrik@hansteen
       </div>
 
-      <div className="grid grid-cols-4 gap-x-4 gap-y-6 w-full max-w-sm">
+      <div className="grid w-full max-w-sm grid-cols-4 gap-x-4 gap-y-6">
         {WINDOW_CONFIGS.map((config, i) => (
           <motion.button
             key={config.id}
@@ -67,10 +67,10 @@ export function MobileHomeScreen({ onOpenApp, ui, locale }: Props) {
             transition={{ delay: i * 0.04, duration: 0.3 }}
             className="flex flex-col items-center gap-1.5"
           >
-            <div className="w-14 h-14 rounded-2xl bg-surface-soft border border-border-medium backdrop-blur-md flex items-center justify-center text-primary-bold shadow-md shadow-wm-shadow-soft active:bg-surface-elevated transition-colors">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border-medium bg-surface-soft text-primary-bold shadow-md shadow-wm-shadow-soft backdrop-blur-md transition-colors active:bg-surface-elevated">
               {GRID_ICONS[config.id]}
             </div>
-            <span className="font-mono text-xs text-readable truncate max-w-[4rem] capitalize">
+            <span className="max-w-[4rem] truncate font-mono text-readable text-xs capitalize">
               {ui.localeTitles[config.id] ?? config.id}
             </span>
           </motion.button>

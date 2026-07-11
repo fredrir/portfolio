@@ -1,6 +1,6 @@
 import type { GalleryImage } from "@/server/gallery";
-import { Thumbnail } from "./thumbnail";
 import { formatDate } from "../utils";
+import { Thumbnail } from "./thumbnail";
 
 export function ImageGrid({
   images,
@@ -14,31 +14,31 @@ export function ImageGrid({
   onSelect: (image: GalleryImage) => void;
 }) {
   return (
-    <div className="flex-1 overflow-y-auto min-h-0">
+    <div className="min-h-0 flex-1 overflow-y-auto">
       <div
         className={`grid gap-3 ${
           narrow
             ? "grid-cols-2"
             : compact
-              ? "grid-cols-4 @xs:grid-cols-5 @sm:grid-cols-6 @md:grid-cols-8"
-              : "grid-cols-3 @xs:grid-cols-4 @sm:grid-cols-5 @md:grid-cols-6 @lg:grid-cols-7"
+              ? "@md:grid-cols-8 @sm:grid-cols-6 @xs:grid-cols-5 grid-cols-4"
+              : "@lg:grid-cols-7 @md:grid-cols-6 @sm:grid-cols-5 @xs:grid-cols-4 grid-cols-3"
         }`}
       >
         {images.map((img) => (
           <button
             key={img.src}
             onClick={() => onSelect(img)}
-            className="rounded overflow-hidden border border-control-border hover:border-control-border-hover transition-all group bg-black/10 relative"
+            className="group relative overflow-hidden rounded border border-control-border bg-black/10 transition-all hover:border-control-border-hover"
           >
             <div className="aspect-[4/3]">
               <Thumbnail
                 image={img}
-                className="group-hover:scale-105 transition-transform duration-200"
+                className="transition-transform duration-200 group-hover:scale-105"
               />
             </div>
             {img.date && (
               <div
-                className={`absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-1 py-0.5 text-3xs text-white/70 text-left ${
+                className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-1 py-0.5 text-left text-3xs text-white/70 ${
                   narrow ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                 } transition-opacity`}
               >

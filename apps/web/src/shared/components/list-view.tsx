@@ -6,18 +6,11 @@ interface Props {
   uiClickToOpen: UiStrings["clickToOpen"];
   children: React.ReactNode;
 }
-const ListView = ({
-  numberOfItems,
-  uiEntries,
-  uiClickToOpen,
-  children,
-}: Props) => {
+const ListView = ({ numberOfItems, uiEntries, uiClickToOpen, children }: Props) => {
   return (
-    <div className="p-2 @sm:p-3 h-full flex flex-col">
-      <div className="flex-1 overflow-y-auto space-y-0.5 min-h-0">
-        {children}
-      </div>
-      <div className="pt-2 mt-1 border-t border-border-faint text-ghost text-2xs flex items-center justify-between">
+    <div className="flex h-full flex-col @sm:p-3 p-2">
+      <div className="min-h-0 flex-1 space-y-0.5 overflow-y-auto">{children}</div>
+      <div className="mt-1 flex items-center justify-between border-border-faint border-t pt-2 text-2xs text-ghost">
         <span>
           {numberOfItems} {uiEntries}
         </span>

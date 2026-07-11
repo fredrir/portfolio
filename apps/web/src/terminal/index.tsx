@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CommandProcessor } from "./command-processor";
-import { useAutocomplete } from "./hooks/use-autocomplete";
 import { createGame } from "./games";
-import { getTerminalStrings } from "./translations";
-import type { CommandOutput, TerminalGame, FileSystemConfig } from "./types";
+import { useAutocomplete } from "./hooks/use-autocomplete";
 import Neofetch from "./neofetch";
+import { getTerminalStrings } from "./translations";
+import type { CommandOutput, FileSystemConfig, TerminalGame } from "./types";
 
 const terminalStore: {
   commandHistory: CommandOutput[];
@@ -40,12 +40,8 @@ export function TerminalPane({
   const [commandHistory, setCommandHistory] = useState<CommandOutput[]>(
     () => terminalStore.commandHistory,
   );
-  const [currentPath, setCurrentPath] = useState(
-    () => terminalStore.currentPath,
-  );
-  const [showNeofetch, setShowNeofetch] = useState(
-    () => terminalStore.showNeofetch,
-  );
+  const [currentPath, setCurrentPath] = useState(() => terminalStore.currentPath);
+  const [showNeofetch, setShowNeofetch] = useState(() => terminalStore.showNeofetch);
   const inputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const gameContainerRef = useRef<HTMLDivElement>(null);
@@ -180,7 +176,7 @@ export function TerminalPane({
             onClosePane?.(result.action.payload);
             break;
           case "startGame": {
-            const game = createGame(result.action.payload);
+            const game = createGame(result.action.payload, t);
             setActiveGame(game);
             setGameFrame(game.render());
             break;
@@ -188,21 +184,16 @@ export function TerminalPane({
           case "wasmPlugin": {
             const [plugin, ...rest] = result.action.payload.split(" ");
             import("./plugins/registry")
-              .then(({ runWasmCommand }) =>
-                runWasmCommand(plugin, rest.join(" ")),
-              )
+              .then(({ runWasmCommand }) => runWasmCommand(plugin, rest.join(" ")))
               .then((output) => {
-                setCommandHistory((prev) => [
-                  ...prev,
-                  { command: "", output },
-                ]);
+                setCommandHistory((prev) => [...prev, { command: "", output }]);
               })
               .catch(() => {
                 setCommandHistory((prev) => [
                   ...prev,
                   {
                     command: "",
-                    output: "wasm plugin failed to load",
+                    output: t.wasmPluginFailed,
                     isError: true,
                   },
                 ]);
@@ -240,35 +231,27 @@ export function TerminalPane({
     return (
       <div
         ref={gameContainerRef}
-        className="font-mono text-xs h-full flex flex-col cursor-text outline-none"
+        className="flex h-full cursor-text flex-col font-mono text-xs outline-none"
         onKeyDown={handleGameKey}
         tabIndex={0}
       >
-        <div
-          ref={contentRef}
-          className="flex-1 overflow-y-auto scroll-smooth px-3 pt-3 pb-1"
-        >
+        <div ref={contentRef} className="flex-1 overflow-y-auto scroll-smooth px-3 pt-3 pb-1">
           <pre className="text-foreground leading-tight">{gameFrame}</pre>
         </div>
-        <div className="px-3 py-2 shrink-0 text-muted-foreground text-xs">
-          {t.pressQToQuit}
-        </div>
+        <div className="shrink-0 px-3 py-2 text-muted-foreground text-xs">{t.pressQToQuit}</div>
       </div>
     );
   }
 
   return (
     <div
-      className="font-mono text-xs h-full flex flex-col cursor-text"
+      className="flex h-full cursor-text flex-col font-mono text-xs"
       onClick={() => inputRef.current?.focus()}
     >
-      <div
-        ref={contentRef}
-        className="flex-1 overflow-y-auto scroll-smooth px-3 pt-3 pb-1"
-      >
+      <div ref={contentRef} className="flex-1 overflow-y-auto scroll-smooth px-3 pt-3 pb-1">
         {showNeofetch && (
           <div className="mb-2">
-            <div className="text-subtle mb-1">
+            <div className="mb-1 text-subtle">
               <span className="text-primary">$</span> neofetch
             </div>
             <Neofetch animate={false} locale={locale} />
@@ -278,13 +261,9 @@ export function TerminalPane({
 
         {commandHistory.map((entry, index) => (
           <div key={index} className="mt-1">
-            <div className="flex items-start flex-wrap">
-              <span className="text-primary flex-shrink-0">
-                [{currentPath}]${" "}
-              </span>
-              <span className="text-foreground ml-1 break-all">
-                {entry.command}
-              </span>
+            <div className="flex flex-wrap items-start">
+              <span className="flex-shrink-0 text-primary">[{currentPath}]$ </span>
+              <span className="ml-1 break-all text-foreground">{entry.command}</span>
             </div>
             {entry.output && (
               <div
@@ -299,10 +278,8 @@ export function TerminalPane({
         ))}
       </div>
 
-      <div className="flex items-center px-3 py-2 shrink-0">
-        <span className="text-primary mr-1 flex-shrink-0 text-xs">
-          [{currentPath}]${" "}
-        </span>
+      <div className="flex shrink-0 items-center px-3 py-2">
+        <span className="mr-1 flex-shrink-0 text-primary text-xs">[{currentPath}]$ </span>
         <input
           ref={inputRef}
           type="text"
@@ -312,11 +289,11 @@ export function TerminalPane({
             resetTabCount();
           }}
           onKeyDown={handleKeyDown}
-          className="flex-1 bg-transparent text-foreground outline-hidden font-mono caret-primary min-w-0 text-xs"
+          className="min-w-0 flex-1 bg-transparent font-mono text-foreground text-xs caret-primary outline-hidden"
           placeholder={t.inputPlaceholder}
           autoComplete="off"
         />
-        <span className="inline-block w-1.5 h-4 bg-primary-bold animate-pulse flex-shrink-0" />
+        <span className="inline-block h-4 w-1.5 flex-shrink-0 animate-pulse bg-primary-bold" />
       </div>
     </div>
   );

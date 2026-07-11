@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useNotification } from "@/shared/notification";
-import { KEYS, read, write } from "@/lib/storage";
 import type { UiStrings } from "@/i18n/types";
+import { KEYS, read, write } from "@/lib/storage";
+import { useNotification } from "@/shared/notification";
 
 export function useTipNotification(tutorialActive: boolean, ui: UiStrings) {
   const notification = useNotification();
@@ -19,11 +19,10 @@ export function useTipNotification(tutorialActive: boolean, ui: UiStrings) {
     const timer = setTimeout(() => {
       notifRef.current.info(
         <span>
-          <span className="text-primary-medium font-bold">Ctrl+K</span>{" "}
-          {ui.tipLauncher}
-          <span className="text-primary-hint mx-2">|</span>
+          <span className="font-bold text-primary-medium">Ctrl+K</span> {ui.tipLauncher}
+          <span className="mx-2 text-primary-hint">|</span>
           {ui.tipDrag}
-          <span className="text-primary-hint mx-2">|</span>
+          <span className="mx-2 text-primary-hint">|</span>
           {ui.tipResize}
         </span>,
         { duration: 8000 },

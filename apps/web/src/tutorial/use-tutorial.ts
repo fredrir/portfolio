@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { TUTORIAL_STEPS } from "./constants";
-import { KEYS, read, readJson, write, writeJson, remove } from "@/lib/storage";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { KEYS, read, readJson, remove, write, writeJson } from "@/lib/storage";
 import { useIsMobile } from "@/shared/hooks/use-is-mobile";
-import type { TutorialStep, TutorialChoices } from "./types";
+import { TUTORIAL_STEPS } from "./constants";
+import type { TutorialChoices, TutorialStep } from "./types";
 
 interface SavedState {
   stepIndex: number;

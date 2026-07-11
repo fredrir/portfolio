@@ -14,8 +14,7 @@ export async function initPosthog(): Promise<void> {
   const { default: posthog } = await import("posthog-js");
   posthog.init(key, {
     api_host:
-      (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ??
-      "https://eu.i.posthog.com",
+      (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ?? "https://eu.i.posthog.com",
     capture_pageview: true,
     person_profiles: "identified_only",
     persistence: "localStorage",

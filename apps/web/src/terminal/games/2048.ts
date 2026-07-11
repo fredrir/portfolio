@@ -1,3 +1,4 @@
+import type { TerminalStrings } from "../translations";
 import type { TerminalGame } from "../types";
 
 const SIZE = 4;
@@ -9,7 +10,7 @@ export class Game2048 implements TerminalGame {
   private won = false;
   private lost = false;
 
-  constructor() {
+  constructor(private t: TerminalStrings) {
     this.grid = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
     this.addTile();
     this.addTile();
@@ -54,11 +55,16 @@ export class Game2048 implements TerminalGame {
 
     const getRow = (i: number): number[] => {
       switch (direction) {
-        case "left": return [...this.grid[i]];
-        case "right": return [...this.grid[i]].reverse();
-        case "up": return this.grid.map((r) => r[i]);
-        case "down": return this.grid.map((r) => r[i]).reverse();
-        default: return [];
+        case "left":
+          return [...this.grid[i]];
+        case "right":
+          return [...this.grid[i]].reverse();
+        case "up":
+          return this.grid.map((r) => r[i]);
+        case "down":
+          return this.grid.map((r) => r[i]).reverse();
+        default:
+          return [];
       }
     };
 
@@ -111,10 +117,18 @@ export class Game2048 implements TerminalGame {
 
     let dir: string | null = null;
     switch (key) {
-      case "ArrowUp": dir = "up"; break;
-      case "ArrowDown": dir = "down"; break;
-      case "ArrowLeft": dir = "left"; break;
-      case "ArrowRight": dir = "right"; break;
+      case "ArrowUp":
+        dir = "up";
+        break;
+      case "ArrowDown":
+        dir = "down";
+        break;
+      case "ArrowLeft":
+        dir = "left";
+        break;
+      case "ArrowRight":
+        dir = "right";
+        break;
     }
 
     if (!dir) return;
@@ -130,7 +144,7 @@ export class Game2048 implements TerminalGame {
 
   render(): string {
     const lines: string[] = [];
-    lines.push(`  Score: ${this.score}  |  Arrow keys to move, q to quit`);
+    lines.push(`  ${this.t.score}: ${this.score}  |  ${this.t.arrowKeysToMove}, ${this.t.qToQuit}`);
     lines.push("");
 
     const cellWidth = 6;
@@ -153,11 +167,11 @@ export class Game2048 implements TerminalGame {
     lines.push("└" + Array(SIZE).fill(hLine).join("┴") + "┘");
 
     if (this.won) {
-      lines.push(`  You win! Score: ${this.score}`);
-      lines.push("  Press q or Escape to exit.");
+      lines.push(`  ${this.t.youWinScore}: ${this.score}`);
+      lines.push(`  ${this.t.pressExit}`);
     } else if (this.lost) {
-      lines.push(`  No moves left! Score: ${this.score}`);
-      lines.push("  Press q or Escape to exit.");
+      lines.push(`  ${this.t.noMovesLeftScore}: ${this.score}`);
+      lines.push(`  ${this.t.pressExit}`);
     }
 
     return lines.join("\n");

@@ -1,18 +1,11 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
-import { locales, type Locale } from "@/i18n/types";
+import { type Locale, locales } from "@/i18n/types";
 import { MY_NAME } from "@/lib/constants";
 import { getPageData } from "@/server/page-data";
 import { WindowManager } from "@/window-manager";
 
 const BASE_URL = "https://hansteen.dev";
-
-const localeContent: Record<Locale, { description: string }> = {
-  en: { description: `${MY_NAME}'s personal website` },
-  nb: { description: `${MY_NAME}s personlige nettside` },
-  nn: { description: `${MY_NAME} si personlege nettside` },
-  fr: { description: `Site personnel de ${MY_NAME}` },
-};
 
 export const Route = createFileRoute("/$locale")({
   loader: async ({ params }) => {
@@ -23,7 +16,7 @@ export const Route = createFileRoute("/$locale")({
   },
   head: ({ loaderData }) => {
     const locale = loaderData?.locale ?? "en";
-    const description = localeContent[locale].description;
+    const description = loaderData?.dict.seo.description ?? MY_NAME;
     return {
       meta: [
         { title: MY_NAME },
@@ -35,8 +28,7 @@ export const Route = createFileRoute("/$locale")({
         { name: "robots", content: "index, follow" },
         {
           name: "googlebot",
-          content:
-            "index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1",
+          content: "index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1",
         },
         { name: "category", content: "portfolio" },
         { property: "og:title", content: MY_NAME },

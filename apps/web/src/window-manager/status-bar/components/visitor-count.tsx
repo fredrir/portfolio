@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRecaptcha } from "@/shared/components/recaptcha-provider";
-import { recordVisit, getVisitorCount } from "@/server/visitor";
+import { useEffect, useState } from "react";
 import { KEYS, read, write } from "@/lib/storage";
+import { getVisitorCount, recordVisit } from "@/server/visitor";
+import { useRecaptcha } from "@/shared/components/recaptcha-provider";
 
 interface Props {
   label: string;
@@ -14,7 +14,9 @@ export function VisitorCount({ label }: Props) {
   const { executeRecaptcha } = useRecaptcha();
 
   useEffect(() => {
-    getVisitorCount().then(setCount).catch(() => {});
+    getVisitorCount()
+      .then(setCount)
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -32,5 +34,9 @@ export function VisitorCount({ label }: Props) {
   }, [executeRecaptcha]);
 
   if (count === null) return null;
-  return <span>{label}: {count}</span>;
+  return (
+    <span>
+      {label}: {count}
+    </span>
+  );
 }

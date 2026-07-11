@@ -46,17 +46,12 @@ function writeString(exports: PluginExports, value: string): [number, number] {
   return [ptr, bytes.length];
 }
 
-export async function runWasmCommand(
-  command: string,
-  args: string,
-): Promise<string> {
+export async function runWasmCommand(command: string, args: string): Promise<string> {
   const exports = await loadPlugins();
   const [cmdPtr, cmdLen] = writeString(exports, command);
   const [argPtr, argLen] = writeString(exports, args);
   const packed = exports.run(cmdPtr, cmdLen, argPtr, argLen);
   const outPtr = Number(packed >> 32n);
   const outLen = Number(packed & 0xffffffffn);
-  return new TextDecoder().decode(
-    new Uint8Array(exports.memory.buffer, outPtr, outLen),
-  );
+  return new TextDecoder().decode(new Uint8Array(exports.memory.buffer, outPtr, outLen));
 }

@@ -1,12 +1,12 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
-import type { CommandOutput, TerminalGame } from "../types";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CommandProcessor } from "../command-processor";
-import { useAutocomplete } from "./use-autocomplete";
-import { useCursor } from "./use-cursor";
-import { useCommandHandler } from "./use-command-handler";
-import { useTypingAnimation } from "./use-typing-animation";
 import { getTerminalStrings } from "../translations";
+import type { CommandOutput, TerminalGame } from "../types";
+import { useAutocomplete } from "./use-autocomplete";
+import { useCommandHandler } from "./use-command-handler";
+import { useCursor } from "./use-cursor";
+import { useTypingAnimation } from "./use-typing-animation";
 
 interface UseTerminalProps {
   mainText: string;
@@ -25,15 +25,9 @@ export const useTerminal = ({ mainText, locale }: UseTerminalProps) => {
   const [activeGame, setActiveGame] = useState<TerminalGame | null>(null);
   const [gameFrame, setGameFrame] = useState("");
 
-  const inputRef = useRef<HTMLInputElement>(
-    null
-  ) as React.RefObject<HTMLInputElement>;
-  const terminalContentRef = useRef<HTMLDivElement>(
-    null
-  ) as React.RefObject<HTMLDivElement>;
-  const gameContainerRef = useRef<HTMLDivElement>(
-    null
-  ) as React.RefObject<HTMLDivElement>;
+  const inputRef = useRef<HTMLInputElement>(null) as React.RefObject<HTMLInputElement>;
+  const terminalContentRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const gameContainerRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
   const commandProcessor = useRef(new CommandProcessor(undefined, true, locale));
 
   const { getCompletions, resetTabCount } = useAutocomplete({
@@ -42,10 +36,9 @@ export const useTerminal = ({ mainText, locale }: UseTerminalProps) => {
     paneIds: [],
   });
 
-  const { text, isTypingComplete, showInitialAnimation, resetTyping } =
-    useTypingAnimation({
-      mainText,
-    });
+  const { text, isTypingComplete, showInitialAnimation, resetTyping } = useTypingAnimation({
+    mainText,
+  });
 
   const { cursorVisible, cursorIsFinished, setCursorIsFinished } = useCursor({
     isTypingComplete,
@@ -61,6 +54,7 @@ export const useTerminal = ({ mainText, locale }: UseTerminalProps) => {
     setCurrentPath,
     commandProcessor: commandProcessor.current,
     terminalContentRef,
+    t,
     onClear: () => {
       resetTyping();
       setShowNeofetch(false);

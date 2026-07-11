@@ -1,12 +1,12 @@
-import { useState, useCallback, useEffect, useRef, useMemo } from "react";
-import { WINDOW_CONFIGS } from "../../constants";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { KEYS, readJson, writeJson } from "@/lib/storage";
-import { LayoutEngine } from "../layout-engine";
-import { DEFAULT_ROW_HEIGHTS, LAYOUT_TIERS } from "../types";
-import type { CellDef } from "../types";
+import { WINDOW_CONFIGS } from "../../constants";
 import type { WindowStates } from "../../types";
-import { useLayoutTier } from "./use-layout-tier";
+import { LayoutEngine } from "../layout-engine";
+import type { CellDef } from "../types";
+import { DEFAULT_ROW_HEIGHTS, LAYOUT_TIERS } from "../types";
 import { useDrag } from "./use-drag";
+import { useLayoutTier } from "./use-layout-tier";
 import { useResize } from "./use-resize";
 
 /** Persisted arrangement, kept shape-consistent (layout ↔ heights ↔ widths). */
@@ -19,9 +19,7 @@ interface PersistedTiling {
 const VALID_PANE_IDS = new Set(WINDOW_CONFIGS.map((c) => c.id));
 
 function defaultTiling(): PersistedTiling {
-  const tier = LayoutEngine.getTier(
-    typeof window !== "undefined" ? window.innerWidth : 1280,
-  );
+  const tier = LayoutEngine.getTier(typeof window !== "undefined" ? window.innerWidth : 1280);
   return {
     layout: LayoutEngine.cloneLayout(LAYOUT_TIERS[tier].layout),
     rowHeights: [...DEFAULT_ROW_HEIGHTS],
@@ -85,19 +83,13 @@ function getInitialStates(allClosed: boolean): WindowStates {
 }
 
 export function useTiling(initialAllClosed = false) {
-  const [states, setStates] = useState<WindowStates>(() =>
-    getInitialStates(initialAllClosed),
-  );
+  const [states, setStates] = useState<WindowStates>(() => getInitialStates(initialAllClosed));
   // Layout, row heights and column widths are restored together so their
   // shapes always match (they are meaningless independently).
   const initialTiling = useMemo(() => loadTiling(), []);
   const [layout, setLayout] = useState<CellDef[][]>(initialTiling.layout);
-  const [rowHeights, setRowHeights] = useState<number[]>(
-    initialTiling.rowHeights,
-  );
-  const [colWidths, setColWidths] = useState<number[][]>(
-    initialTiling.colWidths,
-  );
+  const [rowHeights, setRowHeights] = useState<number[]>(initialTiling.rowHeights);
+  const [colWidths, setColWidths] = useState<number[][]>(initialTiling.colWidths);
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [maximizedId, setMaximizedId] = useState<string | null>(null);
   const maxZRef = useRef(100);

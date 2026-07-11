@@ -2,20 +2,14 @@
 
 import type { components } from "@portfolio/api-client";
 
-import {
-  Badge,
-  HashChip,
-  Hint,
-  Instrument,
-  PaneShell,
-  Readout,
-  useMounted,
-} from "@/panes/platform-ui";
+import type { UiStrings } from "@/i18n/types";
+import { Badge, HashChip, Instrument, PaneShell, Readout, useMounted } from "@/panes/platform-ui";
 import { useApiData } from "@/shared/hooks/use-api-data";
 import { cn } from "@/shared/utils/cn";
 
 type MediaItem = components["schemas"]["MediaItem"];
 type MediaVariant = components["schemas"]["MediaVariant"];
+type MediaLabStrings = UiStrings["platform"]["medialab"];
 
 function kib(bytes: number): string {
   return `${(bytes / 1024).toFixed(1)} KiB`;
@@ -27,10 +21,12 @@ function VariantTile({
   variant,
   worst,
   best,
+  t,
 }: {
   variant: MediaVariant;
   worst: number;
   best: boolean;
+  t: MediaLabStrings;
 }) {
   const mounted = useMounted();
   const pct = worst > 0 ? Math.max(6, (variant.size_bytes / worst) * 100) : 100;
@@ -40,20 +36,20 @@ function VariantTile({
         {variant.url ? (
           <img
             src={variant.url}
-            alt={`${variant.format} variant`}
+            alt={t.variantAlt.replace("{format}", variant.format)}
             className="h-28 w-full object-cover"
             loading="lazy"
           />
         ) : (
           <div className="h-28" />
         )}
-        <figcaption className="absolute left-1 top-1 flex items-center gap-1">
+        <figcaption className="absolute top-1 left-1 flex items-center gap-1">
           <Badge tone={best ? "ok" : "idle"}>{variant.format.toUpperCase()}</Badge>
-          {best && <Badge tone="ok">smallest</Badge>}
+          {best && <Badge tone="ok">{t.smallest}</Badge>}
         </figcaption>
       </div>
       <div className="flex items-center justify-between text-2xs">
-        <span className="font-mono tabular-nums text-readable">{kib(variant.size_bytes)}</span>
+        <span className="font-mono text-readable tabular-nums">{kib(variant.size_bytes)}</span>
         <span className="text-muted-foreground">
           {variant.width}×{variant.height}
         </span>
@@ -68,26 +64,15 @@ function VariantTile({
   );
 }
 
-function MediaCard({ item }: { item: MediaItem }) {
+function MediaCard({ item, t }: { item: MediaItem; t: MediaLabStrings }) {
   const variants = [...item.variants].sort(
     (a, b) => FORMAT_ORDER.indexOf(a.format) - FORMAT_ORDER.indexOf(b.format),
   );
   const worst = Math.max(1, ...variants.map((v) => v.size_bytes));
-  const smallest = variants.reduce(
-    (min, v) => (v.size_bytes < min ? v.size_bytes : min),
-    Infinity,
-  );
-  const largest = Math.max(...variants.map((v) => v.size_bytes));
-  const savings =
-    largest > 0 && smallest < Infinity
-      ? Math.round((1 - smallest / largest) * 100)
-      : 0;
+  const smallest = variants.reduce((min, v) => (v.size_bytes < min ? v.size_bytes : min), Infinity);
 
   return (
-    <Instrument
-      label={item.filename}
-      right={savings > 0 ? <Badge tone="ok">−{savings}% best</Badge> : undefined}
-    >
+    <Instrument label={item.filename}>
       <div className="flex gap-2">
         {variants.map((v) => (
           <VariantTile
@@ -95,20 +80,19 @@ function MediaCard({ item }: { item: MediaItem }) {
             variant={v}
             worst={worst}
             best={v.size_bytes === smallest}
+            t={t}
           />
         ))}
       </div>
-      <div className="mt-2 flex items-center justify-between gap-2 border-t border-border-faint pt-1.5">
+      <div className="mt-2 flex items-center justify-between gap-2 border-border-faint border-t pt-1.5">
         {item.content_hash ? <HashChip hash={item.content_hash} /> : <span />}
-        <span className="text-3xs uppercase tracking-[0.15em] text-muted-foreground">
-          content-addressed · immutable
-        </span>
       </div>
     </Instrument>
   );
 }
 
-export function MediaLabPane() {
+export function MediaLabPane({ ui }: { ui: UiStrings }) {
+  const t = ui.platform.medialab;
   const { data, loading, error } = useApiData<MediaItem[]>("/api/v1/media");
   const items = (data ?? []).filter((m) => m.variants.length > 0);
   const variantCount = items.reduce((n, m) => n + m.variants.length, 0);
@@ -128,42 +112,26 @@ export function MediaLabPane() {
   return (
     <PaneShell>
       <div className="grid grid-cols-3 gap-2">
-        <Instrument label="processed">
-          <Readout value={items.length || "··"} label="images" tone="primary" />
+        <Instrument label={t.processed}>
+          <Readout value={items.length || "··"} label={t.images} tone="primary" />
         </Instrument>
-        <Instrument label="variants">
-          <Readout value={variantCount || "··"} label="avif + webp" />
+        <Instrument label={t.variants}>
+          <Readout value={variantCount || "··"} label={t.avifWebp} />
         </Instrument>
-        <Instrument label="avg saving">
-          <Readout value={avgSavings != null ? `${avgSavings}%` : "··"} label="best vs largest" />
+        <Instrument label={t.avgSaving}>
+          <Readout value={avgSavings != null ? `${avgSavings}%` : "··"} label={t.bestVsLargest} />
         </Instrument>
       </div>
 
-      {loading && (
-        <p className="text-xs text-muted-foreground">Loading the codec bench…</p>
-      )}
-      {error && (
-        <p className="text-xs text-muted-foreground">
-          The media pipeline is momentarily unavailable.
-        </p>
-      )}
-      {data && items.length === 0 && (
-        <p className="text-xs text-muted-foreground">
-          No processed media yet. Uploads become variants within seconds.
-        </p>
-      )}
+      {loading && <p className="text-muted-foreground text-xs">{t.loading}</p>}
+      {error && <p className="text-muted-foreground text-xs">{t.unavailable}</p>}
+      {data && items.length === 0 && <p className="text-muted-foreground text-xs">{t.empty}</p>}
 
-      <div className="grid gap-2.5 @md:grid-cols-2">
+      <div className="grid @md:grid-cols-2 gap-2.5">
         {items.slice(0, 12).map((item) => (
-          <MediaCard key={item.id} item={item} />
+          <MediaCard key={item.id} item={item} t={t} />
         ))}
       </div>
-
-      <Hint>
-        An upload flows through a presigned S3 PUT, an SQS event and a Rust
-        worker that strips metadata and encodes AVIF and WebP under
-        content-hashed keys. The edge signs and caches the reads.
-      </Hint>
     </PaneShell>
   );
 }

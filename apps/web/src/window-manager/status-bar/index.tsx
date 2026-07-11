@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "@/shared/components/image";
 import { useTheme } from "next-themes";
-import { isDarkTheme } from "@/lib/themes";
+import { useEffect, useState } from "react";
 import type { UiStrings } from "@/i18n/types";
+import { isDarkTheme } from "@/lib/themes";
+import Image from "@/shared/components/image";
 import { computeUptime } from "@/terminal/neofetch";
 import { STATUS_BAR_HEIGHT } from "../constants";
-import { Weather } from "./components/weather";
-import { VisitorCount } from "./components/visitor-count";
 import { Clock } from "./components/clock";
+import { VisitorCount } from "./components/visitor-count";
+import { Weather } from "./components/weather";
 
 interface Props {
   locale: string;
@@ -18,12 +18,7 @@ interface Props {
   onOpenSettings: () => void;
 }
 
-export function StatusBar({
-  locale,
-  ui,
-  onOpenLauncher,
-  onOpenSettings,
-}: Props) {
+export function StatusBar({ locale, ui, onOpenLauncher, onOpenSettings }: Props) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -37,23 +32,21 @@ export function StatusBar({
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 flex items-center justify-between px-2 font-mono text-xs border-t border-wm-border bg-glass-heavy backdrop-blur-md select-none z-[9999]"
+      className="fixed right-0 bottom-0 left-0 z-[9999] flex select-none items-center justify-between border-wm-border border-t bg-glass-heavy px-2 font-mono text-xs backdrop-blur-md"
       style={{ height: STATUS_BAR_HEIGHT }}
     >
-      <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
         <button
           onClick={onOpenLauncher}
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-launcher-bg text-primary hover:bg-launcher-hover active:bg-launcher-active transition-all font-bold border border-border-medium hover:border-chart-fill hover:shadow-xs hover:shadow-wm-shadow shrink-0"
+          className="flex shrink-0 items-center gap-1.5 rounded-md border border-border-medium bg-launcher-bg px-2 py-0.5 font-bold text-primary transition-all hover:border-chart-fill hover:bg-launcher-hover hover:shadow-wm-shadow hover:shadow-xs active:bg-launcher-active"
         >
-          <span className="text-2xs font-extrabold tracking-tight">F</span>
-          <span className="text-sm text-primary-medium hidden sm:inline">
-            FredOS
-          </span>
+          <span className="font-extrabold text-2xs tracking-tight">F</span>
+          <span className="hidden text-primary-medium text-sm sm:inline">FredOS</span>
         </button>
       </div>
 
       <div className="flex items-center gap-3 text-faded">
-        <span className="text-primary-dim hidden sm:inline">
+        <span className="hidden text-primary-dim sm:inline">
           {ui.uptime}: {computeUptime()}
         </span>
 
@@ -61,38 +54,30 @@ export function StatusBar({
         <VisitorCount label={ui.visitors} />
 
         <div className="flex items-center gap-1.5">
-          <a
-            href="https://www.linkedin.com/in/fredrir"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://www.linkedin.com/in/fredrir" target="_blank" rel="noopener noreferrer">
             <Image
               src={linkedInSrc}
               alt="LinkedIn"
               width={12}
               height={12}
-              className="opacity-50 hover:opacity-100 transition-opacity"
+              className="opacity-50 transition-opacity hover:opacity-100"
             />
           </a>
-          <a
-            href="https://www.github.com/fredrir"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://www.github.com/fredrir" target="_blank" rel="noopener noreferrer">
             <Image
               src={githubSrc}
               alt="GitHub"
               width={12}
               height={12}
-              className="opacity-50 hover:opacity-100 transition-opacity"
+              className="opacity-50 transition-opacity hover:opacity-100"
             />
           </a>
         </div>
 
         <button
           onClick={onOpenSettings}
-          className="text-subtle hover:text-primary transition-colors text-xs"
-          title="Settings"
+          className="text-subtle text-xs transition-colors hover:text-primary"
+          title={ui.localeTitles.settings}
         >
           ⚙
         </button>

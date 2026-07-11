@@ -36,11 +36,9 @@ export const recordVisit = createServerFn({ method: "POST" })
     return { success: true, count: data.count };
   });
 
-export const getVisitorCount = createServerFn().handler(
-  async (): Promise<number> => {
-    const { data } = await api.GET("/api/v1/visits/count", {
-      headers: traceHeaders(),
-    });
-    return data?.count ?? 0;
-  },
-);
+export const getVisitorCount = createServerFn().handler(async (): Promise<number> => {
+  const { data } = await api.GET("/api/v1/visits/count", {
+    headers: traceHeaders(),
+  });
+  return data?.count ?? 0;
+});

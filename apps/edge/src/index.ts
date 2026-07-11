@@ -62,8 +62,7 @@ function decorate(response: Response, ctx: EdgeContext): Response {
   // The Access exchange with the private origin issues CF_* cookies; never
   // leak them to the browser or they poison this hostname's later requests.
   const setCookies =
-    (response.headers as unknown as { getSetCookie?: () => string[] }).getSetCookie?.() ??
-    [];
+    (response.headers as unknown as { getSetCookie?: () => string[] }).getSetCookie?.() ?? [];
   if (setCookies.length > 0) {
     headers.delete("set-cookie");
     for (const cookie of setCookies) {
@@ -82,9 +81,7 @@ function decorate(response: Response, ctx: EdgeContext): Response {
 function stripAccessCookies(request: Request): void {
   const cookie = request.headers.get("cookie");
   if (!cookie) return;
-  const kept = cookie
-    .split(/;\s*/)
-    .filter((pair) => pair && !/^CF_/i.test(pair));
+  const kept = cookie.split(/;\s*/).filter((pair) => pair && !/^CF_/i.test(pair));
   if (kept.length > 0) {
     request.headers.set("cookie", kept.join("; "));
   } else {
@@ -100,9 +97,7 @@ async function rateLimited(
   ctx: EdgeContext,
 ): Promise<Response | null> {
   const rule =
-    request.method === "POST" && url.pathname.startsWith("/api/")
-      ? API_WRITE_LIMIT
-      : GENERAL_LIMIT;
+    request.method === "POST" && url.pathname.startsWith("/api/") ? API_WRITE_LIMIT : GENERAL_LIMIT;
   try {
     const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
     const stub = env.RATE_LIMITER.get(env.RATE_LIMITER.idFromName(ip));
@@ -112,10 +107,7 @@ async function rateLimited(
     });
     if (verdict.status === 429) {
       const { retryAfter } = (await verdict.json()) as { retryAfter: number };
-      const response = decorate(
-        new Response("rate limit exceeded", { status: 429 }),
-        ctx,
-      );
+      const response = decorate(new Response("rate limit exceeded", { status: 429 }), ctx);
       response.headers.set("retry-after", String(retryAfter));
       return response;
     }
@@ -167,8 +159,7 @@ async function serveMedia(
   const cacheable = new Response(body, {
     status: 200,
     headers: {
-      "content-type":
-        response.headers.get("content-type") ?? "application/octet-stream",
+      "content-type": response.headers.get("content-type") ?? "application/octet-stream",
       "content-length": String(body.byteLength),
       "cache-control": "public, max-age=31536000, immutable",
     },
@@ -187,16 +178,10 @@ async function proxyOrigin(request: Request, url: URL, env: Env, ctx: EdgeContex
   // would be evaluated against the wrong Access app and rejected.
   stripAccessCookies(originRequest);
   originRequest.headers.set("CF-Access-Client-Id", env.CF_ACCESS_CLIENT_ID.trim());
-  originRequest.headers.set(
-    "CF-Access-Client-Secret",
-    env.CF_ACCESS_CLIENT_SECRET.trim(),
-  );
+  originRequest.headers.set("CF-Access-Client-Secret", env.CF_ACCESS_CLIENT_SECRET.trim());
   originRequest.headers.set("x-request-id", ctx.requestId);
   originRequest.headers.set("x-forwarded-host", url.hostname);
-  originRequest.headers.set(
-    "x-visitor-country",
-    String(request.cf?.country ?? ""),
-  );
+  originRequest.headers.set("x-visitor-country", String(request.cf?.country ?? ""));
   // The admin origin marker only ever comes from Caddy's admin vhost.
   originRequest.headers.delete("x-admin-origin");
 
@@ -244,8 +229,7 @@ export default {
     // Immutable, content-hashed assets and media are cache-friendly and
     // subresource-heavy (a gallery load pulls dozens); rate-limiting them would
     // 429 legitimate page loads and cost a Durable Object round-trip per hit.
-    const isCacheable =
-      IMMUTABLE_PATH.test(url.pathname) || url.pathname.startsWith("/media/");
+    const isCacheable = IMMUTABLE_PATH.test(url.pathname) || url.pathname.startsWith("/media/");
     if (!isCacheable) {
       const limited = await rateLimited(request, url, env, ctx);
       if (limited) {

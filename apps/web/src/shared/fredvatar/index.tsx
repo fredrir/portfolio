@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AvatarModel } from "./components/avatar-model";
 import { REACTIONS } from "./constants";
 
-export function FredVatar() {
+export function FredVatar({ ariaLabel }: { ariaLabel: string }) {
   const [reaction, setReaction] = useState<string>("idle");
   const [exprIdx, setExprIdx] = useState(-1);
   const [hovered, setHovered] = useState(false);
@@ -37,12 +37,12 @@ export function FredVatar() {
 
   return (
     <div
-      className="cursor-pointer w-38 h-65 @sm:w-35 @sm:h-62.5 @xl:w-45 @xl:h-56.5"
+      className="@sm:h-62.5 @xl:h-56.5 h-65 @sm:w-35 @xl:w-45 w-38 cursor-pointer"
       onClick={triggerReaction}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       role="img"
-      aria-label="Interactive 3D avatar of Fredrik"
+      aria-label={ariaLabel}
     >
       <Canvas
         camera={{ position: [0, 0, 4.8], fov: 38 }}
@@ -51,11 +51,7 @@ export function FredVatar() {
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[3, 4, 5]} intensity={0.7} />
-        <directionalLight
-          position={[-2, 2, 3]}
-          intensity={0.3}
-          color="#b0c4de"
-        />
+        <directionalLight position={[-2, 2, 3]} intensity={0.3} color="#b0c4de" />
         <pointLight position={[0, 1, -2]} intensity={0.4} color="#8EC8E8" />
         <AvatarModel reaction={reaction} hovered={hovered} exprIdx={exprIdx} />
       </Canvas>

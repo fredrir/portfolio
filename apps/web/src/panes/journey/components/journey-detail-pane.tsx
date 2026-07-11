@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "@/shared/components/image";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { isDarkTheme } from "@/lib/themes";
+import Image from "@/shared/components/image";
 import type { journeyType } from "@/shared/types";
 
 interface Props {
@@ -15,47 +15,37 @@ export function JourneyDetailPane({ journey }: Props) {
   const [src, setSrc] = useState("");
 
   useEffect(() => {
-    setSrc(
-      isDarkTheme(resolvedTheme)
-        ? journey.darkModeImageUri
-        : journey.lightModeImageUri,
-    );
+    setSrc(isDarkTheme(resolvedTheme) ? journey.darkModeImageUri : journey.lightModeImageUri);
   }, [resolvedTheme, journey.darkModeImageUri, journey.lightModeImageUri]);
 
   return (
-    <div className="h-full flex flex-col overflow-auto text-sm p-5 space-y-5">
-      <div className="flex gap-4 items-start">
+    <div className="flex h-full flex-col space-y-5 overflow-auto p-5 text-sm">
+      <div className="flex items-start gap-4">
         {src && (
-          <div className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden bg-background border border-border-faint flex items-center justify-center">
+          <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-faint bg-background">
             <Image
               src={src}
               alt={journey.company}
               width={400}
               height={400}
-              className="object-contain p-1 w-14 h-14"
+              className="h-14 w-14 object-contain p-1"
             />
           </div>
         )}
 
-        <div className="flex flex-col min-w-0 space-y-1">
-          <h2 className="text-base font-semibold text-primary leading-tight">
-            {journey.jobTitle}
-          </h2>
+        <div className="flex min-w-0 flex-col space-y-1">
+          <h2 className="font-semibold text-base text-primary leading-tight">{journey.jobTitle}</h2>
 
           <div className="text-base text-foreground">{journey.company}</div>
 
-          <div className="text-xs text-date-accent tracking-wide">
-            {journey.date}
-          </div>
+          <div className="text-date-accent text-xs tracking-wide">{journey.date}</div>
         </div>
       </div>
 
-      <div className="border-t border-border-faint" />
+      <div className="border-border-faint border-t" />
 
       <div className="space-y-2">
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          {journey.description}
-        </p>
+        <p className="text-muted-foreground text-sm leading-relaxed">{journey.description}</p>
       </div>
     </div>
   );

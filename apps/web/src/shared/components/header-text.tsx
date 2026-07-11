@@ -8,8 +8,8 @@ const HeaderText = ({ title, href, className }: Props) => {
   return (
     <div className={className}>
       <a href={href}>
-        <div className="dark:text-white rounded-3xl px-4 py-2 mt-4 w-fit text-center border-solid border-2 border-gray-400 dark:border-gray-600">
-          <h1 className="text-4xl font-bold">{title}</h1>
+        <div className="mt-4 w-fit rounded-3xl border-2 border-gray-400 border-solid px-4 py-2 text-center dark:border-gray-600 dark:text-white">
+          <h1 className="font-bold text-4xl">{title}</h1>
         </div>
       </a>
     </div>

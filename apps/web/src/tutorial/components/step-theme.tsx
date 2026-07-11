@@ -1,10 +1,10 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import type { TutorialStrings } from "@/i18n/types";
 import { THEMES } from "@/lib/themes";
 import { ThemeSwatch } from "@/panes/settings/components/theme-swatch";
 import { StepLayout } from "./step-layout";
-import type { TutorialStrings } from "@/i18n/types";
 
 interface Props {
   t: TutorialStrings;
@@ -24,7 +24,7 @@ export function StepTheme({ t, onSelectTheme }: Props) {
               setTheme(th.id);
               onSelectTheme(th.id);
             }}
-            className={`flex items-center gap-1.5 px-2 py-2 md:py-4 rounded-md border text-xs transition-all ${
+            className={`flex items-center gap-1.5 rounded-md border px-2 py-2 text-xs transition-all md:py-4 ${
               theme === th.id
                 ? "border-primary bg-control-active text-primary"
                 : "border-control-border text-muted-foreground hover:border-control-border-hover hover:bg-control-hover"

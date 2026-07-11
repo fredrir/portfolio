@@ -7,7 +7,7 @@ interface Props {
 export function ContentArea({ children }: Props) {
   return (
     <div
-      className="relative flex flex-col w-full"
+      className="relative flex w-full flex-col"
       style={{
         height: `calc(100vh - ${STATUS_BAR_HEIGHT}px)`,
         padding: GAP,

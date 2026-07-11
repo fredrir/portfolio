@@ -1,8 +1,8 @@
 "use client";
 
+import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
 
 export function Mouth({ expression }: { expression: number }) {
   const groupRef = useRef<THREE.Group>(null);
@@ -35,19 +35,14 @@ export function Mouth({ expression }: { expression: number }) {
 
     if (s.talking) {
       const t = clock.getElapsedTime();
-      const wave =
-        Math.sin(t * 8) * 0.4 + Math.sin(t * 13) * 0.3 + Math.sin(t * 5) * 0.2;
+      const wave = Math.sin(t * 8) * 0.4 + Math.sin(t * 13) * 0.3 + Math.sin(t * 5) * 0.2;
       const open = 0.3 + Math.max(0, wave) * 1.4;
       const wide = 1 + Math.max(0, wave) * 0.3;
       groupRef.current.scale.set(wide, open, 1);
     } else {
       const curr = groupRef.current.scale.y;
       const currX = groupRef.current.scale.x;
-      groupRef.current.scale.set(
-        currX + (1.15 - currX) * 0.1,
-        curr + (0.6 - curr) * 0.1,
-        1,
-      );
+      groupRef.current.scale.set(currX + (1.15 - currX) * 0.1, curr + (0.6 - curr) * 0.1, 1);
     }
   });
 

@@ -1,4 +1,4 @@
-export function SpotifyEmbed({ trackId }: { trackId: string }) {
+export function SpotifyEmbed({ trackId, title }: { trackId: string; title: string }) {
   return (
     <iframe
       src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`}
@@ -7,7 +7,7 @@ export function SpotifyEmbed({ trackId }: { trackId: string }) {
       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
       loading="lazy"
       className="rounded-md border border-border-faint"
-      title="Spotify player"
+      title={title}
     />
   );
 }

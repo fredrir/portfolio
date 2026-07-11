@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import { useEffect, useState } from "react";
+import type { WindowStates } from "../../types";
 import { LayoutEngine } from "../layout-engine";
 import type { LayoutTier, TilingState } from "../types";
-import type { WindowStates } from "../../types";
-import type { Dispatch, SetStateAction } from "react";
 
 export function useLayoutTier(
   tiling: TilingState,

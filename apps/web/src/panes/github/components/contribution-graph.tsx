@@ -1,9 +1,5 @@
-import {
-  CONTRIBUTION_LEVEL_CHARS,
-  CONTRIBUTION_LEVEL_COLORS,
-  MS_PER_DAY,
-} from "../constants";
 import type { ContributionDay } from "@/shared/types";
+import { CONTRIBUTION_LEVEL_CHARS, CONTRIBUTION_LEVEL_COLORS, MS_PER_DAY } from "../constants";
 
 export function ContributionGraph({
   contributions,
@@ -22,10 +18,7 @@ export function ContributionGraph({
   lastYearLabel?: string;
   contributionsLabel?: string;
 }) {
-  const weeks: (ContributionDay | null)[][] = Array.from(
-    { length: 53 },
-    () => Array(7).fill(null),
-  );
+  const weeks: (ContributionDay | null)[][] = Array.from({ length: 53 }, () => Array(7).fill(null));
 
   contributions.forEach((day) => {
     const dow = new Date(day.date + "T00:00:00").getDay();
@@ -43,15 +36,15 @@ export function ContributionGraph({
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-primary font-semibold text-2xs">
+        <span className="font-semibold text-2xs text-primary">
           {total.toLocaleString()} {contributionsLabel}
         </span>
-        <div className="flex gap-1 flex-wrap justify-end">
+        <div className="flex flex-wrap justify-end gap-1">
           {years.map((y) => (
             <button
               key={y}
               onClick={() => onYearChange(y)}
-              className={`text-2xs px-1.5 py-0.5 rounded transition-colors ${
+              className={`rounded px-1.5 py-0.5 text-2xs transition-colors ${
                 selectedYear === y
                   ? "bg-surface-selected text-primary"
                   : "text-subtle hover:text-muted-hover"
@@ -63,7 +56,7 @@ export function ContributionGraph({
         </div>
       </div>
 
-      <div className="w-full overflow-y-hidden overflow-x-auto">
+      <div className="w-full overflow-x-auto overflow-y-hidden">
         <div
           className="grid w-full font-mono leading-none"
           style={{ gridTemplateColumns: "repeat(53, 1fr)" }}
@@ -75,12 +68,8 @@ export function ContributionGraph({
                 return (
                   <span
                     key={di}
-                    className={`${CONTRIBUTION_LEVEL_COLORS[level]} text-3xs @lg:text-xs select-none text-center`}
-                    title={
-                      day
-                        ? `${day.count} ${contributionsLabel} on ${day.date}`
-                        : undefined
-                    }
+                    className={`${CONTRIBUTION_LEVEL_COLORS[level]} select-none text-center @lg:text-xs text-3xs`}
+                    title={day ? `${day.count} ${contributionsLabel} on ${day.date}` : undefined}
                   >
                     {CONTRIBUTION_LEVEL_CHARS[level]}
                   </span>

@@ -1,7 +1,7 @@
 "use client";
 
-import type { WindowConfig } from "../../types";
 import { cn } from "@/shared/utils/cn";
+import type { WindowConfig } from "../../types";
 import { WindowFrame } from "./window-frame";
 
 interface Props {
@@ -34,12 +34,8 @@ export function Window({
   return (
     <div
       data-pane-id={config.id}
-      className={`flex-1 min-w-0 flex flex-col transition-all duration-200 ${
-        isDragging
-          ? "opacity-50 scale-[0.98]"
-          : isSwapTarget
-            ? "scale-[1.01]"
-            : ""
+      className={`flex min-w-0 flex-1 flex-col transition-all duration-200 ${
+        isDragging ? "scale-[0.98] opacity-50" : isSwapTarget ? "scale-[1.01]" : ""
       }`}
       onMouseDown={onFocus ?? undefined}
     >
@@ -57,11 +53,11 @@ export function Window({
         }}
         onTitleBarDoubleClick={onMaximize}
         className={cn(
-          "flex-1 min-w-0 bg-glass-light",
+          "min-w-0 flex-1 bg-glass-light",
           isDragging
             ? "border-wm-border-drag"
             : isSwapTarget
-              ? "border-wm-border-swap ring-2 ring-wm-ring shadow-lg shadow-wm-shadow"
+              ? "border-wm-border-swap shadow-lg shadow-wm-shadow ring-2 ring-wm-ring"
               : isFocused
                 ? "border-wm-border-focus shadow-lg shadow-wm-shadow"
                 : "border-wm-border shadow-md shadow-wm-shadow-soft",
@@ -72,7 +68,7 @@ export function Window({
         {children}
         {showResizeGrip && (
           <div
-            className="absolute bottom-0 right-0 w-5 h-5 cursor-nwse-resize z-20 group/grip"
+            className="group/grip absolute right-0 bottom-0 z-20 h-5 w-5 cursor-nwse-resize"
             onMouseDown={(e) => {
               e.stopPropagation();
               onCornerResize?.(e);
@@ -80,11 +76,35 @@ export function Window({
           >
             <svg
               viewBox="0 0 16 16"
-              className="w-full h-full text-primary-subtle group-hover/grip:text-primary-soft transition-colors"
+              className="h-full w-full text-primary-subtle transition-colors group-hover/grip:text-primary-soft"
             >
-              <line x1="14" y1="6" x2="6" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="14" y1="10" x2="10" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="14" y1="14" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <line
+                x1="14"
+                y1="6"
+                x2="6"
+                y2="14"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              <line
+                x1="14"
+                y1="10"
+                x2="10"
+                y2="14"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              <line
+                x1="14"
+                y1="14"
+                x2="14"
+                y2="14"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           </div>
         )}

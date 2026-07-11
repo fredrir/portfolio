@@ -1,9 +1,9 @@
 "use client";
 
+import { GithubLogoIcon, LinkIcon } from "@phosphor-icons/react/dist/ssr";
+import type { UiStrings } from "@/i18n/types";
 import Image from "@/shared/components/image";
 import type { projectType } from "@/shared/types";
-import type { UiStrings } from "@/i18n/types";
-import { GithubLogoIcon, LinkIcon } from "@phosphor-icons/react/dist/ssr";
 
 interface Props {
   project: projectType;
@@ -13,7 +13,7 @@ interface Props {
 
 function MobileScreensShowcase({ images }: { images: string[] }) {
   return (
-    <div className="flex justify-center items-end gap-3 py-3 px-2">
+    <div className="flex items-end justify-center gap-3 px-2 py-3">
       {images.map((src, i) => {
         const isCenter = i === Math.floor(images.length / 2);
         return (
@@ -28,18 +28,12 @@ function MobileScreensShowcase({ images }: { images: string[] }) {
                   : "rotate(3deg) translateY(4px)",
             }}
           >
-            <div className="w-[100px] rounded-xl border-2 border-border-medium bg-black overflow-hidden shadow-lg">
-              <div className="w-full h-1.5 bg-black flex items-center justify-center">
-                <div className="w-6 h-0.5 rounded-full bg-border-medium" />
+            <div className="w-[100px] overflow-hidden rounded-xl border-2 border-border-medium bg-black shadow-lg">
+              <div className="flex h-1.5 w-full items-center justify-center bg-black">
+                <div className="h-0.5 w-6 rounded-full bg-border-medium" />
               </div>
-              <Image
-                src={src}
-                alt=""
-                width={200}
-                height={400}
-                className="w-full h-auto"
-              />
-              <div className="w-full h-1 bg-black" />
+              <Image src={src} alt="" width={200} height={400} className="h-auto w-full" />
+              <div className="h-1 w-full bg-black" />
             </div>
           </div>
         );
@@ -50,30 +44,21 @@ function MobileScreensShowcase({ images }: { images: string[] }) {
 
 function LaptopShowcase({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="flex justify-center py-3 px-2">
+    <div className="flex justify-center px-2 py-3">
       <div className="w-full max-w-[340px]">
-        <div className="rounded-t-lg border border-b-0 border-border-medium bg-black overflow-hidden shadow-lg">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-surface-dim border-b border-border-medium">
-            <div className="w-1.5 h-1.5 rounded-full bg-terminal-close" />
-            <div className="w-1.5 h-1.5 rounded-full bg-terminal-minimize" />
-            <div className="w-1.5 h-1.5 rounded-full bg-terminal-maximize" />
+        <div className="overflow-hidden rounded-t-lg border border-border-medium border-b-0 bg-black shadow-lg">
+          <div className="flex items-center gap-1.5 border-border-medium border-b bg-surface-dim px-2.5 py-1">
+            <div className="h-1.5 w-1.5 rounded-full bg-terminal-close" />
+            <div className="h-1.5 w-1.5 rounded-full bg-terminal-minimize" />
+            <div className="h-1.5 w-1.5 rounded-full bg-terminal-maximize" />
           </div>
-          <Image
-            src={src}
-            alt={alt}
-            width={600}
-            height={340}
-            className="w-full h-auto"
-          />
+          <Image src={src} alt={alt} width={600} height={340} className="h-auto w-full" />
         </div>
         <div
-          className="h-2.5 bg-border-medium rounded-b-sm mx-auto"
+          className="mx-auto h-2.5 rounded-b-sm bg-border-medium"
           style={{ width: "108%", marginLeft: "-4%" }}
         />
-        <div
-          className="h-1 bg-border-medium/60 rounded-b-md mx-auto"
-          style={{ width: "40%" }}
-        />
+        <div className="mx-auto h-1 rounded-b-md bg-border-medium/60" style={{ width: "40%" }} />
       </div>
     </div>
   );
@@ -85,44 +70,38 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
   const langs = project.languages.split(",").map((l) => l.trim());
 
   return (
-    <div className="h-full flex flex-col overflow-auto">
-      <div className="flex-1 p-4 space-y-4">
+    <div className="flex h-full flex-col overflow-auto">
+      <div className="flex-1 space-y-4 p-4">
         <div>
-          <h2 className="text-lg font-bold text-foreground tracking-tight">
-            {project.title}
-          </h2>
+          <h2 className="font-bold text-foreground text-lg tracking-tight">{project.title}</h2>
         </div>
 
-        {isMobileApp && (
-          <MobileScreensShowcase images={project.mobileImages!} />
-        )}
+        {isMobileApp && <MobileScreensShowcase images={project.mobileImages!} />}
 
         {thumb && <LaptopShowcase src={thumb} alt={project.title} />}
 
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-primary font-bold text-base lg:text-lg uppercase tracking-wider">
+          <div className="mb-1.5 flex items-center gap-2">
+            <span className="font-bold text-base text-primary uppercase tracking-wider lg:text-lg">
               {ui.about}
             </span>
-            <div className="flex-1 h-px bg-border-faint" />
+            <div className="h-px flex-1 bg-border-faint" />
           </div>
-          <p className="text-muted-foreground leading-relaxed text-sm">
-            {project.description}
-          </p>
+          <p className="text-muted-foreground text-sm leading-relaxed">{project.description}</p>
         </div>
 
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-primary font-bold text-base lg:text-lg uppercase tracking-wider">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="font-bold text-base text-primary uppercase tracking-wider lg:text-lg">
               {ui.techStack}
             </span>
-            <div className="flex-1 h-px bg-border-faint" />
+            <div className="h-px flex-1 bg-border-faint" />
           </div>
           <div className="flex flex-wrap gap-1.5">
             {langs.map((lang, i) => (
               <span
                 key={i}
-                className="px-2.5 py-1 rounded-md text-xs border border-border-medium bg-surface-dim text-primary font-medium"
+                className="rounded-md border border-border-medium bg-surface-dim px-2.5 py-1 font-medium text-primary text-xs"
               >
                 {lang}
               </span>
@@ -132,11 +111,11 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
 
         {(project.websiteLink || project.githubLink) && (
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-primary font-bold text-xs uppercase tracking-wider">
+            <div className="mb-2 flex items-center gap-2">
+              <span className="font-bold text-primary text-xs uppercase tracking-wider">
                 {ui.links}
               </span>
-              <div className="flex-1 h-px bg-border-faint" />
+              <div className="h-px flex-1 bg-border-faint" />
             </div>
             <div className="space-y-1.5">
               {project.websiteLink && (
@@ -144,16 +123,14 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
                   href={project.websiteLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 rounded-md border border-wm-border hover:border-control-border-hover hover:bg-control-hover transition-all group"
+                  className="group flex items-center gap-2 rounded-md border border-wm-border px-3 py-2 transition-all hover:border-control-border-hover hover:bg-control-hover"
                 >
                   <span className="text-primary-muted group-hover:text-primary">
-                    <LinkIcon className="group-hover:fill-primary h-4 w-4 fill-primary" />
+                    <LinkIcon className="h-4 w-4 fill-primary group-hover:fill-primary" />
                   </span>
-                  <span className="text-foreground group-hover:text-primary transition-colors text-xs">
+                  <span className="text-foreground text-xs transition-colors group-hover:text-primary">
                     {project.websiteAlias ||
-                      project.websiteLink
-                        .replace(/https?:\/\//, "")
-                        .replace(/\/$/, "")}
+                      project.websiteLink.replace(/https?:\/\//, "").replace(/\/$/, "")}
                   </span>
                 </a>
               )}
@@ -162,12 +139,12 @@ export function ProjectDetailPane({ project, viewCode, ui }: Props) {
                   href={project.githubLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 rounded-md border border-wm-border hover:border-control-border-hover hover:bg-control-hover transition-all group"
+                  className="group flex items-center gap-2 rounded-md border border-wm-border px-3 py-2 transition-all hover:border-control-border-hover hover:bg-control-hover"
                 >
                   <span>
-                    <GithubLogoIcon className="group-hover:fill-primary w-4 h-4 fill-primary" />
+                    <GithubLogoIcon className="h-4 w-4 fill-primary group-hover:fill-primary" />
                   </span>
-                  <span className="text-muted-hover group-hover:text-primary transition-colors text-xs">
+                  <span className="text-muted-hover text-xs transition-colors group-hover:text-primary">
                     {viewCode}
                   </span>
                 </a>

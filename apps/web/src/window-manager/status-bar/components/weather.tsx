@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { KEYS, read, write } from "@/lib/storage";
 
 export function Weather() {

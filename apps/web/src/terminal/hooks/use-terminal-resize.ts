@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useIsMobile } from "@/shared/hooks/use-is-mobile";
 
 interface TerminalSize {
@@ -79,9 +79,7 @@ export const useTerminalResize = ({ isExpanded }: UseTerminalResizeProps) => {
       setStartSize({ ...terminalSize });
 
       document.body.style.cursor =
-        direction.includes("e") &&
-        direction.includes("s") &&
-        direction.includes("w")
+        direction.includes("e") && direction.includes("s") && direction.includes("w")
           ? "nwse-resize"
           : direction.includes("n") && direction.includes("w")
             ? "nw-resize"
@@ -106,28 +104,16 @@ export const useTerminalResize = ({ isExpanded }: UseTerminalResizeProps) => {
       let newHeight = startSize.height;
 
       if (resizeDirection.includes("e")) {
-        newWidth = Math.max(
-          MIN_WIDTH,
-          Math.min(MAX_WIDTH, startSize.width + deltaX),
-        );
+        newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, startSize.width + deltaX));
       }
       if (resizeDirection.includes("w")) {
-        newWidth = Math.max(
-          MIN_WIDTH,
-          Math.min(MAX_WIDTH, startSize.width - deltaX),
-        );
+        newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, startSize.width - deltaX));
       }
       if (resizeDirection.includes("s")) {
-        newHeight = Math.max(
-          MIN_HEIGHT,
-          Math.min(MAX_HEIGHT, startSize.height + deltaY),
-        );
+        newHeight = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, startSize.height + deltaY));
       }
       if (resizeDirection.includes("n")) {
-        newHeight = Math.max(
-          MIN_HEIGHT,
-          Math.min(MAX_HEIGHT, startSize.height - deltaY),
-        );
+        newHeight = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, startSize.height - deltaY));
       }
 
       setTerminalSize({ width: newWidth, height: newHeight });

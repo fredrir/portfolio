@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import type { TilingState, ResizeResult } from "../types";
+import type { ResizeResult, TilingState } from "../types";
 
 export function useResize(tiling: TilingState): ResizeResult {
   const startRowResize = useCallback(
@@ -42,8 +42,14 @@ export function useResize(tiling: TilingState): ResizeResult {
         const dxPercent = (dx / totalWidth) * 100;
         const newW = startWidths.map((r) => [...r]);
         if (!newW[rowIndex]) return;
-        newW[rowIndex][dividerIndex] = Math.max(10, startWidths[rowIndex][dividerIndex] + dxPercent);
-        newW[rowIndex][dividerIndex + 1] = Math.max(10, startWidths[rowIndex][dividerIndex + 1] - dxPercent);
+        newW[rowIndex][dividerIndex] = Math.max(
+          10,
+          startWidths[rowIndex][dividerIndex] + dxPercent,
+        );
+        newW[rowIndex][dividerIndex + 1] = Math.max(
+          10,
+          startWidths[rowIndex][dividerIndex + 1] - dxPercent,
+        );
         tiling.setColWidths(newW);
       };
 
@@ -84,7 +90,10 @@ export function useResize(tiling: TilingState): ResizeResult {
         const newW = startWidths.map((r) => [...r]);
         if (newW[rowIndex] && colIndex < newW[rowIndex].length - 1) {
           newW[rowIndex][colIndex] = Math.max(10, startWidths[rowIndex][colIndex] + dxPercent);
-          newW[rowIndex][colIndex + 1] = Math.max(10, startWidths[rowIndex][colIndex + 1] - dxPercent);
+          newW[rowIndex][colIndex + 1] = Math.max(
+            10,
+            startWidths[rowIndex][colIndex + 1] - dxPercent,
+          );
           tiling.setColWidths(newW);
         }
       };

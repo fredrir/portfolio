@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { createClient } from "@supabase/supabase-js";
 /**
  * One-time migration of the `visitors` table from Supabase to the
  * portfolio Postgres database (apps/api).
@@ -15,7 +16,6 @@
  * cutover after truncating the target table, or the import duplicates rows.
  */
 import { SQL } from "bun";
-import { createClient } from "@supabase/supabase-js";
 
 const PAGE_SIZE = 1000;
 
@@ -33,14 +33,11 @@ const dryRun = process.argv.includes("--dry-run");
 const append = process.argv.includes("--append");
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_ANON_KEY;
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error(
-    "Missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_ANON_KEY).",
-  );
+  console.error("Missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_ANON_KEY).");
   process.exit(1);
 }
 if (!databaseUrl && !dryRun) {

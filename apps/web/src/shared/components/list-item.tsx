@@ -21,25 +21,25 @@ const ListItem = ({ visual, title, subtitle, onClick, badge }: Props) => {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left flex items-center gap-2 @sm:gap-3 py-1 @sm:py-1.5 px-1.5 @sm:px-2 rounded-md hover:bg-control-hover transition-colors group"
+      className="group flex w-full items-center @sm:gap-3 gap-2 rounded-md @sm:px-2 px-1.5 @sm:py-1.5 py-1 text-left transition-colors hover:bg-control-hover"
     >
       {visual &&
         (isCustomVisual(visual)
           ? visual.custom
           : visual.imageSrc && (
-              <div className="shrink-0 w-10 h-7 @sm:w-12 @sm:h-8 @lg:w-16 @lg:h-11 rounded-md overflow-hidden border border-control-border bg-background">
+              <div className="@lg:h-11 @sm:h-8 h-7 @lg:w-16 @sm:w-12 w-10 shrink-0 overflow-hidden rounded-md border border-control-border bg-background">
                 <Image
                   src={visual.imageSrc}
                   alt={title}
                   width={96}
                   height={64}
-                  className="object-cover w-full h-full"
+                  className="h-full w-full object-cover"
                 />
               </div>
             ))}
 
       <div className="min-w-0 flex-1">
-        <span className="text-primary font-semibold truncate block group-hover:underline text-2xs @sm:text-xs">
+        <span className="block truncate font-semibold @sm:text-xs text-2xs text-primary group-hover:underline">
           {title}
         </span>
         <div className="mt-0.5">{subtitle}</div>
@@ -47,7 +47,7 @@ const ListItem = ({ visual, title, subtitle, onClick, badge }: Props) => {
 
       {badge}
 
-      <ArrowRightIcon className="text-primary-hint group-hover:text-primary-muted transition-colors shrink-0 transtion-transform duration-300 group-hover:translate-x-0.5 -group-hover:translate-y-0.5 -rotate-45" />
+      <ArrowRightIcon className="transtion-transform shrink-0 -group-hover:translate-y-0.5 -rotate-45 text-primary-hint transition-colors duration-300 group-hover:translate-x-0.5 group-hover:text-primary-muted" />
     </button>
   );
 };

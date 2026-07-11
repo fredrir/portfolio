@@ -1,22 +1,22 @@
-import type { SpotifyData } from "@/shared/types";
+import { PauseIcon, PlayIcon } from "@phosphor-icons/react";
+import { useState } from "react";
 import type { UiStrings } from "@/i18n/types";
 import Image from "@/shared/components/image";
+import type { SpotifyData } from "@/shared/types";
 import { SPOTIFY_ASCII } from "../constants";
-import { PauseIcon, PlayIcon } from "@phosphor-icons/react";
 import { formatTime, relativeTime } from "../utils";
 import { SpotifyEmbed } from "./spotify-embed";
-import { useState } from "react";
 
 interface Props {
   displayData: SpotifyData;
-  ui?: UiStrings;
+  ui: UiStrings;
   compact?: boolean;
   locale?: string;
 }
 
 const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
   const [showEmbed, setShowEmbed] = useState(false);
-  const lpLabel = ui?.lastPlayed ?? "LAST PLAYED";
+  const lpLabel = ui.lastPlayed;
   const lastPlayedLabel =
     !displayData?.isPlaying && displayData?.lastPlayedAt
       ? `${lpLabel} ${relativeTime(displayData.lastPlayedAt, locale)}`
@@ -28,23 +28,23 @@ const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
 
   return (
     <>
-      <div className="flex gap-3 @sm:gap-4 items-start">
+      <div className="flex items-start @sm:gap-4 gap-3">
         {!compact && (
-          <div className="shrink-0 block">
+          <div className="block shrink-0">
             {displayData.albumArt ? (
               <Image
                 src={displayData.albumArt}
-                alt={displayData.album ?? "Album art"}
+                alt={displayData.album ?? ui.albumArt}
                 width={64}
                 height={64}
-                className="w-16 h-16 rounded border border-border-medium opacity-80"
+                className="h-16 w-16 rounded border border-border-medium opacity-80"
                 unoptimized
               />
             ) : (
               SPOTIFY_ASCII.map((line, i) => (
                 <span
                   key={i}
-                  className="text-green-400/60 whitespace-pre text-xs leading-tight block"
+                  className="block whitespace-pre text-green-400/60 text-xs leading-tight"
                 >
                   {line}
                 </span>
@@ -53,9 +53,9 @@ const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
           </div>
         )}
 
-        <div className="min-w-0 text-xs  space-y-0.5 flex-1">
+        <div className="min-w-0 flex-1 space-y-0.5 text-xs">
           <div className="flex items-center gap-2">
-            <span className="text-primary font-semibold">
+            <span className="font-semibold text-primary">
               {displayData.isPlaying ? (
                 <PlayIcon className="h-3 w-3 fill-primary-muted" />
               ) : (
@@ -63,22 +63,18 @@ const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
               )}
             </span>
             <span className="text-faded">
-              {displayData.isPlaying
-                ? (ui?.nowPlaying ?? "NOW PLAYING")
-                : lastPlayedLabel}
+              {displayData.isPlaying ? ui.nowPlaying : lastPlayedLabel}
             </span>
           </div>
           <div>
-            <span className="text-primary font-semibold">
-              {ui?.track ?? "Track"}
-            </span>
+            <span className="font-semibold text-primary">{ui.track}</span>
             <span className="text-muted-foreground"> </span>
             {displayData.songUrl ? (
               <a
                 href={displayData.songUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground hover:text-primary hover:underline transition-colors"
+                className="text-foreground transition-colors hover:text-primary hover:underline"
               >
                 {displayData.title}
               </a>
@@ -87,52 +83,45 @@ const NowPlaying = ({ displayData, ui, compact, locale }: Props) => {
             )}
           </div>
           <div>
-            <span className="text-primary font-semibold">
-              {ui?.artist ?? "Artist"}
-            </span>
+            <span className="font-semibold text-primary">{ui.artist}</span>
             <span className="text-muted-foreground"> {displayData.artist}</span>
           </div>
           {!compact && (
             <div>
-              <span className="text-primary font-semibold">
-                {ui?.album ?? "Album"}
-              </span>
-              <span className="text-muted-foreground">
-                {" "}
-                {displayData.album}
-              </span>
+              <span className="font-semibold text-primary">{ui.album}</span>
+              <span className="text-muted-foreground"> {displayData.album}</span>
             </div>
           )}
           {displayData.isPlaying && (
-            <div className="flex pt-1 items-center gap-2">
-              <span className="text-faded text-xs w-8">
+            <div className="flex items-center gap-2 pt-1">
+              <span className="w-8 text-faded text-xs">
                 {formatTime(displayData.progressMs ?? 0)}
               </span>
-              <div className="flex-1 flex items-center">
-                <div className="w-full bg-progress-track h-1 rounded-full ">
+              <div className="flex flex-1 items-center">
+                <div className="h-1 w-full rounded-full bg-progress-track">
                   <div
-                    className="h-full bg-progress-fill rounded-full transition-all duration-1000"
+                    className="h-full rounded-full bg-progress-fill transition-all duration-1000"
                     style={{ width: `${progressPct}%` }}
                   />
                 </div>
               </div>
-              <span className="text-faded text-xs w-8 text-right">
+              <span className="w-8 text-right text-faded text-xs">
                 {formatTime(displayData.durationMs ?? 0)}
               </span>
             </div>
           )}
           <button
             onClick={() => setShowEmbed((prev) => !prev)}
-            className="text-xs mt-1  text-primary-soft hover:text-primary transition-colors flex items-center gap-1.5 px-2 py-1 rounded border border-wm-border hover:border-control-border-hover hover:bg-control-hover"
+            className="mt-1 flex items-center gap-1.5 rounded border border-wm-border px-2 py-1 text-primary-soft text-xs transition-colors hover:border-control-border-hover hover:bg-control-hover hover:text-primary"
           >
             <PlayIcon className="h-2 w-2 fill-primary-soft" />
-            {ui?.playInBrowser ?? "play in browser"}
+            {ui.playInBrowser}
           </button>
         </div>
       </div>
 
       {showEmbed && displayData?.trackId && (
-        <SpotifyEmbed trackId={displayData.trackId} />
+        <SpotifyEmbed trackId={displayData.trackId} title={ui.spotifyPlayer} />
       )}
     </>
   );

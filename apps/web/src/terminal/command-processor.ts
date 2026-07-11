@@ -1,12 +1,14 @@
-import { FileSystemManager } from "./file-system";
+import { MY_NAME, PORTFOLIO_VERSION } from "@/lib/constants";
 import { computeUptime, getNeofetchPlainText } from "@/terminal/neofetch";
-import { PORTFOLIO_VERSION, MY_NAME } from "@/lib/constants";
-import type { CommandResult, FileSystemConfig } from "./types";
+import { FileSystemManager } from "./file-system";
 import { getTerminalStrings, type TerminalStrings } from "./translations";
+import type { CommandResult, FileSystemConfig } from "./types";
 
 interface CommandDef {
   name: string;
-  descKey: keyof TerminalStrings;
+  descKey: {
+    [K in keyof TerminalStrings]: TerminalStrings[K] extends string ? K : never;
+  }[keyof TerminalStrings];
 }
 
 const COMMANDS: CommandDef[] = [
@@ -38,16 +40,14 @@ export class CommandProcessor {
   private paneIds: string[];
   private isStandalone: boolean;
   private t: TerminalStrings;
+  private locale?: string;
 
-  constructor(
-    config?: FileSystemConfig,
-    isStandalone = false,
-    locale?: string,
-  ) {
-    this.fileSystemManager = new FileSystemManager(config);
+  constructor(config?: FileSystemConfig, isStandalone = false, locale?: string) {
+    this.t = getTerminalStrings(locale);
+    this.fileSystemManager = new FileSystemManager(config, this.t);
     this.paneIds = config?.paneIds ?? [];
     this.isStandalone = isStandalone;
-    this.t = getTerminalStrings(locale);
+    this.locale = locale;
   }
 
   get fs(): FileSystemManager {
@@ -60,9 +60,7 @@ export class CommandProcessor {
     switch (cmd.toLowerCase()) {
       case "help": {
         const maxLen = Math.max(...COMMANDS.map((c) => c.name.length));
-        const lines = COMMANDS.map(
-          (c) => `  ${c.name.padEnd(maxLen + 2)} ${this.t[c.descKey]}`,
-        );
+        const lines = COMMANDS.map((c) => `  ${c.name.padEnd(maxLen + 2)} ${this.t[c.descKey]}`);
         return {
           output: {
             command,
@@ -75,7 +73,7 @@ export class CommandProcessor {
         return {
           output: {
             command,
-            output: getNeofetchPlainText(),
+            output: getNeofetchPlainText(undefined, this.locale),
           },
         };
 
@@ -121,10 +119,10 @@ export class CommandProcessor {
           output: {
             command,
             output: `fredrir v${PORTFOLIO_VERSION}
-Built with TanStack Start + Rust (Axum) + Tailwind
-Type 'help' for available commands
-Repository: https://github.com/fredrir/portfolio
-Author: ${MY_NAME}`,
+${this.t.aboutBuiltWith}
+${this.t.aboutHelp}
+${this.t.aboutRepository}: https://github.com/fredrir/portfolio
+${this.t.aboutAuthor}: ${MY_NAME}`,
           },
         };
 
@@ -147,7 +145,7 @@ Author: ${MY_NAME}`,
         return {
           output: {
             command,
-            output: `up ${computeUptime()}`,
+            output: `${this.t.up} ${computeUptime()}`,
           },
         };
 
@@ -275,11 +273,7 @@ Author: ${MY_NAME}`,
     };
   }
 
-  private handleLsCommand(
-    command: string,
-    args: string[],
-    currentPath: string,
-  ): CommandResult {
+  private handleLsCommand(command: string, args: string[], currentPath: string): CommandResult {
     try {
       const lsPath = args[0]
         ? this.fileSystemManager.resolvePath(args[0], currentPath)
@@ -292,20 +286,14 @@ Author: ${MY_NAME}`,
       return {
         output: {
           command,
-          output: `ls: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`,
+          output: `ls: ${error instanceof Error ? error.message : this.t.unknownError}`,
           isError: true,
         },
       };
     }
   }
 
-  private handleCdCommand(
-    command: string,
-    args: string[],
-    currentPath: string,
-  ): CommandResult {
+  private handleCdCommand(command: string, args: string[], currentPath: string): CommandResult {
     if (!args[0] || args[0] === "~") {
       return {
         output: { command, output: "" },
@@ -343,20 +331,14 @@ Author: ${MY_NAME}`,
       return {
         output: {
           command,
-          output: `cd: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`,
+          output: `cd: ${error instanceof Error ? error.message : this.t.unknownError}`,
           isError: true,
         },
       };
     }
   }
 
-  private handleCatCommand(
-    command: string,
-    args: string[],
-    currentPath: string,
-  ): CommandResult {
+  private handleCatCommand(command: string, args: string[], currentPath: string): CommandResult {
     if (!args[0]) {
       return {
         output: {
@@ -377,25 +359,18 @@ Author: ${MY_NAME}`,
       return {
         output: {
           command,
-          output: `cat: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`,
+          output: `cat: ${error instanceof Error ? error.message : this.t.unknownError}`,
           isError: true,
         },
       };
     }
   }
 
-  private handleTreeCommand(
-    command: string,
-    currentPath: string,
-  ): CommandResult {
+  private handleTreeCommand(command: string, currentPath: string): CommandResult {
     try {
       const currentNode = this.fileSystemManager.getNodeAtPath(currentPath);
       if (currentNode) {
-        const treeOutput = this.fileSystemManager
-          .buildDirectoryTree(currentNode)
-          .trim();
+        const treeOutput = this.fileSystemManager.buildDirectoryTree(currentNode).trim();
         return {
           output: { command, output: treeOutput },
         };
@@ -412,9 +387,7 @@ Author: ${MY_NAME}`,
       return {
         output: {
           command,
-          output: `tree: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`,
+          output: `tree: ${error instanceof Error ? error.message : this.t.unknownError}`,
           isError: true,
         },
       };

@@ -1,17 +1,17 @@
 "use client";
 
-import { useRef, useEffect } from "react";
-import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { Hair } from "./hair";
-import { Eye } from "./eye";
-import { Mouth } from "./mouth";
-import { Collar } from "./collar";
-import { Buttons } from "./buttons";
-import { Leg } from "./leg";
-import { Shoe } from "./shoe";
-import { Arm } from "./arm";
+import { useEffect, useRef } from "react";
+import * as THREE from "three";
 import { easeInOut, HAIR_DARK, SHIRT, SKIN, SKIN_SHADOW } from "../constants";
+import { Arm } from "./arm";
+import { Buttons } from "./buttons";
+import { Collar } from "./collar";
+import { Eye } from "./eye";
+import { Hair } from "./hair";
+import { Leg } from "./leg";
+import { Mouth } from "./mouth";
+import { Shoe } from "./shoe";
 
 export function AvatarModel({
   reaction,

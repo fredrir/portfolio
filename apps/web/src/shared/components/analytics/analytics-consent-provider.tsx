@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from "react";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { KEYS, read, write } from "@/lib/storage";
 
 interface AnalyticsConsentContextType {
@@ -14,15 +8,9 @@ interface AnalyticsConsentContextType {
   setConsent: (consent: boolean) => void;
 }
 
-const AnalyticsConsentContext = createContext<
-  AnalyticsConsentContextType | undefined
->(undefined);
+const AnalyticsConsentContext = createContext<AnalyticsConsentContextType | undefined>(undefined);
 
-export function AnalyticsConsentProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export function AnalyticsConsentProvider({ children }: { children: ReactNode }) {
   const [hasConsent, setHasConsent] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -49,9 +37,7 @@ export function AnalyticsConsentProvider({
 export function useAnalyticsConsent() {
   const context = useContext(AnalyticsConsentContext);
   if (context === undefined) {
-    throw new Error(
-      "useAnalyticsConsent must be used within an AnalyticsConsentProvider"
-    );
+    throw new Error("useAnalyticsConsent must be used within an AnalyticsConsentProvider");
   }
   return context;
 }

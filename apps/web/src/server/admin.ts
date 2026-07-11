@@ -34,12 +34,8 @@ export const adminListMedia = createServerFn().handler(async () => {
 
 export const adminCreateUpload = createServerFn({ method: "POST" })
   .validator(
-    (input: {
-      filename: string;
-      content_type: string;
-      size_bytes: number;
-      category?: string;
-    }) => input,
+    (input: { filename: string; content_type: string; size_bytes: number; category?: string }) =>
+      input,
   )
   .handler(async ({ data: input }) => {
     assertAdminOrigin();
@@ -66,23 +62,21 @@ export interface AdminAuditEntry {
   detail: string;
 }
 
-export const adminAuditLog = createServerFn().handler(
-  async (): Promise<AdminAuditEntry[]> => {
-    assertAdminOrigin();
-    const { data, error } = await api.GET("/api/v1/audit", {
-      headers: adminHeaders(),
-    });
-    if (error || !data) throw new Error("audit list failed");
-    // `detail` is arbitrary JSON; stringify so the payload is serializable.
-    return data.map((e) => ({
-      id: e.id,
-      at: e.at,
-      action: e.action,
-      entry_hash: e.entry_hash,
-      detail: JSON.stringify(e.detail),
-    }));
-  },
-);
+export const adminAuditLog = createServerFn().handler(async (): Promise<AdminAuditEntry[]> => {
+  assertAdminOrigin();
+  const { data, error } = await api.GET("/api/v1/audit", {
+    headers: adminHeaders(),
+  });
+  if (error || !data) throw new Error("audit list failed");
+  // `detail` is arbitrary JSON; stringify so the payload is serializable.
+  return data.map((e) => ({
+    id: e.id,
+    at: e.at,
+    action: e.action,
+    entry_hash: e.entry_hash,
+    detail: JSON.stringify(e.detail),
+  }));
+});
 
 export const adminAuditVerify = createServerFn().handler(async () => {
   assertAdminOrigin();

@@ -10,19 +10,18 @@ export function CategoryTabs({
   onSelect: (name: string) => void;
 }) {
   return (
-    <div className="flex gap-1 mb-1.5 @sm:mb-2 overflow-x-auto shrink-0">
+    <div className="@sm:mb-2 mb-1.5 flex shrink-0 gap-1 overflow-x-auto">
       {categories.map((cat) => (
         <button
           key={cat.name}
           onClick={() => onSelect(cat.name)}
-          className={`px-2 py-0.5 @sm:py-1 rounded text-2xs whitespace-nowrap transition-all ${
+          className={`whitespace-nowrap rounded px-2 @sm:py-1 py-0.5 text-2xs transition-all ${
             activeCategory === cat.name
-              ? "bg-surface-elevated text-primary border border-control-border-hover"
-              : "text-faded border border-transparent hover:text-primary-medium hover:bg-control-hover"
+              ? "border border-control-border-hover bg-surface-elevated text-primary"
+              : "border border-transparent text-faded hover:bg-control-hover hover:text-primary-medium"
           }`}
         >
-          {cat.name}/
-          <span className="text-ghost ml-1">{cat.images.length}</span>
+          {cat.name}/<span className="ml-1 text-ghost">{cat.images.length}</span>
         </button>
       ))}
     </div>

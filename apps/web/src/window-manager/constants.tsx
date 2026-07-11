@@ -1,21 +1,21 @@
 import {
-  UserCircle,
-  GithubLogo,
-  SpotifyLogo,
-  Path,
-  FolderSimple,
-  EnvelopeSimple,
-  GearSix,
-  Terminal,
-  Images,
-  FileText,
-  Cpu,
-  RocketLaunch,
-  Flask,
   ChartLine,
+  Cpu,
+  EnvelopeSimple,
+  FileText,
+  Flask,
+  FolderSimple,
+  GearSix,
+  GithubLogo,
+  Images,
+  Path,
+  RocketLaunch,
+  SpotifyLogo,
+  Terminal,
+  UserCircle,
 } from "@phosphor-icons/react";
-import type { WindowConfig } from "./types";
 import type { BackgroundConfig } from "./background/types";
+import type { WindowConfig } from "./types";
 
 export const GAP = 10;
 export const STATUS_BAR_HEIGHT = 28;
@@ -23,9 +23,7 @@ export const STATUS_BAR_HEIGHT = 28;
 export function openExternalWindow(config: WindowConfig, locale: string): void {
   if (!config.href) return;
   const url =
-    typeof config.href === "string"
-      ? config.href
-      : (config.href[locale] ?? config.href.en);
+    typeof config.href === "string" ? config.href : (config.href[locale] ?? config.href.en);
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
@@ -140,9 +138,7 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   },
 ];
 
-export const configMap = Object.fromEntries(
-  WINDOW_CONFIGS.map((c) => [c.id, c]),
-);
+export const configMap = Object.fromEntries(WINDOW_CONFIGS.map((c) => [c.id, c]));
 
 export const BACKGROUND_PRESETS: BackgroundConfig[] = [
   { id: "starfield", name: "Starfield", type: "animated-dots" },

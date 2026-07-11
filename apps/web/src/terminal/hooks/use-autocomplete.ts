@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
-import type { FileSystemManager } from "../file-system";
 import { COMMAND_NAMES } from "../command-processor";
+import type { FileSystemManager } from "../file-system";
 
 interface UseAutocompleteProps {
   fileSystemManager: FileSystemManager;
@@ -13,11 +13,7 @@ interface CompletionResult {
   suggestions: string[];
 }
 
-export function useAutocomplete({
-  fileSystemManager,
-  currentPath,
-  paneIds,
-}: UseAutocompleteProps) {
+export function useAutocomplete({ fileSystemManager, currentPath, paneIds }: UseAutocompleteProps) {
   const tabCountRef = useRef(0);
 
   const resetTabCount = useCallback(() => {

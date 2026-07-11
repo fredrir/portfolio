@@ -40,6 +40,40 @@ export interface TerminalStrings {
   gameOver: string;
   pressQToQuit: string;
   inputPlaceholder: string;
+  wasmPluginFailed: string;
+  unknownError: string;
+  aboutBuiltWith: string;
+  aboutHelp: string;
+  aboutRepository: string;
+  aboutAuthor: string;
+  up: string;
+  application: string;
+  profileDeveloperOf: string;
+  profileContact: string;
+  nodeExecutable: string;
+  systemStarted: string;
+  terminalInitialized: string;
+  readyForCommands: string;
+  cannotAccess: string;
+  emptyDirectory: string;
+  emptyFile: string;
+  score: string;
+  arrowKeysToMove: string;
+  qToQuit: string;
+  gameOverFinalScore: string;
+  pressExit: string;
+  youWinScore: string;
+  noMovesLeftScore: string;
+  neofetch: {
+    os: string;
+    kernel: string;
+    uptime: string;
+    shell: string;
+    wm: string;
+    theme: string;
+    packages: string;
+    locale: string;
+  };
 }
 
 const en: TerminalStrings = {
@@ -84,6 +118,40 @@ const en: TerminalStrings = {
   gameOver: "Game over! Score",
   pressQToQuit: "Press q or Escape to quit",
   inputPlaceholder: "Type 'help' for commands...",
+  wasmPluginFailed: "wasm plugin failed to load",
+  unknownError: "Unknown error",
+  aboutBuiltWith: "Built with TanStack Start + Rust (Axum) + Tailwind",
+  aboutHelp: "Type 'help' for available commands",
+  aboutRepository: "Repository",
+  aboutAuthor: "Author",
+  up: "up",
+  application: "Application",
+  profileDeveloperOf: "Developer of FredrikOS",
+  profileContact: "Contact",
+  nodeExecutable: "Node.js executable",
+  systemStarted: "System started",
+  terminalInitialized: "Terminal initialized",
+  readyForCommands: "Ready for commands",
+  cannotAccess: "cannot access",
+  emptyDirectory: "(empty directory)",
+  emptyFile: "(empty file)",
+  score: "Score",
+  arrowKeysToMove: "Arrow keys to move",
+  qToQuit: "q to quit",
+  gameOverFinalScore: "Game Over! Final score",
+  pressExit: "Press q or Escape to exit.",
+  youWinScore: "You win! Score",
+  noMovesLeftScore: "No moves left! Score",
+  neofetch: {
+    os: "OS",
+    kernel: "Kernel",
+    uptime: "Uptime",
+    shell: "Shell",
+    wm: "WM",
+    theme: "Theme",
+    packages: "Packages",
+    locale: "Locale",
+  },
 };
 
 const nb: TerminalStrings = {
@@ -128,6 +196,40 @@ const nb: TerminalStrings = {
   gameOver: "Spillet er over! Poeng",
   pressQToQuit: "Trykk q eller Escape for å avslutte",
   inputPlaceholder: "Skriv 'help' for kommandoer...",
+  wasmPluginFailed: "klarte ikke laste wasm-plugin",
+  unknownError: "Ukjent feil",
+  aboutBuiltWith: "Bygget med TanStack Start + Rust (Axum) + Tailwind",
+  aboutHelp: "Skriv 'help' for tilgjengelige kommandoer",
+  aboutRepository: "Repo",
+  aboutAuthor: "Forfatter",
+  up: "oppe",
+  application: "Applikasjon",
+  profileDeveloperOf: "Utvikler av FredrikOS",
+  profileContact: "Kontakt",
+  nodeExecutable: "Node.js-kjørbar fil",
+  systemStarted: "System startet",
+  terminalInitialized: "Terminal initialisert",
+  readyForCommands: "Klar for kommandoer",
+  cannotAccess: "kan ikke åpne",
+  emptyDirectory: "(tom mappe)",
+  emptyFile: "(tom fil)",
+  score: "Poeng",
+  arrowKeysToMove: "Piltaster for å flytte",
+  qToQuit: "q for å avslutte",
+  gameOverFinalScore: "Spillet er over! Sluttpoeng",
+  pressExit: "Trykk q eller Escape for å avslutte.",
+  youWinScore: "Du vant! Poeng",
+  noMovesLeftScore: "Ingen trekk igjen! Poeng",
+  neofetch: {
+    os: "OS",
+    kernel: "Kjerne",
+    uptime: "Oppetid",
+    shell: "Skall",
+    wm: "VM",
+    theme: "Tema",
+    packages: "Pakker",
+    locale: "Språk",
+  },
 };
 
 const nn: TerminalStrings = {
@@ -166,12 +268,47 @@ const nn: TerminalStrings = {
   available: "Tilgjengelege",
   cannotCloseTerminal: "Kan ikkje lukke terminalen frå seg sjølv.",
   wmOnly: "Spel er berre tilgjengelege i vindaugshandsamaren sin terminal.",
-  wmOnlyOpenClose: "open/close-kommandoar er berre tilgjengelege i vindaugshandsamaren sin terminal.",
+  wmOnlyOpenClose:
+    "open/close-kommandoar er berre tilgjengelege i vindaugshandsamaren sin terminal.",
   startingSnake: "Startar Snake...",
   starting2048: "Startar 2048...",
   gameOver: "Spelet er over! Poeng",
   pressQToQuit: "Trykk q eller Escape for å avslutte",
   inputPlaceholder: "Skriv 'help' for kommandoar...",
+  wasmPluginFailed: "klarte ikkje laste wasm-plugin",
+  unknownError: "Ukjend feil",
+  aboutBuiltWith: "Bygd med TanStack Start + Rust (Axum) + Tailwind",
+  aboutHelp: "Skriv 'help' for tilgjengelege kommandoar",
+  aboutRepository: "Repo",
+  aboutAuthor: "Forfattar",
+  up: "oppe",
+  application: "Applikasjon",
+  profileDeveloperOf: "Utviklar av FredrikOS",
+  profileContact: "Kontakt",
+  nodeExecutable: "Node.js-køyrbar fil",
+  systemStarted: "System starta",
+  terminalInitialized: "Terminal initialisert",
+  readyForCommands: "Klar for kommandoar",
+  cannotAccess: "kan ikkje opne",
+  emptyDirectory: "(tom mappe)",
+  emptyFile: "(tom fil)",
+  score: "Poeng",
+  arrowKeysToMove: "Piltastar for å flytte",
+  qToQuit: "q for å avslutte",
+  gameOverFinalScore: "Spelet er over! Sluttpoeng",
+  pressExit: "Trykk q eller Escape for å avslutte.",
+  youWinScore: "Du vann! Poeng",
+  noMovesLeftScore: "Ingen trekk att! Poeng",
+  neofetch: {
+    os: "OS",
+    kernel: "Kjerne",
+    uptime: "Oppetid",
+    shell: "Skal",
+    wm: "VM",
+    theme: "Tema",
+    packages: "Pakkar",
+    locale: "Språk",
+  },
 };
 
 const fr: TerminalStrings = {
@@ -210,12 +347,47 @@ const fr: TerminalStrings = {
   available: "Disponibles",
   cannotCloseTerminal: "Impossible de fermer le terminal depuis lui-même.",
   wmOnly: "Les jeux ne sont disponibles que dans le terminal du gestionnaire de fenêtres.",
-  wmOnlyOpenClose: "Les commandes open/close ne sont disponibles que dans le terminal du gestionnaire de fenêtres.",
+  wmOnlyOpenClose:
+    "Les commandes open/close ne sont disponibles que dans le terminal du gestionnaire de fenêtres.",
   startingSnake: "Lancement de Snake...",
   starting2048: "Lancement de 2048...",
   gameOver: "Fin de partie ! Score",
   pressQToQuit: "Appuyez sur q ou Échap pour quitter",
   inputPlaceholder: "Tapez 'help' pour les commandes...",
+  wasmPluginFailed: "échec du chargement du plugin wasm",
+  unknownError: "Erreur inconnue",
+  aboutBuiltWith: "Construit avec TanStack Start + Rust (Axum) + Tailwind",
+  aboutHelp: "Tapez 'help' pour les commandes disponibles",
+  aboutRepository: "Dépôt",
+  aboutAuthor: "Auteur",
+  up: "actif depuis",
+  application: "Application",
+  profileDeveloperOf: "Développeur de FredrikOS",
+  profileContact: "Contact",
+  nodeExecutable: "Exécutable Node.js",
+  systemStarted: "Système démarré",
+  terminalInitialized: "Terminal initialisé",
+  readyForCommands: "Prêt pour les commandes",
+  cannotAccess: "impossible d'accéder à",
+  emptyDirectory: "(répertoire vide)",
+  emptyFile: "(fichier vide)",
+  score: "Score",
+  arrowKeysToMove: "Flèches pour déplacer",
+  qToQuit: "q pour quitter",
+  gameOverFinalScore: "Fin de partie ! Score final",
+  pressExit: "Appuyez sur q ou Échap pour quitter.",
+  youWinScore: "Vous gagnez ! Score",
+  noMovesLeftScore: "Plus de coups ! Score",
+  neofetch: {
+    os: "OS",
+    kernel: "Noyau",
+    uptime: "Disponibilité",
+    shell: "Shell",
+    wm: "WM",
+    theme: "Thème",
+    packages: "Paquets",
+    locale: "Langue",
+  },
 };
 
 const translations: Record<string, TerminalStrings> = { en, nb, nn, fr };

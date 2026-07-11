@@ -1,16 +1,12 @@
 import type { components } from "@portfolio/api-client";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import type { AdminStrings } from "@/i18n/types";
 import { adminCreateUpload, adminListMedia } from "@/server/admin";
 
 type MediaItem = components["schemas"]["MediaItem"];
 
-export type JobStage =
-  | "authorizing"
-  | "uploading"
-  | "processing"
-  | "ready"
-  | "failed";
+export type JobStage = "authorizing" | "uploading" | "processing" | "ready" | "failed";
 
 /** Pipeline station the stage maps to: authorize → s3 put → worker → live. */
 export const STATION_OF: Record<JobStage, number> = {
@@ -44,6 +40,7 @@ function putWithProgress(
   headers: Record<string, string>,
   file: File,
   onProgress: (fraction: number) => void,
+  errors: AdminStrings["uploadErrors"],
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -55,10 +52,8 @@ function putWithProgress(
       if (e.lengthComputable) onProgress(e.loaded / e.total);
     };
     xhr.onload = () =>
-      xhr.status >= 200 && xhr.status < 300
-        ? resolve()
-        : reject(new Error(`S3 PUT ${xhr.status}`));
-    xhr.onerror = () => reject(new Error("network error during S3 PUT"));
+      xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`S3 PUT ${xhr.status}`));
+    xhr.onerror = () => reject(new Error(errors.networkDuringS3));
     xhr.send(file);
   });
 }
@@ -68,7 +63,10 @@ function putWithProgress(
  * S3 PUT with byte progress → poll until the worker settles the item.
  * `onLanded` fires once per job that reaches "ready".
  */
-export function useUploads(onLanded: () => void) {
+export function useUploads(
+  onLanded: () => void,
+  errors: AdminStrings["uploadErrors"],
+) {
   const [jobs, setJobs] = useState<UploadJob[]>([]);
   const landedRef = useRef(new Set<string>());
   const onLandedRef = useRef(onLanded);
@@ -96,12 +94,12 @@ export function useUploads(onLanded: () => void) {
         patch(id, {
           stage: "failed",
           failedAt: 0,
-          detail: "not a jpeg, png or webp",
+          detail: errors.invalidType,
         });
         return;
       }
       if (file.size > MAX_BYTES) {
-        patch(id, { stage: "failed", failedAt: 0, detail: "over 25 MiB" });
+        patch(id, { stage: "failed", failedAt: 0, detail: errors.tooLarge });
         return;
       }
       try {
@@ -115,14 +113,18 @@ export function useUploads(onLanded: () => void) {
         });
         patch(id, { stage: "uploading", mediaId: grant.media_id });
         try {
-          await putWithProgress(grant.upload_url, grant.headers, file, (sent) =>
-            patch(id, { sent }),
+          await putWithProgress(
+            grant.upload_url,
+            grant.headers,
+            file,
+            (sent) => patch(id, { sent }),
+            errors,
           );
         } catch (err) {
           patch(id, {
             stage: "failed",
             failedAt: 1,
-            detail: err instanceof Error ? err.message : "upload failed",
+            detail: err instanceof Error ? err.message : errors.uploadFailed,
           });
           return;
         }
@@ -131,11 +133,11 @@ export function useUploads(onLanded: () => void) {
         patch(id, {
           stage: "failed",
           failedAt: 0,
-          detail: err instanceof Error ? err.message : "authorization failed",
+          detail: err instanceof Error ? err.message : errors.authorizationFailed,
         });
       }
     },
-    [patch],
+    [patch, errors],
   );
 
   // Poll processing jobs until the worker settles them.
@@ -155,7 +157,7 @@ export function useUploads(onLanded: () => void) {
                 ...job,
                 stage: "failed",
                 failedAt: 2,
-                detail: "processing failed",
+                detail: errors.processingFailed,
               };
             return job;
           }),
@@ -165,7 +167,7 @@ export function useUploads(onLanded: () => void) {
       }
     }, 3000);
     return () => clearInterval(timer);
-  }, [jobs]);
+  }, [jobs, errors.processingFailed]);
 
   // Notify (once per job) when an upload lands, so the library can refresh.
   useEffect(() => {
@@ -180,10 +182,7 @@ export function useUploads(onLanded: () => void) {
   const clearSettled = useCallback(() => {
     setJobs((all) => {
       for (const job of all) {
-        if (
-          (job.stage === "ready" || job.stage === "failed") &&
-          job.previewUrl
-        ) {
+        if ((job.stage === "ready" || job.stage === "failed") && job.previewUrl) {
           URL.revokeObjectURL(job.previewUrl);
         }
       }

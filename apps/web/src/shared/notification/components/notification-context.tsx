@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useCallback,
-  useState,
-  useRef,
-  type ReactNode,
-} from "react";
+import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from "react";
 import type {
   Notification,
   NotificationApi,
@@ -36,9 +29,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const counterRef = useRef(0);
 
   const dismiss = useCallback((id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, dismissing: true } : n)),
-    );
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, dismissing: true } : n)));
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     }, DISMISS_MS);

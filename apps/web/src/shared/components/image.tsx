@@ -26,9 +26,7 @@ export default function Image({
       alt={alt}
       loading={loading ?? (priority ? "eager" : "lazy")}
       decoding="async"
-      className={
-        fill ? cn("absolute inset-0 h-full w-full", className) : className
-      }
+      className={fill ? cn("absolute inset-0 h-full w-full", className) : className}
       {...rest}
     />
   );

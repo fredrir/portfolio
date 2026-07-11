@@ -1,5 +1,5 @@
-import { Window } from "../../shell/components/window";
 import { configMap } from "../../constants";
+import { Window } from "../../shell/components/window";
 import { useTilingContext } from "../index";
 
 interface Props {
@@ -23,9 +23,7 @@ export function TilingPane({ paneId, rowIndex, colIndex }: Props) {
       isFocused={isFocused}
       isSwapTarget={drag.swapTarget === paneId}
       isDragging={drag.dragTarget === paneId}
-      showResizeGrip={
-        isFocused && rowIndex !== undefined && colIndex !== undefined
-      }
+      showResizeGrip={isFocused && rowIndex !== undefined && colIndex !== undefined}
       onClose={() => onClose(paneId)}
       onMaximize={() => onMaximize(paneId)}
       onFocus={() => onFocus(paneId)}

@@ -57,9 +57,7 @@ export const THEMES = [
 
 export type ThemeId = (typeof THEMES)[number]["id"];
 
-const DARK_IDS: Set<string> = new Set(
-  THEMES.filter((t) => t.dark).map((t) => t.id),
-);
+const DARK_IDS: Set<string> = new Set(THEMES.filter((t) => t.dark).map((t) => t.id));
 
 export function isDarkTheme(theme?: string): boolean {
   return theme === "dark" || DARK_IDS.has(theme ?? "");

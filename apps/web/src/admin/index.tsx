@@ -8,24 +8,17 @@ import { Ledger } from "@/admin/ledger";
 import { Library } from "@/admin/library";
 import { IngestStrip } from "@/admin/pipeline";
 import { useUploads } from "@/admin/use-uploads";
+import { getStaticDictionary } from "@/i18n/dictionaries";
 import { StatusDot } from "@/panes/platform-ui";
-import {
-  type AdminAuditEntry,
-  adminAuditLog,
-  adminListMedia,
-} from "@/server/admin";
+import { type AdminAuditEntry, adminAuditLog, adminListMedia } from "@/server/admin";
 
 type MediaItem = components["schemas"]["MediaItem"];
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col items-end">
-      <span className="font-mono text-sm leading-tight tabular-nums text-foreground">
-        {value}
-      </span>
-      <span className="text-3xs uppercase tracking-[0.2em] text-muted-foreground">
-        {label}
-      </span>
+      <span className="font-mono text-foreground text-sm tabular-nums leading-tight">{value}</span>
+      <span className="text-3xs text-muted-foreground uppercase tracking-[0.2em]">{label}</span>
     </div>
   );
 }
@@ -38,8 +31,7 @@ function useWindowDrop(onDrop: (files: File[]) => void) {
 
   useEffect(() => {
     let depth = 0;
-    const hasFiles = (e: DragEvent) =>
-      Array.from(e.dataTransfer?.types ?? []).includes("Files");
+    const hasFiles = (e: DragEvent) => Array.from(e.dataTransfer?.types ?? []).includes("Files");
     const enter = (e: DragEvent) => {
       if (!hasFiles(e)) return;
       e.preventDefault();
@@ -77,6 +69,7 @@ function useWindowDrop(onDrop: (files: File[]) => void) {
 }
 
 export function AdminConsole() {
+  const [locale, setLocale] = useState("en");
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [audit, setAudit] = useState<AdminAuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,18 +78,21 @@ export function AdminConsole() {
 
   const refresh = useCallback(() => {
     setLoading(true);
-    Promise.allSettled([adminListMedia(), adminAuditLog()]).then(
-      ([mediaResult, auditResult]) => {
-        if (mediaResult.status === "fulfilled") setMedia(mediaResult.value);
-        if (auditResult.status === "fulfilled") setAudit(auditResult.value);
-        setApiDown(mediaResult.status === "rejected");
-        setLoading(false);
-      },
-    );
+    Promise.allSettled([adminListMedia(), adminAuditLog()]).then(([mediaResult, auditResult]) => {
+      if (mediaResult.status === "fulfilled") setMedia(mediaResult.value);
+      if (auditResult.status === "fulfilled") setAudit(auditResult.value);
+      setApiDown(mediaResult.status === "rejected");
+      setLoading(false);
+    });
   }, []);
   useEffect(refresh, [refresh]);
 
-  const { jobs, upload, clearSettled } = useUploads(refresh);
+  useEffect(() => {
+    setLocale(navigator.language);
+  }, []);
+
+  const t = getStaticDictionary(locale).admin;
+  const { jobs, upload, clearSettled } = useUploads(refresh, t.uploadErrors);
 
   const handleFiles = useCallback(
     (files: File[]) => {
@@ -107,10 +103,7 @@ export function AdminConsole() {
   const dragging = useWindowDrop(handleFiles);
 
   const categories = useMemo(
-    () =>
-      Array.from(
-        new Set(media.map((m) => m.category).filter((c): c is string => !!c)),
-      ).sort(),
+    () => Array.from(new Set(media.map((m) => m.category).filter((c): c is string => !!c))).sort(),
     [media],
   );
 
@@ -125,28 +118,28 @@ export function AdminConsole() {
       {dragging && (
         <div
           aria-hidden
-          className="pointer-events-none fixed inset-2 z-40 rounded-lg border-2 border-dashed border-primary"
+          className="pointer-events-none fixed inset-2 z-40 rounded-lg border-2 border-primary border-dashed"
         />
       )}
 
-      <header className="sticky top-0 z-20 border-b border-border-faint bg-glass-heavy backdrop-blur">
+      <header className="sticky top-0 z-20 border-border-faint border-b bg-glass-heavy backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-2 sm:px-4">
           <div className="flex min-w-0 items-center gap-2.5">
             <StatusDot tone={apiDown ? "fail" : "ok"} pulse={!apiDown} />
             <div className="min-w-0">
-              <h1 className="truncate text-sm font-bold tracking-wide">
+              <h1 className="truncate font-bold text-sm tracking-wide">
                 admin<span className="text-primary-dim">@</span>hansteen.dev
               </h1>
-              <p className="text-3xs uppercase tracking-[0.2em] text-muted-foreground">
-                {apiDown ? "api unreachable" : "media pipeline · access-gated"}
+              <p className="text-3xs text-muted-foreground uppercase tracking-[0.2em]">
+                {apiDown ? t.apiUnreachable : t.subtitle}
               </p>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-4 sm:gap-5">
-            <Stat value={String(media.length)} label="items" />
-            <Stat value={String(ready)} label="live" />
+            <Stat value={String(media.length)} label={t.stats.items} />
+            <Stat value={String(ready)} label={t.stats.live} />
             <div className="hidden sm:block">
-              <Stat value={formatBytes(storedBytes)} label="stored" />
+              <Stat value={formatBytes(storedBytes)} label={t.stats.stored} />
             </div>
           </div>
         </div>
@@ -158,13 +151,14 @@ export function AdminConsole() {
           dragging={dragging}
           category={category}
           categories={categories}
+          t={t.pipeline}
           onCategory={setCategory}
           onFiles={handleFiles}
           onClearSettled={clearSettled}
         />
         <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_20rem]">
-          <Library media={media} loading={loading} onRefresh={refresh} />
-          <Ledger audit={audit} />
+          <Library media={media} loading={loading} onRefresh={refresh} t={t} />
+          <Ledger audit={audit} t={t} />
         </div>
       </main>
     </div>

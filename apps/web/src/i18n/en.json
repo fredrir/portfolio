@@ -1,4 +1,135 @@
 {
+  "seo": {
+    "description": "Fredrik Carsten Hansteen's personal website"
+  },
+  "cookieConsent": {
+    "prompt": "{name} wants your cookies",
+    "accept": "[Y] accept",
+    "decline": "[n] decline",
+    "info": "[i] info",
+    "gdprTitle": "GDPR / Privacy Information",
+    "gdprLines": [
+      "Data controller: {name} ({email})",
+      "Collected after consent: page views, referrer, browser and country, aggregated",
+      "Product analytics: PostHog (EU region); first-party counts aggregated on my own server",
+      "PostHog stores a first-party id in this site's local storage; no cross-site tracking cookies",
+      "No IP addresses are stored - your country is derived at the Cloudflare edge",
+      "Spam protection: Google reCAPTCHA guards the contact form and may set Google cookies",
+      "Legal basis: Art. 6(1)(a) GDPR / Norwegian Personal Data Act (Personopplysningsloven)",
+      "Withdraw consent any time by clearing this site's local storage",
+      "Right to complain: Datatilsynet (Norwegian Data Protection Authority) - datatilsynet.no"
+    ],
+    "gdprBack": "[q] back",
+    "cookieLine": "pending...",
+    "cookieLabel": "Cookies"
+  },
+  "admin": {
+    "pageTitle": "Administration - hansteen.dev",
+    "apiUnreachable": "api unreachable",
+    "subtitle": "media pipeline · access-gated",
+    "stats": {
+      "items": "items",
+      "live": "live",
+      "stored": "stored"
+    },
+    "uploadErrors": {
+      "invalidType": "not a jpeg, png or webp",
+      "tooLarge": "over 25 MiB",
+      "uploadFailed": "upload failed",
+      "authorizationFailed": "authorization failed",
+      "processingFailed": "processing failed",
+      "networkDuringS3": "network error during S3 PUT"
+    },
+    "pipeline": {
+      "stations": [
+        {
+          "label": "authorize",
+          "sub": "grant + audit"
+        },
+        {
+          "label": "s3 put",
+          "sub": "presigned"
+        },
+        {
+          "label": "worker",
+          "sub": "avif · webp"
+        },
+        {
+          "label": "live",
+          "sub": "gallery"
+        }
+      ],
+      "ingest": "ingest",
+      "clearFinished": "clear finished",
+      "uploadAria": "Upload images: drop files anywhere or press Enter to browse",
+      "release": "release to feed the pipeline",
+      "drop": "drop images anywhere, or click to browse",
+      "constraints": "jpeg / png / webp · <= 25 MiB",
+      "category": "category",
+      "uncategorized": "uncategorized",
+      "failed": "failed",
+      "failedAt": "{detail} · at {station}",
+      "putProgress": "put {percent}%",
+      "stageLabels": {
+        "authorizing": "authorizing",
+        "uploading": "uploading",
+        "processing": "processing",
+        "ready": "live",
+        "failed": "failed"
+      }
+    },
+    "library": {
+      "label": "library",
+      "of": "of",
+      "refreshAria": "Refresh library",
+      "openAria": "Open {filename}",
+      "filters": {
+        "all": "all",
+        "ready": "ready",
+        "processing": "processing",
+        "failed": "failed"
+      },
+      "filterPlaceholder": "filter by filename",
+      "filterAria": "Filter by filename",
+      "reading": "reading the library...",
+      "empty": "library is empty - feed the pipeline above",
+      "noMatches": "nothing matches these filters",
+      "uncategorized": "uncategorized"
+    },
+    "lightbox": {
+      "copied": "copied",
+      "closePreview": "Close preview",
+      "noVariant": "no variant to preview yet",
+      "previousImage": "Previous image",
+      "nextImage": "Next image",
+      "size": "size",
+      "source": "source",
+      "sha256": "sha-256",
+      "copyContentHash": "Copy content hash",
+      "encodedVariants": "encoded variants",
+      "copyFormatUrl": "Copy {format} URL",
+      "openFormatNewTab": "Open {format} in a new tab",
+      "of": "of",
+      "moveHint": "to move"
+    },
+    "ledger": {
+      "label": "ledger",
+      "verifying": "verifying...",
+      "verifyChain": "verify chain",
+      "chainIntact": "chain intact - {entries} entries verified",
+      "chainBroken": "chain broken at entry #{id}",
+      "verificationFailed": "verification did not run - try again",
+      "empty": "no entries yet - the first authorization starts the chain",
+      "collapse": "collapse",
+      "showAll": "show all {count} entries"
+    },
+    "time": {
+      "secondsAgo": "s ago",
+      "minutesAgo": "m ago",
+      "hoursAgo": "h ago",
+      "daysAgo": "d ago"
+    }
+  },
   "tutorial": {
     "welcomeTitle": "Welcome!",
     "welcomeBody": "I'm Fredrik, let me show you around my desktop. Pick your language first.",
@@ -54,7 +185,8 @@
   },
   "landing": {
     "title": "Hi, I'm",
-    "mainText": "I'm currently pursuing a master's degree in Computer Science at NTNU in Trondheim. You're more than welcome to have a look around or get in touch."
+    "mainText": "I'm currently pursuing a master's degree in Computer Science at NTNU in Trondheim. You're more than welcome to have a look around or get in touch.",
+    "avatarLabel": "Interactive 3D avatar of Fredrik"
   },
   "journey": {
     "title": "My Journey",
@@ -251,11 +383,7 @@
         "title": "Online Events",
         "description": "A mobile app for students where they can sign up for events, get notifications and play games.",
         "languages": "Auth0 / Flutter / Firebase / Go / Google Cloud Platform",
-        "mobileImages": [
-          "/app-picture.png",
-          "/app-picture-2.jpg",
-          "/app-picture-3.jpg"
-        ],
+        "mobileImages": ["/app-picture.png", "/app-picture-2.jpg", "/app-picture-3.jpg"],
         "githubLink": "https://github.com/appKom/online_events",
         "websiteLink": "https://apps.apple.com/no/app/online/id6476830274",
         "websiteAlias": "App Store"
@@ -293,7 +421,30 @@
     "recaptchaError": "Please complete the reCAPTCHA.",
     "optional": "optional",
     "vimHintNormal": "Press \"i\" to start typing...",
-    "vimHintStatus": "Type {i} to edit, {wq} to send"
+    "vimHintStatus": "Type {i} to edit, {wq} to send",
+    "toLabel": "To:",
+    "fromLabel": "From:",
+    "mailLabel": "Mail:",
+    "phoneLabel": "Tel:",
+    "insertMode": "-- INSERT --",
+    "submitCommand": ":wq",
+    "log": {
+      "resolvingMx": "Resolving MX record for hansteen.dev...",
+      "captchaOk": "CAPTCHA verification .............. [  OK  ]",
+      "captchaFailed": "CAPTCHA verification .............. [FAILED]",
+      "tlsOk": "Establishing TLS connection ........ [  OK  ]",
+      "authOk": "Authenticating sender .............. [  OK  ]",
+      "sendingBytes": "Sending {bytes} bytes ...",
+      "deliveryOk": "Message delivery ................... [  OK  ]",
+      "deliveryFailed": "Message delivery ................... [FAILED]",
+      "sent": "Mail sent successfully. Queue ID: {queueId}",
+      "sentPrefix": "Mail sent successfully.",
+      "error": "Error: {error}",
+      "errorPrefix": "Error:",
+      "unknownError": "unknown",
+      "connectionError": "Connection error: ETIMEDOUT",
+      "connectionErrorPrefix": "Connection error:"
+    }
   },
   "footer": {
     "license1": "All rights reserved.",
@@ -384,6 +535,92 @@
       "deployments": "deploys",
       "medialab": "medialab",
       "analytics": "analytics"
-    }
+    },
+    "loading": "loading...",
+    "albumArt": "Album art",
+    "platform": {
+      "common": {
+        "noDataYet": "No data yet.",
+        "direct": "direct",
+        "dailySeriesPeak": "Daily series, peak",
+        "relativeTime": {
+          "secondsAgo": "s ago",
+          "minutesAgo": "m ago",
+          "hoursAgo": "h ago",
+          "daysAgo": "d ago"
+        }
+      },
+      "engineering": {
+        "browser": "Browser",
+        "yourDevice": "your device",
+        "cfWorker": "CF Worker",
+        "colo": "colo",
+        "routing": "routing",
+        "access": "Access",
+        "serviceToken": "service token",
+        "tunnel": "Tunnel",
+        "cloudflared": "cloudflared",
+        "caddy": "Caddy",
+        "reverseProxy": "reverse proxy",
+        "slotSuffix": "slot",
+        "originSlot": "origin slot",
+        "privateOrigin": "private origin",
+        "liveRequestPath": "live request path",
+        "traced": "traced",
+        "tracing": "tracing...",
+        "privatePathNote": "No public ports on the origin - the edge Worker presents an Access service token and everything after it is private.",
+        "roundTrip": "round trip",
+        "roundTripLabel": "ms, browser->origin",
+        "edgeTime": "edge time",
+        "edgeTimeLabel": "ms at worker",
+        "cache": "cache",
+        "release": "release",
+        "signedVerified": "signed · verified",
+        "commit": "commit",
+        "liveSlot": "live slot",
+        "requestId": "request id"
+      },
+      "deployments": {
+        "health": "health",
+        "lastRuns": "last 10 runs",
+        "median": "median",
+        "buildToLive": "build->live",
+        "live": "live",
+        "servingNow": "serving now",
+        "releaseLedger": "release ledger · main",
+        "runs": "runs",
+        "readingHistory": "Reading run history...",
+        "historyUnavailable": "Deployment history is momentarily unavailable."
+      },
+      "medialab": {
+        "variantAlt": "{format} variant",
+        "smallest": "smallest",
+        "processed": "processed",
+        "images": "images",
+        "variants": "variants",
+        "avifWebp": "avif + webp",
+        "avgSaving": "avg saving",
+        "bestVsLargest": "best vs largest",
+        "loading": "Loading the codec bench...",
+        "unavailable": "The media pipeline is momentarily unavailable.",
+        "empty": "No processed media yet. Uploads become variants within seconds.",
+        "hint": "An upload flows through a presigned S3 PUT, an SQS event and a Rust worker that strips metadata and encodes AVIF and WebP under content-hashed keys. The edge signs and caches the reads."
+      },
+      "analytics": {
+        "aggregating": "Aggregating visits...",
+        "visitors30": "visitors · 30 days",
+        "inLast7d": "{count} in last 7d",
+        "totalVisits": "total visits",
+        "countries": "countries",
+        "browsers": "browsers",
+        "referrers": "referrers",
+        "noVisits": "No visits recorded yet - the counter starts once consent is given.",
+        "productAnalytics": "product analytics · posthog",
+        "consented": "consented",
+        "pageviews30": "pageviews, 30 days"
+      }
+    },
+    "uncategorized": "uncategorized",
+    "spotifyPlayer": "Spotify player"
   }
 }

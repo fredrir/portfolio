@@ -1,6 +1,6 @@
-import { LAYOUT_TIERS } from "./types";
-import type { CellDef, LayoutTier, PanePos, TierConfig } from "./types";
 import type { WindowStates } from "../types";
+import type { CellDef, LayoutTier, PanePos, TierConfig } from "./types";
+import { LAYOUT_TIERS } from "./types";
 
 export class LayoutEngine {
   static getTier(width: number): LayoutTier {
@@ -36,8 +36,7 @@ export class LayoutEngine {
     const posA = this.findPane(layout, a);
     const posB = this.findPane(layout, b);
     if (!posA || !posB) return layout;
-    if (posA.row === posB.row && posA.col === posB.col && posA.sub === posB.sub)
-      return layout;
+    if (posA.row === posB.row && posA.col === posB.col && posA.sub === posB.sub) return layout;
 
     const next = this.cloneLayout(layout);
 
@@ -57,9 +56,7 @@ export class LayoutEngine {
   }
 
   static cloneLayout(layout: CellDef[][]): CellDef[][] {
-    return layout.map((row) =>
-      row.map((cell) => (Array.isArray(cell) ? [...cell] : cell)),
-    );
+    return layout.map((row) => row.map((cell) => (Array.isArray(cell) ? [...cell] : cell)));
   }
 
   static addPaneRow(
@@ -78,26 +75,14 @@ export class LayoutEngine {
     };
   }
 
-  static getVisibleLayout(
-    layout: CellDef[][],
-    states: WindowStates,
-  ): CellDef[][] {
+  static getVisibleLayout(layout: CellDef[][], states: WindowStates): CellDef[][] {
     return layout
-      .map((row) =>
-        row.filter((cell) =>
-          this.getCellPanes(cell).some((id) => states[id]?.isOpen),
-        ),
-      )
+      .map((row) => row.filter((cell) => this.getCellPanes(cell).some((id) => states[id]?.isOpen)))
       .filter((row) => row.length > 0);
   }
 
-  static closePanesNotInLayout(
-    states: WindowStates,
-    layout: CellDef[][],
-  ): WindowStates {
-    const layoutPanes = new Set(
-      layout.flat().flatMap((c) => this.getCellPanes(c)),
-    );
+  static closePanesNotInLayout(states: WindowStates, layout: CellDef[][]): WindowStates {
+    const layoutPanes = new Set(layout.flat().flatMap((c) => this.getCellPanes(c)));
     const next = { ...states };
     for (const id of Object.keys(next)) {
       if (!layoutPanes.has(id) && next[id].isOpen) {

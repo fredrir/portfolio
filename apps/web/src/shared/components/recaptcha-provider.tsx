@@ -1,19 +1,17 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 interface RecaptchaContextType {
   executeRecaptcha: ((action: string) => Promise<string>) | null;
+  configured: boolean;
+  ready: boolean;
 }
 
 const RecaptchaContext = createContext<RecaptchaContextType>({
   executeRecaptcha: null,
+  configured: false,
+  ready: false,
 });
 
 export function useRecaptcha() {
@@ -33,6 +31,7 @@ const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? "";
 
 export function RecaptchaProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
+  const configured = Boolean(SITE_KEY);
 
   useEffect(() => {
     if (!SITE_KEY) return;
@@ -64,7 +63,7 @@ export function RecaptchaProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <RecaptchaContext.Provider
-      value={{ executeRecaptcha: ready ? executeRecaptcha : null }}
+      value={{ executeRecaptcha: ready ? executeRecaptcha : null, configured, ready }}
     >
       {children}
     </RecaptchaContext.Provider>

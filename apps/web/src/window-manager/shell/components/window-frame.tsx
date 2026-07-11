@@ -30,7 +30,7 @@ function Dot({
   interactive: boolean;
 }) {
   if (!interactive) {
-    return <div className={cn("w-3 h-3 rounded-full", color)} />;
+    return <div className={cn("h-3 w-3 rounded-full", color)} />;
   }
 
   return (
@@ -44,7 +44,7 @@ function Dot({
     >
       <div
         className={cn(
-          "w-3 h-3 rounded-full transition-colors",
+          "h-3 w-3 rounded-full transition-colors",
           color,
           hoverColor && `group-hover:${hoverColor}`,
         )}
@@ -65,9 +65,9 @@ function TitleDots({
   if (variant === "static") {
     return (
       <div className="flex items-center gap-2.5">
-        <div className="w-3.5 h-3.5 rounded-full bg-wm-close" />
-        <div className="w-3.5 h-3.5 rounded-full bg-wm-minimize" />
-        <div className="w-3.5 h-3.5 rounded-full bg-wm-maximize" />
+        <div className="h-3.5 w-3.5 rounded-full bg-wm-close" />
+        <div className="h-3.5 w-3.5 rounded-full bg-wm-minimize" />
+        <div className="h-3.5 w-3.5 rounded-full bg-wm-maximize" />
       </div>
     );
   }
@@ -76,32 +76,17 @@ function TitleDots({
     return (
       <div className="flex items-center gap-2.5">
         <button onClick={onClose} className="group">
-          <div className="w-4 h-4 rounded-full bg-wm-close group-hover:bg-destructive transition-colors" />
+          <div className="h-4 w-4 rounded-full bg-wm-close transition-colors group-hover:bg-destructive" />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center -ml-1.5">
-      <Dot
-        color="bg-wm-close"
-        hoverColor="bg-destructive"
-        onClick={onClose}
-        interactive
-      />
-      <Dot
-        color="bg-wm-minimize"
-        hoverColor="bg-accent-yellow"
-        onClick={onClose}
-        interactive
-      />
-      <Dot
-        color="bg-wm-maximize"
-        hoverColor="bg-primary"
-        onClick={onMaximize}
-        interactive
-      />
+    <div className="-ml-1.5 flex items-center">
+      <Dot color="bg-wm-close" hoverColor="bg-destructive" onClick={onClose} interactive />
+      <Dot color="bg-wm-minimize" hoverColor="bg-accent-yellow" onClick={onClose} interactive />
+      <Dot color="bg-wm-maximize" hoverColor="bg-primary" onClick={onMaximize} interactive />
     </div>
   );
 }
@@ -120,10 +105,12 @@ export function WindowFrame({
   children,
 }: Props) {
   return (
-    <div className={cn("rounded-xl border backdrop-blur-md overflow-hidden flex flex-col", className)}>
+    <div
+      className={cn("flex flex-col overflow-hidden rounded-xl border backdrop-blur-md", className)}
+    >
       <div
         className={cn(
-          "flex items-center justify-between px-3 py-0.5 border-b border-wm-border bg-surface-faint shrink-0",
+          "flex shrink-0 items-center justify-between border-wm-border border-b bg-surface-faint px-3 py-0.5",
           titleBarClassName,
         )}
         onMouseDown={onTitleBarMouseDown}
@@ -131,18 +118,12 @@ export function WindowFrame({
       >
         <TitleDots variant={dots} onClose={onClose} onMaximize={onMaximize} />
 
-        <span className="font-mono text-xs truncate mx-2">
-          {title}
-        </span>
+        <span className="mx-2 truncate font-mono text-xs">{title}</span>
 
-        <span className="font-mono text-3xs text-primary-subtle">
-          {trailing}
-        </span>
+        <span className="font-mono text-3xs text-primary-subtle">{trailing}</span>
       </div>
 
-      <div className={cn("flex-1 overflow-auto min-h-0", contentClassName)}>
-        {children}
-      </div>
+      <div className={cn("min-h-0 flex-1 overflow-auto", contentClassName)}>{children}</div>
     </div>
   );
 }

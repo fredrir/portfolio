@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { HAIR, sr } from "../constants";
 

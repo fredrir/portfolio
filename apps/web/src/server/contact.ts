@@ -7,10 +7,7 @@ const contactSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
   email: z.email("Invalid email address"),
   phone: z.string().max(30, "Phone number is too long").optional().default(""),
-  message: z
-    .string()
-    .min(1, "Message is required")
-    .max(5000, "Message is too long"),
+  message: z.string().min(1, "Message is required").max(5000, "Message is too long"),
   recaptchaToken: z.string().min(1, "reCAPTCHA token missing"),
 });
 

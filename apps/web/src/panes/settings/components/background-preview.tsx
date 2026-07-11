@@ -13,7 +13,7 @@ function StarfieldPreview() {
   ];
 
   return (
-    <svg viewBox="0 0 24 16" className="w-full h-full">
+    <svg viewBox="0 0 24 16" className="h-full w-full">
       <rect width="24" height="16" className="fill-background" />
       {dots.map((d, i) => (
         <circle key={i} cx={d.cx} cy={d.cy} r={d.r} className="fill-chart-fill" />
@@ -34,7 +34,7 @@ function MatrixPreview() {
   ];
 
   return (
-    <svg viewBox="0 0 24 16" className="w-full h-full">
+    <svg viewBox="0 0 24 16" className="h-full w-full">
       <rect width="24" height="16" className="fill-background" />
       {cols.map((col, i) =>
         col.chars.split("").map((ch, j) => (
@@ -57,13 +57,29 @@ function MatrixPreview() {
 
 function GridPreview() {
   return (
-    <svg viewBox="0 0 24 16" className="w-full h-full">
+    <svg viewBox="0 0 24 16" className="h-full w-full">
       <rect width="24" height="16" className="fill-background" />
       {[4, 8, 12, 16, 20].map((x) => (
-        <line key={`v${x}`} x1={x} y1="0" x2={x} y2="16" className="stroke-surface-soft" strokeWidth="0.3" />
+        <line
+          key={`v${x}`}
+          x1={x}
+          y1="0"
+          x2={x}
+          y2="16"
+          className="stroke-surface-soft"
+          strokeWidth="0.3"
+        />
       ))}
       {[4, 8, 12].map((y) => (
-        <line key={`h${y}`} x1="0" y1={y} x2="24" y2={y} className="stroke-surface-soft" strokeWidth="0.3" />
+        <line
+          key={`h${y}`}
+          x1="0"
+          y1={y}
+          x2="24"
+          y2={y}
+          className="stroke-surface-soft"
+          strokeWidth="0.3"
+        />
       ))}
     </svg>
   );
@@ -71,7 +87,7 @@ function GridPreview() {
 
 function GradientPreview() {
   return (
-    <svg viewBox="0 0 24 16" className="w-full h-full">
+    <svg viewBox="0 0 24 16" className="h-full w-full">
       <defs>
         <radialGradient id="gp" cx="50%" cy="0%" r="80%">
           <stop offset="0%" className="[stop-color:var(--color-primary)]" stopOpacity="0.2" />
@@ -86,7 +102,7 @@ function GradientPreview() {
 
 function PlainPreview() {
   return (
-    <svg viewBox="0 0 24 16" className="w-full h-full">
+    <svg viewBox="0 0 24 16" className="h-full w-full">
       <defs>
         <radialGradient id="pp" cx="50%" cy="50%" r="50%">
           <stop offset="0%" className="[stop-color:var(--color-primary)]" stopOpacity="0.05" />
@@ -101,7 +117,7 @@ function PlainPreview() {
 
 export function BackgroundPreview({ config }: { config: BackgroundConfig }) {
   return (
-    <div className="w-full aspect-[3/2] rounded-sm overflow-hidden border border-control-border">
+    <div className="aspect-[3/2] w-full overflow-hidden rounded-sm border border-control-border">
       {config.type === "animated-dots" && <StarfieldPreview />}
       {config.type === "matrix" && <MatrixPreview />}
       {config.type === "grid" && <GridPreview />}

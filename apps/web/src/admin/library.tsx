@@ -1,6 +1,5 @@
 "use client";
 
-import type { components } from "@portfolio/api-client";
 import {
   ArrowsClockwise,
   HourglassMedium,
@@ -8,10 +7,12 @@ import {
   MagnifyingGlass,
   WarningCircle,
 } from "@phosphor-icons/react";
+import type { components } from "@portfolio/api-client";
 import { useMemo, useState } from "react";
 
 import { formatBytes } from "@/admin/format";
 import { Lightbox } from "@/admin/lightbox";
+import type { AdminStrings } from "@/i18n/types";
 import { Instrument, useMounted } from "@/panes/platform-ui";
 import { cn } from "@/shared/utils/cn";
 
@@ -37,10 +38,12 @@ function Tile({
   item,
   index,
   onOpen,
+  t,
 }: {
   item: MediaItem;
   index: number;
   onOpen: () => void;
+  t: AdminStrings["library"];
 }) {
   const mounted = useMounted();
   const thumb = thumbOf(item);
@@ -50,7 +53,7 @@ function Tile({
     <button
       type="button"
       onClick={onOpen}
-      aria-label={`Open ${item.filename}`}
+      aria-label={t.openAria.replace("{filename}", item.filename)}
       style={{ transitionDelay: `${Math.min(index * 25, 400)}ms` }}
       className={cn(
         "group relative aspect-square overflow-hidden rounded-md border text-left outline-none",
@@ -77,18 +80,14 @@ function Tile({
               : "text-muted-foreground motion-safe:animate-pulse",
           )}
         >
-          {bucket === "failed" ? (
-            <WarningCircle size={18} />
-          ) : (
-            <HourglassMedium size={18} />
-          )}
-          {bucket}
+          {bucket === "failed" ? <WarningCircle size={18} /> : <HourglassMedium size={18} />}
+          {t.filters[bucket]}
         </span>
       )}
       <span className="absolute inset-x-0 bottom-0 translate-y-full bg-glass-medium px-1.5 py-1 backdrop-blur-sm transition-transform duration-200 group-hover:translate-y-0 group-focus-visible:translate-y-0">
         <span className="block truncate font-mono text-2xs">{item.filename}</span>
         <span className="block text-3xs text-muted-foreground">
-          {item.width && item.height ? `${item.width}×${item.height}` : item.state}
+          {item.width && item.height ? `${item.width}×${item.height}` : t.filters[bucket]}
           {webpBytes ? ` · ${formatBytes(webpBytes)}` : ""}
           {item.category ? ` · ${item.category}` : ""}
         </span>
@@ -101,11 +100,14 @@ export function Library({
   media,
   loading,
   onRefresh,
+  t,
 }: {
   media: MediaItem[];
   loading: boolean;
   onRefresh: () => void;
+  t: AdminStrings;
 }) {
+  const library = t.library;
   const [stateFilter, setStateFilter] = useState<StateFilter>("all");
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -120,34 +122,33 @@ export function Library({
   const categories = useMemo(() => {
     const set = new Map<string, number>();
     for (const m of media) {
-      const key = m.category ?? "uncategorized";
+      const key = m.category ?? library.uncategorized;
       set.set(key, (set.get(key) ?? 0) + 1);
     }
     return Array.from(set.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-  }, [media]);
+  }, [media, library.uncategorized]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     return media.filter((m) => {
       if (stateFilter !== "all" && bucketOf(m) !== stateFilter) return false;
-      if (categoryFilter && (m.category ?? "uncategorized") !== categoryFilter)
-        return false;
+      if (categoryFilter && (m.category ?? library.uncategorized) !== categoryFilter) return false;
       if (q && !m.filename.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [media, stateFilter, categoryFilter, query]);
+  }, [media, stateFilter, categoryFilter, query, library.uncategorized]);
 
   const openIndex = visible.findIndex((m) => m.id === openId);
   const openItem = openIndex >= 0 ? visible[openIndex] : null;
 
   return (
     <Instrument
-      label={`library · ${visible.length}${visible.length !== media.length ? ` of ${media.length}` : ""}`}
+      label={`${library.label} · ${visible.length}${visible.length !== media.length ? ` ${library.of} ${media.length}` : ""}`}
       right={
         <button
           type="button"
           onClick={onRefresh}
-          aria-label="Refresh library"
+          aria-label={library.refreshAria}
           className="rounded p-1 text-muted-foreground transition-colors hover:bg-control-hover hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ArrowsClockwise size={13} className={loading ? "motion-safe:animate-spin" : undefined} />
@@ -168,21 +169,21 @@ export function Library({
                   : "text-muted-foreground hover:bg-control-hover hover:text-foreground",
               )}
             >
-              {f} <span className="text-faded">{counts[f]}</span>
+              {library.filters[f]} <span className="text-faded">{counts[f]}</span>
             </button>
           ))}
         </div>
         <label className="relative ml-auto">
           <MagnifyingGlass
             size={12}
-            className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-faded"
+            className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-faded"
           />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="filter by filename"
-            aria-label="Filter by filename"
-            className="w-40 rounded border border-border-faint bg-transparent py-0.5 pl-7 pr-2 font-mono text-xs outline-none placeholder:text-placeholder focus-visible:ring-2 focus-visible:ring-ring"
+            placeholder={library.filterPlaceholder}
+            aria-label={library.filterAria}
+            className="w-40 rounded border border-border-faint bg-transparent py-0.5 pr-2 pl-7 font-mono text-xs outline-none placeholder:text-placeholder focus-visible:ring-2 focus-visible:ring-ring"
           />
         </label>
       </div>
@@ -193,9 +194,7 @@ export function Library({
             <button
               key={name}
               type="button"
-              onClick={() =>
-                setCategoryFilter(categoryFilter === name ? null : name)
-              }
+              onClick={() => setCategoryFilter(categoryFilter === name ? null : name)}
               className={cn(
                 "rounded border px-1.5 py-px font-mono text-2xs transition-colors",
                 categoryFilter === name
@@ -210,16 +209,14 @@ export function Library({
       )}
 
       {loading && media.length === 0 ? (
-        <p className="py-6 text-center text-xs text-muted-foreground motion-safe:animate-pulse">
-          reading the library…
+        <p className="py-6 text-center text-muted-foreground text-xs motion-safe:animate-pulse">
+          {library.reading}
         </p>
       ) : visible.length === 0 ? (
         <div className="flex flex-col items-center gap-1.5 py-8 text-muted-foreground">
           <ImageSquare size={22} />
           <p className="text-xs">
-            {media.length === 0
-              ? "library is empty — feed the pipeline above"
-              : "nothing matches these filters"}
+            {media.length === 0 ? library.empty : library.noMatches}
           </p>
         </div>
       ) : (
@@ -230,6 +227,7 @@ export function Library({
               item={item}
               index={i}
               onOpen={() => setOpenId(item.id)}
+              t={library}
             />
           ))}
         </div>
@@ -240,6 +238,7 @@ export function Library({
           item={openItem}
           index={openIndex}
           total={visible.length}
+          t={t}
           onClose={() => setOpenId(null)}
           onNav={(delta) => {
             const next = visible[openIndex + delta];

@@ -1,20 +1,13 @@
 import "@fontsource/roboto/400.css";
 
-import {
-  createRootRoute,
-  HeadContent,
-  Outlet,
-  Scripts,
-  useParams,
-} from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Outlet, Scripts, useParams } from "@tanstack/react-router";
 import { ThemeProvider } from "next-themes";
-
+import { THEMES } from "@/lib/themes";
 import { PosthogGate } from "@/shared/analytics/posthog-gate";
 import { AnalyticsConsentProvider } from "@/shared/components/analytics/analytics-consent-provider";
 import { CookieConsentBanner } from "@/shared/components/analytics/cookie-consent";
 import { RecaptchaProvider } from "@/shared/components/recaptcha-provider";
 import { NotificationProvider } from "@/shared/notification";
-import { THEMES } from "@/lib/themes";
 import globalsCss from "@/styles/globals.css?url";
 
 export const Route = createRootRoute({
@@ -52,10 +45,7 @@ function RootComponent() {
       <head>
         <HeadContent />
       </head>
-      <body
-        className="h-screen overflow-hidden dark:text-white font-mono"
-        suppressHydrationWarning
-      >
+      <body className="h-screen overflow-hidden font-mono dark:text-white" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="fredrir"

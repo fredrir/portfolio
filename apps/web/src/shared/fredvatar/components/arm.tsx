@@ -1,10 +1,10 @@
 "use client";
 
+import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
-import { Hand } from "./hand";
 import { SHIRT } from "../constants";
+import { Hand } from "./hand";
 
 export function Arm({ side, reaction }: { side: -1 | 1; reaction: string }) {
   const s = side;
@@ -18,16 +18,12 @@ export function Arm({ side, reaction }: { side: -1 | 1; reaction: string }) {
 
     if (reaction === "idle") {
       shoulderRef.current.rotation.z =
-        s * -0.12 +
-        Math.sin(t * 0.55 + o) * 0.07 +
-        Math.sin(t * 0.21 + o) * 0.035;
+        s * -0.12 + Math.sin(t * 0.55 + o) * 0.07 + Math.sin(t * 0.21 + o) * 0.035;
       shoulderRef.current.rotation.x =
         Math.sin(t * 0.38 + o) * 0.05 + Math.sin(t * 0.15 + o) * 0.025;
 
       elbowRef.current.rotation.z =
-        s * -0.1 +
-        Math.sin(t * 0.7 + o + 0.8) * 0.05 +
-        Math.sin(t * 0.3 + o + 1.2) * 0.025;
+        s * -0.1 + Math.sin(t * 0.7 + o + 0.8) * 0.05 + Math.sin(t * 0.3 + o + 1.2) * 0.025;
       elbowRef.current.rotation.x = Math.sin(t * 0.45 + o + 0.5) * 0.03;
     } else if (reaction === "thumbsup" && s === 1) {
       shoulderRef.current.rotation.z = -2.6;
@@ -35,11 +31,9 @@ export function Arm({ side, reaction }: { side: -1 | 1; reaction: string }) {
       elbowRef.current.rotation.z = 0.4;
       elbowRef.current.rotation.x = 0;
     } else if (reaction === "thumbsup" && s === -1) {
-      shoulderRef.current.rotation.z =
-        -0.12 + Math.sin(t * 0.55 + o) * 0.04;
+      shoulderRef.current.rotation.z = -0.12 + Math.sin(t * 0.55 + o) * 0.04;
       shoulderRef.current.rotation.x = Math.sin(t * 0.38 + o) * 0.03;
-      elbowRef.current.rotation.z =
-        -0.1 + Math.sin(t * 0.7 + o + 0.8) * 0.03;
+      elbowRef.current.rotation.z = -0.1 + Math.sin(t * 0.7 + o + 0.8) * 0.03;
       elbowRef.current.rotation.x = 0;
     } else {
       shoulderRef.current.rotation.set(0, 0, 0);

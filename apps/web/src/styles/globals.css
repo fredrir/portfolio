@@ -12,7 +12,9 @@ html {
   }
 }
 
-@custom-variant dark (:is(.dark, .fredrir, .nord, .catppuccin-mocha, .rosepine, .tokyo-night, .gruvbox) &);
+@custom-variant dark (
+  :is(.dark, .fredrir, .nord, .catppuccin-mocha, .rosepine, .tokyo-night, .gruvbox) &
+);
 
 @theme inline {
   --font-size-2xs: 0.625rem;

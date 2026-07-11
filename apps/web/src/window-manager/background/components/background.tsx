@@ -1,11 +1,11 @@
 "use client";
 
 import type { BackgroundConfig } from "../types";
-import { StarfieldBackground } from "./starfield";
-import { MatrixBackground } from "./matrix";
-import { GridBackground } from "./grid";
 import { GradientBackground } from "./gradient";
+import { GridBackground } from "./grid";
+import { MatrixBackground } from "./matrix";
 import { PlainBackground } from "./plain";
+import { StarfieldBackground } from "./starfield";
 
 export function Background({ config }: { config: BackgroundConfig }) {
   return (
@@ -16,7 +16,7 @@ export function Background({ config }: { config: BackgroundConfig }) {
       {config.type === "gradient" && <GradientBackground />}
       {config.type === "custom-image" && config.value && (
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-center bg-cover bg-no-repeat"
           style={{ backgroundImage: `url(${config.value})` }}
         />
       )}

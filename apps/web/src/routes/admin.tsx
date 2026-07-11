@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 
 import { AdminConsole } from "@/admin";
+import { getStaticDictionary } from "@/i18n/dictionaries";
 
 // Reachable only via admin.hansteen.dev: Access gates the hostname, Caddy
 // stamps x-admin-origin, and everything else 404s (defense in depth — the
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/admin")({
   },
   head: () => ({
     meta: [
-      { title: "Administration — hansteen.dev" },
+      { title: getStaticDictionary("en").admin.pageTitle },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),

@@ -1,17 +1,11 @@
 "use client";
 
+import { ArrowSquareOut, CaretLeft, CaretRight, Check, Copy, X } from "@phosphor-icons/react";
 import type { components } from "@portfolio/api-client";
-import {
-  ArrowSquareOut,
-  CaretLeft,
-  CaretRight,
-  Check,
-  Copy,
-  X,
-} from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
 import { formatBytes } from "@/admin/format";
+import type { AdminStrings } from "@/i18n/types";
 import { Badge, HashChip, Meter, type Tone } from "@/panes/platform-ui";
 
 type MediaItem = components["schemas"]["MediaItem"];
@@ -21,13 +15,21 @@ const STATE_TONE: Record<string, Tone> = {
   failed: "fail",
 };
 
-function CopyButton({ text, label }: { text: string; label: string }) {
+function CopyButton({
+  text,
+  label,
+  copiedLabel,
+}: {
+  text: string;
+  label: string;
+  copiedLabel: string;
+}) {
   const [copied, setCopied] = useState(false);
   return (
     <button
       type="button"
       aria-label={label}
-      title={copied ? "copied" : label}
+      title={copied ? copiedLabel : label}
       onClick={() => {
         void navigator.clipboard.writeText(text).then(() => {
           setCopied(true);
@@ -44,7 +46,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-2 py-1 text-xs">
-      <span className="shrink-0 text-3xs uppercase tracking-[0.2em] text-muted-foreground">
+      <span className="shrink-0 text-3xs text-muted-foreground uppercase tracking-[0.2em]">
         {label}
       </span>
       <span className="min-w-0 text-right font-mono">{children}</span>
@@ -56,16 +58,21 @@ export function Lightbox({
   item,
   index,
   total,
+  t,
   onClose,
   onNav,
 }: {
   item: MediaItem;
   index: number;
   total: number;
+  t: AdminStrings;
   onClose: () => void;
   onNav: (delta: 1 | -1) => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const copy = t.lightbox;
+  const stateKey =
+    item.state === "ready" || item.state === "failed" ? item.state : "processing";
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -94,7 +101,7 @@ export function Lightbox({
     >
       <button
         type="button"
-        aria-label="Close preview"
+        aria-label={copy.closePreview}
         onClick={onClose}
         className="absolute inset-0 cursor-default bg-overlay-heavy backdrop-blur-sm"
         tabIndex={-1}
@@ -108,15 +115,13 @@ export function Lightbox({
               className="max-h-[50dvh] w-full object-contain md:max-h-[80dvh]"
             />
           ) : (
-            <p className="p-10 text-xs text-muted-foreground">
-              no variant to preview yet
-            </p>
+            <p className="p-10 text-muted-foreground text-xs">{copy.noVariant}</p>
           )}
           {total > 1 && (
             <>
               <button
                 type="button"
-                aria-label="Previous image"
+                aria-label={copy.previousImage}
                 onClick={() => onNav(-1)}
                 className="absolute left-1 rounded-full bg-glass-light p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
               >
@@ -124,7 +129,7 @@ export function Lightbox({
               </button>
               <button
                 type="button"
-                aria-label="Next image"
+                aria-label={copy.nextImage}
                 onClick={() => onNav(1)}
                 className="absolute right-1 rounded-full bg-glass-light p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
               >
@@ -134,15 +139,13 @@ export function Lightbox({
           )}
         </figure>
 
-        <aside className="w-full shrink-0 space-y-2 overflow-y-auto border-t border-border-faint p-3 md:w-72 md:border-l md:border-t-0">
+        <aside className="w-full shrink-0 space-y-2 overflow-y-auto border-border-faint border-t p-3 md:w-72 md:border-t-0 md:border-l">
           <div className="flex items-start justify-between gap-2">
-            <p className="min-w-0 break-all font-mono text-xs font-bold">
-              {item.filename}
-            </p>
+            <p className="min-w-0 break-all font-bold font-mono text-xs">{item.filename}</p>
             <button
               ref={closeRef}
               type="button"
-              aria-label="Close preview"
+              aria-label={copy.closePreview}
               onClick={onClose}
               className="rounded p-1 text-muted-foreground transition-colors hover:bg-control-hover hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
             >
@@ -151,22 +154,26 @@ export function Lightbox({
           </div>
 
           <div className="flex flex-wrap gap-1">
-            <Badge tone={STATE_TONE[item.state] ?? "warn"}>{item.state}</Badge>
-            <Badge tone="idle">{item.category ?? "uncategorized"}</Badge>
+            <Badge tone={STATE_TONE[item.state] ?? "warn"}>
+              {t.library.filters[stateKey]}
+            </Badge>
+            <Badge tone="idle">{item.category ?? t.library.uncategorized}</Badge>
           </div>
 
-          <div className="divide-y divide-border-faint border-y border-border-faint">
-            <MetaRow label="size">
-              {item.width && item.height
-                ? `${item.width} × ${item.height}`
-                : "—"}
+          <div className="divide-y divide-border-faint border-border-faint border-y">
+            <MetaRow label={copy.size}>
+              {item.width && item.height ? `${item.width} × ${item.height}` : "—"}
             </MetaRow>
-            <MetaRow label="source">{item.content_type}</MetaRow>
+            <MetaRow label={copy.source}>{item.content_type}</MetaRow>
             {item.content_hash && (
-              <MetaRow label="sha-256">
+              <MetaRow label={copy.sha256}>
                 <span className="inline-flex items-center gap-1">
                   <HashChip hash={item.content_hash} />
-                  <CopyButton text={item.content_hash} label="Copy content hash" />
+                  <CopyButton
+                    text={item.content_hash}
+                    label={copy.copyContentHash}
+                    copiedLabel={copy.copied}
+                  />
                 </span>
               </MetaRow>
             )}
@@ -174,8 +181,8 @@ export function Lightbox({
 
           {item.variants.length > 0 && (
             <div>
-              <p className="mb-1 text-3xs uppercase tracking-[0.2em] text-muted-foreground">
-                encoded variants
+              <p className="mb-1 text-3xs text-muted-foreground uppercase tracking-[0.2em]">
+                {copy.encodedVariants}
               </p>
               {item.variants.map((v) => (
                 <Meter
@@ -187,12 +194,16 @@ export function Lightbox({
                   leading={
                     v.url ? (
                       <span className="inline-flex items-center gap-0.5">
-                        <CopyButton text={v.url} label={`Copy ${v.format} URL`} />
+                        <CopyButton
+                          text={v.url}
+                          label={copy.copyFormatUrl.replace("{format}", v.format)}
+                          copiedLabel={copy.copied}
+                        />
                         <a
                           href={v.url}
                           target="_blank"
                           rel="noreferrer"
-                          aria-label={`Open ${v.format} in a new tab`}
+                          aria-label={copy.openFormatNewTab.replace("{format}", v.format)}
                           className="rounded p-0.5 text-muted-foreground transition-colors hover:bg-control-hover hover:text-foreground"
                         >
                           <ArrowSquareOut size={12} />
@@ -207,7 +218,7 @@ export function Lightbox({
 
           {total > 1 && (
             <p className="pt-1 text-center text-2xs text-faded">
-              {index + 1} of {total} · ← → to move
+              {index + 1} {copy.of} {total} · ← → {copy.moveHint}
             </p>
           )}
         </aside>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { GITHUB_ASCII } from "../constants";
 
 const GLITCH_CHARS = "░▒▓█▀▄▌▐─│┤├┴┬┼╭╮╰╯";
@@ -22,9 +22,7 @@ export function AnimatedAscii() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef(0);
   const scaleRef = useRef(1);
-  const glitchRef = useRef<
-    { row: number; col: number; char: string; ttl: number }[]
-  >([]);
+  const glitchRef = useRef<{ row: number; col: number; char: string; ttl: number }[]>([]);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -122,9 +120,7 @@ export function AnimatedAscii() {
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
-        const baseW = Math.ceil(
-          Math.max(...GITHUB_ASCII.map((l) => l.length)) * 7.2,
-        );
+        const baseW = Math.ceil(Math.max(...GITHUB_ASCII.map((l) => l.length)) * 7.2);
         const baseH = Math.ceil(GITHUB_ASCII.length * 11);
         const scaleW = width / baseW;
         const scaleH = height / baseH;
@@ -156,13 +152,10 @@ export function AnimatedAscii() {
   }, [draw]);
 
   return (
-    <div
-      ref={wrapperRef}
-      className="flex items-center justify-center overflow-hidden"
-    >
+    <div ref={wrapperRef} className="flex items-center justify-center overflow-hidden">
       <canvas
         ref={canvasRef}
-        className="text-primary origin-center"
+        className="origin-center text-primary"
         style={{ imageRendering: "pixelated" }}
       />
     </div>

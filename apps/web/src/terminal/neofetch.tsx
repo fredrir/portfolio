@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
-import { BIRTHDAY, USER_HOST } from "@/lib/constants";
-import { THEMES } from "@/lib/themes";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  BIRTHDAY,
   PORTFOLIO_VERSION,
   START_VERSION,
   TAILWIND_VERSION,
+  USER_HOST,
 } from "@/lib/constants";
+import { THEMES } from "@/lib/themes";
 import { WINDOW_CONFIGS } from "@/window-manager/constants";
+import { getTerminalStrings } from "./translations";
 
 export const LOGO_LINES = [
   "  \u256D\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256E",
@@ -58,10 +60,8 @@ const LOCALE_NAMES: Record<string, string> = {
   fr: "fr_FR.UTF-8",
 };
 
-export function getDefaultInfo(
-  locale?: string,
-  themeName?: string,
-): NeofetchInfoLine[] {
+export function getDefaultInfo(locale?: string, themeName?: string): NeofetchInfoLine[] {
+  const t = getTerminalStrings(locale).neofetch;
   return [
     { label: null, value: USER_HOST },
     {
@@ -69,38 +69,20 @@ export function getDefaultInfo(
       value:
         "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
     },
-    { label: "OS", value: `fredrir ${PORTFOLIO_VERSION}` },
-    { label: "Kernel", value: `TanStack Start ${START_VERSION}` },
-    { label: "Uptime", value: computeUptime() },
-    { label: "Shell", value: "zsh 5.9" },
-    { label: "WM", value: `Tailwind CSS v${TAILWIND_VERSION}` },
-    { label: "Theme", value: themeName ?? "fredrir" },
-    { label: "Packages", value: `${WINDOW_CONFIGS.length}` },
-    { label: "Locale", value: LOCALE_NAMES[locale ?? "en"] ?? "en_US.UTF-8" },
+    { label: t.os, value: `fredrir ${PORTFOLIO_VERSION}` },
+    { label: t.kernel, value: `TanStack Start ${START_VERSION}` },
+    { label: t.uptime, value: computeUptime() },
+    { label: t.shell, value: "zsh 5.9" },
+    { label: t.wm, value: `Tailwind CSS v${TAILWIND_VERSION}` },
+    { label: t.theme, value: themeName ?? "fredrir" },
+    { label: t.packages, value: `${WINDOW_CONFIGS.length}` },
+    { label: t.locale, value: LOCALE_NAMES[locale ?? "en"] ?? "en_US.UTF-8" },
   ];
 }
 
 const THEME_COLOR_MAP: Record<string, string[]> = {
-  fredrir: [
-    "#ef4444",
-    "#f97316",
-    "#eab308",
-    "#22c55e",
-    "#06b6d4",
-    "#3b82f6",
-    "#a855f7",
-    "#ec4899",
-  ],
-  nord: [
-    "#bf616a",
-    "#d08770",
-    "#ebcb8b",
-    "#a3be8c",
-    "#88c0d0",
-    "#5e81ac",
-    "#b48ead",
-    "#d8dee9",
-  ],
+  fredrir: ["#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4", "#3b82f6", "#a855f7", "#ec4899"],
+  nord: ["#bf616a", "#d08770", "#ebcb8b", "#a3be8c", "#88c0d0", "#5e81ac", "#b48ead", "#d8dee9"],
   "catppuccin-mocha": [
     "#f38ba8",
     "#fab387",
@@ -131,16 +113,7 @@ const THEME_COLOR_MAP: Record<string, string[]> = {
     "#bb9af7",
     "#c0caf5",
   ],
-  gruvbox: [
-    "#fb4934",
-    "#fe8019",
-    "#fabd2f",
-    "#b8bb26",
-    "#8ec07c",
-    "#83a598",
-    "#d3869b",
-    "#ebdbb2",
-  ],
+  gruvbox: ["#fb4934", "#fe8019", "#fabd2f", "#b8bb26", "#8ec07c", "#83a598", "#d3869b", "#ebdbb2"],
   "solarized-light": [
     "#dc322f",
     "#cb4b16",
@@ -236,10 +209,7 @@ export default function Neofetch({
       const info = resolvedInfoRef.current;
       const totalChars = info.reduce(
         (sum, item) =>
-          sum +
-          (item.label
-            ? item.label.length + 1 + item.value.length
-            : item.value.length),
+          sum + (item.label ? item.label.length + 1 + item.value.length : item.value.length),
         0,
       );
       let chars = 0;
@@ -263,9 +233,7 @@ export default function Neofetch({
     }
   }, [animate, phase]);
 
-  const getInfoLineVisibility = (
-    index: number,
-  ): { visible: boolean; text: string } => {
+  const getInfoLineVisibility = (index: number): { visible: boolean; text: string } => {
     if (phase === "done" || !animate) {
       const item = resolvedInfo[index];
       return {
@@ -279,9 +247,7 @@ export default function Neofetch({
     let charsBefore = 0;
     for (let i = 0; i < index; i++) {
       const item = resolvedInfo[i];
-      charsBefore += item.label
-        ? item.label.length + 1 + item.value.length
-        : item.value.length;
+      charsBefore += item.label ? item.label.length + 1 + item.value.length : item.value.length;
     }
 
     const item = resolvedInfo[index];
@@ -297,20 +263,17 @@ export default function Neofetch({
   };
 
   return (
-    <div className="flex gap-3 @[300px]:gap-6 @[500px]:gap-10 items-start @container">
+    <div className="@container flex items-start @[300px]:gap-6 @[500px]:gap-10 gap-3">
       {!hideLogo && (
         <div className="shrink-0">
           {LOGO_LINES.map((line, i) => (
             <div
               key={i}
-              className="text-primary leading-[1.2] text-[12px] @[300px]:text-[14px] @[500px]:text-[15px] whitespace-pre transition-opacity duration-150"
+              className="whitespace-pre @[300px]:text-[14px] @[500px]:text-[15px] text-[12px] text-primary leading-[1.2] transition-opacity duration-150"
               style={{
                 opacity: i < logoLine ? (i >= 7 ? 0.4 : 1) : 0,
                 textShadow:
-                  i < 7 &&
-                  i < logoLine &&
-                  i === logoLine - 1 &&
-                  phase === "logo"
+                  i < 7 && i < logoLine && i === logoLine - 1 && phase === "logo"
                     ? "0 0 12px hsl(var(--primary) / 0.5)"
                     : i < 7 && i < logoLine
                       ? "0 0 8px hsl(var(--primary) / 0.3)"
@@ -334,17 +297,15 @@ export default function Neofetch({
             >
               {item.label ? (
                 <span>
-                  <span className="text-primary font-semibold">
+                  <span className="font-semibold text-primary">
                     {text.slice(0, item.label.length)}
                   </span>
-                  <span className="text-muted-foreground">
-                    {text.slice(item.label.length)}
-                  </span>
+                  <span className="text-muted-foreground">{text.slice(item.label.length)}</span>
                 </span>
               ) : i === 0 ? (
-                <span className="text-primary font-bold">{text}</span>
+                <span className="font-bold text-primary">{text}</span>
               ) : (
-                <span className="text-primary-subtle text-[10px]">{text}</span>
+                <span className="text-[10px] text-primary-subtle">{text}</span>
               )}
             </div>
           );
@@ -354,11 +315,7 @@ export default function Neofetch({
           style={{ opacity: colorVisible ? 1 : 0 }}
         >
           {themeColors.map((c, i) => (
-            <div
-              key={i}
-              className="w-2.5 h-2.5 rounded-sm"
-              style={{ backgroundColor: c }}
-            />
+            <div key={i} className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: c }} />
           ))}
         </div>
         <div
@@ -368,7 +325,7 @@ export default function Neofetch({
           {themeColors.map((c, i) => (
             <div
               key={i}
-              className="w-2.5 h-2.5 rounded-sm brightness-50"
+              className="h-2.5 w-2.5 rounded-sm brightness-50"
               style={{ backgroundColor: c }}
             />
           ))}
@@ -378,10 +335,7 @@ export default function Neofetch({
   );
 }
 
-export function getNeofetchPlainText(
-  extraLines?: NeofetchInfoLine[],
-  locale?: string,
-): string {
+export function getNeofetchPlainText(extraLines?: NeofetchInfoLine[], locale?: string): string {
   const info = extraLines ?? getDefaultInfo(locale);
 
   const infoStrings = info.map((item) =>

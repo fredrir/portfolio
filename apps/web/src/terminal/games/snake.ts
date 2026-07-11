@@ -1,3 +1,4 @@
+import type { TerminalStrings } from "../translations";
 import type { TerminalGame } from "../types";
 
 type Direction = "up" | "down" | "left" | "right";
@@ -15,7 +16,7 @@ export class SnakeGame implements TerminalGame {
   private score = 0;
   private gameOver = false;
 
-  constructor() {
+  constructor(private t: TerminalStrings) {
     this.snake = [
       { x: 5, y: 10 },
       { x: 4, y: 10 },
@@ -63,15 +64,25 @@ export class SnakeGame implements TerminalGame {
     const newHead = { ...head };
 
     switch (this.direction) {
-      case "up": newHead.y--; break;
-      case "down": newHead.y++; break;
-      case "left": newHead.x--; break;
-      case "right": newHead.x++; break;
+      case "up":
+        newHead.y--;
+        break;
+      case "down":
+        newHead.y++;
+        break;
+      case "left":
+        newHead.x--;
+        break;
+      case "right":
+        newHead.x++;
+        break;
     }
 
     if (
-      newHead.x < 0 || newHead.x >= WIDTH ||
-      newHead.y < 0 || newHead.y >= HEIGHT ||
+      newHead.x < 0 ||
+      newHead.x >= WIDTH ||
+      newHead.y < 0 ||
+      newHead.y >= HEIGHT ||
       this.snake.some((s) => s.x === newHead.x && s.y === newHead.y)
     ) {
       this.gameOver = true;
@@ -90,7 +101,7 @@ export class SnakeGame implements TerminalGame {
 
   render(): string {
     const lines: string[] = [];
-    lines.push(`  Score: ${this.score}  |  Arrow keys to move, q to quit`);
+    lines.push(`  ${this.t.score}: ${this.score}  |  ${this.t.arrowKeysToMove}, ${this.t.qToQuit}`);
     lines.push("┌" + "──".repeat(WIDTH) + "┐");
 
     for (let y = 0; y < HEIGHT; y++) {
@@ -112,8 +123,8 @@ export class SnakeGame implements TerminalGame {
     lines.push("└" + "──".repeat(WIDTH) + "┘");
 
     if (this.gameOver) {
-      lines.push(`  Game Over! Final score: ${this.score}`);
-      lines.push("  Press q or Escape to exit.");
+      lines.push(`  ${this.t.gameOverFinalScore}: ${this.score}`);
+      lines.push(`  ${this.t.pressExit}`);
     }
 
     return lines.join("\n");

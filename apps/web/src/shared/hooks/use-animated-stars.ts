@@ -14,6 +14,6 @@ export const useAnimatedStars = (count: number): Star[] => {
         y: Math.random() * 100,
         radius: Math.random() * 3 + 1,
       })),
-    [count]
+    [count],
   );
 };

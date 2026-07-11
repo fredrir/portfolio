@@ -8,24 +8,20 @@ export function BarChart({
   maxCount: number;
 }) {
   return (
-    <div className="space-y-0.5 mt-1 w-full">
+    <div className="mt-1 w-full space-y-0.5">
       {items.map(({ lang, count }) => {
         const pct = Math.max(5, Math.round((count / maxCount) * 100));
         return (
-          <div key={lang} className="flex items-center gap-2 w-full">
+          <div key={lang} className="flex w-full items-center gap-2">
             <LangIcon lang={lang} />
-            <span className="text-muted-foreground w-14 @xs:w-20 shrink-0 truncate">
-              {lang}
-            </span>
-            <div className="flex-1 h-3 bg-chart-track rounded-sm overflow-hidden">
+            <span className="@xs:w-20 w-14 shrink-0 truncate text-muted-foreground">{lang}</span>
+            <div className="h-3 flex-1 overflow-hidden rounded-sm bg-chart-track">
               <div
-                className="h-full bg-chart-fill rounded-sm transition-all duration-500"
+                className="h-full rounded-sm bg-chart-fill transition-all duration-500"
                 style={{ width: `${pct}%` }}
               />
             </div>
-            <span className="text-readable shrink-0 w-6 text-right">
-              {count}
-            </span>
+            <span className="w-6 shrink-0 text-right text-readable">{count}</span>
           </div>
         );
       })}

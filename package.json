@@ -8,11 +8,16 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "bun run --filter @portfolio/web dev",
+    "dev": "bun scripts/dev.ts",
+    "dev:web": "bun run --filter @portfolio/web dev",
+    "dev:api": "doppler run --preserve-env=DATABASE_URL,API_ADDR,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION,AWS_ENDPOINT_URL,MEDIA_BUCKET,ADMIN_TOKEN,RECAPTCHA_SECRET_KEY -- cargo run -p portfolio-api",
     "build": "bun run --filter @portfolio/web build",
-    "lint": "bun run --filter '*' lint"
+    "lint": "biome ci .",
+    "format": "biome check --write .",
+    "format:unsafe": "biome check --write --unsafe ."
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.3",
     "@supabase/supabase-js": "^2.110.2"
   }
 }

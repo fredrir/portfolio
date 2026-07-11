@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { LayoutEngine } from "../layout-engine";
-import type { TilingState, DragResult } from "../types";
+import type { DragResult, TilingState } from "../types";
 
 export function useDrag(tiling: TilingState): DragResult {
   const [dragTarget, setDragTarget] = useState<string | null>(null);
@@ -20,9 +20,7 @@ export function useDrag(tiling: TilingState): DragResult {
 
       setDragTarget(paneId);
       setDragPos({ x: e.clientX - offsetX, y: e.clientY - offsetY });
-      setDragSize(
-        rect ? { w: rect.width, h: rect.height } : { w: 300, h: 200 },
-      );
+      setDragSize(rect ? { w: rect.width, h: rect.height } : { w: 300, h: 200 });
 
       let rafId: number | null = null;
       const lastMouse = { x: 0, y: 0 };
@@ -58,9 +56,7 @@ export function useDrag(tiling: TilingState): DragResult {
         const dropTarget = swapTargetRef.current;
 
         if (dropTarget && dropTarget !== paneId) {
-          tiling.setLayout((prev) =>
-            LayoutEngine.swapPanes(prev, paneId, dropTarget),
-          );
+          tiling.setLayout((prev) => LayoutEngine.swapPanes(prev, paneId, dropTarget));
           tiling.onSwapRef.current?.();
         }
 

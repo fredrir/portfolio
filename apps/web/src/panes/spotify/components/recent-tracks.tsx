@@ -7,17 +7,14 @@ export function RecentTracks({ tracks }: { tracks: SpotifyTrack[] }) {
   return (
     <>
       {tracks.map((track, i) => (
-        <div
-          key={`${track.title}-${i}`}
-          className="flex items-center gap-2 py-0.5"
-        >
+        <div key={`${track.title}-${i}`} className="flex items-center gap-2 py-0.5">
           {track.albumArt && (
             <Image
               src={track.albumArt}
               alt={track.album}
               width={20}
               height={20}
-              className="w-5 h-5 rounded border border-border-faint object-cover"
+              className="h-5 w-5 rounded border border-border-faint object-cover"
               unoptimized
             />
           )}
@@ -27,17 +24,15 @@ export function RecentTracks({ tracks }: { tracks: SpotifyTrack[] }) {
                 href={track.songUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground hover:text-primary hover:underline transition-colors text-xs truncate block"
+                className="block truncate text-foreground text-xs transition-colors hover:text-primary hover:underline"
               >
                 {track.title}
               </a>
             ) : (
-              <span className="text-foreground text-xs truncate block">
-                {track.title}
-              </span>
+              <span className="block truncate text-foreground text-xs">{track.title}</span>
             )}
           </div>
-          <span className="text-ghost text-3xs truncate max-w-20 hidden @xs:inline">
+          <span className="@xs:inline hidden max-w-20 truncate text-3xs text-ghost">
             {track.artist}
           </span>
         </div>

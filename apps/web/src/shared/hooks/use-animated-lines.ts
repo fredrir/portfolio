@@ -18,6 +18,6 @@ export const useAnimatedLines = (count: number): Line[] => {
         y2: Math.random() * 100,
         opacity: Math.random() * 0.5 + 0.1,
       })),
-    [count]
+    [count],
   );
 };

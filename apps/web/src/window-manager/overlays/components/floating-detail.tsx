@@ -26,11 +26,11 @@ export function FloatingDetail({ title, onClose, children }: Props) {
     >
       <div className="mx-2" onClick={(e) => e.stopPropagation()}>
         <WindowFrame
-          title={<span className="hidden md:flex text-primary-subtle">{title}</span>}
-          trailing={<span className="text-xs text-primary-subtle">{USER_HOST}</span>}
+          title={<span className="hidden text-primary-subtle md:flex">{title}</span>}
+          trailing={<span className="text-primary-subtle text-xs">{USER_HOST}</span>}
           dots="close-only"
           onClose={onClose}
-          className="w-full max-w-lg max-h-[80vh] border-wm-border-drag bg-glass-heavy shadow-2xl shadow-wm-shadow font-mono"
+          className="max-h-[80vh] w-full max-w-lg border-wm-border-drag bg-glass-heavy font-mono shadow-2xl shadow-wm-shadow"
           titleBarClassName="px-4 py-2"
         >
           {children}

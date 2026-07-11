@@ -1,19 +1,19 @@
 "use client";
 
-import { useTiling, TilingGrid, TilingProvider } from "./tiling";
-import { useBackground } from "./background/hooks/use-background";
-import { useIsMobile } from "@/shared/hooks/use-is-mobile";
-import { useTutorial } from "@/tutorial/use-tutorial";
-import { useTutorialSync } from "./overlays/hooks/use-tutorial-sync";
-import { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
-import { useMobileApp } from "./mobile/hooks/use-mobile-app";
-import { useFocus } from "./shell/hooks/use-focus";
-import { useWindowManagerView } from "./window-manager-view";
-import { Shell, ContentArea, Window } from "./shell";
-import { useTipNotification } from "./shell/hooks/use-tip-notification";
-import { MobileLayout, MobileDock } from "./mobile";
-import type { GitHubData, SpotifyData } from "@/shared/types";
 import type { DictType, Locale } from "@/i18n/types";
+import { useIsMobile } from "@/shared/hooks/use-is-mobile";
+import type { GitHubData, SpotifyData } from "@/shared/types";
+import { useTutorial } from "@/tutorial/use-tutorial";
+import { useBackground } from "./background/hooks/use-background";
+import { MobileDock, MobileLayout } from "./mobile";
+import { useMobileApp } from "./mobile/hooks/use-mobile-app";
+import { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
+import { useTutorialSync } from "./overlays/hooks/use-tutorial-sync";
+import { ContentArea, Shell, Window } from "./shell";
+import { useFocus } from "./shell/hooks/use-focus";
+import { useTipNotification } from "./shell/hooks/use-tip-notification";
+import { TilingGrid, TilingProvider, useTiling } from "./tiling";
+import { useWindowManagerView } from "./window-manager-view";
 
 interface Props {
   currentLocale: Locale;
@@ -22,12 +22,7 @@ interface Props {
   spotifyData: SpotifyData | null;
 }
 
-export function WindowManager({
-  currentLocale,
-  dict,
-  githubData,
-  spotifyData,
-}: Props) {
+export function WindowManager({ currentLocale, dict, githubData, spotifyData }: Props) {
   const { ui } = dict;
 
   const isMobile = useIsMobile();

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+import type { DictType } from "@/i18n/types";
 import { JourneyDetailPane } from "@/panes/journey/components/journey-detail-pane";
 import { ProjectDetailPane } from "@/panes/projects/components/project-detail-pane";
 import type { journeyType, projectType } from "@/shared/types";
-import type { DictType } from "@/i18n/types";
 
 interface FloatingDetail {
   title: string;
@@ -25,13 +25,7 @@ export function useFloatingDetail(dict: DictType) {
     (p: projectType) => {
       setDetail({
         title: `~/projects/${p.title}`,
-        content: (
-          <ProjectDetailPane
-            project={p}
-            viewCode={dict.project.viewCode}
-            ui={dict.ui}
-          />
-        ),
+        content: <ProjectDetailPane project={p} viewCode={dict.project.viewCode} ui={dict.ui} />,
       });
     },
     [dict.project.viewCode, dict.ui],

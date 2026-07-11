@@ -1,4 +1,135 @@
 {
+  "seo": {
+    "description": "Site personnel de Fredrik Carsten Hansteen"
+  },
+  "cookieConsent": {
+    "prompt": "{name} a besoin de vos cookies",
+    "accept": "[Y] accepter",
+    "decline": "[n] refuser",
+    "info": "[i] info",
+    "gdprTitle": "RGPD / Confidentialité",
+    "gdprLines": [
+      "Responsable du traitement : {name} ({email})",
+      "Collecté après consentement : pages vues, référent, navigateur et pays, agrégés",
+      "Analyse produit : PostHog (région UE) ; les comptes de première partie sont agrégés sur mon propre serveur",
+      "PostHog stocke un identifiant de première partie dans le stockage local du site ; aucun cookie de suivi inter-sites",
+      "Aucune adresse IP n'est stockée - votre pays est déduit à la périphérie Cloudflare",
+      "Protection anti-spam : Google reCAPTCHA protège le formulaire de contact et peut déposer des cookies Google",
+      "Base juridique : Art. 6(1)(a) RGPD / Loi norvégienne sur les données personnelles (Personopplysningsloven)",
+      "Retirez votre consentement à tout moment en effaçant le stockage local du site",
+      "Droit de réclamation : Datatilsynet (Autorité norvégienne de protection des données) - datatilsynet.no"
+    ],
+    "gdprBack": "[q] retour",
+    "cookieLine": "en attente...",
+    "cookieLabel": "Cookies"
+  },
+  "admin": {
+    "pageTitle": "Administration - hansteen.dev",
+    "apiUnreachable": "api indisponible",
+    "subtitle": "pipeline média · protégé par Access",
+    "stats": {
+      "items": "éléments",
+      "live": "live",
+      "stored": "stocké"
+    },
+    "uploadErrors": {
+      "invalidType": "pas un jpeg, png ou webp",
+      "tooLarge": "plus de 25 MiB",
+      "uploadFailed": "échec du téléversement",
+      "authorizationFailed": "échec de l'autorisation",
+      "processingFailed": "échec du traitement",
+      "networkDuringS3": "erreur réseau pendant le S3 PUT"
+    },
+    "pipeline": {
+      "stations": [
+        {
+          "label": "autoriser",
+          "sub": "grant + audit"
+        },
+        {
+          "label": "s3 put",
+          "sub": "présigné"
+        },
+        {
+          "label": "worker",
+          "sub": "avif · webp"
+        },
+        {
+          "label": "live",
+          "sub": "galerie"
+        }
+      ],
+      "ingest": "ingestion",
+      "clearFinished": "effacer terminés",
+      "uploadAria": "Téléverser des images : déposer des fichiers n'importe où ou appuyer sur Entrée pour parcourir",
+      "release": "relâcher pour alimenter le pipeline",
+      "drop": "déposez des images n'importe où, ou cliquez pour parcourir",
+      "constraints": "jpeg / png / webp · <= 25 MiB",
+      "category": "catégorie",
+      "uncategorized": "non classé",
+      "failed": "échec",
+      "failedAt": "{detail} · à {station}",
+      "putProgress": "put {percent}%",
+      "stageLabels": {
+        "authorizing": "autorisation",
+        "uploading": "téléversement",
+        "processing": "traitement",
+        "ready": "live",
+        "failed": "échec"
+      }
+    },
+    "library": {
+      "label": "bibliothèque",
+      "of": "sur",
+      "refreshAria": "Actualiser la bibliothèque",
+      "openAria": "Ouvrir {filename}",
+      "filters": {
+        "all": "tout",
+        "ready": "prêt",
+        "processing": "traitement",
+        "failed": "échec"
+      },
+      "filterPlaceholder": "filtrer par nom",
+      "filterAria": "Filtrer par nom",
+      "reading": "lecture de la bibliothèque...",
+      "empty": "la bibliothèque est vide - alimentez le pipeline ci-dessus",
+      "noMatches": "aucun résultat pour ces filtres",
+      "uncategorized": "non classé"
+    },
+    "lightbox": {
+      "copied": "copié",
+      "closePreview": "Fermer l'aperçu",
+      "noVariant": "aucune variante à prévisualiser pour le moment",
+      "previousImage": "Image précédente",
+      "nextImage": "Image suivante",
+      "size": "taille",
+      "source": "source",
+      "sha256": "sha-256",
+      "copyContentHash": "Copier le hash de contenu",
+      "encodedVariants": "variantes encodées",
+      "copyFormatUrl": "Copier l'URL {format}",
+      "openFormatNewTab": "Ouvrir {format} dans un nouvel onglet",
+      "of": "sur",
+      "moveHint": "pour naviguer"
+    },
+    "ledger": {
+      "label": "ledger",
+      "verifying": "vérification...",
+      "verifyChain": "vérifier la chaîne",
+      "chainIntact": "chaîne intacte - {entries} entrées vérifiées",
+      "chainBroken": "chaîne rompue à l'entrée #{id}",
+      "verificationFailed": "la vérification n'a pas démarré - réessayez",
+      "empty": "aucune entrée pour le moment - la première autorisation démarre la chaîne",
+      "collapse": "réduire",
+      "showAll": "afficher les {count} entrées"
+    },
+    "time": {
+      "secondsAgo": "s",
+      "minutesAgo": "min",
+      "hoursAgo": "h",
+      "daysAgo": "j"
+    }
+  },
   "tutorial": {
     "welcomeTitle": "Bienvenue !",
     "welcomeBody": "Je suis Fredrik, laissez-moi vous faire visiter mon bureau. Choisissez d'abord votre langue.",
@@ -54,7 +185,8 @@
   },
   "landing": {
     "title": "Salut, je suis",
-    "mainText": "Je poursuis actuellement un master en informatique à NTNU, à Trondheim. N'hésitez pas à explorer mon site ou à me contacter."
+    "mainText": "Je poursuis actuellement un master en informatique à NTNU, à Trondheim. N'hésitez pas à explorer mon site ou à me contacter.",
+    "avatarLabel": "Avatar 3D interactif de Fredrik"
   },
   "journey": {
     "title": "Mon Parcours",
@@ -251,11 +383,7 @@
         "title": "Online Events",
         "description": "Une application mobile conçue pour les étudiants, leur permettant de s'inscrire à des événements, de recevoir des notifications et de jouer à des jeux.",
         "languages": "Auth0 / Flutter / Firebase / Go / Google Cloud Platform",
-        "mobileImages": [
-          "/app-picture.png",
-          "/app-picture-2.jpg",
-          "/app-picture-3.jpg"
-        ],
+        "mobileImages": ["/app-picture.png", "/app-picture-2.jpg", "/app-picture-3.jpg"],
         "githubLink": "https://github.com/appKom/online_events",
         "websiteLink": "https://apps.apple.com/no/app/online/id6476830274",
         "websiteAlias": "App Store"
@@ -293,7 +421,30 @@
     "recaptchaError": "Veuillez compléter le reCAPTCHA.",
     "optional": "facultatif",
     "vimHintNormal": "Appuyez sur « i » pour commencer à écrire...",
-    "vimHintStatus": "Tapez {i} pour éditer, {wq} pour envoyer"
+    "vimHintStatus": "Tapez {i} pour éditer, {wq} pour envoyer",
+    "toLabel": "À :",
+    "fromLabel": "De :",
+    "mailLabel": "Mail :",
+    "phoneLabel": "Tél :",
+    "insertMode": "-- INSERTION --",
+    "submitCommand": ":wq",
+    "log": {
+      "resolvingMx": "Résolution de l'enregistrement MX pour hansteen.dev...",
+      "captchaOk": "Vérification CAPTCHA .............. [  OK  ]",
+      "captchaFailed": "Vérification CAPTCHA .............. [FAILED]",
+      "tlsOk": "Établissement de la connexion TLS . [  OK  ]",
+      "authOk": "Authentification de l'expéditeur .. [  OK  ]",
+      "sendingBytes": "Envoi de {bytes} octets ...",
+      "deliveryOk": "Livraison du message .............. [  OK  ]",
+      "deliveryFailed": "Livraison du message .............. [FAILED]",
+      "sent": "Message envoyé. ID de file : {queueId}",
+      "sentPrefix": "Message envoyé.",
+      "error": "Erreur : {error}",
+      "errorPrefix": "Erreur :",
+      "unknownError": "inconnue",
+      "connectionError": "Erreur de connexion : ETIMEDOUT",
+      "connectionErrorPrefix": "Erreur de connexion :"
+    }
   },
   "footer": {
     "license1": "Tous droits réservés.",
@@ -384,6 +535,92 @@
       "deployments": "deploys",
       "medialab": "medialab",
       "analytics": "analytics"
-    }
+    },
+    "loading": "chargement...",
+    "albumArt": "Pochette d'album",
+    "platform": {
+      "common": {
+        "noDataYet": "Pas encore de données.",
+        "direct": "direct",
+        "dailySeriesPeak": "Série quotidienne, pic",
+        "relativeTime": {
+          "secondsAgo": "s",
+          "minutesAgo": "min",
+          "hoursAgo": "h",
+          "daysAgo": "j"
+        }
+      },
+      "engineering": {
+        "browser": "Navigateur",
+        "yourDevice": "votre appareil",
+        "cfWorker": "CF Worker",
+        "colo": "colo",
+        "routing": "routage",
+        "access": "Access",
+        "serviceToken": "jeton de service",
+        "tunnel": "Tunnel",
+        "cloudflared": "cloudflared",
+        "caddy": "Caddy",
+        "reverseProxy": "proxy inverse",
+        "slotSuffix": "slot",
+        "originSlot": "slot origin",
+        "privateOrigin": "origin privé",
+        "liveRequestPath": "chemin de requête live",
+        "traced": "tracé",
+        "tracing": "traçage...",
+        "privatePathNote": "Aucun port public sur l'origin - le Worker edge présente un jeton de service Access et tout ce qui suit reste privé.",
+        "roundTrip": "aller-retour",
+        "roundTripLabel": "ms, navigateur->origin",
+        "edgeTime": "temps edge",
+        "edgeTimeLabel": "ms au worker",
+        "cache": "cache",
+        "release": "release",
+        "signedVerified": "signé · vérifié",
+        "commit": "commit",
+        "liveSlot": "slot live",
+        "requestId": "request id"
+      },
+      "deployments": {
+        "health": "santé",
+        "lastRuns": "10 dernières exécutions",
+        "median": "médiane",
+        "buildToLive": "build->live",
+        "live": "live",
+        "servingNow": "servi maintenant",
+        "releaseLedger": "registre release · main",
+        "runs": "exécutions",
+        "readingHistory": "Lecture de l'historique...",
+        "historyUnavailable": "L'historique des déploiements est momentanément indisponible."
+      },
+      "medialab": {
+        "variantAlt": "variante {format}",
+        "smallest": "plus petit",
+        "processed": "traitées",
+        "images": "images",
+        "variants": "variantes",
+        "avifWebp": "avif + webp",
+        "avgSaving": "gain moyen",
+        "bestVsLargest": "meilleur vs plus grand",
+        "loading": "Chargement du banc codec...",
+        "unavailable": "Le pipeline média est momentanément indisponible.",
+        "empty": "Aucun média traité pour le moment. Les téléversements deviennent des variantes en quelques secondes.",
+        "hint": "Un téléversement passe par un S3 PUT présigné, un événement SQS et un worker Rust qui supprime les métadonnées et encode AVIF et WebP sous des clés hashées par contenu. L'edge signe et met les lectures en cache."
+      },
+      "analytics": {
+        "aggregating": "Agrégation des visites...",
+        "visitors30": "visiteurs · 30 jours",
+        "inLast7d": "{count} sur 7 j",
+        "totalVisits": "visites totales",
+        "countries": "pays",
+        "browsers": "navigateurs",
+        "referrers": "référents",
+        "noVisits": "Aucune visite enregistrée - le compteur démarre une fois le consentement donné.",
+        "productAnalytics": "analyse produit · posthog",
+        "consented": "consenti",
+        "pageviews30": "pages vues, 30 jours"
+      }
+    },
+    "uncategorized": "non classé",
+    "spotifyPlayer": "Lecteur Spotify"
   }
 }

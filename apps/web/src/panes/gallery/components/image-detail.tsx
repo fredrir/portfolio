@@ -1,8 +1,8 @@
-import { useRef, useCallback, useEffect } from "react";
-import Image from "@/shared/components/image";
-import { AnimatePresence, motion, type PanInfo } from "framer-motion";
-import type { GalleryImage } from "@/server/gallery";
 import { CaretLeft, CaretRight, MapPin } from "@phosphor-icons/react";
+import { AnimatePresence, motion, type PanInfo } from "framer-motion";
+import { useCallback, useEffect, useRef } from "react";
+import type { GalleryImage } from "@/server/gallery";
+import Image from "@/shared/components/image";
 import { useExifData } from "../hooks/use-exif";
 import { formatDate } from "../utils";
 
@@ -74,8 +74,8 @@ export function ImageDetail({
   );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 gap-1 relative">
-      <div className="flex-1 min-h-0 rounded-md overflow-hidden relative border border-control-border bg-black/20">
+    <div className="relative flex min-h-0 flex-1 flex-col gap-1">
+      <div className="relative min-h-0 flex-1 overflow-hidden rounded-md border border-control-border bg-black/20">
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div
             key={image.src}
@@ -99,7 +99,7 @@ export function ImageDetail({
               alt=""
               fill
               sizes="(max-width: 768px) 100vw, 60vw"
-              className="object-contain pointer-events-none"
+              className="pointer-events-none object-contain"
             />
           </motion.div>
         </AnimatePresence>
@@ -108,35 +108,30 @@ export function ImageDetail({
         <>
           <button
             onClick={() => hasPrev && onSwipe("right")}
-            className={`absolute left-1.5 top-1/2 -translate-y-1/2 z-10 font-mono text-sm px-2 py-3 rounded bg-black/60 backdrop-blur-sm border border-white/10 transition-all ${hasPrev ? "text-primary hover:text-primary-bold hover:bg-black/80 active:scale-95" : "text-white/20 pointer-events-none"}`}
+            className={`absolute top-1/2 left-1.5 z-10 -translate-y-1/2 rounded border border-white/10 bg-black/60 px-2 py-3 font-mono text-sm backdrop-blur-sm transition-all ${hasPrev ? "text-primary hover:bg-black/80 hover:text-primary-bold active:scale-95" : "pointer-events-none text-white/20"}`}
           >
             <CaretLeft weight="bold" />
           </button>
-          <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-10 font-mono text-2xs tabular-nums px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm border border-white/10 text-white/50">
+          <span className="absolute bottom-1.5 left-1/2 z-10 -translate-x-1/2 rounded border border-white/10 bg-black/60 px-1.5 py-0.5 font-mono text-2xs text-white/50 tabular-nums backdrop-blur-sm">
             [{currentIndex + 1}/{totalCount}]
           </span>
           <button
             onClick={() => hasNext && onSwipe("left")}
-            className={`absolute right-1.5 top-1/2 -translate-y-1/2 z-10 font-mono text-sm px-2 py-3 rounded bg-black/60 backdrop-blur-sm border border-white/10 transition-all ${hasNext ? "text-primary hover:text-primary-bold hover:bg-black/80 active:scale-95" : "text-white/20 pointer-events-none"}`}
+            className={`absolute top-1/2 right-1.5 z-10 -translate-y-1/2 rounded border border-white/10 bg-black/60 px-2 py-3 font-mono text-sm backdrop-blur-sm transition-all ${hasNext ? "text-primary hover:bg-black/80 hover:text-primary-bold active:scale-95" : "pointer-events-none text-white/20"}`}
           >
             <CaretRight weight="bold" />
           </button>
         </>
       )}
 
-      <div className="shrink-0 min-h-[1.25rem] flex pt-2 flex-wrap gap-x-3 gap-y-0.5 text-2xs text-faded px-0.5">
+      <div className="flex min-h-[1.25rem] shrink-0 flex-wrap gap-x-3 gap-y-0.5 px-0.5 pt-2 text-2xs text-faded">
         {exifLoading && <span className="animate-pulse">...</span>}
         {displayDate && <span>{formatDate(displayDate)}</span>}
         {image.filename && <span> {image.filename} </span>}
         {exif?.camera && <span>{exif.camera}</span>}
         {exif?.focalLength && (
           <span>
-            {[
-              exif.focalLength,
-              exif.aperture,
-              exif.shutter,
-              exif.iso ? `ISO${exif.iso}` : null,
-            ]
+            {[exif.focalLength, exif.aperture, exif.shutter, exif.iso ? `ISO${exif.iso}` : null]
               .filter(Boolean)
               .join(" · ")}
           </span>
@@ -151,7 +146,7 @@ export function ImageDetail({
             href={`https://www.google.com/maps?q=${exif.latitude},${exif.longitude}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary-dim hover:text-primary-medium transition-colors inline-flex items-center gap-0.5"
+            className="inline-flex items-center gap-0.5 text-primary-dim transition-colors hover:text-primary-medium"
           >
             <MapPin size={12} />
             {exif.latitude.toFixed(4)}, {exif.longitude.toFixed(4)}
