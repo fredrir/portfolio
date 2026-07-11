@@ -1,0 +1,36 @@
+# Enable Dependabot version bumps. Kept UNGROUPED so each PR carries a
+# parseable "Bump X from A to B" title for the central auto-merger on
+# fredrir/openclaw. See that repo: .github/workflows/dependabot-automerge.yml.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directories: ["/", "/apps/api", "/apps/worker"]
+    schedule: { interval: weekly }
+    commit-message: { prefix: "chore(deps)" }
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directories: ["/", "/apps/edge", "/apps/web", "/packages/api-client"]
+    schedule: { interval: weekly }
+    commit-message: { prefix: "chore(deps)" }
+    open-pull-requests-limit: 5
+  - package-ecosystem: docker
+    directories: ["/apps/api", "/apps/web", "/apps/worker"]
+    schedule: { interval: weekly }
+    commit-message: { prefix: "build(deps)" }
+    open-pull-requests-limit: 5
+  - package-ecosystem: terraform
+    directories:
+      - "/infra/terraform/bootstrap"
+      - "/infra/terraform/envs/preview"
+      - "/infra/terraform/envs/prod"
+      - "/infra/terraform/modules/aws-media"
+      - "/infra/terraform/modules/cloudflare-ingress"
+      - "/infra/terraform/modules/github-oidc"
+    schedule: { interval: weekly }
+    commit-message: { prefix: "chore(deps)" }
+    open-pull-requests-limit: 5
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule: { interval: weekly }
+    commit-message: { prefix: "ci(deps)" }
+    open-pull-requests-limit: 5
