@@ -1,16 +1,11 @@
 "use client";
 
-/**
- * The ingest strip: the drop zone *is* the pipeline diagram. Four stations
- * (authorize → s3 put → worker → live) sit on a rail; active jobs light up
- * their current station and ride a per-job progress track underneath.
- */
 import { useRef } from "react";
 
 import { formatBytes } from "@/admin/format";
 import { STATION_OF, type UploadJob } from "@/admin/use-uploads";
 import type { AdminStrings } from "@/i18n/types";
-import { Badge, StatusDot, type Tone } from "@/panes/platform-ui";
+import { Badge, type Tone } from "@/panes/platform-ui";
 import { cn } from "@/shared/utils/cn";
 
 const STAGE_TONE: Record<UploadJob["stage"], Tone> = {
@@ -161,7 +156,6 @@ export function IngestStrip({
 }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const hasSettled = jobs.some((j) => j.stage === "ready" || j.stage === "failed");
-  const busy = jobs.some((j) => j.stage !== "ready" && j.stage !== "failed");
 
   return (
     <section
@@ -173,12 +167,6 @@ export function IngestStrip({
       )}
     >
       <header className="flex items-center justify-between gap-2 border-border-faint border-b px-3 py-1.5">
-        <div className="flex items-center gap-1.5">
-          <StatusDot tone={busy ? "warn" : "ok"} pulse={busy} />
-          <h2 className="font-bold text-2xs text-primary uppercase tracking-[0.18em]">
-            {t.ingest}
-          </h2>
-        </div>
         {hasSettled && (
           <button
             type="button"

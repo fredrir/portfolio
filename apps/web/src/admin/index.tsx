@@ -3,7 +3,6 @@
 import type { components } from "@portfolio/api-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { formatBytes } from "@/admin/format";
 import { Ledger } from "@/admin/ledger";
 import { Library } from "@/admin/library";
 import { IngestStrip } from "@/admin/pipeline";
@@ -13,15 +12,7 @@ import { StatusDot } from "@/panes/platform-ui";
 import { type AdminAuditEntry, adminAuditLog, adminListMedia } from "@/server/admin";
 
 type MediaItem = components["schemas"]["MediaItem"];
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="flex flex-col items-end">
-      <span className="font-mono text-foreground text-sm tabular-nums leading-tight">{value}</span>
-      <span className="text-3xs text-muted-foreground uppercase tracking-[0.2em]">{label}</span>
-    </div>
-  );
-}
+const ADMIN_STRINGS = getStaticDictionary("en").admin;
 
 /** Registers a whole-window file drop target; returns whether files hover. */
 function useWindowDrop(onDrop: (files: File[]) => void) {
@@ -69,7 +60,6 @@ function useWindowDrop(onDrop: (files: File[]) => void) {
 }
 
 export function AdminConsole() {
-  const [locale, setLocale] = useState("en");
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [audit, setAudit] = useState<AdminAuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,11 +77,7 @@ export function AdminConsole() {
   }, []);
   useEffect(refresh, [refresh]);
 
-  useEffect(() => {
-    setLocale(navigator.language);
-  }, []);
-
-  const t = getStaticDictionary(locale).admin;
+  const t = ADMIN_STRINGS;
   const { jobs, upload, clearSettled } = useUploads(refresh, t.uploadErrors);
 
   const handleFiles = useCallback(
@@ -105,12 +91,6 @@ export function AdminConsole() {
   const categories = useMemo(
     () => Array.from(new Set(media.map((m) => m.category).filter((c): c is string => !!c))).sort(),
     [media],
-  );
-
-  const ready = media.filter((m) => m.state === "ready").length;
-  const storedBytes = media.reduce(
-    (sum, m) => sum + m.variants.reduce((s, v) => s + v.size_bytes, 0),
-    0,
   );
 
   return (
@@ -130,16 +110,6 @@ export function AdminConsole() {
               <h1 className="truncate font-bold text-sm tracking-wide">
                 admin<span className="text-primary-dim">@</span>hansteen.dev
               </h1>
-              <p className="text-3xs text-muted-foreground uppercase tracking-[0.2em]">
-                {apiDown ? t.apiUnreachable : t.subtitle}
-              </p>
-            </div>
-          </div>
-          <div className="flex shrink-0 items-center gap-4 sm:gap-5">
-            <Stat value={String(media.length)} label={t.stats.items} />
-            <Stat value={String(ready)} label={t.stats.live} />
-            <div className="hidden sm:block">
-              <Stat value={formatBytes(storedBytes)} label={t.stats.stored} />
             </div>
           </div>
         </div>

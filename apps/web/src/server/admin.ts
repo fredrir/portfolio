@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeader } from "@tanstack/react-start/server";
 
+import { isAdminOrigin } from "@/server/admin-origin";
 import { api, traceHeaders } from "@/server/api";
 
 /**
@@ -9,7 +9,7 @@ import { api, traceHeaders } from "@/server/api";
  * requests with x-admin-origin. The ADMIN_TOKEN never reaches the browser.
  */
 function assertAdminOrigin(): void {
-  if (getRequestHeader("x-admin-origin") !== "1") {
+  if (!isAdminOrigin()) {
     throw new Error("not found");
   }
 }
