@@ -15,5 +15,45 @@ services:
       timeout: 3s
       retries: 10
 
+  # Production-like app containers; start with: docker compose --profile app up --build
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      args:
+        GIT_SHA: ${GIT_SHA:-}
+    environment:
+      DATABASE_URL: postgres://portfolio:portfolio@db:5432/portfolio
+      API_ADDR: 0.0.0.0:8080
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    profiles: ["app"]
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      API_URL: http://api:8080
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - api
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    profiles: ["app"]
+
 volumes:
   db-data:

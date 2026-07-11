@@ -7,5 +7,12 @@ import { defineConfig } from "vite";
 export default defineConfig({
   server: { port: 3000 },
   resolve: { tsconfigPaths: true },
-  plugins: [tailwindcss(), tanstackStart(), nitro(), viteReact()],
+  plugins: [
+    tailwindcss(),
+    tanstackStart(),
+    // Pin the preset so the build artifact is runtime-independent; without
+    // this, building under Bun bakes in a Bun.serve entry that Node can't run.
+    nitro({ preset: "node-server" }),
+    viteReact(),
+  ],
 });
