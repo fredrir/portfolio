@@ -16,6 +16,62 @@ permissions:
   contents: read
 
 jobs:
+  # Auto-incrementing semantic version from the latest v-tag (baseline 3.0.0).
+  # Conventional commits since that tag decide the bump: BREAKING/`!` → major,
+  # feat → minor, otherwise patch. Idempotent: a commit already tagged reuses
+  # its tag so re-runs don't inflate the version.
+  version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.compute.outputs.version }}
+      tag: ${{ steps.compute.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - id: compute
+        run: |
+          set -euo pipefail
+          EXISTING=$(git tag --points-at HEAD -l 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -1)
+          if [ -n "$EXISTING" ]; then
+            NEXT="${EXISTING#v}"
+            echo "HEAD already tagged $EXISTING"
+          else
+            LATEST=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -1)
+            if [ -z "$LATEST" ]; then
+              NEXT="3.0.0"
+            else
+              BASE=${LATEST#v}; MAJ=${BASE%%.*}; REST=${BASE#*.}; MIN=${REST%%.*}; PAT=${REST#*.}
+              LOG=$(git log --format='%s%n%b' "${LATEST}..HEAD")
+              if grep -qE '^[a-z]+(\([^)]*\))?!:' <<<"$LOG" || grep -qiE 'BREAKING[ -]CHANGE' <<<"$LOG"; then
+                MAJ=$((MAJ+1)); MIN=0; PAT=0
+              elif grep -qE '^feat(\([^)]*\))?:' <<<"$LOG"; then
+                MIN=$((MIN+1)); PAT=0
+              else
+                PAT=$((PAT+1))
+              fi
+              NEXT="${MAJ}.${MIN}.${PAT}"
+            fi
+          fi
+          echo "version=$NEXT" >> "$GITHUB_OUTPUT"
+          echo "tag=v$NEXT" >> "$GITHUB_OUTPUT"
+          echo "resolved version: v$NEXT"
+      - name: Tag the release commit
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.compute.outputs.tag }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "$TAG already exists; skipping"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+          fi
+
   checks:
     runs-on: ubuntu-latest
     services:
@@ -46,7 +102,7 @@ jobs:
       - run: cargo test --workspace
 
   build:
-    needs: [checks]
+    needs: [checks, version]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -72,6 +128,8 @@ jobs:
           tags: ghcr.io/fredrir/portfolio-${{ matrix.image }}:${{ github.sha }}
           build-args: |
             GIT_SHA=${{ github.sha }}
+            APP_VERSION=${{ needs.version.outputs.version }}
+            VITE_APP_VERSION=${{ needs.version.outputs.version }}
             VITE_RECAPTCHA_SITE_KEY=${{ vars.VITE_RECAPTCHA_SITE_KEY }}
             VITE_POSTHOG_KEY=${{ vars.VITE_POSTHOG_KEY }}
             VITE_POSTHOG_HOST=${{ vars.VITE_POSTHOG_HOST }}
@@ -134,6 +192,32 @@ jobs:
             -f state=success \
             -f environment=production \
             -f log_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+  release:
+    needs: [version, deploy]
+    if: success()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="${{ needs.version.outputs.tag }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "release $TAG already published"
+            exit 0
+          fi
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --generate-notes \
+            --notes "Deployed to production from \`${GITHUB_SHA}\`. Images: \`ghcr.io/fredrir/portfolio-{web,api,worker}:${GITHUB_SHA}\` (SBOM + provenance attested, keyless-Cosign signed, signature-verified on the host)."
 
   edge:
     needs: [deploy]

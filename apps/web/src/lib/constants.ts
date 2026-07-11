@@ -9,7 +9,10 @@ export const MY_PHONE = "+47 476 30 231";
 export const USER_HOST = "fredrik@hansteen";
 export const GITHUB_USERNAME = "fredrir";
 
-export const PORTFOLIO_VERSION = pkg.version;
+// Release version injected at build time by CI (VITE_APP_VERSION); the
+// package.json version is the local/dev fallback.
+export const PORTFOLIO_VERSION =
+  import.meta.env.VITE_APP_VERSION || pkg.version;
 export const START_VERSION = pkg.dependencies["@tanstack/react-start"].replace(
   /^[\^~]/,
   "",
