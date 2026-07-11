@@ -17,12 +17,13 @@ if [[ -z "${CLOUDFLARE_API_TOKEN:-}" ]]; then
 fi
 
 echo "==> syncing quadlets, Caddyfile and scripts"
-tar -C "$(dirname "$0")" -cf - quadlets caddy bin | ssh "$HOST" '
+tar -C "$(dirname "$0")" -cf - quadlets caddy bin units | ssh "$HOST" '
   set -e
   rm -rf /tmp/portfolio-host && mkdir -p /tmp/portfolio-host
   tar -C /tmp/portfolio-host -xf -
   install -o portfolio -g portfolio -m 600 /tmp/portfolio-host/quadlets/* /home/portfolio/.config/containers/systemd/
-  install -d -o portfolio -g portfolio /home/portfolio/caddy/slots /home/portfolio/bin
+  install -d -o portfolio -g portfolio /home/portfolio/caddy/slots /home/portfolio/bin /home/portfolio/.config/systemd/user
+  install -o portfolio -g portfolio -m 644 /tmp/portfolio-host/units/* /home/portfolio/.config/systemd/user/
   install -o portfolio -g portfolio -m 644 /tmp/portfolio-host/caddy/Caddyfile /home/portfolio/caddy/Caddyfile
   install -o portfolio -g portfolio -m 755 /tmp/portfolio-host/bin/* /home/portfolio/bin/
   if [ ! -f /home/portfolio/caddy/slots/active.caddy ]; then
@@ -67,6 +68,7 @@ ssh "$HOST" '
   uid=$(id -u portfolio)
   run_as() { sudo -u portfolio env XDG_RUNTIME_DIR=/run/user/$uid DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$uid/bus "$@"; }
   run_as systemctl --user daemon-reload
+  run_as systemctl --user enable --now backup.timer restore-test.timer
   run_as systemctl --user restart caddy.service cloudflared.service
   sleep 3
   run_as systemctl --user --no-pager --plain list-units "caddy.service" "cloudflared.service"

@@ -1,0 +1,6 @@
+[Unit]
+Description=Backup restoration test into a disposable database
+
+[Service]
+Type=oneshot
+ExecStart=/home/portfolio/bin/restore-test.sh

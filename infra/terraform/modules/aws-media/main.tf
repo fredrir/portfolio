@@ -231,8 +231,20 @@ data "aws_iam_policy_document" "backup_writer" {
   statement {
     sid       = "WriteBackups"
     effect    = "Allow"
-    actions   = ["s3:PutObject"]
+    actions   = ["s3:PutObject", "s3:GetObject"]
     resources = ["${aws_s3_bucket.backups[0].arn}/postgres/*"]
+  }
+  # Restoration tests must find the newest dump.
+  statement {
+    sid       = "ListBackups"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.backups[0].arn]
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["postgres/*"]
+    }
   }
 }
 

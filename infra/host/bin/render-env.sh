@@ -53,6 +53,13 @@ write("worker.env", {
     "RUST_LOG": s.get("RUST_LOG", "info"),
 })
 
+write("backup.env", {
+    "AWS_REGION": s["AWS_REGION"],
+    "AWS_ACCESS_KEY_ID": s["BACKUP_AWS_ACCESS_KEY_ID"],
+    "AWS_SECRET_ACCESS_KEY": s["BACKUP_AWS_SECRET_ACCESS_KEY"],
+    "BACKUP_BUCKET": s["BACKUP_BUCKET"],
+})
+
 for slot in ("blue", "green"):
     write(f"web-{slot}.env", {
         "API_URL": f"http://api-{slot}:8080",
