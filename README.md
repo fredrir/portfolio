@@ -18,16 +18,20 @@ The full architecture and delivery plan live in [docs/ARCHITECTURE.md](docs/ARCH
 
 ## Development
 
-Requirements: [Bun](https://bun.sh), Rust (stable), Docker with compose.
+Requirements: [Bun](https://bun.sh), Rust (stable), Docker with compose, and the
+[Doppler CLI](https://docs.doppler.com/docs/cli) (`doppler login`). Configuration
+lives in the Doppler project `portfolio` (`dev`/`preview`/`prd`); `doppler.yaml`
+binds this repo to the `dev` config — there is no `.env` file
+(`.env.example` documents the variable names).
 
 ```bash
-cp .env.example .env           # adjust if needed
-docker compose up -d           # Postgres 17 (5432) + LocalStack S3/SQS (4566)
+doppler setup --no-interactive              # once per checkout
+docker compose up -d                        # Postgres 17 (5432) + LocalStack S3/SQS (4566)
 bun install
 
-bun run dev                    # web app on http://localhost:3000
-cargo run -p portfolio-api     # API on http://localhost:8080
-cargo run -p portfolio-worker  # media worker (SQS consumer)
+doppler run -- bun run dev                  # web app on http://localhost:3000
+doppler run -- cargo run -p portfolio-api   # API on http://localhost:8080
+doppler run -- cargo run -p portfolio-worker
 ```
 
 The media flow runs fully locally: `POST /api/v1/media/uploads` (bearer

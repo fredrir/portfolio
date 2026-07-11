@@ -521,13 +521,13 @@ Terraform never manages the shared server resource, DR rebuild exercises use a s
 server, and moving SSH behind Cloudflare Access is deferred until coordinated with
 leploy's access needs.
 
-### 3. Workers VPC availability must be verified (blocks final Phase 3 routing)
+### 3. Workers VPC availability — VERIFIED 2026-07-11
 
-Workers VPC private origins is a recent Cloudflare feature; confirm it is available on the
-account's plan before building routing around it (requires an authenticated wrangler or a
-Cloudflare API token). Until confirmed, the default ingress design is the fallback that
-preserves "no public origin ports": Tunnel public hostname restricted by a Cloudflare
-Access service token that only the Worker presents.
+`wrangler vpc service list` succeeds on the account (open beta), so Workers VPC private
+origins are available. The Terraform `cloudflare-ingress` module keeps the Access
+service-token fallback as the default (`enable_workers_vpc = false`) until the VPC
+routing is actually built and tested; the VPC service itself is created via wrangler/API
+while the feature is in beta.
 
 ### 4. Vercel exit
 
