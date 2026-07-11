@@ -29,10 +29,13 @@ doppler setup --no-interactive              # once per checkout
 docker compose up -d                        # Postgres 17 (5432) + LocalStack S3/SQS (4566)
 bun install
 
-doppler run -- bun run dev                  # web app on http://localhost:3000
+bun run dev                                 # web app on http://localhost:3000 (wraps `doppler run`)
 doppler run -- cargo run -p portfolio-api   # API on http://localhost:8080
 doppler run -- cargo run -p portfolio-worker
 ```
+
+The web `dev` script invokes `doppler run` internally, so it needs no prefix; the
+Rust binaries still take an explicit `doppler run --`.
 
 The media flow runs fully locally: `POST /api/v1/media/uploads` (bearer
 `ADMIN_TOKEN`) returns a presigned S3 PUT; the S3 event fans through SQS to the

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "doppler run -- vite dev",
     "build": "vite build",
     "start": "node .output/server/index.mjs",
     "lint": "eslint .",
