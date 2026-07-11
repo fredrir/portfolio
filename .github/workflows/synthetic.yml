@@ -30,7 +30,7 @@ jobs:
           curl -s -m 15 "$BASE_URL/api/v1/version"
           echo
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::391824190305:role/hansteen-portfolio-ci-reader
           aws-region: eu-north-1
