@@ -6,9 +6,11 @@ interface Props {
   paneId: string;
   rowIndex?: number;
   colIndex?: number;
+  nextRowIndex?: number;
+  nextColIndex?: number;
 }
 
-export function TilingPane({ paneId, rowIndex, colIndex }: Props) {
+export function TilingPane({ paneId, rowIndex, colIndex, nextRowIndex, nextColIndex }: Props) {
   const { states, focusedId, paneContent, drag, resize, onClose, onMaximize, onFocus } =
     useTilingContext();
 
@@ -30,7 +32,7 @@ export function TilingPane({ paneId, rowIndex, colIndex }: Props) {
       onTitleMouseDown={drag.startTitleDrag}
       onCornerResize={
         rowIndex !== undefined && colIndex !== undefined
-          ? (e) => resize.startCornerResize(rowIndex, colIndex, e)
+          ? (e) => resize.startCornerResize(rowIndex, colIndex, e, nextRowIndex, nextColIndex)
           : undefined
       }
     >

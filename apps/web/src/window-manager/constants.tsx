@@ -130,6 +130,14 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   },
 ];
 
+export const PANE_CONFIGS = WINDOW_CONFIGS.filter((config) => !config.isExternal);
+export const PANE_IDS = PANE_CONFIGS.map((config) => config.id);
+const PANE_ID_SET = new Set(PANE_IDS);
+
+export function isPaneId(id: string): boolean {
+  return PANE_ID_SET.has(id);
+}
+
 export const configMap = Object.fromEntries(WINDOW_CONFIGS.map((c) => [c.id, c]));
 
 export const BACKGROUND_PRESETS: BackgroundConfig[] = [

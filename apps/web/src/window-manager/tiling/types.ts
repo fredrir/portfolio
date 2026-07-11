@@ -10,6 +10,16 @@ export type PanePos = {
   sub: number | null;
 };
 
+export interface VisibleCell {
+  cell: CellDef;
+  sourceCol: number;
+}
+
+export interface VisibleRow {
+  cells: VisibleCell[];
+  sourceRow: number;
+}
+
 export interface TierConfig {
   layout: CellDef[][];
   rowHeights: number[];
@@ -36,9 +46,20 @@ export interface DragResult {
 }
 
 export interface ResizeResult {
-  startRowResize: (dividerIndex: number, e: React.MouseEvent) => void;
-  startColResize: (rowIndex: number, dividerIndex: number, e: React.MouseEvent) => void;
-  startCornerResize: (rowIndex: number, colIndex: number, e: React.MouseEvent) => void;
+  startRowResize: (topRowIndex: number, bottomRowIndex: number, e: React.MouseEvent) => void;
+  startColResize: (
+    rowIndex: number,
+    leftColIndex: number,
+    rightColIndex: number,
+    e: React.MouseEvent,
+  ) => void;
+  startCornerResize: (
+    rowIndex: number,
+    colIndex: number,
+    e: React.MouseEvent,
+    nextRowIndex?: number,
+    nextColIndex?: number,
+  ) => void;
 }
 
 export const STACK_HEIGHTS: Record<string, number[]> = {

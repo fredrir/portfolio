@@ -1,5 +1,5 @@
 import type { WindowStates } from "../types";
-import type { CellDef, LayoutTier, PanePos, TierConfig } from "./types";
+import type { CellDef, LayoutTier, PanePos, TierConfig, VisibleRow } from "./types";
 import { LAYOUT_TIERS } from "./types";
 
 export class LayoutEngine {
@@ -75,20 +75,36 @@ export class LayoutEngine {
     };
   }
 
-  static getVisibleLayout(layout: CellDef[][], states: WindowStates): CellDef[][] {
-    return layout
-      .map((row) => row.filter((cell) => this.getCellPanes(cell).some((id) => states[id]?.isOpen)))
-      .filter((row) => row.length > 0);
+  static ensurePanesInLayout(
+    layout: CellDef[][],
+    paneIds: string[],
+    rowHeights: number[],
+    colWidths: number[][],
+  ): { layout: CellDef[][]; rowHeights: number[]; colWidths: number[][] } {
+    let next = {
+      layout,
+      rowHeights,
+      colWidths,
+    };
+    const layoutPanes = new Set(layout.flat().flatMap((cell) => this.getCellPanes(cell)));
+
+    for (const id of paneIds) {
+      if (layoutPanes.has(id)) continue;
+      next = this.addPaneRow(next.layout, id, next.rowHeights, next.colWidths);
+      layoutPanes.add(id);
+    }
+
+    return next;
   }
 
-  static closePanesNotInLayout(states: WindowStates, layout: CellDef[][]): WindowStates {
-    const layoutPanes = new Set(layout.flat().flatMap((c) => this.getCellPanes(c)));
-    const next = { ...states };
-    for (const id of Object.keys(next)) {
-      if (!layoutPanes.has(id) && next[id].isOpen) {
-        next[id] = { ...next[id], isOpen: false };
-      }
-    }
-    return next;
+  static getVisibleLayout(layout: CellDef[][], states: WindowStates): VisibleRow[] {
+    return layout
+      .map((row, sourceRow) => ({
+        sourceRow,
+        cells: row
+          .map((cell, sourceCol) => ({ cell, sourceCol }))
+          .filter(({ cell }) => this.getCellPanes(cell).some((id) => states[id]?.isOpen)),
+      }))
+      .filter((row) => row.cells.length > 0);
   }
 }

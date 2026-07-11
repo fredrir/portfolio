@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { UiStrings } from "@/i18n/types";
 import { openExternalWindow, WINDOW_CONFIGS } from "../../constants";
-import type { WindowStates } from "../../types";
+import type { WindowConfig, WindowStates } from "../../types";
+import { PaneList } from "./pane-list";
 
 interface Props {
   states: WindowStates;
@@ -39,14 +40,13 @@ export function AppLauncher({ states, ui, locale, onOpen, onStop, onClose }: Pro
   }, [query]);
 
   const handleSelect = useCallback(
-    (id: string) => {
-      const config = WINDOW_CONFIGS.find((c) => c.id === id);
-      if (config?.isExternal && config.href) {
+    (config: WindowConfig) => {
+      if (config.isExternal && config.href) {
         openExternalWindow(config, locale);
         onClose();
         return;
       }
-      onOpen(id);
+      onOpen(config.id);
       onClose();
     },
     [onOpen, onClose, locale],
@@ -65,7 +65,7 @@ export function AppLauncher({ states, ui, locale, onOpen, onStop, onClose }: Pro
           break;
         case "Enter":
           e.preventDefault();
-          if (filtered[selectedIdx]) handleSelect(filtered[selectedIdx].id);
+          if (filtered[selectedIdx]) handleSelect(filtered[selectedIdx]);
           break;
         case "Escape":
           e.preventDefault();
@@ -80,6 +80,10 @@ export function AppLauncher({ states, ui, locale, onOpen, onStop, onClose }: Pro
     const el = listRef.current?.children[selectedIdx] as HTMLElement | undefined;
     el?.scrollIntoView({ block: "nearest" });
   }, [selectedIdx]);
+
+  useEffect(() => {
+    setSelectedIdx((idx) => Math.min(idx, Math.max(filtered.length - 1, 0)));
+  }, [filtered.length]);
 
   return (
     <div
@@ -106,67 +110,15 @@ export function AppLauncher({ states, ui, locale, onOpen, onStop, onClose }: Pro
         </div>
 
         <div ref={listRef} className="max-h-80 overflow-y-auto">
-          {filtered.length === 0 ? (
-            <div className="px-4 py-6 text-center text-sm text-subtle">{ui.noMatching}</div>
-          ) : (
-            filtered.map((config, i) => {
-              const isOpen = states[config.id]?.isOpen;
-              const isSelected = i === selectedIdx;
-              return (
-                <div
-                  key={config.id}
-                  onMouseEnter={() => setSelectedIdx(i)}
-                  className={`group flex w-full items-center justify-between px-4 py-2.5 transition-colors ${
-                    isSelected ? "bg-control-active" : "hover:bg-control-hover"
-                  }`}
-                >
-                  <button
-                    onClick={() => handleSelect(config.id)}
-                    className="flex flex-1 items-center gap-3 text-left"
-                  >
-                    <span className="w-5 text-center text-primary-soft text-sm">
-                      {config.icon || "·"}
-                    </span>
-                    <div>
-                      <span
-                        className={`text-sm transition-colors ${
-                          isSelected ? "text-primary" : "text-foreground"
-                        }`}
-                      >
-                        {config.title}
-                      </span>
-                      <span className="ml-2 text-2xs text-ghost">
-                        {ui.shortTitles[config.id] ?? config.id}
-                      </span>
-                    </div>
-                  </button>
-                  {config.isExternal ? (
-                    <span className="rounded bg-launcher-bg px-1.5 py-0.5 text-2xs text-primary">
-                      ↗
-                    </span>
-                  ) : (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (isOpen) {
-                          onStop(config.id);
-                        } else {
-                          handleSelect(config.id);
-                        }
-                      }}
-                      className={`rounded px-1.5 py-0.5 text-2xs transition-colors ${
-                        isOpen
-                          ? "bg-badge-stop text-red-400 hover:bg-badge-stop-hover"
-                          : "bg-launcher-bg text-primary hover:bg-launcher-hover"
-                      }`}
-                    >
-                      {isOpen ? ui.stop : ui.start}
-                    </button>
-                  )}
-                </div>
-              );
-            })
-          )}
+          <PaneList
+            configs={filtered}
+            states={states}
+            ui={ui}
+            selectedIdx={selectedIdx}
+            onSelect={handleSelect}
+            onStop={onStop}
+            onHover={setSelectedIdx}
+          />
         </div>
 
         <div className="flex items-center justify-between border-border-faint border-t px-4 py-2 text-2xs text-ghost">

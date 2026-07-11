@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { KEYS, readJson, writeJson } from "@/lib/storage";
-import { WINDOW_CONFIGS } from "../../constants";
+import { isPaneId, PANE_CONFIGS } from "../../constants";
 import type { WindowStates } from "../../types";
 import { LayoutEngine } from "../layout-engine";
 import type { CellDef } from "../types";
@@ -15,8 +15,6 @@ interface PersistedTiling {
   rowHeights: number[];
   colWidths: number[][];
 }
-
-const VALID_PANE_IDS = new Set(WINDOW_CONFIGS.map((c) => c.id));
 
 function defaultTiling(): PersistedTiling {
   const tier = LayoutEngine.getTier(typeof window !== "undefined" ? window.innerWidth : 1280);
@@ -54,7 +52,7 @@ function loadTiling(): PersistedTiling {
       return defaultTiling();
     }
     for (const cell of saved.layout[r]) {
-      if (LayoutEngine.getCellPanes(cell).some((id) => !VALID_PANE_IDS.has(id))) {
+      if (LayoutEngine.getCellPanes(cell).some((id) => !isPaneId(id))) {
         return defaultTiling();
       }
     }
@@ -67,7 +65,7 @@ function getInitialStates(allClosed: boolean): WindowStates {
 
   const savedPanes = allClosed ? null : readJson<string[]>(KEYS.openPanes);
 
-  WINDOW_CONFIGS.forEach((config) => {
+  PANE_CONFIGS.forEach((config) => {
     const isOpen = allClosed
       ? false
       : savedPanes
@@ -84,9 +82,22 @@ function getInitialStates(allClosed: boolean): WindowStates {
 
 export function useTiling(initialAllClosed = false) {
   const [states, setStates] = useState<WindowStates>(() => getInitialStates(initialAllClosed));
+  const statesRef = useRef(states);
+  statesRef.current = states;
   // Layout, row heights and column widths are restored together so their
   // shapes always match (they are meaningless independently).
-  const initialTiling = useMemo(() => loadTiling(), []);
+  const initialTiling = useMemo(() => {
+    const loaded = loadTiling();
+    const openPaneIds = Object.entries(states)
+      .filter(([, state]) => state.isOpen)
+      .map(([id]) => id);
+    return LayoutEngine.ensurePanesInLayout(
+      loaded.layout,
+      openPaneIds,
+      loaded.rowHeights,
+      loaded.colWidths,
+    );
+  }, []);
   const [layout, setLayout] = useState<CellDef[][]>(initialTiling.layout);
   const [rowHeights, setRowHeights] = useState<number[]>(initialTiling.rowHeights);
   const [colWidths, setColWidths] = useState<number[][]>(initialTiling.colWidths);
@@ -111,23 +122,36 @@ export function useTiling(initialAllClosed = false) {
     [layout, rowHeights, colWidths],
   );
 
-  const layoutTier = useLayoutTier(tilingState, setStates);
+  const getOpenPaneIds = useCallback(
+    () =>
+      Object.entries(statesRef.current)
+        .filter(([, state]) => state.isOpen)
+        .map(([id]) => id),
+    [],
+  );
+
+  const layoutTier = useLayoutTier(tilingState, getOpenPaneIds);
   const drag = useDrag(tilingState);
   const resize = useResize(tilingState);
 
   const openWindow = useCallback(
     (id: string) => {
-      setStates((prev) => ({
-        ...prev,
-        [id]: {
-          ...(prev[id] || { isOpen: false, isMaximized: false, zIndex: 0 }),
-          isOpen: true,
-        },
-      }));
+      if (!isPaneId(id)) return;
+
+      setStates((prev) => {
+        const state = prev[id];
+        if (!state) return prev;
+        return {
+          ...prev,
+          [id]: {
+            ...state,
+            isOpen: true,
+          },
+        };
+      });
       setLayout((prev) => {
-        const allPanes = prev.flat().flatMap((c) => LayoutEngine.getCellPanes(c));
-        if (allPanes.includes(id)) return prev;
-        const result = LayoutEngine.addPaneRow(prev, id, rowHeights, colWidths);
+        const result = LayoutEngine.ensurePanesInLayout(prev, [id], rowHeights, colWidths);
+        if (result.layout === prev) return prev;
         setRowHeights(result.rowHeights);
         setColWidths(result.colWidths);
         return result.layout;
@@ -136,41 +160,72 @@ export function useTiling(initialAllClosed = false) {
     [rowHeights, colWidths],
   );
 
-  const closeWindow = useCallback(
-    (id: string) => {
-      setStates((prev) => ({
-        ...prev,
-        [id]: { ...prev[id], isOpen: false },
-      }));
-      if (maximizedId === id) setMaximizedId(null);
-    },
-    [maximizedId],
-  );
+  const closeWindow = useCallback((id: string) => {
+    if (!isPaneId(id)) return;
 
-  const setOpenPanes = useCallback((ids: string[]) => {
-    const openSet = new Set(ids);
     setStates((prev) => {
-      const next = { ...prev };
-      for (const id of Object.keys(next)) {
-        const shouldBeOpen = openSet.has(id);
-        if (next[id].isOpen !== shouldBeOpen) {
-          next[id] = { ...next[id], isOpen: shouldBeOpen };
-        }
-      }
-      return next;
+      const state = prev[id];
+      if (!state || !state.isOpen) return prev;
+      return {
+        ...prev,
+        [id]: {
+          ...state,
+          isMaximized: false,
+          isOpen: false,
+        },
+      };
     });
+    setMaximizedId((prev) => (prev === id ? null : prev));
   }, []);
 
+  const setOpenPanes = useCallback(
+    (ids: string[]) => {
+      const paneIds = [...new Set(ids.filter(isPaneId))];
+      const openSet = new Set(paneIds);
+
+      setStates((prev) => {
+        const next = { ...prev };
+        for (const id of Object.keys(next)) {
+          const shouldBeOpen = openSet.has(id);
+          if (next[id].isOpen !== shouldBeOpen) {
+            next[id] = {
+              ...next[id],
+              isMaximized: shouldBeOpen && next[id].isMaximized,
+              isOpen: shouldBeOpen,
+            };
+          }
+        }
+        return next;
+      });
+      setMaximizedId((prev) => (prev && openSet.has(prev) ? prev : null));
+      setLayout((prev) => {
+        const result = LayoutEngine.ensurePanesInLayout(prev, paneIds, rowHeights, colWidths);
+        if (result.layout === prev) return prev;
+        setRowHeights(result.rowHeights);
+        setColWidths(result.colWidths);
+        return result.layout;
+      });
+    },
+    [rowHeights, colWidths],
+  );
+
   const toggleMaximize = useCallback((id: string) => {
+    if (!isPaneId(id) || !statesRef.current[id]?.isOpen) return;
     setMaximizedId((prev) => (prev === id ? null : id));
   }, []);
 
   const focusWindow = useCallback((id: string) => {
+    if (!isPaneId(id)) return;
+
     maxZRef.current++;
-    setStates((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], zIndex: maxZRef.current },
-    }));
+    setStates((prev) => {
+      const state = prev[id];
+      if (!state) return prev;
+      return {
+        ...prev,
+        [id]: { ...state, zIndex: maxZRef.current },
+      };
+    });
   }, []);
 
   useEffect(() => {

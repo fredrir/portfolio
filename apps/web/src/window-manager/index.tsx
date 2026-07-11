@@ -96,24 +96,28 @@ export function WindowManager({ currentLocale, dict, githubData, spotifyData }: 
         <Shell background={bg.current}>
           {!view.tutorialIsFullscreen && (
             <ContentArea>
-              <TilingProvider
-                value={{
-                  states: wm.states,
-                  focusedId: focus.focusedId,
-                  paneContent: view.paneContent,
-                  drag: wm.drag,
-                  resize: wm.resize,
-                  onClose: wm.closeWindow,
-                  onMaximize: wm.toggleMaximize,
-                  onFocus: focus.focus,
-                }}
-              >
-                <TilingGrid
-                  visibleLayout={wm.visibleLayout}
-                  rowHeights={wm.rowHeights}
-                  colWidths={wm.colWidths}
-                />
-              </TilingProvider>
+              {view.hasOpenPanes ? (
+                <TilingProvider
+                  value={{
+                    states: wm.states,
+                    focusedId: focus.focusedId,
+                    paneContent: view.paneContent,
+                    drag: wm.drag,
+                    resize: wm.resize,
+                    onClose: wm.closeWindow,
+                    onMaximize: wm.toggleMaximize,
+                    onFocus: focus.focus,
+                  }}
+                >
+                  <TilingGrid
+                    visibleLayout={wm.visibleLayout}
+                    rowHeights={wm.rowHeights}
+                    colWidths={wm.colWidths}
+                  />
+                </TilingProvider>
+              ) : (
+                view.desktopPaneLauncher
+              )}
             </ContentArea>
           )}
 

@@ -1,9 +1,29 @@
 import { useCallback } from "react";
 import type { ResizeResult, TilingState } from "../types";
 
+const MIN_SIZE = 10;
+
+function resizePair(values: number[], firstIndex: number, secondIndex: number, delta: number) {
+  if (
+    firstIndex === secondIndex ||
+    values[firstIndex] === undefined ||
+    values[secondIndex] === undefined
+  ) {
+    return values;
+  }
+
+  const next = [...values];
+  const total = values[firstIndex] + values[secondIndex];
+  const min = Math.min(MIN_SIZE, total / 2);
+  const first = Math.min(Math.max(values[firstIndex] + delta, min), total - min);
+  next[firstIndex] = first;
+  next[secondIndex] = total - first;
+  return next;
+}
+
 export function useResize(tiling: TilingState): ResizeResult {
   const startRowResize = useCallback(
-    (dividerIndex: number, e: React.MouseEvent) => {
+    (topRowIndex: number, bottomRowIndex: number, e: React.MouseEvent) => {
       e.preventDefault();
       const startY = e.clientY;
       const startHeights = [...tiling.rowHeights];
@@ -12,10 +32,7 @@ export function useResize(tiling: TilingState): ResizeResult {
       const onMouseMove = (ev: MouseEvent) => {
         const dy = ev.clientY - startY;
         const dyPercent = (dy / totalHeight) * 100;
-        const newH = [...startHeights];
-        newH[dividerIndex] = Math.max(10, startHeights[dividerIndex] + dyPercent);
-        newH[dividerIndex + 1] = Math.max(10, startHeights[dividerIndex + 1] - dyPercent);
-        tiling.setRowHeights(newH);
+        tiling.setRowHeights(resizePair(startHeights, topRowIndex, bottomRowIndex, dyPercent));
       };
 
       const onMouseUp = () => {
@@ -31,7 +48,7 @@ export function useResize(tiling: TilingState): ResizeResult {
   );
 
   const startColResize = useCallback(
-    (rowIndex: number, dividerIndex: number, e: React.MouseEvent) => {
+    (rowIndex: number, leftColIndex: number, rightColIndex: number, e: React.MouseEvent) => {
       e.preventDefault();
       const startX = e.clientX;
       const startWidths = tiling.colWidths.map((r) => [...r]);
@@ -42,14 +59,7 @@ export function useResize(tiling: TilingState): ResizeResult {
         const dxPercent = (dx / totalWidth) * 100;
         const newW = startWidths.map((r) => [...r]);
         if (!newW[rowIndex]) return;
-        newW[rowIndex][dividerIndex] = Math.max(
-          10,
-          startWidths[rowIndex][dividerIndex] + dxPercent,
-        );
-        newW[rowIndex][dividerIndex + 1] = Math.max(
-          10,
-          startWidths[rowIndex][dividerIndex + 1] - dxPercent,
-        );
+        newW[rowIndex] = resizePair(startWidths[rowIndex], leftColIndex, rightColIndex, dxPercent);
         tiling.setColWidths(newW);
       };
 
@@ -66,7 +76,13 @@ export function useResize(tiling: TilingState): ResizeResult {
   );
 
   const startCornerResize = useCallback(
-    (rowIndex: number, colIndex: number, e: React.MouseEvent) => {
+    (
+      rowIndex: number,
+      colIndex: number,
+      e: React.MouseEvent,
+      nextRowIndex?: number,
+      nextColIndex?: number,
+    ) => {
       e.preventDefault();
       const startX = e.clientX;
       const startY = e.clientY;
@@ -78,22 +94,17 @@ export function useResize(tiling: TilingState): ResizeResult {
       const onMouseMove = (ev: MouseEvent) => {
         const dy = ev.clientY - startY;
         const dyPercent = (dy / totalHeight) * 100;
-        const newH = [...startHeights];
-        if (rowIndex < startHeights.length - 1) {
-          newH[rowIndex] = Math.max(10, startHeights[rowIndex] + dyPercent);
-          newH[rowIndex + 1] = Math.max(10, startHeights[rowIndex + 1] - dyPercent);
-          tiling.setRowHeights(newH);
+        if (nextRowIndex !== undefined) {
+          tiling.setRowHeights(resizePair(startHeights, rowIndex, nextRowIndex, dyPercent));
         }
 
         const dx = ev.clientX - startX;
         const dxPercent = (dx / totalWidth) * 100;
-        const newW = startWidths.map((r) => [...r]);
-        if (newW[rowIndex] && colIndex < newW[rowIndex].length - 1) {
-          newW[rowIndex][colIndex] = Math.max(10, startWidths[rowIndex][colIndex] + dxPercent);
-          newW[rowIndex][colIndex + 1] = Math.max(
-            10,
-            startWidths[rowIndex][colIndex + 1] - dxPercent,
-          );
+        if (nextColIndex !== undefined) {
+          const newW = startWidths.map((r) => [...r]);
+          if (newW[rowIndex]) {
+            newW[rowIndex] = resizePair(startWidths[rowIndex], colIndex, nextColIndex, dxPercent);
+          }
           tiling.setColWidths(newW);
         }
       };

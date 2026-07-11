@@ -12,8 +12,9 @@ import { PaneHost } from "@/shared/components/pane-host";
 import type { GitHubData, SpotifyData } from "@/shared/types";
 import type { useTutorial } from "@/tutorial/use-tutorial";
 import type { useBackground } from "./background/hooks/use-background";
-import { configMap, WINDOW_CONFIGS } from "./constants";
+import { configMap, PANE_IDS } from "./constants";
 import { AppLauncher } from "./launcher/components/app-launcher";
+import { DesktopPaneLauncher } from "./launcher/components/desktop-pane-launcher";
 import { DragGhost } from "./overlays/components/drag-ghost";
 import { FloatingDetail } from "./overlays/components/floating-detail";
 import type { useFloatingDetail } from "./overlays/hooks/use-floating-detail";
@@ -109,6 +110,7 @@ export function useWindowManagerView(ctx: ViewContext) {
   })();
 
   const maximizedConfig: WindowConfig = configMap[wm.maximizedId!];
+  const hasOpenPanes = Object.values(wm.states).some((state) => state.isOpen);
 
   const paneContent = useMemo<Record<string, ReactNode>>(
     () => ({
@@ -159,7 +161,7 @@ export function useWindowManagerView(ctx: ViewContext) {
         <SuspendedPane>
           <TerminalPaneLazy
             locale={locale}
-            paneIds={WINDOW_CONFIGS.map((c) => c.id)}
+            paneIds={PANE_IDS}
             projects={project.projects.map((p) => ({ title: p.title }))}
             careers={journey.journeys.map((j) => ({
               jobTitle: j.jobTitle,
@@ -253,6 +255,10 @@ export function useWindowManagerView(ctx: ViewContext) {
     />
   ) : null;
 
+  const desktopPaneLauncher = (
+    <DesktopPaneLauncher states={wm.states} ui={ui} onOpen={focus.openPane} />
+  );
+
   const { dragTarget, dragPos, dragSize } = wm.drag;
   const dragGhost =
     dragTarget && dragPos && dragSize && configMap[dragTarget] ? (
@@ -265,12 +271,14 @@ export function useWindowManagerView(ctx: ViewContext) {
     paneContent,
     layoutMode,
     maximizedConfig,
+    hasOpenPanes,
     tutorialIsFloating,
     tutorialIsFullscreen,
     statusBar,
     tutorialOverlay,
     floatingDetail,
     appLauncher,
+    desktopPaneLauncher,
     dragGhost,
   };
 }

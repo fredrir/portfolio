@@ -1,7 +1,7 @@
 "use client";
 
 import type { TutorialStrings, UiStrings } from "@/i18n/types";
-import { WINDOW_CONFIGS } from "@/window-manager/constants";
+import { PANE_CONFIGS } from "@/window-manager/constants";
 import { StepLayout } from "./step-layout";
 
 interface Props {
@@ -11,13 +11,11 @@ interface Props {
   onTogglePane: (id: string) => void;
 }
 
-const selectableConfigs = WINDOW_CONFIGS.filter((c) => !c.isExternal);
-
 export function StepPaneSelection({ t, ui, selectedPanes, onTogglePane }: Props) {
   return (
     <StepLayout command="hyprctl dispatch" title={t.paneSelectionTitle} body={t.paneSelectionBody}>
       <div className="grid grid-cols-3 gap-3">
-        {selectableConfigs.map((config) => {
+        {PANE_CONFIGS.map((config) => {
           const isSelected = selectedPanes.includes(config.id);
           return (
             <button
