@@ -41,6 +41,26 @@ printf 'TUNNEL_TOKEN=%s\n' "$TOKEN" | ssh "$HOST" '
   chown portfolio:portfolio /home/portfolio/.config/portfolio/cloudflared.env
 '
 
+echo "==> ensuring cosign and the CI deploy key"
+scp -q "$(dirname "$0")/deploy_key.pub" "$HOST:/tmp/portfolio-deploy-key.pub"
+ssh "$HOST" '
+  set -e
+  if ! command -v cosign >/dev/null; then
+    curl -sfL -o /usr/local/bin/cosign \
+      https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
+    chmod 755 /usr/local/bin/cosign
+  fi
+  install -d -o portfolio -g portfolio -m 700 /home/portfolio/.ssh
+  {
+    printf "command=\"/home/portfolio/bin/deploy-entry.sh\",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty "
+    cat /tmp/portfolio-deploy-key.pub
+  } > /home/portfolio/.ssh/authorized_keys
+  chown portfolio:portfolio /home/portfolio/.ssh/authorized_keys
+  chmod 600 /home/portfolio/.ssh/authorized_keys
+  rm -f /tmp/portfolio-deploy-key.pub
+  cosign version 2>/dev/null | head -1
+'
+
 echo "==> reloading user services"
 ssh "$HOST" '
   set -e
