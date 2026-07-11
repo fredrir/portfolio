@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { verifyCaptcha } from "@/lib/captcha";
-import { api } from "@/server/api";
+import { api, traceHeaders } from "@/server/api";
 
 const contactSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -55,6 +55,7 @@ export const sendContactForm = createServerFn({ method: "POST" })
     // so an API failure must not fail the submission.
     try {
       await api.POST("/api/v1/contact", {
+        headers: traceHeaders(),
         body: { name, email, phone: phone || null, message },
       });
     } catch (error) {

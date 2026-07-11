@@ -13,12 +13,14 @@ if [ "$ACTIVE" = "blue" ]; then TARGET=green; else TARGET=blue; fi
 
 cat > "$SLOTS/active.caddy" <<CADDY
 handle /api/* {
+	header +x-origin-slot $TARGET
 	reverse_proxy api-$TARGET:8080
 }
 handle /readyz {
 	reverse_proxy api-$TARGET:8080
 }
 handle {
+	header +x-origin-slot $TARGET
 	reverse_proxy web-$TARGET:3000
 }
 CADDY
