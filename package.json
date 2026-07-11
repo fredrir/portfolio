@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "prepare": "git config core.hooksPath .githooks",
+    "prepare": "if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then git config core.hooksPath .githooks; fi",
     "dev": "bun scripts/dev.ts",
     "dev:web": "bun run --filter @portfolio/web dev",
     "dev:api": "doppler run --preserve-env=DATABASE_URL,API_ADDR,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION,AWS_ENDPOINT_URL,MEDIA_BUCKET,ADMIN_TOKEN,RECAPTCHA_SECRET_KEY -- cargo run -p portfolio-api",
