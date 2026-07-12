@@ -75,6 +75,22 @@ function runSetup() {
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
   }
+
+  // Ready hooks only run when LocalStack starts. Re-run the idempotent setup
+  // so changes such as the browser-upload CORS policy also reach an existing
+  // container on the next `bun run dev`.
+  const provision = spawnSync(
+    "docker",
+    ["compose", "exec", "-T", "localstack", "bash", "/etc/localstack/init/ready.d/init-aws.sh"],
+    {
+      cwd: root,
+      stdio: "inherit",
+    },
+  );
+
+  if (provision.status !== 0) {
+    process.exit(provision.status ?? 1);
+  }
 }
 
 async function apiIsHealthy() {
