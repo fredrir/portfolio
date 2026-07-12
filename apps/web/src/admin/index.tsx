@@ -1,10 +1,8 @@
 "use client";
 
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
-import { useFileIngest } from "@/admin/hooks/use-file-ingest";
 import { useMediaLibrary } from "@/admin/hooks/use-media-library";
 import { type UploadJob, useUploads } from "@/admin/hooks/use-uploads";
-import { IngestStrip } from "@/admin/ingest";
 import { PhotoGrid } from "@/admin/library";
 import { Lightbox } from "@/admin/lightbox";
 import {
@@ -15,6 +13,7 @@ import {
   UNCATEGORIZED,
 } from "@/admin/model";
 import { DeskHeader } from "@/admin/toolbar";
+import { DropPhotos } from "./drop-photos";
 
 interface AdminConsoleProps {
   initialLibrary?: AdminMediaLibrary;
@@ -95,7 +94,6 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
     },
     [upload, uploadCategory],
   );
-  const dragging = useFileIngest(handleFiles);
 
   const selectCategory = useCallback((category: string | null) => {
     setCategoryFilter(category);
@@ -163,23 +161,6 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
 
   return (
     <div className="admin-desk h-dvh overflow-y-auto text-sm antialiased">
-      {dragging && (
-        <div
-          aria-hidden
-          className="pointer-events-none fixed inset-0 z-40 bg-background/80 backdrop-blur-[2px]"
-        >
-          <div className="absolute inset-3 flex items-center justify-center rounded-lg border-2 border-primary border-dashed">
-            <p className="font-mono text-primary text-sm">
-              release to develop
-              <span className="text-muted-foreground">
-                {" "}
-                → {uploadCategory.trim() || UNCATEGORIZED}
-              </span>
-            </p>
-          </div>
-        </div>
-      )}
-
       <DeskHeader
         apiDown={apiDown}
         refreshing={refreshing}
@@ -198,7 +179,7 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
       />
 
       <main className="mx-auto max-w-7xl px-3 pb-16 sm:px-5">
-        <IngestStrip
+        <DropPhotos
           jobs={jobs}
           category={uploadCategory}
           categoryNames={categoryNames}

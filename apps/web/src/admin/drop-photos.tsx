@@ -31,7 +31,7 @@ function aggregateProgress(jobs: UploadJob[]): number {
  * tiles in the grid below, so this strip only invites, shows the aggregate
  * loader, and holds the destination category.
  */
-export function IngestStrip({
+export function DropPhotos({
   jobs,
   category,
   categoryNames,
@@ -64,7 +64,7 @@ export function IngestStrip({
           type="button"
           aria-label="Upload multiple photos: drop files anywhere, paste, or press Enter to browse"
           onClick={() => fileInputRef.current?.click()}
-          className="group flex min-h-14 min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left outline-none transition-colors hover:bg-surface-dim focus-visible:bg-surface-dim focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset sm:px-4"
+          className="group flex min-h-18 min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left outline-none transition-colors hover:bg-surface-dim focus-visible:bg-surface-dim focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset sm:px-4"
         >
           <span
             className={cn(
@@ -92,10 +92,7 @@ export function IngestStrip({
             </span>
           ) : (
             <span className="min-w-0">
-              <span className="block truncate text-foreground text-xs">Drop photos or browse</span>
-              <span className="block truncate text-2xs text-muted-foreground">
-                JPEG, PNG or WebP · paste also works
-              </span>
+              <span className="block truncate text-foreground text-xs">Drop photos</span>
             </span>
           )}
         </button>
