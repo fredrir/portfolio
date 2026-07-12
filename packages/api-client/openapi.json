@@ -330,6 +330,219 @@
         }
       }
     },
+    "/api/v1/media/admin": {
+      "get": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Search and summarize the complete media library (administration).",
+        "operationId": "admin_media",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "description": "Case-insensitive substring search across filename and category.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Restrict to one normalized processing-state bucket.",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ready",
+                    "processing",
+                    "failed"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Restrict to one category; `uncategorized` selects null categories.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMediaLibrary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Administration API disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/categories/rename": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Rename a category across all media; renaming onto an existing category\nmerges them (administration).",
+        "operationId": "rename_category",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RenameCategoryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No media in the source category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Administration API disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/status": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Return processing states for active uploads (administration).",
+        "operationId": "media_status",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MediaStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MediaStatus"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Administration API disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/media/uploads": {
       "post": {
         "tags": [
@@ -360,6 +573,141 @@
           },
           "401": {
             "description": "Missing or invalid bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Administration API disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/{id}": {
+      "delete": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Delete a media item, its variants and stored objects (administration).",
+        "operationId": "delete_media",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such media item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Administration API disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Re-categorize a media item (administration).",
+        "operationId": "update_media",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMediaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateMediaResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such media item",
             "content": {
               "application/json": {
                 "schema": {
@@ -485,6 +833,58 @@
         }
       }
     },
+    "/api/v1/weather": {
+      "get": {
+        "tags": [
+          "weather"
+        ],
+        "summary": "Current weather for Trondheim, cached in Postgres for 15 minutes.",
+        "operationId": "weather",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherData"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream unavailable and no recent cache",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/weather/metrics": {
+      "get": {
+        "tags": [
+          "weather"
+        ],
+        "summary": "Process-local weather cache counters for operational diagnostics.",
+        "operationId": "weather_metrics",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherMetricsSnapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/healthz": {
       "get": {
         "tags": [
@@ -526,6 +926,91 @@
   },
   "components": {
     "schemas": {
+      "AdminMediaCategory": {
+        "type": "object",
+        "required": [
+          "name",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminMediaLibrary": {
+        "type": "object",
+        "required": [
+          "items",
+          "summary"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItem"
+            }
+          },
+          "summary": {
+            "$ref": "#/components/schemas/AdminMediaSummary",
+            "description": "Facets for the complete library, independent of the active filters."
+          }
+        }
+      },
+      "AdminMediaStateCounts": {
+        "type": "object",
+        "required": [
+          "ready",
+          "processing",
+          "failed"
+        ],
+        "properties": {
+          "failed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "processing": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ready": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AdminMediaSummary": {
+        "type": "object",
+        "required": [
+          "total",
+          "stored_bytes",
+          "state_counts",
+          "categories"
+        ],
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminMediaCategory"
+            }
+          },
+          "state_counts": {
+            "$ref": "#/components/schemas/AdminMediaStateCounts"
+          },
+          "stored_bytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "AnalyticsResponse": {
         "type": "object",
         "required": [
@@ -1078,6 +1563,7 @@
           "filename",
           "content_type",
           "state",
+          "created_at",
           "variants"
         ],
         "properties": {
@@ -1096,6 +1582,10 @@
           "content_type": {
             "type": "string"
           },
+          "created_at": {
+            "type": "string",
+            "description": "UTC upload time, RFC 3339."
+          },
           "filename": {
             "type": "string"
           },
@@ -1109,6 +1599,14 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "size_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Original upload size in bytes."
           },
           "state": {
             "type": "string"
@@ -1125,6 +1623,37 @@
               "null"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "MediaStatus": {
+        "type": "object",
+        "required": [
+          "id",
+          "state"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "MediaStatusRequest": {
+        "type": "object",
+        "required": [
+          "ids"
+        ],
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       },
@@ -1257,6 +1786,42 @@
               "null"
             ],
             "description": "Referrer reported by the browser."
+          }
+        }
+      },
+      "RenameCategoryRequest": {
+        "type": "object",
+        "required": [
+          "from",
+          "to"
+        ],
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          }
+        }
+      },
+      "RenameCategoryResponse": {
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "updated"
+        ],
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Number of media items moved."
           }
         }
       },
@@ -1441,6 +2006,36 @@
           }
         }
       },
+      "UpdateMediaRequest": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "New gallery category; null or absent clears it (uncategorized)."
+          }
+        }
+      },
+      "UpdateMediaResponse": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "VersionInfo": {
         "type": "object",
         "required": [
@@ -1467,6 +2062,85 @@
           "count": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "WeatherData": {
+        "type": "object",
+        "required": [
+          "location",
+          "temperatureC",
+          "weatherCode",
+          "observedAt",
+          "stale"
+        ],
+        "properties": {
+          "location": {
+            "type": "string"
+          },
+          "observedAt": {
+            "type": "string"
+          },
+          "stale": {
+            "type": "boolean"
+          },
+          "temperatureC": {
+            "type": "number",
+            "format": "double"
+          },
+          "weatherCode": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "WeatherMetricsSnapshot": {
+        "type": "object",
+        "required": [
+          "cacheHits",
+          "cacheMisses",
+          "staleServed",
+          "refreshSuccesses",
+          "refreshFailures",
+          "backgroundRefreshes",
+          "coalescedRequests"
+        ],
+        "properties": {
+          "backgroundRefreshes": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "cacheHits": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "cacheMisses": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "coalescedRequests": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "refreshFailures": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "refreshSuccesses": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "staleServed": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           }
         }
       }

@@ -10,7 +10,6 @@ export type localeParams = Promise<{ locale: string }>;
 export type Landing = DictType["landing"];
 export type Journey = DictType["journey"];
 export type NavbarType = DictType["navbar"];
-export type AdminStrings = DictType["admin"];
 export type CookieConsentStrings = DictType["cookieConsent"];
 export type ContactStrings = DictType["contact"];
 

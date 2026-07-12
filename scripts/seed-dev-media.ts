@@ -220,8 +220,45 @@ async function seedSpecs(): Promise<SeedSpec[]> {
   return [...projectFiles, ...sampled];
 }
 
+function readySeedCount(keys: string[]): number | undefined {
+  const keyList = keys.map(sql).join(", ");
+  const result = spawnSync(
+    "docker",
+    [
+      "compose",
+      "exec",
+      "-T",
+      "db",
+      "psql",
+      "-U",
+      "portfolio",
+      "-d",
+      "portfolio",
+      "-At",
+      "-c",
+      `select count(*) from media where original_key in (${keyList}) and state = 'ready'`,
+    ],
+    { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] },
+  );
+  if (result.status !== 0) return undefined;
+  const count = Number.parseInt(result.stdout.trim(), 10);
+  return Number.isFinite(count) ? count : undefined;
+}
+
 async function main() {
   const specs = await seedSpecs();
+  if (process.env.DEV_SEED_IF_PRESENT === "skip") {
+    const seedKeys = specs.map((spec) => {
+      const filename = sanitizeName(spec.filename || basename(spec.source));
+      return `originals/dev/${spec.category}/${filename}`;
+    });
+    const existing = readySeedCount(seedKeys);
+    if (existing !== undefined && existing >= specs.length) {
+      console.log(`[dev-seed] ${existing} ready fixtures already present; skipping`);
+      return;
+    }
+  }
+
   const statements: string[] = ["begin;"];
 
   let seeded = 0;

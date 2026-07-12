@@ -3,7 +3,7 @@
 import type { components } from "@portfolio/api-client";
 
 import type { UiStrings } from "@/i18n/types";
-import { Instrument, Meter, PaneShell, Readout, Sparkbars, StatusDot } from "@/panes/platform-ui";
+import { Instrument, Meter, PaneShell, Readout, Sparkbars } from "@/panes/platform-ui";
 import { useApiData } from "@/shared/hooks/use-api-data";
 
 type AnalyticsResponse = components["schemas"]["AnalyticsResponse"];
@@ -111,15 +111,7 @@ export function AnalyticsPane({ ui }: { ui: UiStrings }) {
       )}
 
       {posthog && (
-        <Instrument
-          label={t.productAnalytics}
-          right={
-            <span className="flex items-center gap-1 text-muted-foreground">
-              <StatusDot tone="info" />
-              {t.consented}
-            </span>
-          }
-        >
+        <Instrument label={t.productAnalytics}>
           <div className="mb-2">
             <Readout
               value={posthog.daily_pageviews.reduce((n, d) => n + d.count, 0)}

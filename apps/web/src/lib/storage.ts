@@ -8,7 +8,7 @@ export const KEYS = {
   backgroundImage: "wm-background-image",
   tutorialCompleted: "tutorial-completed",
   tutorialState: "tutorial-state",
-  analyticsConsent: "vercel-analytics-consent",
+  analyticsConsent: "analytics-consent",
   tipDismissed: "wm-tip-dismissed",
   visited: "wm-visited",
   weather: "wm-weather",

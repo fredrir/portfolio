@@ -181,6 +181,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/admin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search and summarize the complete media library (administration). */
+        get: operations["admin_media"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/categories/rename": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rename a category across all media; renaming onto an existing category
+         *     merges them (administration).
+         */
+        post: operations["rename_category"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Return processing states for active uploads (administration). */
+        post: operations["media_status"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/uploads": {
         parameters: {
             query?: never;
@@ -196,6 +250,24 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a media item, its variants and stored objects (administration). */
+        delete: operations["delete_media"];
+        options?: never;
+        head?: never;
+        /** Re-categorize a media item (administration). */
+        patch: operations["update_media"];
         trace?: never;
     };
     "/api/v1/spotify": {
@@ -271,6 +343,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/weather": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Current weather for Trondheim, cached in Postgres for 15 minutes. */
+        get: operations["weather"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/weather/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Process-local weather cache counters for operational diagnostics. */
+        get: operations["weather_metrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/healthz": {
         parameters: {
             query?: never;
@@ -309,6 +415,32 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AdminMediaCategory: {
+            /** Format: int64 */
+            count: number;
+            name: string;
+        };
+        AdminMediaLibrary: {
+            items: components["schemas"]["MediaItem"][];
+            /** @description Facets for the complete library, independent of the active filters. */
+            summary: components["schemas"]["AdminMediaSummary"];
+        };
+        AdminMediaStateCounts: {
+            /** Format: int64 */
+            failed: number;
+            /** Format: int64 */
+            processing: number;
+            /** Format: int64 */
+            ready: number;
+        };
+        AdminMediaSummary: {
+            categories: components["schemas"]["AdminMediaCategory"][];
+            state_counts: components["schemas"]["AdminMediaStateCounts"];
+            /** Format: int64 */
+            stored_bytes: number;
+            /** Format: int64 */
+            total: number;
+        };
         AnalyticsResponse: {
             browsers: components["schemas"]["KeyCount"][];
             countries: components["schemas"]["KeyCount"][];
@@ -471,15 +603,30 @@ export interface components {
             category?: string | null;
             content_hash?: string | null;
             content_type: string;
+            /** @description UTC upload time, RFC 3339. */
+            created_at: string;
             filename: string;
             /** Format: int32 */
             height?: number | null;
             /** Format: uuid */
             id: string;
+            /**
+             * Format: int64
+             * @description Original upload size in bytes.
+             */
+            size_bytes?: number | null;
             state: string;
             variants: components["schemas"]["MediaVariant"][];
             /** Format: int32 */
             width?: number | null;
+        };
+        MediaStatus: {
+            /** Format: uuid */
+            id: string;
+            state: string;
+        };
+        MediaStatusRequest: {
+            ids: string[];
         };
         MediaVariant: {
             format: string;
@@ -518,6 +665,19 @@ export interface components {
             /** @description Referrer reported by the browser. */
             referrer?: string | null;
         };
+        RenameCategoryRequest: {
+            from: string;
+            to: string;
+        };
+        RenameCategoryResponse: {
+            from: string;
+            to: string;
+            /**
+             * Format: int64
+             * @description Number of media items moved.
+             */
+            updated: number;
+        };
         SpotifyArtist: {
             genres?: string[] | null;
             imageUrl?: string | null;
@@ -553,6 +713,15 @@ export interface components {
             title: string;
             trackId?: string | null;
         };
+        UpdateMediaRequest: {
+            /** @description New gallery category; null or absent clears it (uncategorized). */
+            category?: string | null;
+        };
+        UpdateMediaResponse: {
+            category?: string | null;
+            /** Format: uuid */
+            id: string;
+        };
         VersionInfo: {
             /** @description Git commit the binary was built from. */
             commit: string;
@@ -562,6 +731,31 @@ export interface components {
         VisitCount: {
             /** Format: int64 */
             count: number;
+        };
+        WeatherData: {
+            location: string;
+            observedAt: string;
+            stale: boolean;
+            /** Format: double */
+            temperatureC: number;
+            /** Format: int32 */
+            weatherCode: number;
+        };
+        WeatherMetricsSnapshot: {
+            /** Format: int64 */
+            backgroundRefreshes: number;
+            /** Format: int64 */
+            cacheHits: number;
+            /** Format: int64 */
+            cacheMisses: number;
+            /** Format: int64 */
+            coalescedRequests: number;
+            /** Format: int64 */
+            refreshFailures: number;
+            /** Format: int64 */
+            refreshSuccesses: number;
+            /** Format: int64 */
+            staleServed: number;
         };
     };
     responses: never;
@@ -823,6 +1017,150 @@ export interface operations {
             };
         };
     };
+    admin_media: {
+        parameters: {
+            query?: {
+                /** @description Case-insensitive substring search across filename and category. */
+                query?: string | null;
+                /** @description Restrict to one normalized processing-state bucket. */
+                state?: null | ("ready" | "processing" | "failed");
+                /** @description Restrict to one category; `uncategorized` selects null categories. */
+                category?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminMediaLibrary"];
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Administration API disabled */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    rename_category: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenameCategoryRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RenameCategoryResponse"];
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description No media in the source category */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Administration API disabled */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    media_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MediaStatusRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaStatus"][];
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Administration API disabled */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     create_upload: {
         parameters: {
             query?: never;
@@ -846,6 +1184,114 @@ export interface operations {
             };
             /** @description Missing or invalid bearer token */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Administration API disabled */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_media: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description No such media item */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Administration API disabled */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    update_media: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMediaRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateMediaResponse"];
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description No such media item */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -949,6 +1395,53 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["VisitCount"];
+                };
+            };
+        };
+    };
+    weather: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeatherData"];
+                };
+            };
+            /** @description Upstream unavailable and no recent cache */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    weather_metrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeatherMetricsSnapshot"];
                 };
             };
         };

@@ -1,4 +1,4 @@
-use portfolio_api::{AppState, Caches, MediaConfig, Upstreams, app};
+use portfolio_api::{AppState, Caches, MediaConfig, Upstreams, app, routes};
 use sqlx::postgres::PgPoolOptions;
 
 #[tokio::main]
@@ -55,21 +55,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     tracing::info!(%addr, "listening");
 
-    axum::serve(
-        listener,
-        app(AppState {
-            pool,
-            s3,
-            media,
-            http,
-            upstreams: std::sync::Arc::new(upstreams),
-            caches: Caches::default(),
-        }),
-    )
-    .with_graceful_shutdown(async {
-        tokio::signal::ctrl_c().await.ok();
-    })
-    .await?;
+    let state = AppState {
+        pool,
+        s3,
+        media,
+        http,
+        upstreams: std::sync::Arc::new(upstreams),
+        caches: Caches::default(),
+    };
+    let weather_refresh = tokio::spawn(routes::weather::refresh_loop(state.clone()));
+
+    let serve_result = axum::serve(listener, app(state))
+        .with_graceful_shutdown(async {
+            tokio::signal::ctrl_c().await.ok();
+        })
+        .await;
+    weather_refresh.abort();
+    let _ = weather_refresh.await;
+    serve_result?;
 
     Ok(())
 }

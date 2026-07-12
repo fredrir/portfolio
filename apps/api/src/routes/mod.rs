@@ -9,3 +9,4 @@ pub mod media;
 pub mod spotify;
 pub mod version;
 pub mod visits;
+pub mod weather;

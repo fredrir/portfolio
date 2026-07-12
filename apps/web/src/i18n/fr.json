@@ -23,113 +23,6 @@
     "cookieLine": "en attente...",
     "cookieLabel": "Cookies"
   },
-  "admin": {
-    "pageTitle": "Administration - hansteen.dev",
-    "apiUnreachable": "api indisponible",
-    "subtitle": "pipeline média · protégé par Access",
-    "stats": {
-      "items": "éléments",
-      "live": "live",
-      "stored": "stocké"
-    },
-    "uploadErrors": {
-      "invalidType": "pas un jpeg, png ou webp",
-      "tooLarge": "plus de 25 MiB",
-      "uploadFailed": "échec du téléversement",
-      "authorizationFailed": "échec de l'autorisation",
-      "processingFailed": "échec du traitement",
-      "networkDuringS3": "erreur réseau pendant le S3 PUT"
-    },
-    "pipeline": {
-      "stations": [
-        {
-          "label": "autoriser",
-          "sub": "grant + audit"
-        },
-        {
-          "label": "s3 put",
-          "sub": "présigné"
-        },
-        {
-          "label": "worker",
-          "sub": "avif · webp"
-        },
-        {
-          "label": "live",
-          "sub": "galerie"
-        }
-      ],
-      "ingest": "ingestion",
-      "clearFinished": "effacer terminés",
-      "uploadAria": "Téléverser des images : déposer des fichiers n'importe où ou appuyer sur Entrée pour parcourir",
-      "release": "relâcher pour alimenter le pipeline",
-      "drop": "déposez des images n'importe où, ou cliquez pour parcourir",
-      "constraints": "jpeg / png / webp · <= 25 MiB",
-      "category": "catégorie",
-      "uncategorized": "non classé",
-      "failed": "échec",
-      "failedAt": "{detail} · à {station}",
-      "putProgress": "put {percent}%",
-      "stageLabels": {
-        "authorizing": "autorisation",
-        "uploading": "téléversement",
-        "processing": "traitement",
-        "ready": "live",
-        "failed": "échec"
-      }
-    },
-    "library": {
-      "label": "bibliothèque",
-      "of": "sur",
-      "refreshAria": "Actualiser la bibliothèque",
-      "openAria": "Ouvrir {filename}",
-      "filters": {
-        "all": "tout",
-        "ready": "prêt",
-        "processing": "traitement",
-        "failed": "échec"
-      },
-      "filterPlaceholder": "filtrer par nom",
-      "filterAria": "Filtrer par nom",
-      "reading": "lecture de la bibliothèque...",
-      "empty": "la bibliothèque est vide - alimentez le pipeline ci-dessus",
-      "noMatches": "aucun résultat pour ces filtres",
-      "uncategorized": "non classé"
-    },
-    "lightbox": {
-      "copied": "copié",
-      "closePreview": "Fermer l'aperçu",
-      "noVariant": "aucune variante à prévisualiser pour le moment",
-      "previousImage": "Image précédente",
-      "nextImage": "Image suivante",
-      "size": "taille",
-      "source": "source",
-      "sha256": "sha-256",
-      "copyContentHash": "Copier le hash de contenu",
-      "encodedVariants": "variantes encodées",
-      "copyFormatUrl": "Copier l'URL {format}",
-      "openFormatNewTab": "Ouvrir {format} dans un nouvel onglet",
-      "of": "sur",
-      "moveHint": "pour naviguer"
-    },
-    "ledger": {
-      "label": "ledger",
-      "verifying": "vérification...",
-      "verifyChain": "vérifier la chaîne",
-      "chainIntact": "chaîne intacte - {entries} entrées vérifiées",
-      "chainBroken": "chaîne rompue à l'entrée #{id}",
-      "verificationFailed": "la vérification n'a pas démarré - réessayez",
-      "empty": "aucune entrée pour le moment - la première autorisation démarre la chaîne",
-      "collapse": "réduire",
-      "showAll": "afficher les {count} entrées"
-    },
-    "time": {
-      "secondsAgo": "s",
-      "minutesAgo": "min",
-      "hoursAgo": "h",
-      "daysAgo": "j"
-    }
-  },
   "tutorial": {
     "welcomeTitle": "Bienvenue !",
     "welcomeBody": "Je suis Fredrik, laissez-moi vous faire visiter mon bureau. Choisissez d'abord votre langue.",
@@ -165,8 +58,7 @@
       "settings": "Thème, langue, fond d'écran",
       "terminal": "Terminal interactif",
       "gallery": "Galerie photo",
-      "engineering": "Vue en direct de la plateforme derrière ce site",
-      "deployments": "Déploiements bleu-vert avec images signées",
+      "docker": "Vue en direct de la plateforme derrière ce site",
       "analytics": "Statistiques de visite, first-party et PostHog"
     }
   },
@@ -470,6 +362,30 @@
     "links": "Voir aussi",
     "visitors": "visiteurs",
     "uptime": "disponibilité",
+    "weather": {
+      "unavailable": "indisponible",
+      "cached": "en cache",
+      "observed": "observé",
+      "displayAdjustment": "Température arrondie ; condition adaptée du code OMM",
+      "provider": "Données météo par Open-Meteo",
+      "conditions": {
+        "clear": "Dégagé",
+        "mostlyClear": "Généralement dégagé",
+        "partlyCloudy": "Partiellement nuageux",
+        "overcast": "Couvert",
+        "fog": "Brouillard",
+        "drizzle": "Bruine",
+        "freezingDrizzle": "Bruine verglaçante",
+        "rain": "Pluie",
+        "freezingRain": "Pluie verglaçante",
+        "snow": "Neige",
+        "rainShowers": "Averses",
+        "snowShowers": "Averses de neige",
+        "thunderstorm": "Orage",
+        "hailThunderstorm": "Orage avec grêle",
+        "unknown": "Inconnu"
+      }
+    },
     "searchApps": "Rechercher des applications...",
     "noMatching": "Aucun résultat",
     "navigate": "naviguer",
@@ -518,8 +434,7 @@
       "gallery": "Galerie",
       "home": "Accueil",
       "resume": "CV",
-      "engineering": "Ingénierie",
-      "deployments": "Déploiements",
+      "docker": "Docker",
       "analytics": "Statistiques"
     },
     "shortTitles": {
@@ -533,8 +448,7 @@
       "terminal": "terminal",
       "gallery": "galerie",
       "resume": "cv",
-      "engineering": "engineering",
-      "deployments": "deploys",
+      "docker": "docker",
       "analytics": "analytics"
     },
     "loading": "chargement...",
@@ -604,8 +518,7 @@
         "browsers": "navigateurs",
         "referrers": "référents",
         "noVisits": "Aucune visite enregistrée - le compteur démarre une fois le consentement donné.",
-        "productAnalytics": "analyse produit · posthog",
-        "consented": "consenti",
+        "productAnalytics": "Analytique produit",
         "pageviews30": "pages vues, 30 jours"
       }
     },

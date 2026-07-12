@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::Json;
-use axum::extract::State;
+use axum::extract::{Path, State};
 use axum::http::{HeaderMap, StatusCode};
 use serde::{Deserialize, Serialize};
 use subtle::ConstantTimeEq;
@@ -13,7 +13,7 @@ use uuid::Uuid;
 use crate::problem::{ApiError, Problem};
 use crate::{AppState, audit};
 
-const MAX_UPLOAD_BYTES: i64 = 25 * 1024 * 1024;
+const MAX_UPLOAD_BYTES: i64 = 100 * 1024 * 1024;
 const PRESIGN_EXPIRY: Duration = Duration::from_secs(900);
 const ALLOWED_CONTENT_TYPES: [&str; 3] = ["image/jpeg", "image/png", "image/webp"];
 
@@ -37,13 +37,14 @@ pub fn require_admin(state: &AppState, headers: &HeaderMap) -> Result<(), Proble
 }
 
 /// Lowercased, charset-restricted gallery grouping key; None when nothing
-/// usable remains.
+/// usable remains. Unicode letters and numbers are retained so category names
+/// can contain characters such as `æ`, `ø`, and `å`.
 pub fn sanitize_category(raw: &str) -> Option<String> {
     let cleaned: String = raw
         .to_lowercase()
         .chars()
         .map(|c| {
-            if c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-') {
+            if c.is_alphanumeric() || matches!(c, '.' | '_' | '-') {
                 c
             } else {
                 '_'
@@ -208,6 +209,258 @@ pub async fn create_upload(
     ))
 }
 
+#[derive(Deserialize, ToSchema)]
+pub struct UpdateMediaRequest {
+    /// New gallery category; null or absent clears it (uncategorized).
+    #[serde(default)]
+    pub category: Option<String>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct UpdateMediaResponse {
+    pub id: Uuid,
+    pub category: Option<String>,
+}
+
+/// Re-categorize a media item (administration).
+#[utoipa::path(patch, path = "/api/v1/media/{id}", tag = "media",
+    request_body = UpdateMediaRequest,
+    responses(
+        (status = 200, body = UpdateMediaResponse),
+        (status = 401, description = "Missing or invalid bearer token", body = Problem),
+        (status = 404, description = "No such media item", body = Problem),
+        (status = 422, description = "Validation failed", body = Problem),
+        (status = 503, description = "Administration API disabled", body = Problem)
+    ))]
+pub async fn update_media(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Path(id): Path<Uuid>,
+    Json(body): Json<UpdateMediaRequest>,
+) -> Result<Json<UpdateMediaResponse>, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    require_admin(&state, &headers).map_err(|p| p.into_response())?;
+
+    let category = match body.category.as_deref() {
+        None => None,
+        Some(raw) => match sanitize_category(raw) {
+            Some(c) => Some(c),
+            None => {
+                let mut errors = BTreeMap::new();
+                errors.insert(
+                    "category".to_owned(),
+                    "Must be 1-64 chars of letters, digits, ._-".to_owned(),
+                );
+                return Err(ApiError::Validation(errors).into_response());
+            }
+        },
+    };
+
+    let mut tx = state
+        .pool
+        .begin()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+    let previous: Option<(Option<String>,)> =
+        sqlx::query_as("select category from media where id = $1 for update")
+            .bind(id)
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(|e| ApiError::from(e).into_response())?;
+    let Some((previous,)) = previous else {
+        return Err(Problem::new(StatusCode::NOT_FOUND, "No such media item").into_response());
+    };
+    sqlx::query("update media set category = $1, updated_at = now() where id = $2")
+        .bind(&category)
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+    audit::record(
+        &mut tx,
+        "media.category_set",
+        serde_json::json!({ "media_id": id, "from": previous, "to": category }),
+    )
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    tx.commit()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+
+    Ok(Json(UpdateMediaResponse { id, category }))
+}
+
+/// Delete a media item, its variants and stored objects (administration).
+#[utoipa::path(delete, path = "/api/v1/media/{id}", tag = "media",
+    responses(
+        (status = 204, description = "Deleted"),
+        (status = 401, description = "Missing or invalid bearer token", body = Problem),
+        (status = 404, description = "No such media item", body = Problem),
+        (status = 503, description = "Administration API disabled", body = Problem)
+    ))]
+pub async fn delete_media(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Path(id): Path<Uuid>,
+) -> Result<StatusCode, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    require_admin(&state, &headers).map_err(|p| p.into_response())?;
+
+    let mut tx = state
+        .pool
+        .begin()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+    let row: Option<(String, String, Option<String>)> = sqlx::query_as(
+        "select original_key, filename, category from media where id = $1 for update",
+    )
+    .bind(id)
+    .fetch_optional(&mut *tx)
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    let Some((original_key, filename, category)) = row else {
+        return Err(Problem::new(StatusCode::NOT_FOUND, "No such media item").into_response());
+    };
+    let variant_keys: Vec<(String,)> =
+        sqlx::query_as("select key from media_variants where media_id = $1")
+            .bind(id)
+            .fetch_all(&mut *tx)
+            .await
+            .map_err(|e| ApiError::from(e).into_response())?;
+    sqlx::query("delete from media where id = $1")
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+    audit::record(
+        &mut tx,
+        "media.deleted",
+        serde_json::json!({
+            "media_id": id,
+            "filename": filename,
+            "category": category,
+            "variants": variant_keys.len(),
+        }),
+    )
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    tx.commit()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+
+    // Variant keys are unique per row and originals embed the media id, so no
+    // other row can reference these objects. Best-effort: the DB row is gone
+    // either way, and an orphaned object is harmless.
+    for key in std::iter::once(original_key).chain(variant_keys.into_iter().map(|(k,)| k)) {
+        if let Err(e) = state
+            .s3
+            .delete_object()
+            .bucket(&state.media.bucket)
+            .key(&key)
+            .send()
+            .await
+        {
+            tracing::warn!(key, error = %e, "s3 delete failed; object orphaned");
+        }
+    }
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct RenameCategoryRequest {
+    pub from: String,
+    pub to: String,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct RenameCategoryResponse {
+    pub from: String,
+    pub to: String,
+    /// Number of media items moved.
+    pub updated: i64,
+}
+
+/// Rename a category across all media; renaming onto an existing category
+/// merges them (administration).
+#[utoipa::path(post, path = "/api/v1/media/categories/rename", tag = "media",
+    request_body = RenameCategoryRequest,
+    responses(
+        (status = 200, body = RenameCategoryResponse),
+        (status = 401, description = "Missing or invalid bearer token", body = Problem),
+        (status = 404, description = "No media in the source category", body = Problem),
+        (status = 422, description = "Validation failed", body = Problem),
+        (status = 503, description = "Administration API disabled", body = Problem)
+    ))]
+pub async fn rename_category(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(body): Json<RenameCategoryRequest>,
+) -> Result<Json<RenameCategoryResponse>, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    require_admin(&state, &headers).map_err(|p| p.into_response())?;
+
+    let mut errors = BTreeMap::new();
+    let from = sanitize_category(&body.from);
+    let to = sanitize_category(&body.to);
+    if from.is_none() {
+        errors.insert(
+            "from".to_owned(),
+            "Must be 1-64 chars of letters, digits, ._-".to_owned(),
+        );
+    }
+    if to.is_none() {
+        errors.insert(
+            "to".to_owned(),
+            "Must be 1-64 chars of letters, digits, ._-".to_owned(),
+        );
+    }
+    if !errors.is_empty() {
+        return Err(ApiError::Validation(errors).into_response());
+    }
+    let (from, to) = (from.expect("checked"), to.expect("checked"));
+    if from == to {
+        return Ok(Json(RenameCategoryResponse {
+            from,
+            to,
+            updated: 0,
+        }));
+    }
+
+    let mut tx = state
+        .pool
+        .begin()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+    let updated = sqlx::query("update media set category = $1, updated_at = now() where category = $2")
+        .bind(&to)
+        .bind(&from)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?
+        .rows_affected() as i64;
+    if updated == 0 {
+        return Err(
+            Problem::new(StatusCode::NOT_FOUND, "No media in the source category").into_response(),
+        );
+    }
+    audit::record(
+        &mut tx,
+        "media.category_renamed",
+        serde_json::json!({ "from": from, "to": to, "updated": updated }),
+    )
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    tx.commit()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+
+    Ok(Json(RenameCategoryResponse { from, to, updated }))
+}
+
 #[derive(Serialize, ToSchema)]
 pub struct MediaVariant {
     pub format: String,
@@ -226,10 +479,82 @@ pub struct MediaItem {
     pub content_type: String,
     pub category: Option<String>,
     pub state: String,
+    /// Original upload size in bytes.
+    pub size_bytes: Option<i64>,
     pub width: Option<i32>,
     pub height: Option<i32>,
     pub content_hash: Option<String>,
+    /// UTC upload time, RFC 3339.
+    pub created_at: String,
     pub variants: Vec<MediaVariant>,
+}
+
+#[derive(Clone, Copy, Deserialize, ToSchema)]
+#[serde(rename_all = "lowercase")]
+pub enum AdminMediaState {
+    Ready,
+    Processing,
+    Failed,
+}
+
+impl AdminMediaState {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Ready => "ready",
+            Self::Processing => "processing",
+            Self::Failed => "failed",
+        }
+    }
+}
+
+#[derive(Deserialize, utoipa::IntoParams)]
+pub struct AdminMediaParams {
+    /// Case-insensitive substring search across filename and category.
+    pub query: Option<String>,
+    /// Restrict to one normalized processing-state bucket.
+    #[param(inline)]
+    pub state: Option<AdminMediaState>,
+    /// Restrict to one category; `uncategorized` selects null categories.
+    pub category: Option<String>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct AdminMediaCategory {
+    pub name: String,
+    pub count: i64,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct AdminMediaStateCounts {
+    pub ready: i64,
+    pub processing: i64,
+    pub failed: i64,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct AdminMediaSummary {
+    pub total: i64,
+    pub stored_bytes: i64,
+    pub state_counts: AdminMediaStateCounts,
+    pub categories: Vec<AdminMediaCategory>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct AdminMediaLibrary {
+    pub items: Vec<MediaItem>,
+    /// Facets for the complete library, independent of the active filters.
+    pub summary: AdminMediaSummary,
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct MediaStatusRequest {
+    pub ids: Vec<Uuid>,
+}
+
+#[derive(Serialize, ToSchema, sqlx::FromRow)]
+pub struct MediaStatus {
+    pub id: Uuid,
+    pub state: String,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -276,14 +601,31 @@ struct MediaListRow {
     content_type: String,
     category: Option<String>,
     state: String,
+    size_bytes: Option<i64>,
     width: Option<i32>,
     height: Option<i32>,
     content_hash: Option<String>,
+    created_at: String,
     v_format: Option<String>,
     v_key: Option<String>,
     v_width: Option<i32>,
     v_height: Option<i32>,
     v_size_bytes: Option<i64>,
+}
+
+#[derive(sqlx::FromRow)]
+struct AdminMediaSummaryRow {
+    total: i64,
+    stored_bytes: i64,
+    ready: i64,
+    processing: i64,
+    failed: i64,
+}
+
+#[derive(sqlx::FromRow)]
+struct AdminMediaCategoryRow {
+    name: String,
+    count: i64,
 }
 
 #[derive(sqlx::FromRow)]
@@ -338,6 +680,49 @@ fn parse_date_from_filename(filename: &str) -> Option<String> {
     ))
 }
 
+fn media_items_from_rows(rows: Vec<MediaListRow>, public_base_url: Option<&str>) -> Vec<MediaItem> {
+    let mut items: Vec<MediaItem> = Vec::new();
+    for row in rows {
+        if items.last().map(|i| i.id) != Some(row.id) {
+            items.push(MediaItem {
+                id: row.id,
+                filename: row.filename,
+                content_type: row.content_type,
+                category: row.category,
+                state: row.state,
+                size_bytes: row.size_bytes,
+                width: row.width,
+                height: row.height,
+                content_hash: row.content_hash,
+                created_at: row.created_at,
+                variants: Vec::new(),
+            });
+        }
+        if let (Some(format), Some(key), Some(w), Some(h), Some(size)) = (
+            row.v_format,
+            row.v_key,
+            row.v_width,
+            row.v_height,
+            row.v_size_bytes,
+        ) {
+            let url = public_base_url.map(|base| format!("{}/{key}", base.trim_end_matches('/')));
+            items
+                .last_mut()
+                .expect("media row must have an item")
+                .variants
+                .push(MediaVariant {
+                    format,
+                    key,
+                    width: w,
+                    height: h,
+                    size_bytes: size,
+                    url,
+                });
+        }
+    }
+    items
+}
+
 /// List processed media with their generated variants.
 #[utoipa::path(get, path = "/api/v1/media", tag = "media",
     params(ListMediaParams),
@@ -359,7 +744,9 @@ pub async fn list_media(
 
     let rows: Vec<MediaListRow> = sqlx::query_as(
         "select m.id, m.filename, m.content_type, m.category, m.state, \
-                m.width, m.height, m.content_hash, \
+                m.size_bytes, m.width, m.height, m.content_hash, \
+                to_char(m.created_at at time zone 'utc', \
+                        'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as created_at, \
                 v.format as v_format, v.key as v_key, v.width as v_width, \
                 v.height as v_height, v.size_bytes as v_size_bytes \
          from media m \
@@ -374,48 +761,132 @@ pub async fn list_media(
     .await
     .map_err(|e| ApiError::from(e).into_response())?;
 
-    let mut items: Vec<MediaItem> = Vec::new();
-    for row in rows {
-        if items.last().map(|i| i.id) != Some(row.id) {
-            items.push(MediaItem {
-                id: row.id,
-                filename: row.filename,
-                content_type: row.content_type,
-                category: row.category,
-                state: row.state,
-                width: row.width,
-                height: row.height,
-                content_hash: row.content_hash,
-                variants: Vec::new(),
-            });
-        }
-        if let (Some(format), Some(key), Some(w), Some(h), Some(size)) = (
-            row.v_format,
-            row.v_key,
-            row.v_width,
-            row.v_height,
-            row.v_size_bytes,
-        ) {
-            let url = state
-                .media
-                .public_base_url
-                .as_deref()
-                .map(|base| format!("{}/{key}", base.trim_end_matches('/')));
-            items
-                .last_mut()
-                .expect("just pushed")
-                .variants
-                .push(MediaVariant {
-                    format,
-                    key,
-                    width: w,
-                    height: h,
-                    size_bytes: size,
-                    url,
-                });
-        }
-    }
-    Ok(Json(items))
+    Ok(Json(media_items_from_rows(
+        rows,
+        state.media.public_base_url.as_deref(),
+    )))
+}
+
+/// Search and summarize the complete media library (administration).
+#[utoipa::path(get, path = "/api/v1/media/admin", tag = "media",
+    params(AdminMediaParams),
+    responses(
+        (status = 200, body = AdminMediaLibrary),
+        (status = 401, description = "Missing or invalid bearer token", body = Problem),
+        (status = 503, description = "Administration API disabled", body = Problem)
+    ))]
+pub async fn admin_media(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    axum::extract::Query(params): axum::extract::Query<AdminMediaParams>,
+) -> Result<Json<AdminMediaLibrary>, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    require_admin(&state, &headers).map_err(|p| p.into_response())?;
+
+    let query = params
+        .query
+        .as_deref()
+        .map(str::trim)
+        .filter(|q| !q.is_empty());
+    let state_filter = params.state.map(AdminMediaState::as_str);
+    let category = params
+        .category
+        .as_deref()
+        .map(str::trim)
+        .filter(|category| !category.is_empty());
+
+    let items_query = sqlx::query_as::<_, MediaListRow>(
+        "select m.id, m.filename, m.content_type, m.category, m.state, \
+                m.size_bytes, m.width, m.height, m.content_hash, \
+                to_char(m.created_at at time zone 'utc', \
+                        'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as created_at, \
+                v.format as v_format, v.key as v_key, v.width as v_width, \
+                v.height as v_height, v.size_bytes as v_size_bytes \
+         from media m \
+         left join media_variants v on v.media_id = m.id \
+         where ($1::text is null \
+                or strpos(lower(m.filename), lower($1)) > 0 \
+                or strpos(lower(coalesce(m.category, 'uncategorized')), lower($1)) > 0) \
+           and ($2::text is null \
+                or case \
+                    when m.state = 'ready' then 'ready' \
+                    when m.state = 'failed' then 'failed' \
+                    else 'processing' \
+                   end = $2) \
+           and ($3::text is null or coalesce(m.category, 'uncategorized') = $3) \
+         order by m.created_at desc, m.id, v.format",
+    )
+    .bind(query)
+    .bind(state_filter)
+    .bind(category);
+    let summary_query = sqlx::query_as::<_, AdminMediaSummaryRow>(
+        "select count(*)::bigint as total, \
+                coalesce(sum(size_bytes), 0)::bigint as stored_bytes, \
+                count(*) filter (where state = 'ready')::bigint as ready, \
+                count(*) filter (where state not in ('ready', 'failed'))::bigint as processing, \
+                count(*) filter (where state = 'failed')::bigint as failed \
+         from media",
+    );
+    let categories_query = sqlx::query_as::<_, AdminMediaCategoryRow>(
+        "select coalesce(category, 'uncategorized') as name, count(*)::bigint as count \
+         from media \
+         group by coalesce(category, 'uncategorized') \
+         order by name",
+    );
+
+    let (rows, summary, categories) = tokio::try_join!(
+        items_query.fetch_all(&state.pool),
+        summary_query.fetch_one(&state.pool),
+        categories_query.fetch_all(&state.pool),
+    )
+    .map_err(|e| ApiError::from(e).into_response())?;
+
+    Ok(Json(AdminMediaLibrary {
+        items: media_items_from_rows(rows, state.media.public_base_url.as_deref()),
+        summary: AdminMediaSummary {
+            total: summary.total,
+            stored_bytes: summary.stored_bytes,
+            state_counts: AdminMediaStateCounts {
+                ready: summary.ready,
+                processing: summary.processing,
+                failed: summary.failed,
+            },
+            categories: categories
+                .into_iter()
+                .map(|category| AdminMediaCategory {
+                    name: category.name,
+                    count: category.count,
+                })
+                .collect(),
+        },
+    }))
+}
+
+/// Return processing states for active uploads (administration).
+#[utoipa::path(post, path = "/api/v1/media/status", tag = "media",
+    request_body = MediaStatusRequest,
+    responses(
+        (status = 200, body = [MediaStatus]),
+        (status = 401, description = "Missing or invalid bearer token", body = Problem),
+        (status = 503, description = "Administration API disabled", body = Problem)
+    ))]
+pub async fn media_status(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(body): Json<MediaStatusRequest>,
+) -> Result<Json<Vec<MediaStatus>>, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    require_admin(&state, &headers).map_err(|p| p.into_response())?;
+    let statuses = sqlx::query_as::<_, MediaStatus>(
+        "select id, state from media where id = any($1) order by id",
+    )
+    .bind(&body.ids)
+    .fetch_all(&state.pool)
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    Ok(Json(statuses))
 }
 
 /// Gallery-ready media grouped and sorted for direct UI consumption.
@@ -498,6 +969,15 @@ mod props {
 
     use super::{sanitize_category, sanitize_filename};
 
+    #[test]
+    fn category_sanitization_preserves_norwegian_characters() {
+        assert_eq!(sanitize_category("Kragerø"), Some("kragerø".to_owned()));
+        assert_eq!(
+            sanitize_category("Ærø, blåbær & Ålesund"),
+            Some("ærø__blåbær___ålesund".to_owned())
+        );
+    }
+
     proptest! {
         #[test]
         fn filename_sanitization_is_idempotent_and_safe(input in ".{0,80}") {
@@ -513,7 +993,7 @@ mod props {
             if let Some(category) = sanitize_category(&input) {
                 prop_assert!(!category.is_empty());
                 prop_assert!(category.chars().count() <= 64);
-                prop_assert!(category.chars().all(|c| c.is_ascii_alphanumeric()
+                prop_assert!(category.chars().all(|c| c.is_alphanumeric()
                     || matches!(c, '.' | '_' | '-')));
                 prop_assert_eq!(category.to_lowercase(), category.clone());
             }

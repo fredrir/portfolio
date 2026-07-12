@@ -2,10 +2,11 @@
 
 import type { UiStrings } from "@/i18n/types";
 import { Badge, Instrument, PaneShell, Readout } from "@/panes/platform-ui";
+import { Deployments } from "./components/Deployments";
 import { Hop } from "./components/Hop";
 import { useProbe } from "./hooks/useProbe";
 
-export function EngineeringPane({ ui }: { ui: UiStrings }) {
+export function ComposePane({ ui }: { ui: UiStrings }) {
   const t = ui.platform.engineering;
   const probe = useProbe();
   const live = probe != null;
@@ -88,6 +89,8 @@ export function EngineeringPane({ ui }: { ui: UiStrings }) {
           <p className="break-all font-mono text-2xs text-readable">{probe?.requestId ?? "··"}</p>
         </div>
       </Instrument>
+
+      <Deployments ui={ui} />
     </PaneShell>
   );
 }

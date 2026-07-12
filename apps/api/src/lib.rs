@@ -37,6 +37,7 @@ pub struct Upstreams {
     pub spotify_accounts: String,
     pub recaptcha: String,
     pub posthog: String,
+    pub weather_api: String,
     pub github_username: String,
     pub github_repo: String,
     pub recaptcha_secret: Option<String>,
@@ -59,6 +60,7 @@ impl Upstreams {
             spotify_accounts: env_or("SPOTIFY_ACCOUNTS_BASE", "https://accounts.spotify.com"),
             recaptcha: env_or("RECAPTCHA_BASE", "https://www.google.com"),
             posthog: env_or("POSTHOG_BASE", "https://eu.posthog.com"),
+            weather_api: env_or("WEATHER_API_BASE", "https://api.open-meteo.com"),
             github_username: env_or("GITHUB_USERNAME", "fredrir"),
             github_repo: env_or("GITHUB_REPO", "fredrir/portfolio"),
             recaptcha_secret: opt("RECAPTCHA_SECRET_KEY"),
@@ -80,6 +82,7 @@ pub struct Caches {
     /// Short TTL: throttles Spotify's OAuth-refresh + 3-call fetch when the
     /// pane polls, without making now-playing noticeably stale.
     pub spotify: Cached<routes::spotify::SpotifyData>,
+    pub weather: Arc<routes::weather::WeatherCacheState>,
 }
 
 #[derive(Clone)]
@@ -106,6 +109,13 @@ fn openapi_router() -> OpenApiRouter<AppState> {
         .routes(routes!(routes::visits::visit_count))
         .routes(routes!(routes::contact::submit_contact))
         .routes(routes!(routes::media::create_upload))
+        .routes(routes!(
+            routes::media::update_media,
+            routes::media::delete_media
+        ))
+        .routes(routes!(routes::media::rename_category))
+        .routes(routes!(routes::media::admin_media))
+        .routes(routes!(routes::media::media_status))
         .routes(routes!(routes::media::list_media))
         .routes(routes!(routes::media::gallery))
         .routes(routes!(routes::cv::active_cv))
@@ -114,6 +124,8 @@ fn openapi_router() -> OpenApiRouter<AppState> {
         .routes(routes!(routes::analytics::analytics))
         .routes(routes!(routes::analytics::posthog_stats))
         .routes(routes!(routes::deployments::deployments))
+        .routes(routes!(routes::weather::weather))
+        .routes(routes!(routes::weather::weather_metrics))
         .routes(routes!(routes::audit::list_audit))
         .routes(routes!(routes::audit::verify_audit))
 }

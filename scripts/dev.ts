@@ -15,7 +15,9 @@ const localDefaults: Record<string, string> = {
   AWS_ENDPOINT_URL: "http://127.0.0.1:4566",
   MEDIA_BUCKET: "portfolio-media-dev",
   MEDIA_PUBLIC_BASE_URL: "http://localhost:4566/portfolio-media-dev",
+  MEDIA_QUEUE_URL: "http://127.0.0.1:4566/000000000000/media-processing",
   ADMIN_TOKEN: "dev-admin-token",
+  CV_SYNC_DISABLED: "1",
   RECAPTCHA_SECRET_KEY: "",
   VITE_RECAPTCHA_SITE_KEY: "",
   VITE_HIDE_COOKIE_CONSENT: "true",
@@ -64,13 +66,40 @@ function envWithDefaults(extra: Record<string, string> = {}) {
 
 function runSetup() {
   console.log("[dev] starting local db and localstack");
-  const result = spawnSync("docker", ["compose", "up", "-d", "db", "localstack"], {
+  // --wait blocks until healthchecks pass; localstack's healthcheck queries the
+  // queue created by the ready-hook, so the media bucket is guaranteed to exist
+  // before the seed runs.
+  const result = spawnSync("docker", ["compose", "up", "-d", "--wait", "db", "localstack"], {
     cwd: root,
     stdio: "inherit",
   });
 
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
+  }
+
+  // Ready hooks only run when LocalStack starts. Refresh just the browser-upload
+  // CORS policy for an existing container; rebuilding queues and notifications
+  // here made every dev launch unnecessarily slow.
+  const provision = spawnSync(
+    "docker",
+    [
+      "compose",
+      "exec",
+      "-T",
+      "localstack",
+      "bash",
+      "/etc/localstack/init/ready.d/init-aws.sh",
+      "--cors-only",
+    ],
+    {
+      cwd: root,
+      stdio: "inherit",
+    },
+  );
+
+  if (provision.status !== 0) {
+    process.exit(provision.status ?? 1);
   }
 }
 
@@ -102,10 +131,10 @@ async function seedWhenApiIsReady(env: NodeJS.ProcessEnv) {
   const deadline = Date.now() + 180_000;
   while (Date.now() < deadline) {
     if (await apiIsHealthy()) {
-      console.log("[dev] seeding local media fixtures");
+      console.log("[dev] checking local media fixtures");
       const result = spawnSync("bun", ["scripts/seed-dev-media.ts"], {
         cwd: root,
-        env,
+        env: { ...env, DEV_SEED_IF_PRESENT: "skip" },
         stdio: "inherit",
       });
       if (result.status !== 0) {
@@ -119,12 +148,19 @@ async function seedWhenApiIsReady(env: NodeJS.ProcessEnv) {
   console.warn("[dev] api did not become healthy before media seed timeout");
 }
 
-function start(name: string, command: string, args: string[], env: NodeJS.ProcessEnv) {
+function start(
+  name: string,
+  command: string,
+  args: string[],
+  env: NodeJS.ProcessEnv,
+  detached = false,
+) {
   console.log(`[dev] starting ${name}`);
   const child = spawn(command, args, {
     cwd: root,
     env,
     stdio: "inherit",
+    detached,
   });
 
   children.set(name, child);
@@ -292,7 +328,28 @@ if (await apiIsHealthy()) {
   startWatchedApi(envWithDefaults());
 }
 
-void seedWhenApiIsReady(envWithDefaults());
+const devEnv = envWithDefaults();
+void seedWhenApiIsReady(devEnv).then(() => {
+  if (stopping) return;
+  start(
+    "worker",
+    "doppler",
+    [
+      "run",
+      `--preserve-env=${preserveEnv}`,
+      "--",
+      "cargo",
+      "run",
+      "-p",
+      "portfolio-worker",
+      "--bin",
+      "portfolio-worker",
+    ],
+    devEnv,
+    // Doppler does not forward shutdown signals to its child process.
+    true,
+  );
+});
 
 start(
   "web",

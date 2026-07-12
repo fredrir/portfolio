@@ -396,15 +396,6 @@ export function ImagePane({ ui }: { ui: UiStrings }) {
                   onSelect={handleSelectImage}
                 />
               )}
-
-              {!compact && !narrow && (
-                <div className="mt-1 flex shrink-0 justify-between border-border-faint border-t pt-1 text-2xs text-ghost">
-                  <span>
-                    {currentCategory?.images.length ?? 0} {ui.images}
-                  </span>
-                  <span className="text-primary-subtle">~/gallery/{activeCategory}/</span>
-                </div>
-              )}
             </>
           )}
         </>

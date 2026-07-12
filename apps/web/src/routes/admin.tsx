@@ -2,8 +2,8 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
 import { AdminConsole } from "@/admin";
-import { getStaticDictionary } from "@/i18n/dictionaries";
-import { adminAuditLog, adminListMedia } from "@/server/admin";
+import { emptyMediaLibrary } from "@/admin/model";
+import { adminListMedia } from "@/server/admin";
 import { isAdminOrigin } from "@/server/admin-origin";
 
 const assertAdminHost = createServerFn().handler(async () => {
@@ -18,26 +18,19 @@ export const Route = createFileRoute("/admin")({
     await assertAdminHost();
   },
   loader: async () => {
-    const [mediaResult, auditResult] = await Promise.allSettled([
-      adminListMedia(),
-      adminAuditLog(),
-    ]);
-    return {
-      media: mediaResult.status === "fulfilled" ? mediaResult.value : [],
-      audit: auditResult.status === "fulfilled" ? auditResult.value : [],
-      apiDown: mediaResult.status === "rejected",
-    };
+    try {
+      return { library: await adminListMedia({ data: {} }), apiDown: false };
+    } catch {
+      return { library: emptyMediaLibrary(), apiDown: true };
+    }
   },
   head: () => ({
-    meta: [
-      { title: getStaticDictionary("en").admin.pageTitle },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "admin.hansteen.dev" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: AdminPage,
 });
 
 function AdminPage() {
-  const { media, audit, apiDown } = Route.useLoaderData();
-  return <AdminConsole initialMedia={media} initialAudit={audit} initialApiDown={apiDown} />;
+  const { library, apiDown } = Route.useLoaderData();
+  return <AdminConsole initialLibrary={library} initialApiDown={apiDown} />;
 }

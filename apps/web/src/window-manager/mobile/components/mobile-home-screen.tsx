@@ -2,7 +2,6 @@
 
 import {
   ChartLine,
-  Cpu,
   EnvelopeSimple,
   FileText,
   FolderSimple,
@@ -10,13 +9,13 @@ import {
   GithubLogo,
   Images,
   Path,
-  RocketLaunch,
   SpotifyLogo,
   Terminal,
   UserCircle,
 } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import type { UiStrings } from "@/i18n/types";
+import { DockerIcon } from "@/shared/components/docker-icon";
 import { openExternalWindow, WINDOW_CONFIGS } from "../../constants";
 
 const GRID_ICONS: Record<string, React.ReactNode> = {
@@ -30,8 +29,7 @@ const GRID_ICONS: Record<string, React.ReactNode> = {
   terminal: <Terminal size={28} weight="duotone" />,
   gallery: <Images size={28} weight="duotone" />,
   resume: <FileText size={28} weight="duotone" />,
-  engineering: <Cpu size={28} weight="duotone" />,
-  deployments: <RocketLaunch size={28} weight="duotone" />,
+  docker: <DockerIcon size={28} />,
   analytics: <ChartLine size={28} weight="duotone" />,
 };
 

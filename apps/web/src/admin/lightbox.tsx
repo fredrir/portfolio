@@ -1,19 +1,12 @@
 "use client";
 
 import { ArrowSquareOut, CaretLeft, CaretRight, Check, Copy, X } from "@phosphor-icons/react";
-import type { components } from "@portfolio/api-client";
 import { useEffect, useRef, useState } from "react";
 
-import { formatBytes } from "@/admin/format";
-import type { AdminStrings } from "@/i18n/types";
-import { Badge, HashChip, Meter, type Tone } from "@/panes/platform-ui";
-
-type MediaItem = components["schemas"]["MediaItem"];
-
-const STATE_TONE: Record<string, Tone> = {
-  ready: "ok",
-  failed: "fail",
-};
+import { formatBytes, timeAgo } from "@/admin/format";
+import { DeleteButton } from "@/admin/library";
+import { bucketOf, type MediaItem, stateLabel, thumbOf } from "@/admin/model";
+import { cn } from "@/shared/utils/cn";
 
 function CopyButton({
   text,
@@ -25,18 +18,27 @@ function CopyButton({
   copiedLabel: string;
 }) {
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timeout = window.setTimeout(() => setCopied(false), 1500);
+    return () => window.clearTimeout(timeout);
+  }, [copied]);
+
   return (
     <button
       type="button"
       aria-label={label}
       title={copied ? copiedLabel : label}
-      onClick={() => {
-        void navigator.clipboard.writeText(text).then(() => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
-        });
-      }}
-      className="rounded p-0.5 text-muted-foreground transition-colors hover:bg-control-hover hover:text-foreground"
+      onClick={() =>
+        void navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            setCopied(true);
+          })
+          .catch(() => undefined)
+      }
+      className="rounded p-1 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground"
     >
       {copied ? <Check size={12} className="text-primary" /> : <Copy size={12} />}
     </button>
@@ -45,33 +47,44 @@ function CopyButton({
 
 function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-2 py-1 text-xs">
-      <span className="shrink-0 text-3xs text-muted-foreground uppercase tracking-[0.2em]">
-        {label}
-      </span>
-      <span className="min-w-0 text-right font-mono">{children}</span>
+    <div className="flex items-baseline justify-between gap-3 py-1.5">
+      <dt className="shrink-0 text-2xs text-faded">{label}</dt>
+      <dd className="min-w-0 text-right font-mono text-xs">{children}</dd>
     </div>
   );
 }
+
+const STATE_STYLE: Record<"ready" | "processing" | "failed", string> = {
+  ready: "bg-[hsl(var(--desk-ok)/0.15)] text-[hsl(var(--desk-ok))]",
+  processing: "bg-surface-soft text-primary",
+  failed: "bg-destructive/15 text-destructive",
+};
 
 export function Lightbox({
   item,
   index,
   total,
-  t,
   onClose,
   onNav,
+  onDelete,
+  onSetCategory,
 }: {
   item: MediaItem;
   index: number;
   total: number;
-  t: AdminStrings;
   onClose: () => void;
   onNav: (delta: 1 | -1) => void;
+  onDelete: (id: string) => Promise<boolean>;
+  onSetCategory: (id: string, category: string | null) => Promise<boolean>;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
-  const copy = t.lightbox;
-  const stateKey = item.state === "ready" || item.state === "failed" ? item.state : "processing";
+  const bucket = bucketOf(item);
+
+  const [category, setCategory] = useState(item.category ?? "");
+  const [saving, setSaving] = useState(false);
+  // Refresh the editor when navigating between photos.
+  useEffect(() => setCategory(item.category ?? ""), [item.id, item.category]);
+  const dirty = category.trim() !== (item.category ?? "");
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -79,17 +92,24 @@ export function Lightbox({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight") onNav(1);
-      if (e.key === "ArrowLeft") onNav(-1);
+      const target = e.target as HTMLElement | null;
+      const typing = target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA");
+      if (e.key === "Escape" && !typing) onClose();
+      if (e.key === "ArrowRight" && !typing) onNav(1);
+      if (e.key === "ArrowLeft" && !typing) onNav(-1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, onNav]);
 
-  const webp = item.variants.find((v) => v.format === "webp");
-  const preview = webp?.url ?? item.variants.find((v) => v.url)?.url;
-  const maxVariant = Math.max(1, ...item.variants.map((v) => v.size_bytes));
+  const saveCategory = async () => {
+    if (!dirty || saving) return;
+    setSaving(true);
+    await onSetCategory(item.id, category.trim() || null);
+    setSaving(false);
+  };
+
+  const preview = thumbOf(item);
 
   return (
     <div
@@ -100,37 +120,38 @@ export function Lightbox({
     >
       <button
         type="button"
-        aria-label={copy.closePreview}
+        aria-label="Close"
         onClick={onClose}
         className="absolute inset-0 cursor-default bg-overlay-heavy backdrop-blur-sm"
         tabIndex={-1}
       />
-      <div className="relative flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-border-medium bg-background shadow-lg md:flex-row">
-        <figure className="relative flex min-h-0 flex-1 items-center justify-center bg-surface-dim">
+      <div className="relative flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-border-faint bg-background shadow-lg md:flex-row">
+        <figure className="relative flex min-h-0 flex-1 items-center justify-center bg-card">
           {preview ? (
             <img
               src={preview}
               alt={item.filename}
+              decoding="async"
               className="max-h-[50dvh] w-full object-contain md:max-h-[80dvh]"
             />
           ) : (
-            <p className="p-10 text-muted-foreground text-xs">{copy.noVariant}</p>
+            <p className="p-10 font-mono text-muted-foreground text-xs">no preview yet</p>
           )}
           {total > 1 && (
             <>
               <button
                 type="button"
-                aria-label={copy.previousImage}
+                aria-label="Previous photo"
                 onClick={() => onNav(-1)}
-                className="absolute left-1 rounded-full bg-glass-light p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                className="absolute left-1.5 rounded-full bg-glass-light p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <CaretLeft size={16} />
               </button>
               <button
                 type="button"
-                aria-label={copy.nextImage}
+                aria-label="Next photo"
                 onClick={() => onNav(1)}
-                className="absolute right-1 rounded-full bg-glass-light p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                className="absolute right-1.5 rounded-full bg-glass-light p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <CaretRight size={16} />
               </button>
@@ -138,86 +159,120 @@ export function Lightbox({
           )}
         </figure>
 
-        <aside className="w-full shrink-0 space-y-2 overflow-y-auto border-border-faint border-t p-3 md:w-72 md:border-t-0 md:border-l">
+        <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto border-border-faint border-t p-3.5 md:w-72 md:border-t-0 md:border-l">
           <div className="flex items-start justify-between gap-2">
-            <p className="min-w-0 break-all font-bold font-mono text-xs">{item.filename}</p>
+            <div className="min-w-0">
+              <p className="break-all font-medium font-mono text-xs">{item.filename}</p>
+              <span
+                className={cn(
+                  "mt-1.5 inline-block rounded-full px-2 py-0.5 font-mono text-2xs",
+                  STATE_STYLE[bucket],
+                )}
+              >
+                {stateLabel(bucket)}
+              </span>
+            </div>
             <button
               ref={closeRef}
               type="button"
-              aria-label={copy.closePreview}
+              aria-label="Close"
               onClick={onClose}
-              className="rounded p-1 text-muted-foreground transition-colors hover:bg-control-hover hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded p-1 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
             >
               <X size={14} />
             </button>
           </div>
 
-          <div className="flex flex-wrap gap-1">
-            <Badge tone={STATE_TONE[item.state] ?? "warn"}>{t.library.filters[stateKey]}</Badge>
-            <Badge tone="idle">{item.category ?? t.library.uncategorized}</Badge>
-          </div>
+          <label className="block">
+            <span className="mb-1 block text-2xs text-faded">category</span>
+            <span className="flex items-center gap-1.5">
+              <input
+                value={category}
+                disabled={saving}
+                list="desk-categories"
+                placeholder="uncategorized"
+                onChange={(e) => setCategory(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void saveCategory();
+                  if (e.key === "Escape") setCategory(item.category ?? "");
+                }}
+                className="min-w-0 flex-1 rounded border border-border-faint bg-card px-2 py-1 font-mono text-xs outline-none placeholder:text-placeholder focus-visible:border-primary-subtle disabled:opacity-60"
+              />
+              {dirty && (
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => void saveCategory()}
+                  className="shrink-0 rounded bg-primary px-2 py-1 font-medium text-2xs text-primary-foreground transition-colors hover:bg-primary-bold disabled:opacity-60"
+                >
+                  save
+                </button>
+              )}
+            </span>
+          </label>
 
-          <div className="divide-y divide-border-faint border-border-faint border-y">
-            <MetaRow label={copy.size}>
+          <dl className="divide-y divide-border-faint border-border-faint border-y">
+            <MetaRow label="dimensions">
               {item.width && item.height ? `${item.width} × ${item.height}` : "—"}
             </MetaRow>
-            <MetaRow label={copy.source}>{item.content_type}</MetaRow>
+            <MetaRow label="source">
+              {item.content_type.replace("image/", "")}
+              {item.size_bytes ? ` · ${formatBytes(item.size_bytes)}` : ""}
+            </MetaRow>
+            <MetaRow label="uploaded">{timeAgo(item.created_at)}</MetaRow>
             {item.content_hash && (
-              <MetaRow label={copy.sha256}>
-                <span className="inline-flex items-center gap-1">
-                  <HashChip hash={item.content_hash} />
-                  <CopyButton
-                    text={item.content_hash}
-                    label={copy.copyContentHash}
-                    copiedLabel={copy.copied}
-                  />
+              <MetaRow label="sha-256">
+                <span className="inline-flex items-center gap-0.5">
+                  <span title={item.content_hash}>{item.content_hash.slice(0, 12)}…</span>
+                  <CopyButton text={item.content_hash} label="Copy sha-256" copiedLabel="copied" />
                 </span>
               </MetaRow>
             )}
-          </div>
+          </dl>
 
           {item.variants.length > 0 && (
             <div>
-              <p className="mb-1 text-3xs text-muted-foreground uppercase tracking-[0.2em]">
-                {copy.encodedVariants}
-              </p>
-              {item.variants.map((v) => (
-                <Meter
-                  key={v.key}
-                  label={v.format}
-                  value={v.size_bytes}
-                  max={maxVariant}
-                  display={formatBytes(v.size_bytes)}
-                  leading={
-                    v.url ? (
-                      <span className="inline-flex items-center gap-0.5">
-                        <CopyButton
-                          text={v.url}
-                          label={copy.copyFormatUrl.replace("{format}", v.format)}
-                          copiedLabel={copy.copied}
-                        />
+              <p className="mb-1 text-2xs text-faded">variants</p>
+              <ul className="space-y-0.5">
+                {item.variants.map((v) => (
+                  <li key={v.key} className="flex items-center gap-1.5 font-mono text-xs">
+                    <span className="text-foreground">{v.format}</span>
+                    <span className="text-3xs text-muted-foreground">
+                      {formatBytes(v.size_bytes)}
+                    </span>
+                    {v.url && (
+                      <span className="ml-auto inline-flex items-center">
+                        <CopyButton text={v.url} label={`Copy ${v.format}`} copiedLabel="copied" />
                         <a
                           href={v.url}
                           target="_blank"
                           rel="noreferrer"
-                          aria-label={copy.openFormatNewTab.replace("{format}", v.format)}
-                          className="rounded p-0.5 text-muted-foreground transition-colors hover:bg-control-hover hover:text-foreground"
+                          aria-label={`Open ${v.format} in a new tab`}
+                          className="rounded p-1 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground"
                         >
                           <ArrowSquareOut size={12} />
                         </a>
                       </span>
-                    ) : undefined
-                  }
-                />
-              ))}
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
-          {total > 1 && (
-            <p className="pt-1 text-center text-2xs text-faded">
-              {index + 1} {copy.of} {total} · ← → {copy.moveHint}
-            </p>
-          )}
+          <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+            <DeleteButton
+              label="delete photo"
+              confirmLabel="really delete?"
+              onDelete={() => onDelete(item.id)}
+              className="border border-border-faint"
+            />
+            {total > 1 && (
+              <p className="font-mono text-2xs text-faded">
+                {index + 1} of {total} · ← → to move
+              </p>
+            )}
+          </div>
         </aside>
       </div>
     </div>

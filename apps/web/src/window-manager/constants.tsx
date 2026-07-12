@@ -1,6 +1,5 @@
 import {
   ChartLine,
-  Cpu,
   EnvelopeSimple,
   FileText,
   FolderSimple,
@@ -8,11 +7,11 @@ import {
   GithubLogo,
   Images,
   Path,
-  RocketLaunch,
   SpotifyLogo,
   Terminal,
   UserCircle,
 } from "@phosphor-icons/react";
+import { DockerIcon } from "@/shared/components/docker-icon";
 import type { BackgroundConfig } from "./background/types";
 import type { WindowConfig } from "./types";
 
@@ -108,18 +107,11 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
     },
   },
   {
-    id: "engineering",
-    title: "cat /proc/engineering",
-    icon: <Cpu size={S} weight={W} />,
+    id: "docker",
+    title: "docker compose up --build",
+    icon: <DockerIcon size={S} />,
     defaultOpen: false,
     order: 10,
-  },
-  {
-    id: "deployments",
-    title: "tail -f /var/log/deploys",
-    icon: <RocketLaunch size={S} weight={W} />,
-    defaultOpen: false,
-    order: 11,
   },
   {
     id: "analytics",

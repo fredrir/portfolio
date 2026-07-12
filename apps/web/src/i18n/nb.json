@@ -23,113 +23,6 @@
     "cookieLine": "venter...",
     "cookieLabel": "Informasjonskapsler"
   },
-  "admin": {
-    "pageTitle": "Administrasjon - hansteen.dev",
-    "apiUnreachable": "api utilgjengelig",
-    "subtitle": "mediepipeline · Access-beskyttet",
-    "stats": {
-      "items": "elementer",
-      "live": "live",
-      "stored": "lagret"
-    },
-    "uploadErrors": {
-      "invalidType": "ikke jpeg, png eller webp",
-      "tooLarge": "over 25 MiB",
-      "uploadFailed": "opplasting feilet",
-      "authorizationFailed": "autorisasjon feilet",
-      "processingFailed": "behandling feilet",
-      "networkDuringS3": "nettverksfeil under S3 PUT"
-    },
-    "pipeline": {
-      "stations": [
-        {
-          "label": "autoriser",
-          "sub": "grant + audit"
-        },
-        {
-          "label": "s3 put",
-          "sub": "presigned"
-        },
-        {
-          "label": "worker",
-          "sub": "avif · webp"
-        },
-        {
-          "label": "live",
-          "sub": "galleri"
-        }
-      ],
-      "ingest": "inntak",
-      "clearFinished": "fjern ferdige",
-      "uploadAria": "Last opp bilder: slipp filer hvor som helst eller trykk Enter for å bla",
-      "release": "slipp for å mate pipelinen",
-      "drop": "slipp bilder hvor som helst, eller klikk for å bla",
-      "constraints": "jpeg / png / webp · <= 25 MiB",
-      "category": "kategori",
-      "uncategorized": "ukategorisert",
-      "failed": "feilet",
-      "failedAt": "{detail} · ved {station}",
-      "putProgress": "put {percent}%",
-      "stageLabels": {
-        "authorizing": "autoriserer",
-        "uploading": "laster opp",
-        "processing": "behandler",
-        "ready": "live",
-        "failed": "feilet"
-      }
-    },
-    "library": {
-      "label": "bibliotek",
-      "of": "av",
-      "refreshAria": "Oppdater bibliotek",
-      "openAria": "Åpne {filename}",
-      "filters": {
-        "all": "alle",
-        "ready": "klare",
-        "processing": "behandles",
-        "failed": "feilet"
-      },
-      "filterPlaceholder": "filtrer på filnavn",
-      "filterAria": "Filtrer på filnavn",
-      "reading": "leser biblioteket...",
-      "empty": "biblioteket er tomt - mat pipelinen over",
-      "noMatches": "ingen treff for disse filtrene",
-      "uncategorized": "ukategorisert"
-    },
-    "lightbox": {
-      "copied": "kopiert",
-      "closePreview": "Lukk forhåndsvisning",
-      "noVariant": "ingen variant å forhåndsvise ennå",
-      "previousImage": "Forrige bilde",
-      "nextImage": "Neste bilde",
-      "size": "størrelse",
-      "source": "kilde",
-      "sha256": "sha-256",
-      "copyContentHash": "Kopier innholdshash",
-      "encodedVariants": "kodede varianter",
-      "copyFormatUrl": "Kopier {format}-URL",
-      "openFormatNewTab": "Åpne {format} i ny fane",
-      "of": "av",
-      "moveHint": "for å flytte"
-    },
-    "ledger": {
-      "label": "ledger",
-      "verifying": "verifiserer...",
-      "verifyChain": "verifiser kjede",
-      "chainIntact": "kjeden er intakt - {entries} oppføringer verifisert",
-      "chainBroken": "kjeden er brutt ved oppføring #{id}",
-      "verificationFailed": "verifisering kjørte ikke - prøv igjen",
-      "empty": "ingen oppføringer ennå - første autorisasjon starter kjeden",
-      "collapse": "fold sammen",
-      "showAll": "vis alle {count} oppføringer"
-    },
-    "time": {
-      "secondsAgo": "s siden",
-      "minutesAgo": "m siden",
-      "hoursAgo": "t siden",
-      "daysAgo": "d siden"
-    }
-  },
   "tutorial": {
     "welcomeTitle": "Velkommen!",
     "welcomeBody": "Jeg er Fredrik, la meg vise deg rundt på skrivebordet mitt. Velg språk først.",
@@ -165,8 +58,7 @@
       "settings": "Tema, språk, bakgrunn",
       "terminal": "Interaktiv terminal",
       "gallery": "Fotogalleri",
-      "engineering": "Sanntidsinnblikk i plattformen bak siden",
-      "deployments": "Blågrønne utrullinger med signerte images",
+      "docker": "Sanntidsinnblikk i plattformen bak siden",
       "analytics": "Besøksstatistikk, førstepart og PostHog"
     }
   },
@@ -470,6 +362,30 @@
     "links": "Se også",
     "visitors": "besøkende",
     "uptime": "oppetid",
+    "weather": {
+      "unavailable": "utilgjengelig",
+      "cached": "bufret",
+      "observed": "observert",
+      "displayAdjustment": "Temperaturen er avrundet; værtypen er tilpasset fra WMO-koden",
+      "provider": "Værdata fra Open-Meteo",
+      "conditions": {
+        "clear": "Klart",
+        "mostlyClear": "For det meste klart",
+        "partlyCloudy": "Delvis skyet",
+        "overcast": "Overskyet",
+        "fog": "Tåke",
+        "drizzle": "Yr",
+        "freezingDrizzle": "Underkjølt yr",
+        "rain": "Regn",
+        "freezingRain": "Underkjølt regn",
+        "snow": "Snø",
+        "rainShowers": "Regnbyger",
+        "snowShowers": "Snøbyger",
+        "thunderstorm": "Tordenvær",
+        "hailThunderstorm": "Tordenvær med hagl",
+        "unknown": "Ukjent"
+      }
+    },
     "searchApps": "Søk etter applikasjoner...",
     "noMatching": "Ingen treff",
     "navigate": "naviger",
@@ -518,8 +434,7 @@
       "gallery": "Galleri",
       "home": "Hjem",
       "resume": "CV",
-      "engineering": "Teknisk",
-      "deployments": "Utrullinger",
+      "docker": "Docker",
       "analytics": "Statistikk"
     },
     "shortTitles": {
@@ -533,8 +448,7 @@
       "terminal": "terminal",
       "gallery": "galleri",
       "resume": "cv",
-      "engineering": "engineering",
-      "deployments": "deploys",
+      "docker": "docker",
       "analytics": "analytics"
     },
     "loading": "laster...",
@@ -604,8 +518,7 @@
         "browsers": "nettlesere",
         "referrers": "henvisere",
         "noVisits": "Ingen besøk registrert ennå - telleren starter når samtykke er gitt.",
-        "productAnalytics": "produktanalyse · posthog",
-        "consented": "samtykket",
+        "productAnalytics": "sidevisninger",
         "pageviews30": "sidevisninger, 30 dager"
       }
     },
