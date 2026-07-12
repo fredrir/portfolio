@@ -89,14 +89,16 @@ export function useMediaLibrary(
   );
 
   const renameCategory = useCallback(
-    async (from: string, to: string): Promise<boolean> => {
+    async (from: string, to: string): Promise<string | null> => {
       const updated = await runAction(() => adminRenameCategory({ data: { from, to } }));
-      if (!updated) return false;
+      if (!updated) return null;
       const currentFilters = filtersRef.current;
-      // The page changes an active renamed filter, which triggers the filtered
-      // reload. Without an active category, reload immediately for fresh facets.
-      if (currentFilters.category !== from) await load(currentFilters, false);
-      return true;
+      const nextFilters =
+        currentFilters.category === from
+          ? { ...currentFilters, category: updated.to }
+          : currentFilters;
+      await load(nextFilters, false);
+      return updated.to;
     },
     [load, runAction],
   );

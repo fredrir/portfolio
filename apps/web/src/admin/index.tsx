@@ -112,12 +112,12 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
 
   const handleRenameCategory = useCallback(
     async (from: string, to: string) => {
-      const renamed = await renameCategory(from, to);
-      if (renamed) {
-        setCategoryFilter((current) => (current === from ? to : current));
-        setUploadCategory((current) => (current === from ? to : current));
+      const renamedTo = await renameCategory(from, to);
+      if (renamedTo) {
+        setCategoryFilter((current) => (current === from ? renamedTo : current));
+        setUploadCategory((current) => (current === from ? renamedTo : current));
       }
-      return renamed;
+      return Boolean(renamedTo);
     },
     [renameCategory],
   );
