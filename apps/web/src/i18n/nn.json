@@ -58,7 +58,7 @@
       "settings": "Tema, språk, bakgrunn",
       "terminal": "Interaktiv terminal",
       "gallery": "Fotogalleri",
-      "engineering": "Sanntidsinnblikk i plattforma bak sida",
+      "docker": "Sanntidsinnblikk i plattforma bak sida",
       "analytics": "Besøksstatistikk, førstepart og PostHog"
     }
   },
@@ -434,7 +434,7 @@
       "gallery": "Galleri",
       "home": "Heim",
       "resume": "CV",
-      "engineering": "Teknisk",
+      "docker": "Docker",
       "analytics": "Statistikk"
     },
     "shortTitles": {
@@ -448,7 +448,7 @@
       "terminal": "terminal",
       "gallery": "galleri",
       "resume": "cv",
-      "engineering": "engineering",
+      "docker": "docker",
       "analytics": "analytics"
     },
     "loading": "lastar...",

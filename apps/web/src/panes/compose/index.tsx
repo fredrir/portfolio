@@ -6,7 +6,7 @@ import { Deployments } from "./components/Deployments";
 import { Hop } from "./components/Hop";
 import { useProbe } from "./hooks/useProbe";
 
-export function EngineeringPane({ ui }: { ui: UiStrings }) {
+export function ComposePane({ ui }: { ui: UiStrings }) {
   const t = ui.platform.engineering;
   const probe = useProbe();
   const live = probe != null;

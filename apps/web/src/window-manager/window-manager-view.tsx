@@ -30,8 +30,8 @@ const AnalyticsPaneLazy = lazy(() =>
 const ContactPaneLazy = lazy(() =>
   import("@/panes/contact").then((m) => ({ default: m.ContactPane })),
 );
-const EngineeringPaneLazy = lazy(() =>
-  import("@/panes/engineering").then((m) => ({ default: m.EngineeringPane })),
+const ComposePaneLazy = lazy(() =>
+  import("@/panes/compose").then((m) => ({ default: m.ComposePane })),
 );
 const GitHubPaneLazy = lazy(() =>
   import("@/panes/github").then((m) => ({ default: m.GitHubPane })),
@@ -186,10 +186,10 @@ export function useWindowManagerView(ctx: ViewContext) {
           <ImagePaneLazy ui={ui} />
         </SuspendedPane>
       ),
-      engineering: (
+      docker: (
         <PaneHost>
           <SuspendedPane>
-            <EngineeringPaneLazy ui={ui} />
+            <ComposePaneLazy ui={ui} />
           </SuspendedPane>
         </PaneHost>
       ),

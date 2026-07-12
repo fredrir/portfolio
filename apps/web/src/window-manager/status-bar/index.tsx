@@ -34,7 +34,7 @@ export function StatusBar({ locale, ui, onOpenLauncher, onOpenSettings, weather 
 
   return (
     <div
-      className="fixed right-0 bottom-0 left-0 z-[9999] flex select-none items-center justify-between border-wm-border border-t bg-glass-heavy px-2 font-mono text-xs backdrop-blur-md"
+      className="fixed right-0 bottom-0 left-0 z-9999 flex select-none items-center justify-between border-wm-border border-t bg-glass-heavy px-2 font-mono text-xs backdrop-blur-md"
       style={{ height: STATUS_BAR_HEIGHT }}
     >
       <button

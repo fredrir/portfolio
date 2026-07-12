@@ -58,7 +58,7 @@
       "settings": "Theme, language, wallpaper",
       "terminal": "Interactive terminal",
       "gallery": "Photo gallery",
-      "engineering": "Live look at the platform serving this site",
+      "docker": "Live look at the platform serving this site",
       "analytics": "Visitor analytics, first-party and PostHog"
     }
   },
@@ -434,7 +434,7 @@
       "gallery": "Gallery",
       "home": "Home",
       "resume": "Resume",
-      "engineering": "Engineering",
+      "docker": "Docker",
       "analytics": "Analytics"
     },
     "shortTitles": {
@@ -448,7 +448,7 @@
       "terminal": "terminal",
       "gallery": "gallery",
       "resume": "resume",
-      "engineering": "engineering",
+      "docker": "docker",
       "analytics": "analytics"
     },
     "loading": "loading...",

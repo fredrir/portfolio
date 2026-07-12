@@ -58,7 +58,7 @@
       "settings": "Thème, langue, fond d'écran",
       "terminal": "Terminal interactif",
       "gallery": "Galerie photo",
-      "engineering": "Vue en direct de la plateforme derrière ce site",
+      "docker": "Vue en direct de la plateforme derrière ce site",
       "analytics": "Statistiques de visite, first-party et PostHog"
     }
   },
@@ -434,7 +434,7 @@
       "gallery": "Galerie",
       "home": "Accueil",
       "resume": "CV",
-      "engineering": "Ingénierie",
+      "docker": "Docker",
       "analytics": "Statistiques"
     },
     "shortTitles": {
@@ -448,7 +448,7 @@
       "terminal": "terminal",
       "gallery": "galerie",
       "resume": "cv",
-      "engineering": "engineering",
+      "docker": "docker",
       "analytics": "analytics"
     },
     "loading": "chargement...",
