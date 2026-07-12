@@ -105,22 +105,18 @@ async fn load_cache(state: &AppState) -> Option<(f64, WeatherData)> {
     }
 }
 
-async fn save_cache(state: &AppState, weather: &WeatherData) {
-    let Ok(data) = serde_json::to_value(weather) else {
-        tracing::error!(cache = CACHE_KEY, "weather cache serialization failed");
-        return;
-    };
-    let result = sqlx::query(
+async fn save_cache(state: &AppState, weather: &WeatherData) -> Result<(), String> {
+    let data = serde_json::to_value(weather).map_err(|error| error.to_string())?;
+    sqlx::query(
         "insert into upstream_cache (id, data, updated_at) values ($1, $2, now()) \
          on conflict (id) do update set data = excluded.data, updated_at = now()",
     )
     .bind(CACHE_KEY)
     .bind(data)
     .execute(&state.pool)
-    .await;
-    if let Err(error) = result {
-        tracing::warn!(%error, cache = CACHE_KEY, "weather cache write failed");
-    }
+    .await
+    .map_err(|error| error.to_string())?;
+    Ok(())
 }
 
 async fn fetch_weather(state: &AppState) -> Result<WeatherData, String> {
@@ -209,21 +205,31 @@ pub async fn refresh_if_due(state: &AppState) {
     }
 
     match fetch_weather(state).await {
-        Ok(weather) => {
-            save_cache(state, &weather).await;
-            cache_state
-                .refresh_successes
-                .fetch_add(1, Ordering::Relaxed);
-            cache_state
-                .background_refreshes
-                .fetch_add(1, Ordering::Relaxed);
-            tracing::info!(
-                cache = CACHE_KEY,
-                cache_status = "refreshed",
-                refresh_trigger = "background",
-                "weather cache refresh"
-            );
-        }
+        Ok(weather) => match save_cache(state, &weather).await {
+            Ok(()) => {
+                cache_state
+                    .refresh_successes
+                    .fetch_add(1, Ordering::Relaxed);
+                cache_state
+                    .background_refreshes
+                    .fetch_add(1, Ordering::Relaxed);
+                tracing::info!(
+                    cache = CACHE_KEY,
+                    cache_status = "refreshed",
+                    refresh_trigger = "background",
+                    "weather cache refresh"
+                );
+            }
+            Err(error) => {
+                cache_state.refresh_failures.fetch_add(1, Ordering::Relaxed);
+                tracing::warn!(
+                    %error,
+                    cache = CACHE_KEY,
+                    refresh_trigger = "background",
+                    "weather cache persistence failed"
+                );
+            }
+        },
         Err(error) => {
             cache_state.refresh_failures.fetch_add(1, Ordering::Relaxed);
             tracing::warn!(
@@ -308,16 +314,28 @@ pub async fn weather(State(state): State<AppState>) -> Result<Json<WeatherData>,
 
     let result = match fetch_weather(&state).await {
         Ok(weather) => {
-            save_cache(&state, &weather).await;
-            cache_state
-                .refresh_successes
-                .fetch_add(1, Ordering::Relaxed);
-            tracing::info!(
-                cache = CACHE_KEY,
-                cache_status = "refreshed",
-                refresh_trigger = "request",
-                "weather cache refresh"
-            );
+            match save_cache(&state, &weather).await {
+                Ok(()) => {
+                    cache_state
+                        .refresh_successes
+                        .fetch_add(1, Ordering::Relaxed);
+                    tracing::info!(
+                        cache = CACHE_KEY,
+                        cache_status = "refreshed",
+                        refresh_trigger = "request",
+                        "weather cache refresh"
+                    );
+                }
+                Err(error) => {
+                    cache_state.refresh_failures.fetch_add(1, Ordering::Relaxed);
+                    tracing::warn!(
+                        %error,
+                        cache = CACHE_KEY,
+                        refresh_trigger = "request",
+                        "weather cache persistence failed"
+                    );
+                }
+            }
             Ok(Json(weather))
         }
         Err(error) => {
