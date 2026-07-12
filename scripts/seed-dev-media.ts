@@ -25,6 +25,20 @@ interface SeedSpec {
   category: string;
   source: string;
   filename?: string;
+  exif?: SeedExif;
+}
+
+/** Mirrors the worker-extracted EXIF columns so the dev gallery shows metadata. */
+interface SeedExif {
+  takenAt: string;
+  camera: string;
+  lens: string | null;
+  focalLengthMm: number;
+  aperture: number;
+  shutterSeconds: number;
+  iso: number;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface Dimensions {
@@ -131,8 +145,46 @@ async function putObject(key: string, bytes: Buffer, contentType: string): Promi
   }
 }
 
+const SAMPLE_EXIF: Record<string, SeedExif> = {
+  "20250609_132456000_iOS.jpg": {
+    takenAt: "2025-06-09 13:24:56",
+    camera: "Apple iPhone 15 Pro",
+    lens: "Main Camera 24mm f/1.78",
+    focalLengthMm: 6.8,
+    aperture: 1.8,
+    shutterSeconds: 1 / 120,
+    iso: 64,
+    latitude: 63.4305,
+    longitude: 10.3951,
+  },
+  "20250429_114135877_iOS.jpg": {
+    takenAt: "2025-04-29 11:41:35",
+    camera: "FUJIFILM X-T5",
+    lens: "XF23mmF1.4 R LM WR",
+    focalLengthMm: 23,
+    aperture: 1.4,
+    shutterSeconds: 1 / 250,
+    iso: 320,
+    latitude: 59.9139,
+    longitude: 10.7522,
+  },
+  "20250706_171110387_iOS.webp": {
+    takenAt: "2025-07-06 17:11:10",
+    camera: "NIKON COOLPIX S3000",
+    lens: null,
+    focalLengthMm: 4.9,
+    aperture: 3.2,
+    shutterSeconds: 1 / 25,
+    iso: 200,
+    latitude: null,
+    longitude: null,
+  },
+};
+
 async function seedSpecs(): Promise<SeedSpec[]> {
-  const projectFiles = (await readdir(PROJECTS_DIR))
+  // The static projects gallery was removed with the Supabase fallback; keep
+  // scanning so fixtures reappear automatically if the directory returns.
+  const projectFiles = (await readdir(PROJECTS_DIR).catch(() => [] as string[]))
     .filter((name) => CONTENT_TYPES[extname(name).toLowerCase()])
     .sort()
     .map((name) => ({ category: "projects", source: join(PROJECTS_DIR, name) }));
@@ -162,6 +214,7 @@ async function seedSpecs(): Promise<SeedSpec[]> {
     category,
     source: join(PUBLIC_DIR, source),
     filename,
+    exif: SAMPLE_EXIF[filename],
   }));
 
   return [...projectFiles, ...sampled];
@@ -192,11 +245,18 @@ async function main() {
     await putObject(webpKey, bytes, contentType);
     await putObject(avifKey, bytes, contentType);
 
+    const exif = spec.exif;
     statements.push(
-      `insert into media (id, original_key, filename, content_type, size_bytes, width, height, content_hash, state, category, created_at, updated_at)
+      `insert into media (id, original_key, filename, content_type, size_bytes, width, height, content_hash, state, category, taken_at, camera, lens, focal_length_mm, aperture, shutter_seconds, iso, latitude, longitude, created_at, updated_at)
        values (${sql(mediaId)}, ${sql(originalKey)}, ${sql(filename)}, ${sql(contentType)}, ${sql(bytes.length)}, ${sql(
          dimensions.width,
        )}, ${sql(dimensions.height)}, ${sql(hash)}, 'ready', ${sql(spec.category)}, ${sql(
+         exif?.takenAt ?? null,
+       )}, ${sql(exif?.camera ?? null)}, ${sql(exif?.lens ?? null)}, ${sql(
+         exif?.focalLengthMm ?? null,
+       )}, ${sql(exif?.aperture ?? null)}, ${sql(exif?.shutterSeconds ?? null)}, ${sql(
+         exif?.iso ?? null,
+       )}, ${sql(exif?.latitude ?? null)}, ${sql(exif?.longitude ?? null)}, ${sql(
          createdAt,
        )}, ${sql(createdAt)})
        on conflict (original_key) do update set
@@ -209,6 +269,15 @@ async function main() {
          state = 'ready',
          error = null,
          category = excluded.category,
+         taken_at = excluded.taken_at,
+         camera = excluded.camera,
+         lens = excluded.lens,
+         focal_length_mm = excluded.focal_length_mm,
+         aperture = excluded.aperture,
+         shutter_seconds = excluded.shutter_seconds,
+         iso = excluded.iso,
+         latitude = excluded.latitude,
+         longitude = excluded.longitude,
          updated_at = now();`,
       `insert into media_variants (media_id, format, key, width, height, size_bytes)
        values (${sql(mediaId)}, 'webp', ${sql(webpKey)}, ${sql(dimensions.width)}, ${sql(
