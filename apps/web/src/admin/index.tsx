@@ -3,7 +3,6 @@
 import type { components } from "@portfolio/api-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Ledger } from "@/admin/ledger";
 import { Library } from "@/admin/library";
 import { IngestStrip } from "@/admin/pipeline";
 import { useUploads } from "@/admin/use-uploads";
@@ -14,7 +13,6 @@ import { type AdminAuditEntry, adminAuditLog, adminListMedia } from "@/server/ad
 type MediaItem = components["schemas"]["MediaItem"];
 const ADMIN_STRINGS = getStaticDictionary("en").admin;
 
-/** Registers a whole-window file drop target; returns whether files hover. */
 function useWindowDrop(onDrop: (files: File[]) => void) {
   const [dragging, setDragging] = useState(false);
   const onDropRef = useRef(onDrop);
@@ -69,7 +67,6 @@ export function AdminConsole({
   initialApiDown?: boolean;
 }) {
   const [media, setMedia] = useState<MediaItem[]>(initialMedia);
-  const [audit, setAudit] = useState<AdminAuditEntry[]>(initialAudit);
   const [loading, setLoading] = useState(initialMedia.length === 0 && !initialApiDown);
   const [apiDown, setApiDown] = useState(initialApiDown);
   const [category, setCategory] = useState("");
@@ -78,7 +75,6 @@ export function AdminConsole({
     setLoading(true);
     Promise.allSettled([adminListMedia(), adminAuditLog()]).then(([mediaResult, auditResult]) => {
       if (mediaResult.status === "fulfilled") setMedia(mediaResult.value);
-      if (auditResult.status === "fulfilled") setAudit(auditResult.value);
       setApiDown(mediaResult.status === "rejected");
       setLoading(false);
     });
@@ -134,10 +130,7 @@ export function AdminConsole({
           onFiles={handleFiles}
           onClearSettled={clearSettled}
         />
-        <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_20rem]">
-          <Library media={media} loading={loading} onRefresh={refresh} t={t} />
-          <Ledger audit={audit} t={t} />
-        </div>
+        <Library media={media} loading={loading} onRefresh={refresh} t={t} />
       </main>
     </div>
   );

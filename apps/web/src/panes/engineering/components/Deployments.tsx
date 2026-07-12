@@ -95,9 +95,7 @@ export function Deployments({ ui }: { ui: UiStrings }) {
                   {run.sha.slice(0, 7)}
                 </a>
                 {!narrow && (
-                  <span className="min-w-0 flex-1 truncate text-muted-foreground">
-                    {run.title}
-                  </span>
+                  <span className="min-w-0 flex-1 truncate text-muted-foreground">{run.title}</span>
                 )}
                 {!narrow && run.duration_seconds != null && (
                   <div className="@sm:block hidden h-1.5 w-12 shrink-0 overflow-hidden rounded-sm bg-chart-track">
