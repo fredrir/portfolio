@@ -197,15 +197,25 @@ async fn handle_record(ctx: &Ctx, record: &S3Record) -> Result<(), WorkerError> 
         return Ok(());
     }
 
-    let media: Option<(Uuid,)> = sqlx::query_as("select id from media where original_key = $1")
-        .bind(&key)
-        .fetch_optional(&ctx.pool)
-        .await?;
-    let Some((media_id,)) = media else {
+    let media: Option<(Uuid, String)> =
+        sqlx::query_as("select id, state from media where original_key = $1")
+            .bind(&key)
+            .fetch_optional(&ctx.pool)
+            .await?;
+    let Some((media_id, state)) = media else {
         return Err(WorkerError::Permanent(format!(
             "no media record for key {key}"
         )));
     };
+
+    // Development seeding writes originals before upserting their already-ready
+    // rows. The resulting notification is still waiting when `bun run dev`
+    // starts this worker, and re-encoding every fixture delays real uploads.
+    // This also makes duplicate S3 notifications cheap in every environment.
+    if state == "ready" {
+        tracing::info!(%key, "media already ready; skipping");
+        return Ok(());
+    }
 
     sqlx::query("update media set state = 'processing', updated_at = now() where id = $1")
         .bind(media_id)

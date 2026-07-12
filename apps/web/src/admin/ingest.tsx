@@ -2,7 +2,7 @@
 
 import { CircleNotch, Plus } from "@phosphor-icons/react";
 
-import type { UploadJob } from "@/admin/use-uploads";
+import type { UploadJob } from "@/admin/hooks/use-uploads";
 import { cn } from "@/shared/utils/cn";
 
 function aggregateProgress(jobs: UploadJob[]): number {
@@ -46,9 +46,9 @@ export function IngestStrip({
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2 sm:px-4">
         <button
           type="button"
-          aria-label="Upload photos: drop files anywhere, paste, or press Enter to browse"
+          aria-label="Upload multiple photos: drop files anywhere, paste, or press Enter to browse"
           onClick={onBrowse}
-          className="inline-flex min-w-0 items-center gap-2 rounded text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex min-h-24 min-w-0 items-center gap-2 rounded text-left outline-none hover:border-blue-600 focus-visible:ring-2 focus-visible:ring-ring"
         >
           {active.length > 0 ? (
             <>
@@ -61,10 +61,7 @@ export function IngestStrip({
           ) : (
             <>
               <Plus size={13} className="shrink-0 text-muted-foreground" />
-              <span className="truncate text-muted-foreground text-xs">
-                drop photos anywhere, paste, or click to browse
-                <span className="text-faded"> · jpeg / png / webp — up to 100 MiB</span>
-              </span>
+              <span className="truncate text-muted-foreground text-xs">drop photos</span>
             </>
           )}
         </button>

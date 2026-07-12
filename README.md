@@ -91,11 +91,10 @@ doppler setup --no-interactive
 docker compose up -d                      
 bun install
 
-bun run dev                                 # db/localstack + API + web
+bun run dev                                 # db/localstack + API + media worker + web
 bun run dev:web                             # web app only, http://localhost:3000
 bun run dev:api                             # API only, http://localhost:8080
 bun run dev:seed                            # local media seed
-doppler run -- cargo run -p portfolio-worker
 ```
 
 

@@ -4,8 +4,8 @@ import { ArrowCounterClockwise, Images, Trash, WarningCircle, X } from "@phospho
 import { memo, useEffect, useState } from "react";
 
 import { formatBytes } from "@/admin/format";
+import type { UploadJob } from "@/admin/hooks/use-uploads";
 import { bucketOf, type MediaItem, stateLabel, thumbOf } from "@/admin/model";
-import type { UploadJob } from "@/admin/use-uploads";
 import { cn } from "@/shared/utils/cn";
 
 /** Two-step trash: first press arms the red confirm, second one deletes. */

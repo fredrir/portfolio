@@ -1,53 +1,10 @@
 "use client";
 
-import {
-  ArrowsClockwise,
-  Check,
-  MagnifyingGlass,
-  PencilSimple,
-  Plus,
-  X,
-} from "@phosphor-icons/react";
+import { ArrowsClockwise, Check, MagnifyingGlass, PencilSimple, X } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
-import { formatBytes } from "@/admin/format";
-import { type MediaState, type StateFilter, stateLabel, UNCATEGORIZED } from "@/admin/model";
+import { type MediaState, type StateFilter, UNCATEGORIZED } from "@/admin/model";
 import { cn } from "@/shared/utils/cn";
-
-const STATE_DOT: Record<MediaState, string> = {
-  ready: "bg-[hsl(var(--desk-ok))]",
-  processing: "bg-primary",
-  failed: "bg-destructive",
-};
-
-function StatePill({
-  bucket,
-  count,
-  active,
-  onToggle,
-}: {
-  bucket: MediaState;
-  count: number;
-  active: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onToggle}
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-2xs transition-colors",
-        active
-          ? "border-primary-hint bg-surface-soft text-foreground"
-          : "border-transparent text-muted-foreground hover:bg-surface-dim hover:text-foreground",
-      )}
-    >
-      <span aria-hidden className={cn("size-1.5 rounded-full", STATE_DOT[bucket])} />
-      {stateLabel(bucket)} {count}
-    </button>
-  );
-}
 
 function CategoryChip({
   name,
@@ -206,7 +163,6 @@ export function DeskHeader({
 }) {
   const searchRef = useRef<HTMLInputElement>(null);
 
-  // "/" focuses search from anywhere outside a text field.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -219,35 +175,28 @@ export function DeskHeader({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const toggleState = (bucket: Exclude<StateFilter, "all">) =>
-    onStateFilter(stateFilter === bucket ? "all" : bucket);
-
   return (
     <header className="sticky top-0 z-20 border-border-faint border-b bg-background">
       <div className="mx-auto max-w-7xl px-3 sm:px-5">
-        <div className="flex h-12 items-center gap-2.5">
-          <span
-            aria-hidden
-            className={cn(
-              "size-2 shrink-0 rounded-full",
-              apiDown ? "bg-destructive" : "bg-[hsl(var(--desk-ok))]",
-            )}
-          />
-          <h1 className="min-w-0 truncate font-mono font-semibold text-sm tracking-tight">
-            darkroom
-            <span className="font-normal text-muted-foreground"> · hansteen.dev</span>
+        <div className="flex h-12 items-center justify-between gap-2.5">
+          <h1 className="min-w-0 truncate font-semibold text-sm tracking-tight">
+            <span className="font-normal text-muted-foreground">
+              <span className="text-orange-400">admin</span>hansteen.dev
+            </span>
           </h1>
-          <p className="ml-auto hidden shrink-0 font-mono text-2xs text-muted-foreground sm:block">
-            {total} photos · {formatBytes(storedBytes)}
-          </p>
-          <button
-            type="button"
-            onClick={onAdd}
-            className="ml-auto inline-flex shrink-0 items-center gap-1 rounded bg-primary px-2.5 py-1.5 font-medium text-primary-foreground text-xs transition-colors hover:bg-primary-bold sm:ml-0"
-          >
-            <Plus size={12} weight="bold" />
-            add photos
-          </button>
+          <div className="ml-auto flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              aria-label="Refresh library"
+              onClick={onRefresh}
+              className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground"
+            >
+              <ArrowsClockwise
+                size={24}
+                className={refreshing ? "motion-safe:animate-spin" : undefined}
+              />
+            </button>
+          </div>
         </div>
 
         {apiDown && (
@@ -297,42 +246,6 @@ export function DeskHeader({
               </button>
             )}
           </label>
-
-          <div className="ml-auto flex shrink-0 items-center gap-1">
-            <StatePill
-              bucket="ready"
-              count={counts.ready}
-              active={stateFilter === "ready"}
-              onToggle={() => toggleState("ready")}
-            />
-            {counts.processing > 0 && (
-              <StatePill
-                bucket="processing"
-                count={counts.processing}
-                active={stateFilter === "processing"}
-                onToggle={() => toggleState("processing")}
-              />
-            )}
-            {counts.failed > 0 && (
-              <StatePill
-                bucket="failed"
-                count={counts.failed}
-                active={stateFilter === "failed"}
-                onToggle={() => toggleState("failed")}
-              />
-            )}
-            <button
-              type="button"
-              aria-label="Refresh library"
-              onClick={onRefresh}
-              className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground"
-            >
-              <ArrowsClockwise
-                size={13}
-                className={refreshing ? "motion-safe:animate-spin" : undefined}
-              />
-            </button>
-          </div>
         </div>
 
         {categories.length > 0 && (

@@ -144,8 +144,8 @@ export function useUploads(onMediaChange: () => void) {
   );
 
   const upload = useCallback(
-    (file: File, category: string) => {
-      const job: UploadJob = {
+    (files: File[], category: string) => {
+      const batch = files.map<UploadJob>((file) => ({
         id: crypto.randomUUID(),
         file,
         name: file.name,
@@ -154,9 +154,13 @@ export function useUploads(onMediaChange: () => void) {
         stage: "authorizing",
         sent: 0,
         previewUrl: URL.createObjectURL(file),
-      };
-      updateJobs((current) => [job, ...current]);
-      void runUpload(job.id, file, category);
+      }));
+      if (batch.length === 0) return;
+
+      // Enqueue the complete selection atomically so every preview appears
+      // immediately, then authorize and upload the files independently.
+      updateJobs((current) => [...batch, ...current]);
+      for (const job of batch) void runUpload(job.id, job.file, category);
     },
     [runUpload, updateJobs],
   );

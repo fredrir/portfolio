@@ -1,11 +1,9 @@
 "use client";
 
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/500.css";
-import "@fontsource/ibm-plex-mono/600.css";
-
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-
+import { useFileIngest } from "@/admin/hooks/use-file-ingest";
+import { useMediaLibrary } from "@/admin/hooks/use-media-library";
+import { type UploadJob, useUploads } from "@/admin/hooks/use-uploads";
 import { IngestStrip } from "@/admin/ingest";
 import { PhotoGrid } from "@/admin/library";
 import { Lightbox } from "@/admin/lightbox";
@@ -17,9 +15,6 @@ import {
   UNCATEGORIZED,
 } from "@/admin/model";
 import { DeskHeader } from "@/admin/toolbar";
-import { useFileIngest } from "@/admin/use-file-ingest";
-import { useMediaLibrary } from "@/admin/use-media-library";
-import { type UploadJob, useUploads } from "@/admin/use-uploads";
 
 interface AdminConsoleProps {
   initialLibrary?: AdminMediaLibrary;
@@ -97,8 +92,7 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
 
   const handleFiles = useCallback(
     (files: File[]) => {
-      const category = uploadCategory.trim();
-      for (const file of files) upload(file, category);
+      upload(files, uploadCategory.trim());
     },
     [upload, uploadCategory],
   );
@@ -225,7 +219,6 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
             event.target.value = "";
           }}
         />
-
         <PhotoGrid
           media={media}
           jobs={visibleJobs}
