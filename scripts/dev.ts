@@ -64,7 +64,10 @@ function envWithDefaults(extra: Record<string, string> = {}) {
 
 function runSetup() {
   console.log("[dev] starting local db and localstack");
-  const result = spawnSync("docker", ["compose", "up", "-d", "db", "localstack"], {
+  // --wait blocks until healthchecks pass; localstack's healthcheck queries the
+  // queue created by the ready-hook, so the media bucket is guaranteed to exist
+  // before the seed runs.
+  const result = spawnSync("docker", ["compose", "up", "-d", "--wait", "db", "localstack"], {
     cwd: root,
     stdio: "inherit",
   });

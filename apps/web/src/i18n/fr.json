@@ -166,7 +166,6 @@
       "terminal": "Terminal interactif",
       "gallery": "Galerie photo",
       "engineering": "Vue en direct de la plateforme derrière ce site",
-      "deployments": "Déploiements bleu-vert avec images signées",
       "analytics": "Statistiques de visite, first-party et PostHog"
     }
   },
@@ -519,7 +518,6 @@
       "home": "Accueil",
       "resume": "CV",
       "engineering": "Ingénierie",
-      "deployments": "Déploiements",
       "analytics": "Statistiques"
     },
     "shortTitles": {
@@ -534,7 +532,6 @@
       "gallery": "galerie",
       "resume": "cv",
       "engineering": "engineering",
-      "deployments": "deploys",
       "analytics": "analytics"
     },
     "loading": "chargement...",

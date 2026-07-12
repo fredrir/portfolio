@@ -30,9 +30,6 @@ const AnalyticsPaneLazy = lazy(() =>
 const ContactPaneLazy = lazy(() =>
   import("@/panes/contact").then((m) => ({ default: m.ContactPane })),
 );
-const DeploymentsPaneLazy = lazy(() =>
-  import("@/panes/deployments").then((m) => ({ default: m.DeploymentsPane })),
-);
 const EngineeringPaneLazy = lazy(() =>
   import("@/panes/engineering").then((m) => ({ default: m.EngineeringPane })),
 );
@@ -181,13 +178,6 @@ export function useWindowManagerView(ctx: ViewContext) {
         <PaneHost>
           <SuspendedPane>
             <EngineeringPaneLazy ui={ui} />
-          </SuspendedPane>
-        </PaneHost>
-      ),
-      deployments: (
-        <PaneHost>
-          <SuspendedPane>
-            <DeploymentsPaneLazy ui={ui} />
           </SuspendedPane>
         </PaneHost>
       ),

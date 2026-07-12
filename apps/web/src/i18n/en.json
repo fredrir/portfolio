@@ -166,7 +166,6 @@
       "terminal": "Interactive terminal",
       "gallery": "Photo gallery",
       "engineering": "Live look at the platform serving this site",
-      "deployments": "Blue-green releases with signed images",
       "analytics": "Visitor analytics, first-party and PostHog"
     }
   },
@@ -519,7 +518,6 @@
       "home": "Home",
       "resume": "Resume",
       "engineering": "Engineering",
-      "deployments": "Deployments",
       "analytics": "Analytics"
     },
     "shortTitles": {
@@ -534,7 +532,6 @@
       "gallery": "gallery",
       "resume": "resume",
       "engineering": "engineering",
-      "deployments": "deploys",
       "analytics": "analytics"
     },
     "loading": "loading...",

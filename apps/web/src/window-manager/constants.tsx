@@ -8,7 +8,6 @@ import {
   GithubLogo,
   Images,
   Path,
-  RocketLaunch,
   SpotifyLogo,
   Terminal,
   UserCircle,
@@ -113,13 +112,6 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
     icon: <Cpu size={S} weight={W} />,
     defaultOpen: false,
     order: 10,
-  },
-  {
-    id: "deployments",
-    title: "tail -f /var/log/deploys",
-    icon: <RocketLaunch size={S} weight={W} />,
-    defaultOpen: false,
-    order: 11,
   },
   {
     id: "analytics",

@@ -10,7 +10,6 @@ import {
   GithubLogo,
   Images,
   Path,
-  RocketLaunch,
   SpotifyLogo,
   Terminal,
   UserCircle,
@@ -31,7 +30,6 @@ const GRID_ICONS: Record<string, React.ReactNode> = {
   gallery: <Images size={28} weight="duotone" />,
   resume: <FileText size={28} weight="duotone" />,
   engineering: <Cpu size={28} weight="duotone" />,
-  deployments: <RocketLaunch size={28} weight="duotone" />,
   analytics: <ChartLine size={28} weight="duotone" />,
 };
 

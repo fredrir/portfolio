@@ -20,64 +20,6 @@ function stationOf(job: UploadJob): number {
   return job.stage === "failed" ? (job.failedAt ?? 0) : STATION_OF[job.stage];
 }
 
-function StationRail({
-  jobs,
-  dragging,
-  t,
-}: {
-  jobs: UploadJob[];
-  dragging: boolean;
-  t: AdminStrings["pipeline"];
-}) {
-  const active = jobs.filter((j) => j.stage !== "ready" && j.stage !== "failed");
-  const reach = active.length
-    ? Math.max(...active.map(stationOf))
-    : jobs.some((j) => j.stage === "ready")
-      ? 3
-      : -1;
-  return (
-    <div className="flex items-center @sm:gap-2 gap-1.5" aria-hidden>
-      {t.stations.map((station, i) => {
-        const lit = dragging || i <= reach;
-        const busyHere = active.some((j) => stationOf(j) === i);
-        const failedHere = jobs.some((j) => j.stage === "failed" && stationOf(j) === i);
-        return (
-          <div key={station.label} className="contents">
-            {i > 0 && (
-              <span
-                className={cn(
-                  "h-px flex-1 transition-colors duration-500",
-                  lit ? "bg-primary-subtle" : "bg-border-faint",
-                )}
-              />
-            )}
-            <div className="flex flex-col items-center gap-0.5">
-              <span
-                className={cn(
-                  "text-xs leading-none transition-colors duration-500",
-                  failedHere ? "text-destructive" : lit ? "text-primary" : "text-primary-hint",
-                  busyHere && "motion-safe:animate-pulse",
-                )}
-              >
-                ◈
-              </span>
-              <span
-                className={cn(
-                  "whitespace-nowrap text-3xs uppercase tracking-[0.18em] transition-colors duration-500",
-                  lit ? "text-foreground" : "text-muted-foreground",
-                )}
-              >
-                {station.label}
-              </span>
-              <span className="@md:block hidden text-3xs text-faded">{station.sub}</span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 function JobRow({ job, t }: { job: UploadJob; t: AdminStrings["pipeline"] }) {
   const station = stationOf(job);
   return (
@@ -155,7 +97,6 @@ export function IngestStrip({
   onClearSettled: () => void;
 }) {
   const fileInput = useRef<HTMLInputElement>(null);
-  const hasSettled = jobs.some((j) => j.stage === "ready" || j.stage === "failed");
 
   return (
     <section
@@ -166,18 +107,6 @@ export function IngestStrip({
           : "border-border-medium bg-surface-faint",
       )}
     >
-      <header className="flex items-center justify-between gap-2 border-border-faint border-b px-3 py-1.5">
-        {hasSettled && (
-          <button
-            type="button"
-            onClick={onClearSettled}
-            className="rounded border border-border-faint px-1.5 py-px text-2xs text-muted-foreground transition-colors hover:bg-control-hover hover:text-foreground"
-          >
-            {t.clearFinished}
-          </button>
-        )}
-      </header>
-
       <div
         role="button"
         tabIndex={0}
@@ -191,7 +120,6 @@ export function IngestStrip({
         }}
         className="cursor-pointer rounded-b-lg @sm:px-5 px-3 @sm:py-4 py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <StationRail jobs={jobs} dragging={dragging} t={t} />
         <p className="mt-3 text-center text-2xs text-muted-foreground">
           {dragging ? (
             <span className="text-primary">{t.release}</span>

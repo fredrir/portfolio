@@ -166,7 +166,6 @@
       "terminal": "Interaktiv terminal",
       "gallery": "Fotogalleri",
       "engineering": "Sanntidsinnblikk i plattforma bak sida",
-      "deployments": "Blågrøne utrullingar med signerte images",
       "analytics": "Besøksstatistikk, førstepart og PostHog"
     }
   },
@@ -519,7 +518,6 @@
       "home": "Heim",
       "resume": "CV",
       "engineering": "Teknisk",
-      "deployments": "Utrullingar",
       "analytics": "Statistikk"
     },
     "shortTitles": {
@@ -534,7 +532,6 @@
       "gallery": "galleri",
       "resume": "cv",
       "engineering": "engineering",
-      "deployments": "deploys",
       "analytics": "analytics"
     },
     "loading": "lastar...",
