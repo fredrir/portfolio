@@ -3,8 +3,7 @@ import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { useCallback, useEffect, useRef } from "react";
 import type { GalleryImage } from "@/server/gallery";
 import Image from "@/shared/components/image";
-import { useExifData } from "../hooks/use-exif";
-import { formatDate } from "../utils";
+import { formatAperture, formatDate, formatFocalLength, formatShutter } from "../utils";
 
 const SWIPE_THRESHOLD = 50;
 const SWIPE_VELOCITY = 300;
@@ -37,8 +36,14 @@ export function ImageDetail({
   totalCount: number;
   adjacentSrcs?: string[];
 }) {
-  const { data: exif, loading: exifLoading } = useExifData(image.originalSrc);
-  const displayDate = exif?.dateTaken ?? image.date ?? null;
+  const exposure = [
+    image.focalLengthMm != null ? formatFocalLength(image.focalLengthMm) : null,
+    image.aperture != null ? formatAperture(image.aperture) : null,
+    image.shutterSeconds != null ? formatShutter(image.shutterSeconds) : null,
+    image.iso ? `ISO${image.iso}` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < totalCount - 1;
 
@@ -125,31 +130,24 @@ export function ImageDetail({
       )}
 
       <div className="flex min-h-[1.25rem] shrink-0 flex-wrap gap-x-3 gap-y-0.5 px-0.5 pt-2 text-2xs text-faded">
-        {exifLoading && <span className="animate-pulse">...</span>}
-        {displayDate && <span>{formatDate(displayDate)}</span>}
-        {image.filename && <span> {image.filename} </span>}
-        {exif?.camera && <span>{exif.camera}</span>}
-        {exif?.focalLength && (
+        {image.date && <span>{formatDate(image.date)}</span>}
+        {image.filename && <span>{image.filename}</span>}
+        {image.camera && <span>{image.camera}</span>}
+        {exposure && <span>{exposure}</span>}
+        {image.width && image.height && (
           <span>
-            {[exif.focalLength, exif.aperture, exif.shutter, exif.iso ? `ISO${exif.iso}` : null]
-              .filter(Boolean)
-              .join(" · ")}
+            {image.width}×{image.height}
           </span>
         )}
-        {exif?.width && exif?.height && (
-          <span>
-            {exif.width}×{exif.height}
-          </span>
-        )}
-        {exif?.latitude != null && exif?.longitude != null && (
+        {image.latitude != null && image.longitude != null && (
           <a
-            href={`https://www.google.com/maps?q=${exif.latitude},${exif.longitude}`}
+            href={`https://www.google.com/maps?q=${image.latitude},${image.longitude}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-0.5 text-primary-dim transition-colors hover:text-primary-medium"
           >
             <MapPin size={12} />
-            {exif.latitude.toFixed(4)}, {exif.longitude.toFixed(4)}
+            {image.latitude.toFixed(4)}, {image.longitude.toFixed(4)}
           </a>
         )}
       </div>

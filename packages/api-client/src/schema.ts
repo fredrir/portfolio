@@ -409,12 +409,30 @@ export interface components {
             name: string;
         };
         GalleryImage: {
+            /** Format: float */
+            aperture?: number | null;
+            camera?: string | null;
             contentType: string;
+            /**
+             * @description EXIF capture time when the worker extracted one, otherwise a
+             *     timestamp parsed from the filename. Local wall-clock, no timezone.
+             */
             date?: string | null;
             filename: string;
+            /** Format: float */
+            focalLengthMm?: number | null;
             /** Format: int32 */
             height?: number | null;
+            /** Format: int32 */
+            iso?: number | null;
+            /** Format: double */
+            latitude?: number | null;
+            lens?: string | null;
+            /** Format: double */
+            longitude?: number | null;
             originalSrc: string;
+            /** Format: double */
+            shutterSeconds?: number | null;
             /** Format: int64 */
             sizeBytes: number;
             src: string;

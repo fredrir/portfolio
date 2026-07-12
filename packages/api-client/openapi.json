@@ -879,6 +879,19 @@
           "sizeBytes"
         ],
         "properties": {
+          "aperture": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "float"
+          },
+          "camera": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "contentType": {
             "type": "string"
           },
@@ -886,10 +899,18 @@
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "EXIF capture time when the worker extracted one, otherwise a\ntimestamp parsed from the filename. Local wall-clock, no timezone."
           },
           "filename": {
             "type": "string"
+          },
+          "focalLengthMm": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "float"
           },
           "height": {
             "type": [
@@ -898,8 +919,42 @@
             ],
             "format": "int32"
           },
+          "iso": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "latitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "lens": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "longitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
           "originalSrc": {
             "type": "string"
+          },
+          "shutterSeconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
           },
           "sizeBytes": {
             "type": "integer",

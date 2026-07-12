@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use aws_sdk_sqs::types::Message;
 use portfolio_worker::events::{S3EventMessage, S3Record};
+use portfolio_worker::exif::extract_exif;
 use portfolio_worker::processor::{ProcessError, process_image};
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
@@ -243,15 +244,17 @@ async fn handle_record(ctx: &Ctx, record: &S3Record) -> Result<(), WorkerError> 
 
     let started = std::time::Instant::now();
     let original_len = original.len();
-    let processed = tokio::task::spawn_blocking(move || process_image(&original))
-        .await
-        .map_err(|e| WorkerError::Transient(format!("processing task: {e}")))?
-        .map_err(|e| match e {
-            ProcessError::UnsupportedFormat | ProcessError::Decode(_) => {
-                WorkerError::Permanent(e.to_string())
-            }
-            ProcessError::Encode { .. } => WorkerError::Transient(e.to_string()),
-        })?;
+    let (processed, exif) = tokio::task::spawn_blocking(move || {
+        process_image(&original).map(|processed| (processed, extract_exif(&original)))
+    })
+    .await
+    .map_err(|e| WorkerError::Transient(format!("processing task: {e}")))?
+    .map_err(|e| match e {
+        ProcessError::UnsupportedFormat | ProcessError::Decode(_) => {
+            WorkerError::Permanent(e.to_string())
+        }
+        ProcessError::Encode { .. } => WorkerError::Transient(e.to_string()),
+    })?;
 
     for variant in &processed.variants {
         ctx.s3
@@ -269,7 +272,10 @@ async fn handle_record(ctx: &Ctx, record: &S3Record) -> Result<(), WorkerError> 
     let mut tx = ctx.pool.begin().await?;
     sqlx::query(
         "update media set state = 'ready', width = $2, height = $3, \
-         content_hash = $4, size_bytes = $5, error = null, updated_at = now() \
+         content_hash = $4, size_bytes = $5, error = null, \
+         taken_at = $6, camera = $7, lens = $8, focal_length_mm = $9, \
+         aperture = $10, shutter_seconds = $11, iso = $12, \
+         latitude = $13, longitude = $14, updated_at = now() \
          where id = $1",
     )
     .bind(media_id)
@@ -277,6 +283,15 @@ async fn handle_record(ctx: &Ctx, record: &S3Record) -> Result<(), WorkerError> 
     .bind(processed.height as i32)
     .bind(&processed.content_hash)
     .bind(original_len as i64)
+    .bind(exif.taken_at)
+    .bind(&exif.camera)
+    .bind(&exif.lens)
+    .bind(exif.focal_length_mm)
+    .bind(exif.aperture)
+    .bind(exif.shutter_seconds)
+    .bind(exif.iso)
+    .bind(exif.latitude)
+    .bind(exif.longitude)
     .execute(&mut *tx)
     .await?;
     for variant in &processed.variants {

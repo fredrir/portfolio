@@ -11,6 +11,14 @@ export interface GalleryImage {
   sizeBytes?: number;
   width?: number;
   height?: number;
+  camera?: string;
+  lens?: string;
+  focalLengthMm?: number;
+  aperture?: number;
+  shutterSeconds?: number;
+  iso?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface GalleryCategory {
@@ -43,6 +51,14 @@ export const getGalleryData = createServerFn()
           sizeBytes: image.sizeBytes,
           width: image.width ?? undefined,
           height: image.height ?? undefined,
+          camera: image.camera ?? undefined,
+          lens: image.lens ?? undefined,
+          focalLengthMm: image.focalLengthMm ?? undefined,
+          aperture: image.aperture ?? undefined,
+          shutterSeconds: image.shutterSeconds ?? undefined,
+          iso: image.iso ?? undefined,
+          latitude: image.latitude ?? undefined,
+          longitude: image.longitude ?? undefined,
         })),
       }))
       .sort((a, b) => a.name.localeCompare(b.name));

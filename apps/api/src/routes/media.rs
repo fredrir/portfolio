@@ -238,11 +238,21 @@ pub struct GalleryImage {
     pub src: String,
     pub original_src: String,
     pub filename: String,
+    /// EXIF capture time when the worker extracted one, otherwise a
+    /// timestamp parsed from the filename. Local wall-clock, no timezone.
     pub date: Option<String>,
     pub content_type: String,
     pub size_bytes: i64,
     pub width: Option<i32>,
     pub height: Option<i32>,
+    pub camera: Option<String>,
+    pub lens: Option<String>,
+    pub focal_length_mm: Option<f32>,
+    pub aperture: Option<f32>,
+    pub shutter_seconds: Option<f64>,
+    pub iso: Option<i32>,
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -286,6 +296,15 @@ struct GalleryRow {
     height: Option<i32>,
     category: String,
     variant_key: String,
+    taken_at: Option<String>,
+    camera: Option<String>,
+    lens: Option<String>,
+    focal_length_mm: Option<f32>,
+    aperture: Option<f32>,
+    shutter_seconds: Option<f64>,
+    iso: Option<i32>,
+    latitude: Option<f64>,
+    longitude: Option<f64>,
 }
 
 fn parse_date_from_filename(filename: &str) -> Option<String> {
@@ -412,7 +431,10 @@ pub async fn gallery(
 
     let rows: Vec<GalleryRow> = sqlx::query_as(
         "select m.filename, m.original_key, m.content_type, m.size_bytes, m.width, m.height, \
-                coalesce(m.category, 'uncategorized') as category, v.key as variant_key \
+                coalesce(m.category, 'uncategorized') as category, v.key as variant_key, \
+                to_char(m.taken_at, 'YYYY-MM-DD\"T\"HH24:MI:SS') as taken_at, \
+                m.camera, m.lens, m.focal_length_mm, m.aperture, m.shutter_seconds, \
+                m.iso, m.latitude, m.longitude \
          from media m \
          join lateral ( \
              select format, key \
@@ -430,18 +452,29 @@ pub async fn gallery(
     for row in rows {
         let src = format!("{public_base_url}/{}", row.variant_key);
         let original_src = format!("{public_base_url}/{}", row.original_key);
+        let date = row
+            .taken_at
+            .or_else(|| parse_date_from_filename(&row.filename));
         by_category
             .entry(row.category)
             .or_default()
             .push(GalleryImage {
                 src,
                 original_src,
-                filename: row.filename.clone(),
-                date: parse_date_from_filename(&row.filename),
+                filename: row.filename,
+                date,
                 content_type: row.content_type,
                 size_bytes: row.size_bytes,
                 width: row.width,
                 height: row.height,
+                camera: row.camera,
+                lens: row.lens,
+                focal_length_mm: row.focal_length_mm,
+                aperture: row.aperture,
+                shutter_seconds: row.shutter_seconds,
+                iso: row.iso,
+                latitude: row.latitude,
+                longitude: row.longitude,
             });
     }
 

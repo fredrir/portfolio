@@ -124,7 +124,7 @@ async function putObject(key: string, bytes: Buffer, contentType: string): Promi
       "cache-control": "public, max-age=31536000, immutable",
       "content-type": contentType,
     },
-    body: bytes as unknown as BodyInit,
+    body: bytes,
   });
   if (!response.ok) {
     throw new Error(`LocalStack put failed for ${key}: ${response.status}`);

@@ -594,9 +594,13 @@ async fn media_list_groups_variants_per_item(pool: PgPool) {
 async fn gallery_groups_ready_media_with_public_urls(pool: PgPool) {
     let first_id: uuid::Uuid = sqlx::query_scalar(
         "insert into media (original_key, filename, content_type, size_bytes, state, \
-                            width, height, content_hash, category) \
+                            width, height, content_hash, category, taken_at, camera, lens, \
+                            focal_length_mm, aperture, shutter_seconds, iso, \
+                            latitude, longitude) \
          values ('originals/first.jpg', '20260711_123456_First.jpg', 'image/jpeg', 100, \
-                 'ready', 32, 32, 'first-hash', 'travel') returning id",
+                 'ready', 32, 32, 'first-hash', 'travel', '2026-07-10 08:09:10', \
+                 'FUJIFILM X-T5', 'XF23mmF1.4 R LM WR', 23.0, 1.4, 0.004, 320, \
+                 59.9139, 10.7522) returning id",
     )
     .fetch_one(&pool)
     .await
@@ -649,10 +653,23 @@ async fn gallery_groups_ready_media_with_public_urls(pool: PgPool) {
         body[0]["images"][0]["originalSrc"],
         "https://media.example.test/assets/originals/first.jpg"
     );
-    assert_eq!(body[0]["images"][0]["date"], "2026-07-11T12:34:56");
+    // Persisted EXIF capture time wins over the filename-derived date.
+    assert_eq!(body[0]["images"][0]["date"], "2026-07-10T08:09:10");
     assert_eq!(body[0]["images"][0]["contentType"], "image/jpeg");
     assert_eq!(body[0]["images"][0]["sizeBytes"], 100);
     assert_eq!(body[0]["images"][0]["width"], 32);
     assert_eq!(body[0]["images"][0]["height"], 32);
+    assert_eq!(body[0]["images"][0]["camera"], "FUJIFILM X-T5");
+    assert_eq!(body[0]["images"][0]["lens"], "XF23mmF1.4 R LM WR");
+    assert_eq!(body[0]["images"][0]["focalLengthMm"], 23.0);
+    assert_eq!(body[0]["images"][0]["aperture"], 1.4);
+    assert_eq!(body[0]["images"][0]["shutterSeconds"], 0.004);
+    assert_eq!(body[0]["images"][0]["iso"], 320);
+    assert_eq!(body[0]["images"][0]["latitude"], 59.9139);
+    assert_eq!(body[0]["images"][0]["longitude"], 10.7522);
     assert_eq!(body[1]["name"], "uncategorized");
+    // No EXIF row and an unparseable filename: everything stays null.
+    assert_eq!(body[1]["images"][0]["date"], Value::Null);
+    assert_eq!(body[1]["images"][0]["camera"], Value::Null);
+    assert_eq!(body[1]["images"][0]["latitude"], Value::Null);
 }

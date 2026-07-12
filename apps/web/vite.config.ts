@@ -1,4 +1,5 @@
 import http from "node:http";
+import process from "node:process";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
