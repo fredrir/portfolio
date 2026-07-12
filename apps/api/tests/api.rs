@@ -640,6 +640,68 @@ async fn media_category_filter_and_pending_gate(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn admin_media_filters_in_postgres_and_returns_complete_facets(pool: PgPool) {
+    for (key, filename, size, state, category) in [
+        ("ready", "Trip-ready.jpg", 100_i64, "ready", Some("travel")),
+        ("pending", "city.png", 200, "pending", Some("oslo")),
+        ("failed", "broken-trip.webp", 300, "failed", None),
+        (
+            "processing",
+            "Trip-processing.jpg",
+            400,
+            "processing",
+            Some("travel"),
+        ),
+    ] {
+        sqlx::query(
+            "insert into media (original_key, filename, content_type, size_bytes, state, category) \
+             values ($1, $2, 'image/jpeg', $3, $4, $5)",
+        )
+        .bind(format!("originals/{key}"))
+        .bind(filename)
+        .bind(size)
+        .bind(state)
+        .bind(category)
+        .execute(&pool)
+        .await
+        .unwrap();
+    }
+
+    let unauthorized = Request::get("/api/v1/media/admin")
+        .body(Body::empty())
+        .unwrap();
+    let (status, _) = send(pool.clone(), unauthorized).await;
+    assert_eq!(status, StatusCode::UNAUTHORIZED);
+
+    let request = Request::get(
+        "/api/v1/media/admin?query=TRIP&state=ready&category=travel",
+    )
+    .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+    .body(Body::empty())
+    .unwrap();
+    let (status, body) = send(pool, request).await;
+    assert_eq!(status, StatusCode::OK);
+
+    let items = body["items"].as_array().unwrap();
+    assert_eq!(items.len(), 1);
+    assert_eq!(items[0]["filename"], "Trip-ready.jpg");
+
+    assert_eq!(body["summary"]["total"], 4);
+    assert_eq!(body["summary"]["stored_bytes"], 1000);
+    assert_eq!(body["summary"]["state_counts"]["ready"], 1);
+    assert_eq!(body["summary"]["state_counts"]["processing"], 2);
+    assert_eq!(body["summary"]["state_counts"]["failed"], 1);
+    assert_eq!(
+        body["summary"]["categories"],
+        json!([
+            { "name": "oslo", "count": 1 },
+            { "name": "travel", "count": 2 },
+            { "name": "uncategorized", "count": 1 }
+        ])
+    );
+}
+
+#[sqlx::test]
 async fn github_returns_null_when_upstream_unavailable(pool: PgPool) {
     let (status, body) = send(
         pool,

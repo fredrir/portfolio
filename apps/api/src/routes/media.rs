@@ -435,13 +435,14 @@ pub async fn rename_category(
         .begin()
         .await
         .map_err(|e| ApiError::from(e).into_response())?;
-    let updated = sqlx::query("update media set category = $1, updated_at = now() where category = $2")
-        .bind(&to)
-        .bind(&from)
-        .execute(&mut *tx)
-        .await
-        .map_err(|e| ApiError::from(e).into_response())?
-        .rows_affected() as i64;
+    let updated =
+        sqlx::query("update media set category = $1, updated_at = now() where category = $2")
+            .bind(&to)
+            .bind(&from)
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| ApiError::from(e).into_response())?
+            .rows_affected() as i64;
     if updated == 0 {
         return Err(
             Problem::new(StatusCode::NOT_FOUND, "No media in the source category").into_response(),
@@ -487,6 +488,63 @@ pub struct MediaItem {
     /// UTC upload time, RFC 3339.
     pub created_at: String,
     pub variants: Vec<MediaVariant>,
+}
+
+#[derive(Clone, Copy, Deserialize, ToSchema)]
+#[serde(rename_all = "lowercase")]
+pub enum AdminMediaState {
+    Ready,
+    Processing,
+    Failed,
+}
+
+impl AdminMediaState {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Ready => "ready",
+            Self::Processing => "processing",
+            Self::Failed => "failed",
+        }
+    }
+}
+
+#[derive(Deserialize, utoipa::IntoParams)]
+pub struct AdminMediaParams {
+    /// Case-insensitive substring search across filename and category.
+    pub query: Option<String>,
+    /// Restrict to one normalized processing-state bucket.
+    #[param(inline)]
+    pub state: Option<AdminMediaState>,
+    /// Restrict to one category; `uncategorized` selects null categories.
+    pub category: Option<String>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct AdminMediaCategory {
+    pub name: String,
+    pub count: i64,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct AdminMediaStateCounts {
+    pub ready: i64,
+    pub processing: i64,
+    pub failed: i64,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct AdminMediaSummary {
+    pub total: i64,
+    pub stored_bytes: i64,
+    pub state_counts: AdminMediaStateCounts,
+    pub categories: Vec<AdminMediaCategory>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct AdminMediaLibrary {
+    pub items: Vec<MediaItem>,
+    /// Facets for the complete library, independent of the active filters.
+    pub summary: AdminMediaSummary,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -546,6 +604,21 @@ struct MediaListRow {
 }
 
 #[derive(sqlx::FromRow)]
+struct AdminMediaSummaryRow {
+    total: i64,
+    stored_bytes: i64,
+    ready: i64,
+    processing: i64,
+    failed: i64,
+}
+
+#[derive(sqlx::FromRow)]
+struct AdminMediaCategoryRow {
+    name: String,
+    count: i64,
+}
+
+#[derive(sqlx::FromRow)]
 struct GalleryRow {
     filename: String,
     original_key: String,
@@ -597,6 +670,49 @@ fn parse_date_from_filename(filename: &str) -> Option<String> {
     ))
 }
 
+fn media_items_from_rows(rows: Vec<MediaListRow>, public_base_url: Option<&str>) -> Vec<MediaItem> {
+    let mut items: Vec<MediaItem> = Vec::new();
+    for row in rows {
+        if items.last().map(|i| i.id) != Some(row.id) {
+            items.push(MediaItem {
+                id: row.id,
+                filename: row.filename,
+                content_type: row.content_type,
+                category: row.category,
+                state: row.state,
+                size_bytes: row.size_bytes,
+                width: row.width,
+                height: row.height,
+                content_hash: row.content_hash,
+                created_at: row.created_at,
+                variants: Vec::new(),
+            });
+        }
+        if let (Some(format), Some(key), Some(w), Some(h), Some(size)) = (
+            row.v_format,
+            row.v_key,
+            row.v_width,
+            row.v_height,
+            row.v_size_bytes,
+        ) {
+            let url = public_base_url.map(|base| format!("{}/{key}", base.trim_end_matches('/')));
+            items
+                .last_mut()
+                .expect("media row must have an item")
+                .variants
+                .push(MediaVariant {
+                    format,
+                    key,
+                    width: w,
+                    height: h,
+                    size_bytes: size,
+                    url,
+                });
+        }
+    }
+    items
+}
+
 /// List processed media with their generated variants.
 #[utoipa::path(get, path = "/api/v1/media", tag = "media",
     params(ListMediaParams),
@@ -635,50 +751,106 @@ pub async fn list_media(
     .await
     .map_err(|e| ApiError::from(e).into_response())?;
 
-    let mut items: Vec<MediaItem> = Vec::new();
-    for row in rows {
-        if items.last().map(|i| i.id) != Some(row.id) {
-            items.push(MediaItem {
-                id: row.id,
-                filename: row.filename,
-                content_type: row.content_type,
-                category: row.category,
-                state: row.state,
-                size_bytes: row.size_bytes,
-                width: row.width,
-                height: row.height,
-                content_hash: row.content_hash,
-                created_at: row.created_at,
-                variants: Vec::new(),
-            });
-        }
-        if let (Some(format), Some(key), Some(w), Some(h), Some(size)) = (
-            row.v_format,
-            row.v_key,
-            row.v_width,
-            row.v_height,
-            row.v_size_bytes,
-        ) {
-            let url = state
-                .media
-                .public_base_url
-                .as_deref()
-                .map(|base| format!("{}/{key}", base.trim_end_matches('/')));
-            items
-                .last_mut()
-                .expect("just pushed")
-                .variants
-                .push(MediaVariant {
-                    format,
-                    key,
-                    width: w,
-                    height: h,
-                    size_bytes: size,
-                    url,
-                });
-        }
-    }
-    Ok(Json(items))
+    Ok(Json(media_items_from_rows(
+        rows,
+        state.media.public_base_url.as_deref(),
+    )))
+}
+
+/// Search and summarize the complete media library (administration).
+#[utoipa::path(get, path = "/api/v1/media/admin", tag = "media",
+    params(AdminMediaParams),
+    responses(
+        (status = 200, body = AdminMediaLibrary),
+        (status = 401, description = "Missing or invalid bearer token", body = Problem),
+        (status = 503, description = "Administration API disabled", body = Problem)
+    ))]
+pub async fn admin_media(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    axum::extract::Query(params): axum::extract::Query<AdminMediaParams>,
+) -> Result<Json<AdminMediaLibrary>, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    require_admin(&state, &headers).map_err(|p| p.into_response())?;
+
+    let query = params
+        .query
+        .as_deref()
+        .map(str::trim)
+        .filter(|q| !q.is_empty());
+    let state_filter = params.state.map(AdminMediaState::as_str);
+    let category = params
+        .category
+        .as_deref()
+        .map(str::trim)
+        .filter(|category| !category.is_empty());
+
+    let items_query = sqlx::query_as::<_, MediaListRow>(
+        "select m.id, m.filename, m.content_type, m.category, m.state, \
+                m.size_bytes, m.width, m.height, m.content_hash, \
+                to_char(m.created_at at time zone 'utc', \
+                        'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as created_at, \
+                v.format as v_format, v.key as v_key, v.width as v_width, \
+                v.height as v_height, v.size_bytes as v_size_bytes \
+         from media m \
+         left join media_variants v on v.media_id = m.id \
+         where ($1::text is null \
+                or strpos(lower(m.filename), lower($1)) > 0 \
+                or strpos(lower(coalesce(m.category, 'uncategorized')), lower($1)) > 0) \
+           and ($2::text is null \
+                or case \
+                    when m.state = 'ready' then 'ready' \
+                    when m.state = 'failed' then 'failed' \
+                    else 'processing' \
+                   end = $2) \
+           and ($3::text is null or coalesce(m.category, 'uncategorized') = $3) \
+         order by m.created_at desc, m.id, v.format",
+    )
+    .bind(query)
+    .bind(state_filter)
+    .bind(category);
+    let summary_query = sqlx::query_as::<_, AdminMediaSummaryRow>(
+        "select count(*)::bigint as total, \
+                coalesce(sum(size_bytes), 0)::bigint as stored_bytes, \
+                count(*) filter (where state = 'ready')::bigint as ready, \
+                count(*) filter (where state not in ('ready', 'failed'))::bigint as processing, \
+                count(*) filter (where state = 'failed')::bigint as failed \
+         from media",
+    );
+    let categories_query = sqlx::query_as::<_, AdminMediaCategoryRow>(
+        "select coalesce(category, 'uncategorized') as name, count(*)::bigint as count \
+         from media \
+         group by coalesce(category, 'uncategorized') \
+         order by name",
+    );
+
+    let (rows, summary, categories) = tokio::try_join!(
+        items_query.fetch_all(&state.pool),
+        summary_query.fetch_one(&state.pool),
+        categories_query.fetch_all(&state.pool),
+    )
+    .map_err(|e| ApiError::from(e).into_response())?;
+
+    Ok(Json(AdminMediaLibrary {
+        items: media_items_from_rows(rows, state.media.public_base_url.as_deref()),
+        summary: AdminMediaSummary {
+            total: summary.total,
+            stored_bytes: summary.stored_bytes,
+            state_counts: AdminMediaStateCounts {
+                ready: summary.ready,
+                processing: summary.processing,
+                failed: summary.failed,
+            },
+            categories: categories
+                .into_iter()
+                .map(|category| AdminMediaCategory {
+                    name: category.name,
+                    count: category.count,
+                })
+                .collect(),
+        },
+    }))
 }
 
 /// Gallery-ready media grouped and sorted for direct UI consumption.

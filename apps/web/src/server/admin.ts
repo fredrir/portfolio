@@ -22,15 +22,23 @@ function adminHeaders(): Record<string, string> {
   return { ...traceHeaders(), authorization: `Bearer ${token}` };
 }
 
-export const adminListMedia = createServerFn().handler(async () => {
-  assertAdminOrigin();
-  const { data, error } = await api.GET("/api/v1/media", {
-    params: { query: { include_pending: true } },
-    headers: adminHeaders(),
+export interface AdminMediaQuery {
+  query?: string;
+  state?: "ready" | "processing" | "failed";
+  category?: string;
+}
+
+export const adminListMedia = createServerFn()
+  .validator((input: AdminMediaQuery) => input)
+  .handler(async ({ data: input }) => {
+    assertAdminOrigin();
+    const { data, error } = await api.GET("/api/v1/media/admin", {
+      params: { query: input },
+      headers: adminHeaders(),
+    });
+    if (error || !data) throw new Error("media list failed");
+    return data;
   });
-  if (error || !data) throw new Error("media list failed");
-  return data;
-});
 
 export const adminCreateUpload = createServerFn({ method: "POST" })
   .validator(

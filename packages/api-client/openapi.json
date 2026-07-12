@@ -330,6 +330,94 @@
         }
       }
     },
+    "/api/v1/media/admin": {
+      "get": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Search and summarize the complete media library (administration).",
+        "operationId": "admin_media",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "description": "Case-insensitive substring search across filename and category.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Restrict to one normalized processing-state bucket.",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ready",
+                    "processing",
+                    "failed"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Restrict to one category; `uncategorized` selects null categories.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMediaLibrary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Administration API disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/media/categories/rename": {
       "post": {
         "tags": [
@@ -784,6 +872,91 @@
   },
   "components": {
     "schemas": {
+      "AdminMediaCategory": {
+        "type": "object",
+        "required": [
+          "name",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminMediaLibrary": {
+        "type": "object",
+        "required": [
+          "items",
+          "summary"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItem"
+            }
+          },
+          "summary": {
+            "$ref": "#/components/schemas/AdminMediaSummary",
+            "description": "Facets for the complete library, independent of the active filters."
+          }
+        }
+      },
+      "AdminMediaStateCounts": {
+        "type": "object",
+        "required": [
+          "ready",
+          "processing",
+          "failed"
+        ],
+        "properties": {
+          "failed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "processing": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ready": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AdminMediaSummary": {
+        "type": "object",
+        "required": [
+          "total",
+          "stored_bytes",
+          "state_counts",
+          "categories"
+        ],
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminMediaCategory"
+            }
+          },
+          "state_counts": {
+            "$ref": "#/components/schemas/AdminMediaStateCounts"
+          },
+          "stored_bytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "AnalyticsResponse": {
         "type": "object",
         "required": [

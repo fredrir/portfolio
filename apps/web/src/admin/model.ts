@@ -1,11 +1,24 @@
 import type { components } from "@portfolio/api-client";
 
 export type MediaItem = components["schemas"]["MediaItem"];
+export type AdminMediaLibrary = components["schemas"]["AdminMediaLibrary"];
 
 export type StateFilter = "all" | "ready" | "processing" | "failed";
 export type MediaState = Exclude<StateFilter, "all">;
 
 export const UNCATEGORIZED = "uncategorized";
+
+export function emptyMediaLibrary(): AdminMediaLibrary {
+  return {
+    items: [],
+    summary: {
+      total: 0,
+      stored_bytes: 0,
+      state_counts: { ready: 0, processing: 0, failed: 0 },
+      categories: [],
+    },
+  };
+}
 
 export function bucketOf(item: MediaItem): MediaState {
   if (item.state === "ready") return "ready";
@@ -23,23 +36,4 @@ export function thumbOf(item: MediaItem): string | undefined {
     item.variants.find((v) => v.url)?.url ??
     undefined
   );
-}
-
-export function summarizeMedia(media: MediaItem[]) {
-  const categoryCounts = new Map<string, number>();
-  const stateCounts: Record<MediaState, number> = { ready: 0, processing: 0, failed: 0 };
-  let storedBytes = 0;
-
-  for (const item of media) {
-    const category = item.category ?? UNCATEGORIZED;
-    categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1);
-    stateCounts[bucketOf(item)] += 1;
-    storedBytes += item.size_bytes ?? 0;
-  }
-
-  return {
-    categories: Array.from(categoryCounts.entries()).sort(([a], [b]) => a.localeCompare(b)),
-    stateCounts,
-    storedBytes,
-  };
 }

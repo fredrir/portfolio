@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
 import { AdminConsole } from "@/admin";
+import { emptyMediaLibrary } from "@/admin/model";
 import { adminListMedia } from "@/server/admin";
 import { isAdminOrigin } from "@/server/admin-origin";
 
@@ -18,9 +19,9 @@ export const Route = createFileRoute("/admin")({
   },
   loader: async () => {
     try {
-      return { media: await adminListMedia(), apiDown: false };
+      return { library: await adminListMedia({ data: {} }), apiDown: false };
     } catch {
-      return { media: [], apiDown: true };
+      return { library: emptyMediaLibrary(), apiDown: true };
     }
   },
   head: () => ({
@@ -30,6 +31,6 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-  const { media, apiDown } = Route.useLoaderData();
-  return <AdminConsole initialMedia={media} initialApiDown={apiDown} />;
+  const { library, apiDown } = Route.useLoaderData();
+  return <AdminConsole initialLibrary={library} initialApiDown={apiDown} />;
 }

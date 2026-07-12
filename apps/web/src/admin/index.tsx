@@ -10,11 +10,10 @@ import { IngestStrip } from "@/admin/ingest";
 import { PhotoGrid } from "@/admin/library";
 import { Lightbox } from "@/admin/lightbox";
 import {
-  bucketOf,
-  type MediaItem,
+  type AdminMediaLibrary,
+  emptyMediaLibrary,
   type MediaState,
   type StateFilter,
-  summarizeMedia,
   UNCATEGORIZED,
 } from "@/admin/model";
 import { DeskHeader } from "@/admin/toolbar";
@@ -23,11 +22,11 @@ import { useMediaLibrary } from "@/admin/use-media-library";
 import { type UploadJob, useUploads } from "@/admin/use-uploads";
 
 interface AdminConsoleProps {
-  initialMedia?: MediaItem[];
+  initialLibrary?: AdminMediaLibrary;
   initialApiDown?: boolean;
 }
 
-function matchesFilters(
+function matchesUploadFilters(
   name: string,
   category: string,
   state: MediaState,
@@ -44,10 +43,26 @@ function uploadState(job: UploadJob): MediaState {
   return job.stage === "failed" ? "failed" : "processing";
 }
 
-export function AdminConsole({ initialMedia = [], initialApiDown = false }: AdminConsoleProps) {
+export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminConsoleProps) {
+  const [query, setQuery] = useState("");
+  const [stateFilter, setStateFilter] = useState<StateFilter>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [uploadCategory, setUploadCategory] = useState("");
+  const [openId, setOpenId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const deferredQuery = useDeferredValue(query);
+  const mediaFilters = useMemo(
+    () => ({
+      ...(deferredQuery.trim() ? { query: deferredQuery.trim() } : {}),
+      ...(stateFilter !== "all" ? { state: stateFilter } : {}),
+      ...(categoryFilter ? { category: categoryFilter } : {}),
+    }),
+    [deferredQuery, stateFilter, categoryFilter],
+  );
+
   const {
     media,
-    applySnapshot,
+    summary,
     apiDown,
     refreshing,
     notice,
@@ -55,31 +70,24 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
     deleteMedia,
     setCategory,
     renameCategory,
-  } = useMediaLibrary(initialMedia, initialApiDown);
-  const { jobs, upload, retry, remove } = useUploads(applySnapshot);
+  } = useMediaLibrary(initialLibrary ?? emptyMediaLibrary(), initialApiDown, mediaFilters);
+  const refreshAfterUpload = useCallback(() => void refresh(), [refresh]);
+  const { jobs, upload, retry, remove } = useUploads(refreshAfterUpload);
 
-  const [query, setQuery] = useState("");
-  const [stateFilter, setStateFilter] = useState<StateFilter>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const [uploadCategory, setUploadCategory] = useState("");
-  const [openId, setOpenId] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const {
-    categories,
-    stateCounts: mediaCounts,
-    storedBytes,
-  } = useMemo(() => summarizeMedia(media), [media]);
+  const categories = useMemo<Array<[string, number]>>(
+    () => summary.categories.map(({ name, count }) => [name, count]),
+    [summary.categories],
+  );
   const categoryNames = useMemo(
     () => categories.map(([name]) => name).filter((name) => name !== UNCATEGORIZED),
     [categories],
   );
 
   const counts = useMemo(() => {
-    const next = { ...mediaCounts };
+    const next = { ...summary.state_counts };
     for (const job of jobs) next[uploadState(job)] += 1;
     return next;
-  }, [jobs, mediaCounts]);
+  }, [jobs, summary.state_counts]);
 
   useEffect(() => {
     if (!categoryFilter || categories.some(([name]) => name === categoryFilter)) return;
@@ -114,26 +122,11 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
     [renameCategory],
   );
 
-  const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
-  const visibleMedia = useMemo(
-    () =>
-      media.filter((item) =>
-        matchesFilters(
-          item.filename,
-          item.category ?? UNCATEGORIZED,
-          bucketOf(item),
-          normalizedQuery,
-          stateFilter,
-          categoryFilter,
-        ),
-      ),
-    [media, normalizedQuery, stateFilter, categoryFilter],
-  );
   const visibleJobs = useMemo(
     () =>
       jobs.filter((job) =>
-        matchesFilters(
+        matchesUploadFilters(
           job.name,
           job.category || UNCATEGORIZED,
           uploadState(job),
@@ -145,28 +138,28 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
     [jobs, normalizedQuery, stateFilter, categoryFilter],
   );
 
-  const openIndex = visibleMedia.findIndex((item) => item.id === openId);
-  const openItem = openIndex >= 0 ? visibleMedia[openIndex] : null;
+  const openIndex = media.findIndex((item) => item.id === openId);
+  const openItem = openIndex >= 0 ? media[openIndex] : null;
 
   const deleteFromLightbox = useCallback(
     async (id: string) => {
-      const index = visibleMedia.findIndex((item) => item.id === id);
+      const index = media.findIndex((item) => item.id === id);
       const deleted = await deleteMedia(id);
       if (deleted) {
-        const next = visibleMedia[index + 1] ?? visibleMedia[index - 1];
+        const next = media[index + 1] ?? media[index - 1];
         setOpenId(next?.id ?? null);
       }
       return deleted;
     },
-    [deleteMedia, visibleMedia],
+    [deleteMedia, media],
   );
 
   const navigateLightbox = useCallback(
     (delta: 1 | -1) => {
-      const next = visibleMedia[openIndex + delta];
+      const next = media[openIndex + delta];
       if (next) setOpenId(next.id);
     },
-    [openIndex, visibleMedia],
+    [openIndex, media],
   );
 
   const clearFilters = useCallback(() => {
@@ -199,8 +192,8 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
         apiDown={apiDown}
         refreshing={refreshing}
         counts={counts}
-        total={media.length}
-        storedBytes={storedBytes}
+        total={summary.total}
+        storedBytes={summary.stored_bytes}
         query={query}
         stateFilter={stateFilter}
         categories={categories}
@@ -234,7 +227,7 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
         />
 
         <PhotoGrid
-          media={visibleMedia}
+          media={media}
           jobs={visibleJobs}
           filtered={Boolean(normalizedQuery || stateFilter !== "all" || categoryFilter)}
           onOpen={setOpenId}
@@ -249,7 +242,7 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
         <Lightbox
           item={openItem}
           index={openIndex}
-          total={visibleMedia.length}
+          total={media.length}
           onClose={closeLightbox}
           onNav={navigateLightbox}
           onDelete={deleteFromLightbox}

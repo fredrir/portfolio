@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { MediaItem } from "@/admin/model";
 import { adminCreateUpload, adminListMedia } from "@/server/admin";
 
 export type JobStage = "authorizing" | "uploading" | "processing" | "failed";
@@ -79,8 +78,8 @@ function putWithProgress(
   });
 }
 
-/** Runs uploads and replaces completed upload jobs with the latest media snapshot. */
-export function useUploads(onMediaChange: (media: MediaItem[]) => void) {
+/** Runs browser uploads and asks the library to refresh when processing completes. */
+export function useUploads(onMediaChange: () => void) {
   const [jobs, setJobs] = useState<UploadJob[]>([]);
   const jobsRef = useRef(jobs);
   const controllersRef = useRef(new Map<string, AbortController>());
@@ -195,7 +194,7 @@ export function useUploads(onMediaChange: (media: MediaItem[]) => void) {
       if (polling) return;
       polling = true;
       try {
-        const media = await adminListMedia();
+        const { items: media } = await adminListMedia({ data: {} });
         const mediaById = new Map(media.map((item) => [item.id, item]));
         const completedIds = new Set<string>();
 
@@ -215,7 +214,7 @@ export function useUploads(onMediaChange: (media: MediaItem[]) => void) {
           }),
         );
 
-        if (completedIds.size > 0) onMediaChangeRef.current(media);
+        if (completedIds.size > 0) onMediaChangeRef.current();
       } catch {
         // The API can be transiently unavailable; the next interval retries.
       } finally {

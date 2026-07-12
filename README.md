@@ -12,7 +12,7 @@
 
 ```mermaid
 flowchart LR
-    V["Visitor<br/>"] --> CF["hansteen.dev"]
+    V["Visitor<br/>(you)"] --> CF["hansteen.dev"]
     A["Admin<br/>(me)"] --> CF
     CF --> GH["GitHub<br/>source, CI, GHCR, deployments API"]
     CF --> AWS["AWS eu-north-1<br/>S3 + SQS"]
@@ -97,6 +97,7 @@ bun run dev:api                             # API only, http://localhost:8080
 bun run dev:seed                            # local media seed
 doppler run -- cargo run -p portfolio-worker
 ```
+
 
 ### Checks
 

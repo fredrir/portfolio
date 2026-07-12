@@ -251,7 +251,7 @@ export function PhotoGrid({
             </button>
           </>
         ) : (
-          <p className="text-xs">no photos yet — drop some anywhere on this page</p>
+          <p className="text-xs">no photos yet</p>
         )}
       </div>
     );
