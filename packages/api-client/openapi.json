@@ -189,7 +189,7 @@
         "tags": [
           "deployments"
         ],
-        "summary": "Production deployment history (GitHub Actions runs, cached server-side).",
+        "summary": "Production deployment history (GitHub Actions runs, cached in Postgres).",
         "operationId": "deployments",
         "responses": {
           "200": {
@@ -396,19 +396,8 @@
         "tags": [
           "spotify"
         ],
-        "summary": "Current/recent playback and top artists (captcha-gated like the old\nserver action; credentials-missing and upstream failures degrade to the\ndatabase cache).",
+        "summary": "Current/recent playback and top artists. Not captcha-gated: the data is\npublic and the in-memory TTL below bounds upstream Spotify calls\nregardless of traffic; credentials-missing and upstream failures degrade\nto the database cache.",
         "operationId": "spotify",
-        "parameters": [
-          {
-            "name": "recaptcha_token",
-            "in": "query",
-            "description": "reCAPTCHA v3 token for the `spotify_data` action.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "",
