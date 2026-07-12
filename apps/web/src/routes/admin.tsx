@@ -2,7 +2,6 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
 import { AdminConsole } from "@/admin";
-import { getStaticDictionary } from "@/i18n/dictionaries";
 import { adminListMedia } from "@/server/admin";
 import { isAdminOrigin } from "@/server/admin-origin";
 
@@ -26,7 +25,7 @@ export const Route = createFileRoute("/admin")({
   },
   head: () => ({
     meta: [
-      { title: getStaticDictionary("en").admin.pageTitle },
+      { title: "admin.hansteen.dev" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),

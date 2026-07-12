@@ -37,13 +37,14 @@ pub fn require_admin(state: &AppState, headers: &HeaderMap) -> Result<(), Proble
 }
 
 /// Lowercased, charset-restricted gallery grouping key; None when nothing
-/// usable remains.
+/// usable remains. Unicode letters and numbers are retained so category names
+/// can contain characters such as `æ`, `ø`, and `å`.
 pub fn sanitize_category(raw: &str) -> Option<String> {
     let cleaned: String = raw
         .to_lowercase()
         .chars()
         .map(|c| {
-            if c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-') {
+            if c.is_alphanumeric() || matches!(c, '.' | '_' | '-') {
                 c
             } else {
                 '_'
@@ -760,6 +761,15 @@ mod props {
 
     use super::{sanitize_category, sanitize_filename};
 
+    #[test]
+    fn category_sanitization_preserves_norwegian_characters() {
+        assert_eq!(sanitize_category("Kragerø"), Some("kragerø".to_owned()));
+        assert_eq!(
+            sanitize_category("Ærø, blåbær & Ålesund"),
+            Some("ærø__blåbær___ålesund".to_owned())
+        );
+    }
+
     proptest! {
         #[test]
         fn filename_sanitization_is_idempotent_and_safe(input in ".{0,80}") {
@@ -775,7 +785,7 @@ mod props {
             if let Some(category) = sanitize_category(&input) {
                 prop_assert!(!category.is_empty());
                 prop_assert!(category.chars().count() <= 64);
-                prop_assert!(category.chars().all(|c| c.is_ascii_alphanumeric()
+                prop_assert!(category.chars().all(|c| c.is_alphanumeric()
                     || matches!(c, '.' | '_' | '-')));
                 prop_assert_eq!(category.to_lowercase(), category.clone());
             }

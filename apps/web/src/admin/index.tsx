@@ -4,276 +4,177 @@ import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
 import "@fontsource/ibm-plex-mono/600.css";
 
-import type { components } from "@portfolio/api-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { IngestStrip } from "@/admin/ingest";
 import { PhotoGrid } from "@/admin/library";
 import { Lightbox } from "@/admin/lightbox";
-import { bucketOf, type StateFilter } from "@/admin/model";
-import { DeskHeader } from "@/admin/toolbar";
-import { useUploads } from "@/admin/use-uploads";
-import { getStaticDictionary } from "@/i18n/dictionaries";
 import {
-  adminDeleteMedia,
-  adminListMedia,
-  adminRenameCategory,
-  adminSetCategory,
-} from "@/server/admin";
+  bucketOf,
+  type MediaItem,
+  type MediaState,
+  type StateFilter,
+  summarizeMedia,
+  UNCATEGORIZED,
+} from "@/admin/model";
+import { DeskHeader } from "@/admin/toolbar";
+import { useFileIngest } from "@/admin/use-file-ingest";
+import { useMediaLibrary } from "@/admin/use-media-library";
+import { type UploadJob, useUploads } from "@/admin/use-uploads";
 
-type MediaItem = components["schemas"]["MediaItem"];
-const ADMIN_STRINGS = getStaticDictionary("en").admin;
+interface AdminConsoleProps {
+  initialMedia?: MediaItem[];
+  initialApiDown?: boolean;
+}
 
-function useWindowDrop(onDrop: (files: File[]) => void) {
-  const [dragging, setDragging] = useState(false);
-  const onDropRef = useRef(onDrop);
-  onDropRef.current = onDrop;
+function matchesFilters(
+  name: string,
+  category: string,
+  state: MediaState,
+  query: string,
+  stateFilter: StateFilter,
+  categoryFilter: string | null,
+): boolean {
+  if (stateFilter !== "all" && state !== stateFilter) return false;
+  if (categoryFilter && category !== categoryFilter) return false;
+  return !query || name.toLowerCase().includes(query) || category.toLowerCase().includes(query);
+}
 
-  useEffect(() => {
-    let depth = 0;
-    const hasFiles = (e: DragEvent) => Array.from(e.dataTransfer?.types ?? []).includes("Files");
-    const enter = (e: DragEvent) => {
-      if (!hasFiles(e)) return;
-      e.preventDefault();
-      depth += 1;
-      setDragging(true);
-    };
-    const over = (e: DragEvent) => {
-      if (hasFiles(e)) e.preventDefault();
-    };
-    const leave = (e: DragEvent) => {
-      if (!hasFiles(e)) return;
-      depth = Math.max(0, depth - 1);
-      if (depth === 0) setDragging(false);
-    };
-    const drop = (e: DragEvent) => {
-      if (!hasFiles(e)) return;
-      e.preventDefault();
-      depth = 0;
-      setDragging(false);
-      onDropRef.current(Array.from(e.dataTransfer?.files ?? []));
-    };
-    window.addEventListener("dragenter", enter);
-    window.addEventListener("dragover", over);
-    window.addEventListener("dragleave", leave);
-    window.addEventListener("drop", drop);
-    return () => {
-      window.removeEventListener("dragenter", enter);
-      window.removeEventListener("dragover", over);
-      window.removeEventListener("dragleave", leave);
-      window.removeEventListener("drop", drop);
-    };
-  }, []);
-
-  return dragging;
+function uploadState(job: UploadJob): MediaState {
+  return job.stage === "failed" ? "failed" : "processing";
 }
 
 export function AdminConsole({
   initialMedia = [],
   initialApiDown = false,
-}: {
-  initialMedia?: MediaItem[];
-  initialApiDown?: boolean;
-}) {
-  const t = ADMIN_STRINGS;
-  const uncat = t.library.uncategorized;
-
-  const [media, setMedia] = useState<MediaItem[]>(initialMedia);
-  const [loading, setLoading] = useState(initialMedia.length === 0 && !initialApiDown);
-  const [refreshing, setRefreshing] = useState(false);
-  const [apiDown, setApiDown] = useState(initialApiDown);
-  const [notice, setNotice] = useState<string | null>(null);
+}: AdminConsoleProps) {
+  const {
+    media,
+    setMedia,
+    apiDown,
+    refreshing,
+    notice,
+    refresh,
+    deleteMedia,
+    setCategory,
+    renameCategory,
+  } = useMediaLibrary(initialMedia, initialApiDown);
+  const { jobs, upload, retry, remove } = useUploads(setMedia);
 
   const [query, setQuery] = useState("");
   const [stateFilter, setStateFilter] = useState<StateFilter>("all");
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [uploadCategory, setUploadCategory] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const refresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      setMedia(await adminListMedia());
-      setApiDown(false);
-    } catch {
-      setApiDown(true);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
-
-  useEffect(() => {
-    if (!notice) return;
-    const timer = setTimeout(() => setNotice(null), 4000);
-    return () => clearTimeout(timer);
-  }, [notice]);
-
-  // Uploads land in the grid as developing tiles; once the worker settles one
-  // the library refreshes and the ghost retires in favor of the real tile.
-  const landedRef = useRef<(jobId: string) => void>(() => {});
-  const { jobs, upload, retry, remove } = useUploads(
-    useCallback((jobId: string) => landedRef.current(jobId), []),
-    t.uploadErrors,
+  const { categories, stateCounts: mediaCounts, storedBytes } = useMemo(
+    () => summarizeMedia(media),
+    [media],
   );
-  landedRef.current = (jobId: string) => {
-    void Promise.allSettled([refresh(), new Promise((r) => setTimeout(r, 700))]).then(() =>
-      remove(jobId),
-    );
-  };
+  const categoryNames = useMemo(
+    () => categories.map(([name]) => name).filter((name) => name !== UNCATEGORIZED),
+    [categories],
+  );
+
+  const counts = useMemo(() => {
+    const next = { ...mediaCounts };
+    for (const job of jobs) next[uploadState(job)] += 1;
+    return next;
+  }, [jobs, mediaCounts]);
+
+  useEffect(() => {
+    if (!categoryFilter || categories.some(([name]) => name === categoryFilter)) return;
+    setCategoryFilter(null);
+    setUploadCategory("");
+  }, [categories, categoryFilter]);
 
   const handleFiles = useCallback(
     (files: File[]) => {
-      for (const file of files) upload(file, uploadCategory.trim());
+      const category = uploadCategory.trim();
+      for (const file of files) upload(file, category);
     },
     [upload, uploadCategory],
   );
-  const dragging = useWindowDrop(handleFiles);
+  const dragging = useFileIngest(handleFiles);
 
-  // Cmd/Ctrl+V with an image on the clipboard uploads it.
-  useEffect(() => {
-    const onPaste = (e: ClipboardEvent) => {
-      const files = Array.from(e.clipboardData?.files ?? []).filter((f) =>
-        f.type.startsWith("image/"),
-      );
-      if (files.length > 0) {
-        e.preventDefault();
-        handleFiles(files);
-      }
-    };
-    window.addEventListener("paste", onPaste);
-    return () => window.removeEventListener("paste", onPaste);
-  }, [handleFiles]);
-
-  const fileInput = useRef<HTMLInputElement>(null);
-  const browse = useCallback(() => fileInput.current?.click(), []);
-
-  const categories = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const m of media) {
-      const key = m.category ?? uncat;
-      map.set(key, (map.get(key) ?? 0) + 1);
-    }
-    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-  }, [media, uncat]);
-
-  // A filter can outlive its category (rename, last delete); drop it then.
-  useEffect(() => {
-    if (categoryFilter && !categories.some(([name]) => name === categoryFilter)) {
-      setCategoryFilter(null);
-    }
-  }, [categories, categoryFilter]);
-
-  // New uploads follow the album being viewed unless overridden in the strip.
-  useEffect(() => {
-    setUploadCategory(categoryFilter && categoryFilter !== uncat ? categoryFilter : "");
-  }, [categoryFilter, uncat]);
-
-  const counts = useMemo(() => {
-    const c = { ready: 0, processing: 0, failed: 0 };
-    for (const m of media) c[bucketOf(m)] += 1;
-    for (const j of jobs) c[j.stage === "failed" ? "failed" : "processing"] += 1;
-    return c;
-  }, [media, jobs]);
-
-  const storedBytes = useMemo(
-    () => media.reduce((sum, m) => sum + (m.size_bytes ?? 0), 0),
-    [media],
-  );
-
-  const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return media.filter((m) => {
-      if (stateFilter !== "all" && bucketOf(m) !== stateFilter) return false;
-      const category = m.category ?? uncat;
-      if (categoryFilter && category !== categoryFilter) return false;
-      if (q && !m.filename.toLowerCase().includes(q) && !category.toLowerCase().includes(q)) {
-        return false;
-      }
-      return true;
-    });
-  }, [media, stateFilter, categoryFilter, query, uncat]);
-
-  const visibleJobs = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return jobs.filter((j) => {
-      const bucket = j.stage === "failed" ? "failed" : "processing";
-      if (stateFilter !== "all" && stateFilter !== bucket) return false;
-      const category = j.category || uncat;
-      if (categoryFilter && category !== categoryFilter) return false;
-      if (q && !j.name.toLowerCase().includes(q) && !category.toLowerCase().includes(q)) {
-        return false;
-      }
-      return true;
-    });
-  }, [jobs, stateFilter, categoryFilter, query, uncat]);
-
-  const handleDelete = useCallback(
-    async (id: string): Promise<boolean> => {
-      try {
-        await adminDeleteMedia({ data: { id } });
-      } catch {
-        setNotice(t.actionFailed);
-        return false;
-      }
-      setMedia((all) => all.filter((m) => m.id !== id));
-      return true;
-    },
-    [t.actionFailed],
-  );
-
-  const deleteFromLightbox = useCallback(
-    async (id: string): Promise<boolean> => {
-      const index = visible.findIndex((m) => m.id === id);
-      const ok = await handleDelete(id);
-      if (ok) {
-        const next = visible[index + 1] ?? visible[index - 1];
-        setOpenId(next && next.id !== id ? next.id : null);
-      }
-      return ok;
-    },
-    [visible, handleDelete],
-  );
-
-  const handleSetCategory = useCallback(
-    async (id: string, category: string | null): Promise<boolean> => {
-      try {
-        const result = await adminSetCategory({ data: { id, category } });
-        setMedia((all) =>
-          all.map((m) => (m.id === id ? { ...m, category: result.category ?? null } : m)),
-        );
-        return true;
-      } catch {
-        setNotice(t.actionFailed);
-        return false;
-      }
-    },
-    [t.actionFailed],
-  );
+  const browse = useCallback(() => fileInputRef.current?.click(), []);
+  const selectCategory = useCallback((category: string | null) => {
+    setCategoryFilter(category);
+    setUploadCategory(category && category !== UNCATEGORIZED ? category : "");
+  }, []);
 
   const handleRenameCategory = useCallback(
-    async (from: string, to: string): Promise<boolean> => {
-      try {
-        const result = await adminRenameCategory({ data: { from, to } });
-        setMedia((all) =>
-          all.map((m) => (m.category === from ? { ...m, category: result.to } : m)),
-        );
-        setCategoryFilter((current) => (current === from ? result.to : current));
-        return true;
-      } catch {
-        setNotice(t.actionFailed);
-        return false;
+    async (from: string, to: string) => {
+      const renamed = await renameCategory(from, to);
+      if (renamed) {
+        setCategoryFilter((current) => (current === from ? to : current));
+        setUploadCategory((current) => (current === from ? to : current));
       }
+      return renamed;
     },
-    [t.actionFailed],
+    [renameCategory],
   );
 
-  const openIndex = visible.findIndex((m) => m.id === openId);
-  const openItem = openIndex >= 0 ? visible[openIndex] : null;
-  const categoryNames = categories.map(([name]) => name).filter((name) => name !== uncat);
+  const normalizedQuery = query.trim().toLowerCase();
+  const visibleMedia = useMemo(
+    () =>
+      media.filter((item) =>
+        matchesFilters(
+          item.filename,
+          item.category ?? UNCATEGORIZED,
+          bucketOf(item),
+          normalizedQuery,
+          stateFilter,
+          categoryFilter,
+        ),
+      ),
+    [media, normalizedQuery, stateFilter, categoryFilter],
+  );
+  const visibleJobs = useMemo(
+    () =>
+      jobs.filter((job) =>
+        matchesFilters(
+          job.name,
+          job.category || UNCATEGORIZED,
+          uploadState(job),
+          normalizedQuery,
+          stateFilter,
+          categoryFilter,
+        ),
+      ),
+    [jobs, normalizedQuery, stateFilter, categoryFilter],
+  );
+
+  const openIndex = visibleMedia.findIndex((item) => item.id === openId);
+  const openItem = openIndex >= 0 ? visibleMedia[openIndex] : null;
+
+  const deleteFromLightbox = useCallback(
+    async (id: string) => {
+      const index = visibleMedia.findIndex((item) => item.id === id);
+      const deleted = await deleteMedia(id);
+      if (deleted) {
+        const next = visibleMedia[index + 1] ?? visibleMedia[index - 1];
+        setOpenId(next?.id ?? null);
+      }
+      return deleted;
+    },
+    [deleteMedia, visibleMedia],
+  );
+
+  const navigateLightbox = useCallback(
+    (delta: 1 | -1) => {
+      const next = visibleMedia[openIndex + delta];
+      if (next) setOpenId(next.id);
+    },
+    [openIndex, visibleMedia],
+  );
+
+  const clearFilters = useCallback(() => {
+    setQuery("");
+    setStateFilter("all");
+    selectCategory(null);
+  }, [selectCategory]);
 
   return (
     <div className="admin-desk h-dvh overflow-y-auto text-sm antialiased">
@@ -284,10 +185,9 @@ export function AdminConsole({
         >
           <div className="absolute inset-3 flex items-center justify-center rounded-lg border-2 border-primary border-dashed">
             <p className="font-mono text-primary text-sm">
-              {t.ingest.release}
+              release to develop
               <span className="text-muted-foreground">
-                {" "}
-                → {uploadCategory.trim() || t.ingest.uncategorized}
+                {" "}→ {uploadCategory.trim() || UNCATEGORIZED}
               </span>
             </p>
           </div>
@@ -295,7 +195,6 @@ export function AdminConsole({
       )}
 
       <DeskHeader
-        t={t}
         apiDown={apiDown}
         refreshing={refreshing}
         counts={counts}
@@ -305,10 +204,9 @@ export function AdminConsole({
         stateFilter={stateFilter}
         categories={categories}
         categoryFilter={categoryFilter}
-        uncat={uncat}
         onQuery={setQuery}
         onStateFilter={setStateFilter}
-        onCategoryFilter={setCategoryFilter}
+        onCategoryFilter={selectCategory}
         onRefresh={() => void refresh()}
         onAdd={browse}
         onRenameCategory={handleRenameCategory}
@@ -316,7 +214,6 @@ export function AdminConsole({
 
       <main className="mx-auto max-w-7xl px-3 pb-16 sm:px-5">
         <IngestStrip
-          t={t.ingest}
           jobs={jobs}
           category={uploadCategory}
           categoryNames={categoryNames}
@@ -324,32 +221,26 @@ export function AdminConsole({
           onBrowse={browse}
         />
         <input
-          ref={fileInput}
+          ref={fileInputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp"
           multiple
           hidden
-          onChange={(e) => {
-            handleFiles(Array.from(e.target.files ?? []));
-            e.target.value = "";
+          onChange={(event) => {
+            handleFiles(Array.from(event.target.files ?? []));
+            event.target.value = "";
           }}
         />
 
         <PhotoGrid
-          t={t}
-          media={visible}
+          media={visibleMedia}
           jobs={visibleJobs}
-          loading={loading}
-          filtered={visible.length !== media.length || visibleJobs.length !== jobs.length}
+          filtered={Boolean(normalizedQuery || stateFilter !== "all" || categoryFilter)}
           onOpen={setOpenId}
-          onDelete={handleDelete}
+          onDelete={deleteMedia}
           onRetryJob={retry}
           onDismissJob={remove}
-          onClearFilters={() => {
-            setQuery("");
-            setStateFilter("all");
-            setCategoryFilter(null);
-          }}
+          onClearFilters={clearFilters}
         />
       </main>
 
@@ -357,16 +248,11 @@ export function AdminConsole({
         <Lightbox
           item={openItem}
           index={openIndex}
-          total={visible.length}
-          categoryNames={categoryNames}
-          t={t}
+          total={visibleMedia.length}
           onClose={() => setOpenId(null)}
-          onNav={(delta) => {
-            const next = visible[openIndex + delta];
-            if (next) setOpenId(next.id);
-          }}
+          onNav={navigateLightbox}
           onDelete={deleteFromLightbox}
-          onSetCategory={handleSetCategory}
+          onSetCategory={setCategory}
         />
       )}
 

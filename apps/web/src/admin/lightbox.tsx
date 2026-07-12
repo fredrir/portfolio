@@ -1,16 +1,12 @@
 "use client";
 
 import { ArrowSquareOut, CaretLeft, CaretRight, Check, Copy, X } from "@phosphor-icons/react";
-import type { components } from "@portfolio/api-client";
 import { useEffect, useRef, useState } from "react";
 
 import { formatBytes, timeAgo } from "@/admin/format";
 import { DeleteButton } from "@/admin/library";
-import { bucketOf } from "@/admin/model";
-import type { AdminStrings } from "@/i18n/types";
+import { bucketOf, type MediaItem, stateLabel, thumbOf } from "@/admin/model";
 import { cn } from "@/shared/utils/cn";
-
-type MediaItem = components["schemas"]["MediaItem"];
 
 function CopyButton({
   text,
@@ -22,17 +18,26 @@ function CopyButton({
   copiedLabel: string;
 }) {
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timeout = window.setTimeout(() => setCopied(false), 1500);
+    return () => window.clearTimeout(timeout);
+  }, [copied]);
+
   return (
     <button
       type="button"
       aria-label={label}
       title={copied ? copiedLabel : label}
-      onClick={() => {
-        void navigator.clipboard.writeText(text).then(() => {
+      onClick={() =>
+        void navigator.clipboard
+          .writeText(text)
+          .then(() => {
           setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
-        });
-      }}
+          })
+          .catch(() => undefined)
+      }
       className="rounded p-1 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground"
     >
       {copied ? <Check size={12} className="text-primary" /> : <Copy size={12} />}
@@ -59,8 +64,6 @@ export function Lightbox({
   item,
   index,
   total,
-  categoryNames,
-  t,
   onClose,
   onNav,
   onDelete,
@@ -69,14 +72,11 @@ export function Lightbox({
   item: MediaItem;
   index: number;
   total: number;
-  categoryNames: string[];
-  t: AdminStrings;
   onClose: () => void;
   onNav: (delta: 1 | -1) => void;
   onDelete: (id: string) => Promise<boolean>;
   onSetCategory: (id: string, category: string | null) => Promise<boolean>;
 }) {
-  const copy = t.lightbox;
   const closeRef = useRef<HTMLButtonElement>(null);
   const bucket = bucketOf(item);
 
@@ -109,8 +109,7 @@ export function Lightbox({
     setSaving(false);
   };
 
-  const webp = item.variants.find((v) => v.format === "webp");
-  const preview = webp?.url ?? item.variants.find((v) => v.url)?.url;
+  const preview = thumbOf(item);
 
   return (
     <div
@@ -121,7 +120,7 @@ export function Lightbox({
     >
       <button
         type="button"
-        aria-label={copy.close}
+        aria-label="Close"
         onClick={onClose}
         className="absolute inset-0 cursor-default bg-overlay-heavy backdrop-blur-sm"
         tabIndex={-1}
@@ -135,13 +134,15 @@ export function Lightbox({
               className="max-h-[50dvh] w-full object-contain md:max-h-[80dvh]"
             />
           ) : (
-            <p className="p-10 font-mono text-muted-foreground text-xs">{copy.noVariant}</p>
+            <p className="p-10 font-mono text-muted-foreground text-xs">
+              no preview yet — still developing
+            </p>
           )}
           {total > 1 && (
             <>
               <button
                 type="button"
-                aria-label={copy.prev}
+                aria-label="Previous photo"
                 onClick={() => onNav(-1)}
                 className="absolute left-1.5 rounded-full bg-glass-light p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
               >
@@ -149,7 +150,7 @@ export function Lightbox({
               </button>
               <button
                 type="button"
-                aria-label={copy.next}
+                aria-label="Next photo"
                 onClick={() => onNav(1)}
                 className="absolute right-1.5 rounded-full bg-glass-light p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
               >
@@ -169,13 +170,13 @@ export function Lightbox({
                   STATE_STYLE[bucket],
                 )}
               >
-                {t.library.states[bucket]}
+                {stateLabel(bucket)}
               </span>
             </div>
             <button
               ref={closeRef}
               type="button"
-              aria-label={copy.close}
+              aria-label="Close"
               onClick={onClose}
               className="rounded p-1 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
             >
@@ -184,13 +185,13 @@ export function Lightbox({
           </div>
 
           <label className="block">
-            <span className="mb-1 block text-2xs text-faded">{copy.category}</span>
+            <span className="mb-1 block text-2xs text-faded">category</span>
             <span className="flex items-center gap-1.5">
               <input
                 value={category}
                 disabled={saving}
                 list="desk-categories"
-                placeholder={t.ingest.uncategorized}
+                placeholder="uncategorized"
                 onChange={(e) => setCategory(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") void saveCategory();
@@ -205,29 +206,29 @@ export function Lightbox({
                   onClick={() => void saveCategory()}
                   className="shrink-0 rounded bg-primary px-2 py-1 font-medium text-2xs text-primary-foreground transition-colors hover:bg-primary-bold disabled:opacity-60"
                 >
-                  {copy.save}
+                  save
                 </button>
               )}
             </span>
           </label>
 
           <dl className="divide-y divide-border-faint border-border-faint border-y">
-            <MetaRow label={copy.dimensions}>
+            <MetaRow label="dimensions">
               {item.width && item.height ? `${item.width} × ${item.height}` : "—"}
             </MetaRow>
-            <MetaRow label={copy.source}>
+            <MetaRow label="source">
               {item.content_type.replace("image/", "")}
               {item.size_bytes ? ` · ${formatBytes(item.size_bytes)}` : ""}
             </MetaRow>
-            <MetaRow label={copy.uploaded}>{timeAgo(item.created_at, t.time)}</MetaRow>
+            <MetaRow label="uploaded">{timeAgo(item.created_at)}</MetaRow>
             {item.content_hash && (
-              <MetaRow label={copy.sha256}>
+              <MetaRow label="sha-256">
                 <span className="inline-flex items-center gap-0.5">
                   <span title={item.content_hash}>{item.content_hash.slice(0, 12)}…</span>
                   <CopyButton
                     text={item.content_hash}
-                    label={copy.copy.replace("{what}", copy.sha256)}
-                    copiedLabel={copy.copied}
+                    label="Copy sha-256"
+                    copiedLabel="copied"
                   />
                 </span>
               </MetaRow>
@@ -236,7 +237,7 @@ export function Lightbox({
 
           {item.variants.length > 0 && (
             <div>
-              <p className="mb-1 text-2xs text-faded">{copy.variants}</p>
+              <p className="mb-1 text-2xs text-faded">variants</p>
               <ul className="space-y-0.5">
                 {item.variants.map((v) => (
                   <li key={v.key} className="flex items-center gap-1.5 font-mono text-xs">
@@ -248,14 +249,14 @@ export function Lightbox({
                       <span className="ml-auto inline-flex items-center">
                         <CopyButton
                           text={v.url}
-                          label={copy.copy.replace("{what}", v.format)}
-                          copiedLabel={copy.copied}
+                          label={`Copy ${v.format}`}
+                          copiedLabel="copied"
                         />
                         <a
                           href={v.url}
                           target="_blank"
                           rel="noreferrer"
-                          aria-label={copy.openTab.replace("{what}", v.format)}
+                          aria-label={`Open ${v.format} in a new tab`}
                           className="rounded p-1 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground"
                         >
                           <ArrowSquareOut size={12} />
@@ -270,14 +271,14 @@ export function Lightbox({
 
           <div className="mt-auto flex items-center justify-between gap-2 pt-2">
             <DeleteButton
-              label={copy.delete}
-              confirmLabel={copy.confirmDelete}
+              label="delete photo"
+              confirmLabel="really delete?"
               onDelete={() => onDelete(item.id)}
               className="border border-border-faint"
             />
             {total > 1 && (
               <p className="font-mono text-2xs text-faded">
-                {index + 1} {copy.of} {total} · ← → {copy.moveHint}
+                {index + 1} of {total} · ← → to move
               </p>
             )}
           </div>

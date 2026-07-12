@@ -11,11 +11,15 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { formatBytes } from "@/admin/format";
-import type { StateFilter } from "@/admin/model";
-import type { AdminStrings } from "@/i18n/types";
+import {
+  type MediaState,
+  type StateFilter,
+  stateLabel,
+  UNCATEGORIZED,
+} from "@/admin/model";
 import { cn } from "@/shared/utils/cn";
 
-const STATE_DOT: Record<Exclude<StateFilter, "all">, string> = {
+const STATE_DOT: Record<MediaState, string> = {
   ready: "bg-[hsl(var(--desk-ok))]",
   processing: "bg-primary",
   failed: "bg-destructive",
@@ -23,13 +27,11 @@ const STATE_DOT: Record<Exclude<StateFilter, "all">, string> = {
 
 function StatePill({
   bucket,
-  label,
   count,
   active,
   onToggle,
 }: {
-  bucket: Exclude<StateFilter, "all">;
-  label: string;
+  bucket: MediaState;
   count: number;
   active: boolean;
   onToggle: () => void;
@@ -47,7 +49,7 @@ function StatePill({
       )}
     >
       <span aria-hidden className={cn("size-1.5 rounded-full", STATE_DOT[bucket])} />
-      {label} {count}
+      {stateLabel(bucket)} {count}
     </button>
   );
 }
@@ -57,7 +59,6 @@ function CategoryChip({
   count,
   active,
   renamable,
-  renameStrings,
   onToggle,
   onRename,
 }: {
@@ -65,7 +66,6 @@ function CategoryChip({
   count: number;
   active: boolean;
   renamable: boolean;
-  renameStrings: AdminStrings["library"];
   onToggle: () => void;
   onRename: (to: string) => Promise<boolean>;
 }) {
@@ -99,8 +99,8 @@ function CategoryChip({
           ref={inputRef}
           value={value}
           disabled={busy}
-          aria-label={renameStrings.renameAria.replace("{category}", name)}
-          placeholder={renameStrings.renamePlaceholder}
+          aria-label={`Rename category ${name}`}
+          placeholder="new name"
           size={Math.max(value.length, 6)}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
@@ -114,7 +114,7 @@ function CategoryChip({
         />
         <button
           type="button"
-          aria-label={renameStrings.renameSave}
+          aria-label="Save category name"
           disabled={busy}
           onClick={() => void commit()}
           className="rounded-full p-0.5 text-primary hover:bg-surface-selected disabled:opacity-50"
@@ -127,7 +127,7 @@ function CategoryChip({
         </button>
         <button
           type="button"
-          aria-label={renameStrings.renameCancel}
+          aria-label="Cancel rename"
           disabled={busy}
           onClick={() => {
             setEditing(false);
@@ -162,7 +162,7 @@ function CategoryChip({
       {active && renamable && (
         <button
           type="button"
-          aria-label={renameStrings.renameAria.replace("{category}", name)}
+          aria-label={`Rename category ${name}`}
           onClick={() => {
             setValue(name);
             setEditing(true);
@@ -177,7 +177,6 @@ function CategoryChip({
 }
 
 export function DeskHeader({
-  t,
   apiDown,
   refreshing,
   counts,
@@ -187,7 +186,6 @@ export function DeskHeader({
   stateFilter,
   categories,
   categoryFilter,
-  uncat,
   onQuery,
   onStateFilter,
   onCategoryFilter,
@@ -195,17 +193,15 @@ export function DeskHeader({
   onAdd,
   onRenameCategory,
 }: {
-  t: AdminStrings;
   apiDown: boolean;
   refreshing: boolean;
-  counts: Record<Exclude<StateFilter, "all">, number>;
+  counts: Record<MediaState, number>;
   total: number;
   storedBytes: number;
   query: string;
   stateFilter: StateFilter;
   categories: Array<[string, number]>;
   categoryFilter: string | null;
-  uncat: string;
   onQuery: (value: string) => void;
   onStateFilter: (value: StateFilter) => void;
   onCategoryFilter: (value: string | null) => void;
@@ -243,11 +239,11 @@ export function DeskHeader({
             )}
           />
           <h1 className="min-w-0 truncate font-mono font-semibold text-sm tracking-tight">
-            {t.wordmark}
+            darkroom
             <span className="font-normal text-muted-foreground"> · hansteen.dev</span>
           </h1>
           <p className="ml-auto hidden shrink-0 font-mono text-2xs text-muted-foreground sm:block">
-            {total} {t.stats.photos} · {formatBytes(storedBytes)}
+            {total} photos · {formatBytes(storedBytes)}
           </p>
           <button
             type="button"
@@ -255,20 +251,22 @@ export function DeskHeader({
             className="ml-auto inline-flex shrink-0 items-center gap-1 rounded bg-primary px-2.5 py-1.5 font-medium text-primary-foreground text-xs transition-colors hover:bg-primary-bold sm:ml-0"
           >
             <Plus size={12} weight="bold" />
-            {t.addPhotos}
+            add photos
           </button>
         </div>
 
         {apiDown && (
           <div className="flex items-center gap-3 border-border-faint border-t py-2">
-            <p className="min-w-0 font-mono text-destructive text-xs">{t.apiDown}</p>
+            <p className="min-w-0 font-mono text-destructive text-xs">
+              API unreachable — the library cannot load or change right now.
+            </p>
             <button
               type="button"
               onClick={onRefresh}
               disabled={refreshing}
               className="shrink-0 rounded border border-destructive/40 px-2 py-0.5 font-mono text-2xs text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
             >
-              {t.retry}
+              retry
             </button>
           </div>
         )}
@@ -289,14 +287,14 @@ export function DeskHeader({
                   e.currentTarget.blur();
                 }
               }}
-              placeholder={t.library.searchPlaceholder}
-              aria-label={t.library.searchAria}
+              placeholder="search"
+              aria-label="Search by filename or category (press / to focus)"
               className="w-full rounded-full border border-border-faint bg-card py-1 pr-7 pl-7 font-mono text-xs outline-none placeholder:text-placeholder focus-visible:border-primary-subtle"
             />
             {query && (
               <button
                 type="button"
-                aria-label={t.library.clearSearch}
+                aria-label="Clear search"
                 onClick={() => onQuery("")}
                 className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:text-foreground"
               >
@@ -308,7 +306,6 @@ export function DeskHeader({
           <div className="ml-auto flex shrink-0 items-center gap-1">
             <StatePill
               bucket="ready"
-              label={t.library.states.ready}
               count={counts.ready}
               active={stateFilter === "ready"}
               onToggle={() => toggleState("ready")}
@@ -316,7 +313,6 @@ export function DeskHeader({
             {counts.processing > 0 && (
               <StatePill
                 bucket="processing"
-                label={t.library.states.processing}
                 count={counts.processing}
                 active={stateFilter === "processing"}
                 onToggle={() => toggleState("processing")}
@@ -325,7 +321,6 @@ export function DeskHeader({
             {counts.failed > 0 && (
               <StatePill
                 bucket="failed"
-                label={t.library.states.failed}
                 count={counts.failed}
                 active={stateFilter === "failed"}
                 onToggle={() => toggleState("failed")}
@@ -333,7 +328,7 @@ export function DeskHeader({
             )}
             <button
               type="button"
-              aria-label={t.library.refresh}
+              aria-label="Refresh library"
               onClick={onRefresh}
               className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground"
             >
@@ -358,7 +353,7 @@ export function DeskHeader({
                   : "text-muted-foreground hover:bg-surface-dim hover:text-foreground",
               )}
             >
-              {t.library.all}
+              all
             </button>
             {categories.map(([name, count]) => (
               <CategoryChip
@@ -366,8 +361,7 @@ export function DeskHeader({
                 name={name}
                 count={count}
                 active={categoryFilter === name}
-                renamable={name !== uncat}
-                renameStrings={t.library}
+                renamable={name !== UNCATEGORIZED}
                 onToggle={() => onCategoryFilter(categoryFilter === name ? null : name)}
                 onRename={(to) => onRenameCategory(name, to)}
               />

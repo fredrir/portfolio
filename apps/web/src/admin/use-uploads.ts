@@ -1,12 +1,9 @@
-import type { components } from "@portfolio/api-client";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { AdminStrings } from "@/i18n/types";
+import type { MediaItem } from "@/admin/model";
 import { adminCreateUpload, adminListMedia } from "@/server/admin";
 
-type MediaItem = components["schemas"]["MediaItem"];
-
-export type JobStage = "authorizing" | "uploading" | "processing" | "ready" | "failed";
+export type JobStage = "authorizing" | "uploading" | "processing" | "failed";
 
 export interface UploadJob {
   id: string;
@@ -15,69 +12,106 @@ export interface UploadJob {
   size: number;
   category: string;
   stage: JobStage;
-  /** 0..1 while the S3 PUT is in flight. */
+  /** Upload progress from 0 to 1. */
   sent: number;
   detail?: string;
   mediaId?: string;
   previewUrl: string;
 }
 
-// Mirrors ALLOWED_CONTENT_TYPES / MAX_UPLOAD_BYTES in the API.
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_BYTES = 100 * 1024 * 1024;
+const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
+const POLL_INTERVAL_MS = 3000;
 
 function putWithProgress(
   url: string,
   headers: Record<string, string>,
   file: File,
+  signal: AbortSignal,
   onProgress: (fraction: number) => void,
-  errors: AdminStrings["uploadErrors"],
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", url);
-    for (const [k, v] of Object.entries(headers)) {
-      if (k.toLowerCase() !== "host") xhr.setRequestHeader(k, v);
-    }
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) onProgress(e.loaded / e.total);
+    const request = new XMLHttpRequest();
+    let animationFrame = 0;
+    let latestProgress = 0;
+
+    const flushProgress = () => {
+      animationFrame = 0;
+      onProgress(latestProgress);
     };
-    xhr.onload = () =>
-      xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`S3 PUT ${xhr.status}`));
-    xhr.onerror = () => reject(new Error(errors.networkDuringS3));
-    xhr.send(file);
+    const cleanup = () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      signal.removeEventListener("abort", abort);
+    };
+    const abort = () => request.abort();
+
+    request.open("PUT", url);
+    for (const [key, value] of Object.entries(headers)) {
+      if (key.toLowerCase() !== "host") request.setRequestHeader(key, value);
+    }
+
+    request.upload.onprogress = (event) => {
+      if (!event.lengthComputable) return;
+      latestProgress = event.loaded / event.total;
+      if (!animationFrame) animationFrame = requestAnimationFrame(flushProgress);
+    };
+    request.onload = () => {
+      cleanup();
+      if (request.status >= 200 && request.status < 300) resolve();
+      else reject(new Error(`Upload failed (${request.status})`));
+    };
+    request.onerror = () => {
+      cleanup();
+      reject(new Error("Network error during upload"));
+    };
+    request.onabort = () => {
+      cleanup();
+      reject(new DOMException("Upload cancelled", "AbortError"));
+    };
+
+    signal.addEventListener("abort", abort, { once: true });
+    request.send(file);
   });
 }
 
-/**
- * Drives uploads through the real pipeline: authorize (audited) → presigned
- * S3 PUT with byte progress → poll until the worker settles the item.
- * `onLanded` fires once per job that reaches "ready"; the caller refreshes
- * the library and then removes the job so the real tile takes over.
- */
-export function useUploads(
-  onLanded: (jobId: string) => void,
-  errors: AdminStrings["uploadErrors"],
-) {
+/** Runs uploads and replaces completed upload jobs with the latest media snapshot. */
+export function useUploads(onMediaChange: (media: MediaItem[]) => void) {
   const [jobs, setJobs] = useState<UploadJob[]>([]);
-  const landedRef = useRef(new Set<string>());
-  const onLandedRef = useRef(onLanded);
-  onLandedRef.current = onLanded;
+  const jobsRef = useRef(jobs);
+  const controllersRef = useRef(new Map<string, AbortController>());
+  const onMediaChangeRef = useRef(onMediaChange);
+  jobsRef.current = jobs;
+  onMediaChangeRef.current = onMediaChange;
 
-  const patch = useCallback((id: string, delta: Partial<UploadJob>) => {
-    setJobs((all) => all.map((j) => (j.id === id ? { ...j, ...delta } : j)));
+  const updateJobs = useCallback((update: (current: UploadJob[]) => UploadJob[]) => {
+    const next = update(jobsRef.current);
+    jobsRef.current = next;
+    setJobs(next);
   }, []);
 
-  const run = useCallback(
+  const patchJob = useCallback(
+    (id: string, patch: Partial<UploadJob>) => {
+      updateJobs((current) =>
+        current.map((job) => (job.id === id ? { ...job, ...patch } : job)),
+      );
+    },
+    [updateJobs],
+  );
+
+  const runUpload = useCallback(
     async (id: string, file: File, category: string) => {
-      if (!ACCEPTED_TYPES.includes(file.type)) {
-        patch(id, { stage: "failed", detail: errors.invalidType });
+      if (!ACCEPTED_TYPES.has(file.type)) {
+        patchJob(id, { stage: "failed", detail: "Only JPEG, PNG and WebP files are supported" });
         return;
       }
-      if (file.size > MAX_BYTES) {
-        patch(id, { stage: "failed", detail: errors.tooLarge });
+      if (file.size > MAX_UPLOAD_BYTES) {
+        patchJob(id, { stage: "failed", detail: "File is larger than 100 MiB" });
         return;
       }
+
+      const controller = new AbortController();
+      controllersRef.current.set(id, controller);
+
       try {
         const grant = await adminCreateUpload({
           data: {
@@ -87,106 +121,116 @@ export function useUploads(
             category: category || undefined,
           },
         });
-        patch(id, { stage: "uploading", mediaId: grant.media_id });
-        try {
-          await putWithProgress(
-            grant.upload_url,
-            grant.headers,
-            file,
-            (sent) => patch(id, { sent }),
-            errors,
-          );
-        } catch (err) {
-          patch(id, {
-            stage: "failed",
-            detail: err instanceof Error ? err.message : errors.uploadFailed,
-          });
-          return;
-        }
-        patch(id, { stage: "processing", sent: 1 });
-      } catch (err) {
-        patch(id, {
+        if (controller.signal.aborted) return;
+
+        patchJob(id, { stage: "uploading", mediaId: grant.media_id });
+        await putWithProgress(grant.upload_url, grant.headers, file, controller.signal, (sent) =>
+          patchJob(id, { sent }),
+        );
+        patchJob(id, { stage: "processing", sent: 1 });
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        patchJob(id, {
           stage: "failed",
-          detail: err instanceof Error ? err.message : errors.authorizationFailed,
+          detail: error instanceof Error ? error.message : "Upload failed",
         });
+      } finally {
+        controllersRef.current.delete(id);
       }
     },
-    [patch, errors],
+    [patchJob],
   );
 
   const upload = useCallback(
     (file: File, category: string) => {
-      const id = `${file.name}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-      setJobs((all) => [
-        {
-          id,
-          file,
-          name: file.name,
-          size: file.size,
-          category,
-          stage: "authorizing",
-          sent: 0,
-          previewUrl: URL.createObjectURL(file),
-        },
-        ...all,
-      ]);
-      void run(id, file, category);
+      const job: UploadJob = {
+        id: crypto.randomUUID(),
+        file,
+        name: file.name,
+        size: file.size,
+        category,
+        stage: "authorizing",
+        sent: 0,
+        previewUrl: URL.createObjectURL(file),
+      };
+      updateJobs((current) => [job, ...current]);
+      void runUpload(job.id, file, category);
     },
-    [run],
+    [runUpload, updateJobs],
   );
 
   const retry = useCallback(
     (id: string) => {
-      const job = jobs.find((j) => j.id === id);
+      const job = jobsRef.current.find((candidate) => candidate.id === id);
       if (!job || job.stage !== "failed") return;
-      patch(id, { stage: "authorizing", sent: 0, detail: undefined, mediaId: undefined });
-      void run(id, job.file, job.category);
+      patchJob(id, { stage: "authorizing", sent: 0, detail: undefined, mediaId: undefined });
+      void runUpload(id, job.file, job.category);
     },
-    [jobs, patch, run],
+    [patchJob, runUpload],
   );
 
-  const remove = useCallback((id: string) => {
-    setJobs((all) => {
-      const job = all.find((j) => j.id === id);
-      if (job) URL.revokeObjectURL(job.previewUrl);
-      return all.filter((j) => j.id !== id);
-    });
-  }, []);
+  const remove = useCallback(
+    (id: string) => {
+      controllersRef.current.get(id)?.abort();
+      controllersRef.current.delete(id);
+      updateJobs((current) => {
+        const removed = current.find((job) => job.id === id);
+        if (removed) URL.revokeObjectURL(removed.previewUrl);
+        return current.filter((job) => job.id !== id);
+      });
+    },
+    [updateJobs],
+  );
 
-  // Poll processing jobs until the worker settles them.
+  const hasProcessingJobs = jobs.some((job) => job.stage === "processing");
+
   useEffect(() => {
-    if (!jobs.some((j) => j.stage === "processing")) return;
-    const timer = setInterval(async () => {
+    if (!hasProcessingJobs) return;
+    let polling = false;
+
+    const poll = async () => {
+      if (polling) return;
+      polling = true;
       try {
         const media = await adminListMedia();
-        setJobs((all) =>
-          all.map((job) => {
-            if (job.stage !== "processing" || !job.mediaId) return job;
-            const item = media.find((m: MediaItem) => m.id === job.mediaId);
-            if (!item) return job;
-            if (item.state === "ready") return { ...job, stage: "ready" as const };
-            if (item.state === "failed")
-              return { ...job, stage: "failed" as const, detail: errors.processingFailed };
-            return job;
+        const mediaById = new Map(media.map((item) => [item.id, item]));
+        const completedIds = new Set<string>();
+
+        updateJobs((current) =>
+          current.flatMap((job) => {
+            if (job.stage !== "processing" || !job.mediaId) return [job];
+            const item = mediaById.get(job.mediaId);
+            if (item?.state === "ready") {
+              completedIds.add(job.id);
+              URL.revokeObjectURL(job.previewUrl);
+              return [];
+            }
+            if (item?.state === "failed") {
+              return [{ ...job, stage: "failed", detail: "Processing failed" }];
+            }
+            return [job];
           }),
         );
-      } catch {
-        // transient; keep polling
-      }
-    }, 3000);
-    return () => clearInterval(timer);
-  }, [jobs, errors.processingFailed]);
 
-  // Notify (once per job) when an upload lands, so the library can refresh
-  // and retire the ghost tile.
-  useEffect(() => {
-    for (const job of jobs) {
-      if (job.stage === "ready" && !landedRef.current.has(job.id)) {
-        landedRef.current.add(job.id);
-        onLandedRef.current(job.id);
+        if (completedIds.size > 0) onMediaChangeRef.current(media);
+      } catch {
+        // The API can be transiently unavailable; the next interval retries.
+      } finally {
+        polling = false;
       }
-    }
-  }, [jobs]);
+    };
+
+    const interval = window.setInterval(() => void poll(), POLL_INTERVAL_MS);
+    return () => window.clearInterval(interval);
+  }, [hasProcessingJobs, updateJobs]);
+
+  useEffect(
+    () => () => {
+      for (const controller of controllersRef.current.values()) controller.abort();
+      for (const job of jobsRef.current) URL.revokeObjectURL(job.previewUrl);
+    },
+    [],
+  );
 
   return { jobs, upload, retry, remove };
 }

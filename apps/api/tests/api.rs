@@ -220,8 +220,13 @@ async fn media_upload_returns_presigned_url_and_pending_record(pool: PgPool) {
         .header(header::CONTENT_TYPE, "application/json")
         .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
         .body(Body::from(
-            json!({ "filename": "My Photo!.jpg", "content_type": "image/jpeg", "size_bytes": 1234 })
-                .to_string(),
+            json!({
+                "filename": "My Photo!.jpg",
+                "content_type": "image/jpeg",
+                "size_bytes": 1234,
+                "category": "Kragerø"
+            })
+            .to_string(),
         ))
         .unwrap();
     let (status, body) = send(pool.clone(), request).await;
@@ -231,12 +236,14 @@ async fn media_upload_returns_presigned_url_and_pending_record(pool: PgPool) {
     assert!(url.contains("originals/"), "key prefix in url: {url}");
     assert!(body["media_id"].is_string());
 
-    let (state, filename): (String, String) = sqlx::query_as("select state, filename from media")
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+    let (state, filename, category): (String, String, Option<String>) =
+        sqlx::query_as("select state, filename, category from media")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
     assert_eq!(state, "pending");
     assert_eq!(filename, "My_Photo_.jpg");
+    assert_eq!(category.as_deref(), Some("kragerø"));
 }
 
 /// Authorize an upload and return the pending media id.
@@ -374,11 +381,11 @@ async fn category_rename_moves_all_media(pool: PgPool) {
         .unwrap();
     let (status, body) = send(pool.clone(), request).await;
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(body["to"], "krager__summer");
+    assert_eq!(body["to"], "kragerø_summer");
     assert_eq!(body["updated"], 2);
 
     let (moved,): (i64,) = sqlx::query_as("select count(*) from media where category = $1")
-        .bind("krager__summer")
+        .bind("kragerø_summer")
         .fetch_one(&pool)
         .await
         .unwrap();
