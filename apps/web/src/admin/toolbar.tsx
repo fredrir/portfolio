@@ -142,7 +142,6 @@ export function DeskHeader({
   onStateFilter,
   onCategoryFilter,
   onRefresh,
-  onAdd,
   onRenameCategory,
 }: {
   apiDown: boolean;
@@ -158,7 +157,6 @@ export function DeskHeader({
   onStateFilter: (value: StateFilter) => void;
   onCategoryFilter: (value: string | null) => void;
   onRefresh: () => void;
-  onAdd: () => void;
   onRenameCategory: (from: string, to: string) => Promise<boolean>;
 }) {
   const searchRef = useRef<HTMLInputElement>(null);

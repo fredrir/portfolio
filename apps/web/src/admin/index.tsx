@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useFileIngest } from "@/admin/hooks/use-file-ingest";
 import { useMediaLibrary } from "@/admin/hooks/use-media-library";
 import { type UploadJob, useUploads } from "@/admin/hooks/use-uploads";
@@ -44,7 +44,6 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [uploadCategory, setUploadCategory] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const deferredQuery = useDeferredValue(query);
   const mediaFilters = useMemo(
     () => ({
@@ -98,7 +97,6 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
   );
   const dragging = useFileIngest(handleFiles);
 
-  const browse = useCallback(() => fileInputRef.current?.click(), []);
   const selectCategory = useCallback((category: string | null) => {
     setCategoryFilter(category);
     setUploadCategory(category && category !== UNCATEGORIZED ? category : "");
@@ -196,7 +194,6 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
         onStateFilter={setStateFilter}
         onCategoryFilter={selectCategory}
         onRefresh={refresh}
-        onAdd={browse}
         onRenameCategory={handleRenameCategory}
       />
 
@@ -206,18 +203,7 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
           category={uploadCategory}
           categoryNames={categoryNames}
           onCategory={setUploadCategory}
-          onBrowse={browse}
-        />
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
-          hidden
-          onChange={(event) => {
-            handleFiles(Array.from(event.target.files ?? []));
-            event.target.value = "";
-          }}
+          onFiles={handleFiles}
         />
         <PhotoGrid
           media={media}

@@ -518,8 +518,7 @@
         "browsers": "nettlesarar",
         "referrers": "tilvisarar",
         "noVisits": "Ingen besøk registrerte enno - teljaren startar når samtykke er gjeve.",
-        "productAnalytics": "produktanalyse · posthog",
-        "consented": "samtykt",
+        "productAnalytics": "sidevisningar",
         "pageviews30": "sidevisingar, 30 dagar"
       }
     },

@@ -518,8 +518,7 @@
         "browsers": "navigateurs",
         "referrers": "référents",
         "noVisits": "Aucune visite enregistrée - le compteur démarre une fois le consentement donné.",
-        "productAnalytics": "analyse produit · posthog",
-        "consented": "consenti",
+        "productAnalytics": "Analytique produit",
         "pageviews30": "pages vues, 30 jours"
       }
     },

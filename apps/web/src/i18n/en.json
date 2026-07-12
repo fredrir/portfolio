@@ -518,8 +518,7 @@
         "browsers": "browsers",
         "referrers": "referrers",
         "noVisits": "No visits recorded yet - the counter starts once consent is given.",
-        "productAnalytics": "product analytics · posthog",
-        "consented": "consented",
+        "productAnalytics": "pageviews",
         "pageviews30": "pageviews, 30 days"
       }
     },
