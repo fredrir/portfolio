@@ -435,14 +435,13 @@ pub async fn rename_category(
         .begin()
         .await
         .map_err(|e| ApiError::from(e).into_response())?;
-    let updated =
-        sqlx::query("update media set category = $1, updated_at = now() where category = $2")
-            .bind(&to)
-            .bind(&from)
-            .execute(&mut *tx)
-            .await
-            .map_err(|e| ApiError::from(e).into_response())?
-            .rows_affected() as i64;
+    let updated = sqlx::query("update media set category = $1, updated_at = now() where category = $2")
+        .bind(&to)
+        .bind(&from)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?
+        .rows_affected() as i64;
     if updated == 0 {
         return Err(
             Problem::new(StatusCode::NOT_FOUND, "No media in the source category").into_response(),
@@ -545,6 +544,17 @@ pub struct AdminMediaLibrary {
     pub items: Vec<MediaItem>,
     /// Facets for the complete library, independent of the active filters.
     pub summary: AdminMediaSummary,
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct MediaStatusRequest {
+    pub ids: Vec<Uuid>,
+}
+
+#[derive(Serialize, ToSchema, sqlx::FromRow)]
+pub struct MediaStatus {
+    pub id: Uuid,
+    pub state: String,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -851,6 +861,32 @@ pub async fn admin_media(
                 .collect(),
         },
     }))
+}
+
+/// Return processing states for active uploads (administration).
+#[utoipa::path(post, path = "/api/v1/media/status", tag = "media",
+    request_body = MediaStatusRequest,
+    responses(
+        (status = 200, body = [MediaStatus]),
+        (status = 401, description = "Missing or invalid bearer token", body = Problem),
+        (status = 503, description = "Administration API disabled", body = Problem)
+    ))]
+pub async fn media_status(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(body): Json<MediaStatusRequest>,
+) -> Result<Json<Vec<MediaStatus>>, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    require_admin(&state, &headers).map_err(|p| p.into_response())?;
+    let statuses = sqlx::query_as::<_, MediaStatus>(
+        "select id, state from media where id = any($1) order by id",
+    )
+    .bind(&body.ids)
+    .fetch_all(&state.pool)
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    Ok(Json(statuses))
 }
 
 /// Gallery-ready media grouped and sorted for direct UI consumption.

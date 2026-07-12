@@ -40,6 +40,18 @@ export const adminListMedia = createServerFn()
     return data;
   });
 
+export const adminGetMediaStatus = createServerFn({ method: "POST" })
+  .validator((input: { ids: string[] }) => input)
+  .handler(async ({ data: input }) => {
+    assertAdminOrigin();
+    const { data, error } = await api.POST("/api/v1/media/status", {
+      body: input,
+      headers: adminHeaders(),
+    });
+    if (error || !data) throw new Error("media status failed");
+    return data;
+  });
+
 export const adminCreateUpload = createServerFn({ method: "POST" })
   .validator(
     (input: { filename: string; content_type: string; size_bytes: number; category?: string }) =>

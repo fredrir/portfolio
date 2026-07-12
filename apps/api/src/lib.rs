@@ -115,6 +115,7 @@ fn openapi_router() -> OpenApiRouter<AppState> {
         ))
         .routes(routes!(routes::media::rename_category))
         .routes(routes!(routes::media::admin_media))
+        .routes(routes!(routes::media::media_status))
         .routes(routes!(routes::media::list_media))
         .routes(routes!(routes::media::gallery))
         .routes(routes!(routes::cv::active_cv))

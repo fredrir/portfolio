@@ -209,7 +209,7 @@ async fn media_upload_rejects_bad_content_type(pool: PgPool) {
                 .to_string(),
         ))
         .unwrap();
-    let (status, body) = send(pool, request).await;
+    let (status, body) = send(pool.clone(), request).await;
     assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
     assert!(body["errors"]["content_type"].is_string());
 }
@@ -679,7 +679,7 @@ async fn admin_media_filters_in_postgres_and_returns_complete_facets(pool: PgPoo
     .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
     .body(Body::empty())
     .unwrap();
-    let (status, body) = send(pool, request).await;
+    let (status, body) = send(pool.clone(), request).await;
     assert_eq!(status, StatusCode::OK);
 
     let items = body["items"].as_array().unwrap();
@@ -699,6 +699,24 @@ async fn admin_media_filters_in_postgres_and_returns_complete_facets(pool: PgPoo
             { "name": "uncategorized", "count": 1 }
         ])
     );
+
+    let ready_id: uuid::Uuid =
+        sqlx::query_scalar("select id from media where filename = 'Trip-ready.jpg'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    let request = Request::post("/api/v1/media/status")
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::from(
+            json!({ "ids": [ready_id, uuid::Uuid::new_v4()] }).to_string(),
+        ))
+        .unwrap();
+    let (status, body) = send(pool, request).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.as_array().unwrap().len(), 1);
+    assert_eq!(body[0]["id"], ready_id.to_string());
+    assert_eq!(body[0]["state"], "ready");
 }
 
 #[sqlx::test]

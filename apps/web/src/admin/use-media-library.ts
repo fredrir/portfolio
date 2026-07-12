@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { AdminMediaLibrary } from "@/admin/model";
 import {
+  type AdminMediaQuery,
   adminDeleteMedia,
   adminListMedia,
-  type AdminMediaQuery,
   adminRenameCategory,
   adminSetCategory,
 } from "@/server/admin";
@@ -36,14 +36,11 @@ export function useMediaLibrary(
     } catch {
       if (requestId === requestIdRef.current) setApiDown(true);
     } finally {
-      if (showRefreshing && requestId === requestIdRef.current) setRefreshing(false);
+      if (showRefreshing) setRefreshing(false);
     }
   }, []);
 
-  const refresh = useCallback(
-    () => load(filtersRef.current, true),
-    [load],
-  );
+  const refresh = useCallback(() => load(filtersRef.current, true), [load]);
 
   const runAction = useCallback(async <Result>(action: () => Promise<Result>) => {
     try {
@@ -96,11 +93,9 @@ export function useMediaLibrary(
       const updated = await runAction(() => adminRenameCategory({ data: { from, to } }));
       if (!updated) return false;
       const currentFilters = filtersRef.current;
-      const nextFilters =
-        currentFilters.category === from
-          ? { ...currentFilters, category: updated.to }
-          : currentFilters;
-      await load(nextFilters, false);
+      // The page changes an active renamed filter, which triggers the filtered
+      // reload. Without an active category, reload immediately for fresh facets.
+      if (currentFilters.category !== from) await load(currentFilters, false);
       return true;
     },
     [load, runAction],

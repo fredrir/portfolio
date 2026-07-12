@@ -218,6 +218,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Return processing states for active uploads (administration). */
+        post: operations["media_status"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/uploads": {
         parameters: {
             query?: never;
@@ -602,6 +619,14 @@ export interface components {
             variants: components["schemas"]["MediaVariant"][];
             /** Format: int32 */
             width?: number | null;
+        };
+        MediaStatus: {
+            /** Format: uuid */
+            id: string;
+            state: string;
+        };
+        MediaStatusRequest: {
+            ids: string[];
         };
         MediaVariant: {
             format: string;
@@ -1077,6 +1102,47 @@ export interface operations {
             };
             /** @description Validation failed */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Administration API disabled */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    media_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MediaStatusRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaStatus"][];
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

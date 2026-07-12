@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { adminCreateUpload, adminListMedia } from "@/server/admin";
+import { adminCreateUpload, adminGetMediaStatus } from "@/server/admin";
 
 export type JobStage = "authorizing" | "uploading" | "processing" | "failed";
 
@@ -194,20 +194,23 @@ export function useUploads(onMediaChange: () => void) {
       if (polling) return;
       polling = true;
       try {
-        const { items: media } = await adminListMedia({ data: {} });
-        const mediaById = new Map(media.map((item) => [item.id, item]));
+        const ids = jobsRef.current.flatMap((job) =>
+          job.stage === "processing" && job.mediaId ? [job.mediaId] : [],
+        );
+        const statuses = await adminGetMediaStatus({ data: { ids } });
+        const stateById = new Map(statuses.map((item) => [item.id, item.state]));
         const completedIds = new Set<string>();
 
         updateJobs((current) =>
           current.flatMap((job) => {
             if (job.stage !== "processing" || !job.mediaId) return [job];
-            const item = mediaById.get(job.mediaId);
-            if (item?.state === "ready") {
+            const state = stateById.get(job.mediaId);
+            if (state === "ready") {
               completedIds.add(job.id);
               URL.revokeObjectURL(job.previewUrl);
               return [];
             }
-            if (item?.state === "failed") {
+            if (state === "failed") {
               return [{ ...job, stage: "failed", detail: "Processing failed" }];
             }
             return [job];
