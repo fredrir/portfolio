@@ -2,7 +2,7 @@
 
 import type { DictType, Locale } from "@/i18n/types";
 import { useIsMobile } from "@/shared/hooks/use-is-mobile";
-import type { GitHubData, SpotifyData } from "@/shared/types";
+import type { GitHubData, SpotifyData, WeatherData } from "@/shared/types";
 import { useTutorial } from "@/tutorial/use-tutorial";
 import { useBackground } from "./background/hooks/use-background";
 import { MobileDock, MobileLayout } from "./mobile";
@@ -20,9 +20,16 @@ interface Props {
   dict: DictType;
   githubData: GitHubData | null;
   spotifyData: SpotifyData | null;
+  weatherData: WeatherData | null;
 }
 
-export function WindowManager({ currentLocale, dict, githubData, spotifyData }: Props) {
+export function WindowManager({
+  currentLocale,
+  dict,
+  githubData,
+  spotifyData,
+  weatherData,
+}: Props) {
   const { ui } = dict;
 
   const isMobile = useIsMobile();
@@ -47,6 +54,7 @@ export function WindowManager({ currentLocale, dict, githubData, spotifyData }: 
     floating,
     githubData,
     spotifyData,
+    weatherData,
   });
 
   switch (view.layoutMode) {

@@ -58,13 +58,14 @@ export const Route = createFileRoute("/$locale")({
 });
 
 function Page() {
-  const { locale, dict, githubData, spotifyData } = Route.useLoaderData();
+  const { locale, dict, githubData, spotifyData, weatherData } = Route.useLoaderData();
   return (
     <WindowManager
       currentLocale={locale}
       dict={dict}
       githubData={githubData}
       spotifyData={spotifyData}
+      weatherData={weatherData}
     />
   );
 }

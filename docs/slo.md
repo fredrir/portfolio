@@ -28,6 +28,7 @@ instead: `x-request-id` generated at the edge and propagated through web
 server functions into API tracing spans and responses; structured logs
 (JSON-capable) in both Rust services; `x-edge-colo`/`x-edge-cache`/
 `x-origin-slot`/`server-timing` on every response; media pipeline
-correlation via `media_id` + content hashes. A collector can be added
+correlation via `media_id` + content hashes; weather cache counters at
+`/api/v1/weather/metrics`. A collector can be added
 later without application changes since instrumentation is already
 tracing-native.

@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { AdminConsole } from "@/admin";
 import { getStaticDictionary } from "@/i18n/dictionaries";
-import { adminAuditLog, adminListMedia } from "@/server/admin";
+import { adminListMedia } from "@/server/admin";
 import { isAdminOrigin } from "@/server/admin-origin";
 
 const assertAdminHost = createServerFn().handler(async () => {
@@ -18,15 +18,11 @@ export const Route = createFileRoute("/admin")({
     await assertAdminHost();
   },
   loader: async () => {
-    const [mediaResult, auditResult] = await Promise.allSettled([
-      adminListMedia(),
-      adminAuditLog(),
-    ]);
-    return {
-      media: mediaResult.status === "fulfilled" ? mediaResult.value : [],
-      audit: auditResult.status === "fulfilled" ? auditResult.value : [],
-      apiDown: mediaResult.status === "rejected",
-    };
+    try {
+      return { media: await adminListMedia(), apiDown: false };
+    } catch {
+      return { media: [], apiDown: true };
+    }
   },
   head: () => ({
     meta: [
@@ -38,6 +34,6 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-  const { media, audit, apiDown } = Route.useLoaderData();
-  return <AdminConsole initialMedia={media} initialAudit={audit} initialApiDown={apiDown} />;
+  const { media, apiDown } = Route.useLoaderData();
+  return <AdminConsole initialMedia={media} initialApiDown={apiDown} />;
 }

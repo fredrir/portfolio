@@ -24,104 +24,83 @@
     "cookieLabel": "Cookies"
   },
   "admin": {
-    "pageTitle": "Administration - hansteen.dev",
-    "apiUnreachable": "api unreachable",
-    "subtitle": "media pipeline · access-gated",
+    "pageTitle": "admin.hansteen.dev",
+    "apiDown": "API unreachable - the library can't load or change right now.",
+    "retry": "retry",
+    "addPhotos": "add photos",
+    "actionFailed": "that didn't go through - try again",
     "stats": {
-      "items": "items",
-      "live": "live",
-      "stored": "stored"
+      "photos": "photos",
+      "developing": "developing",
+      "failed": "failed"
     },
     "uploadErrors": {
       "invalidType": "not a jpeg, png or webp",
-      "tooLarge": "over 25 MiB",
+      "tooLarge": "over 100 MiB",
       "uploadFailed": "upload failed",
       "authorizationFailed": "authorization failed",
       "processingFailed": "processing failed",
-      "networkDuringS3": "network error during S3 PUT"
+      "networkDuringS3": "network error during upload"
     },
-    "pipeline": {
-      "stations": [
-        {
-          "label": "authorize",
-          "sub": "grant + audit"
-        },
-        {
-          "label": "s3 put",
-          "sub": "presigned"
-        },
-        {
-          "label": "worker",
-          "sub": "avif · webp"
-        },
-        {
-          "label": "live",
-          "sub": "gallery"
-        }
-      ],
-      "ingest": "ingest",
-      "clearFinished": "clear finished",
-      "uploadAria": "Upload images: drop files anywhere or press Enter to browse",
-      "release": "release to feed the pipeline",
-      "drop": "drop images anywhere, or click to browse",
-      "constraints": "jpeg / png / webp · <= 25 MiB",
+    "ingest": {
+      "uploadAria": "Upload photos: drop files anywhere, paste, or press Enter to browse",
+      "drop": "drop photos anywhere, paste, or click to browse",
+      "release": "release to develop",
+      "constraints": "jpeg / png / webp - up to 100 MiB",
+      "into": "into",
       "category": "category",
+      "categoryAria": "Category for new uploads",
       "uncategorized": "uncategorized",
-      "failed": "failed",
-      "failedAt": "{detail} · at {station}",
-      "putProgress": "put {percent}%",
-      "stageLabels": {
-        "authorizing": "authorizing",
-        "uploading": "uploading",
-        "processing": "processing",
+      "developingCount": "developing {count}",
+      "stageAuthorizing": "authorizing",
+      "stageUploading": "uploading {percent}%",
+      "stageProcessing": "developing",
+      "retry": "Retry upload of {filename}",
+      "dismiss": "Dismiss failed upload of {filename}"
+    },
+    "library": {
+      "searchPlaceholder": "search",
+      "searchAria": "Search by filename or category (press / to focus)",
+      "clearSearch": "Clear search",
+      "refresh": "Refresh library",
+      "all": "all",
+      "uncategorized": "uncategorized",
+      "renameAria": "Rename category {category}",
+      "renamePlaceholder": "new name",
+      "renameSave": "Save category name",
+      "renameCancel": "Cancel rename",
+      "loading": "loading the library...",
+      "empty": "no photos yet - drop some anywhere on this page",
+      "noMatches": "nothing matches",
+      "clearFilters": "clear filters",
+      "openAria": "Open {filename}",
+      "deleteAria": "Delete {filename}",
+      "confirmDelete": "delete?",
+      "states": {
         "ready": "live",
+        "processing": "developing",
         "failed": "failed"
       }
     },
-    "library": {
-      "label": "library",
-      "of": "of",
-      "refreshAria": "Refresh library",
-      "openAria": "Open {filename}",
-      "filters": {
-        "all": "all",
-        "ready": "ready",
-        "processing": "processing",
-        "failed": "failed"
-      },
-      "filterPlaceholder": "filter by filename",
-      "filterAria": "Filter by filename",
-      "reading": "reading the library...",
-      "empty": "library is empty - feed the pipeline above",
-      "noMatches": "nothing matches these filters",
-      "uncategorized": "uncategorized"
-    },
     "lightbox": {
-      "copied": "copied",
-      "closePreview": "Close preview",
-      "noVariant": "no variant to preview yet",
-      "previousImage": "Previous image",
-      "nextImage": "Next image",
-      "size": "size",
+      "close": "Close",
+      "prev": "Previous photo",
+      "next": "Next photo",
+      "of": "of",
+      "moveHint": "to move",
+      "noVariant": "no preview yet - still developing",
+      "category": "category",
+      "save": "save",
+      "uploaded": "uploaded",
+      "dimensions": "dimensions",
       "source": "source",
       "sha256": "sha-256",
-      "copyContentHash": "Copy content hash",
-      "encodedVariants": "encoded variants",
-      "copyFormatUrl": "Copy {format} URL",
-      "openFormatNewTab": "Open {format} in a new tab",
-      "of": "of",
-      "moveHint": "to move"
-    },
-    "ledger": {
-      "label": "ledger",
-      "verifying": "verifying...",
-      "verifyChain": "verify chain",
-      "chainIntact": "chain intact - {entries} entries verified",
-      "chainBroken": "chain broken at entry #{id}",
-      "verificationFailed": "verification did not run - try again",
-      "empty": "no entries yet - the first authorization starts the chain",
-      "collapse": "collapse",
-      "showAll": "show all {count} entries"
+      "variants": "variants",
+      "copy": "Copy {what}",
+      "copied": "copied",
+      "openTab": "Open {what} in a new tab",
+      "delete": "delete photo",
+      "confirmDelete": "really delete?"
     },
     "time": {
       "secondsAgo": "s ago",
@@ -469,6 +448,30 @@
     "links": "See Also",
     "visitors": "visitors",
     "uptime": "uptime",
+    "weather": {
+      "unavailable": "unavailable",
+      "cached": "cached",
+      "observed": "observed",
+      "displayAdjustment": "Temperature rounded; condition adapted from the WMO code",
+      "provider": "Weather data by Open-Meteo",
+      "conditions": {
+        "clear": "Clear",
+        "mostlyClear": "Mostly clear",
+        "partlyCloudy": "Partly cloudy",
+        "overcast": "Overcast",
+        "fog": "Fog",
+        "drizzle": "Drizzle",
+        "freezingDrizzle": "Freezing drizzle",
+        "rain": "Rain",
+        "freezingRain": "Freezing rain",
+        "snow": "Snow",
+        "rainShowers": "Rain showers",
+        "snowShowers": "Snow showers",
+        "thunderstorm": "Thunderstorm",
+        "hailThunderstorm": "Thunderstorm with hail",
+        "unknown": "Unknown"
+      }
+    },
     "searchApps": "Search applications...",
     "noMatching": "No matching windows",
     "navigate": "navigate",

@@ -24,104 +24,83 @@
     "cookieLabel": "Cookies"
   },
   "admin": {
-    "pageTitle": "Administration - hansteen.dev",
-    "apiUnreachable": "api indisponible",
-    "subtitle": "pipeline média · protégé par Access",
+    "pageTitle": "admin.hansteen.dev",
+    "apiDown": "API injoignable - la bibliothèque ne peut ni charger ni modifier pour l'instant.",
+    "retry": "réessayer",
+    "addPhotos": "ajouter des photos",
+    "actionFailed": "ça n'est pas passé - réessayez",
     "stats": {
-      "items": "éléments",
-      "live": "live",
-      "stored": "stocké"
+      "photos": "photos",
+      "developing": "en développement",
+      "failed": "en échec"
     },
     "uploadErrors": {
-      "invalidType": "pas un jpeg, png ou webp",
-      "tooLarge": "plus de 25 MiB",
-      "uploadFailed": "échec du téléversement",
-      "authorizationFailed": "échec de l'autorisation",
-      "processingFailed": "échec du traitement",
-      "networkDuringS3": "erreur réseau pendant le S3 PUT"
+      "invalidType": "ni jpeg, ni png, ni webp",
+      "tooLarge": "plus de 100 Mio",
+      "uploadFailed": "envoi échoué",
+      "authorizationFailed": "autorisation échouée",
+      "processingFailed": "traitement échoué",
+      "networkDuringS3": "erreur réseau pendant l'envoi"
     },
-    "pipeline": {
-      "stations": [
-        {
-          "label": "autoriser",
-          "sub": "grant + audit"
-        },
-        {
-          "label": "s3 put",
-          "sub": "présigné"
-        },
-        {
-          "label": "worker",
-          "sub": "avif · webp"
-        },
-        {
-          "label": "live",
-          "sub": "galerie"
-        }
-      ],
-      "ingest": "ingestion",
-      "clearFinished": "effacer terminés",
-      "uploadAria": "Téléverser des images : déposer des fichiers n'importe où ou appuyer sur Entrée pour parcourir",
-      "release": "relâcher pour alimenter le pipeline",
-      "drop": "déposez des images n'importe où, ou cliquez pour parcourir",
-      "constraints": "jpeg / png / webp · <= 25 MiB",
+    "ingest": {
+      "uploadAria": "Envoyer des photos : déposez des fichiers n'importe où, collez, ou appuyez sur Entrée pour parcourir",
+      "drop": "déposez des photos n'importe où, collez, ou cliquez pour parcourir",
+      "release": "relâchez pour développer",
+      "constraints": "jpeg / png / webp - jusqu'à 100 Mio",
+      "into": "vers",
       "category": "catégorie",
-      "uncategorized": "non classé",
-      "failed": "échec",
-      "failedAt": "{detail} · à {station}",
-      "putProgress": "put {percent}%",
-      "stageLabels": {
-        "authorizing": "autorisation",
-        "uploading": "téléversement",
-        "processing": "traitement",
-        "ready": "live",
-        "failed": "échec"
-      }
+      "categoryAria": "Catégorie des nouveaux envois",
+      "uncategorized": "sans catégorie",
+      "developingCount": "développement de {count}",
+      "stageAuthorizing": "autorisation",
+      "stageUploading": "envoi {percent}%",
+      "stageProcessing": "développement",
+      "retry": "Réessayer l'envoi de {filename}",
+      "dismiss": "Retirer l'envoi échoué de {filename}"
     },
     "library": {
-      "label": "bibliothèque",
-      "of": "sur",
-      "refreshAria": "Actualiser la bibliothèque",
+      "searchPlaceholder": "rechercher",
+      "searchAria": "Rechercher par nom de fichier ou catégorie (touche / pour cibler)",
+      "clearSearch": "Effacer la recherche",
+      "refresh": "Actualiser la bibliothèque",
+      "all": "toutes",
+      "uncategorized": "sans catégorie",
+      "renameAria": "Renommer la catégorie {category}",
+      "renamePlaceholder": "nouveau nom",
+      "renameSave": "Enregistrer le nom",
+      "renameCancel": "Annuler le renommage",
+      "loading": "chargement de la bibliothèque...",
+      "empty": "aucune photo pour l'instant - déposez-en n'importe où sur la page",
+      "noMatches": "aucun résultat",
+      "clearFilters": "effacer les filtres",
       "openAria": "Ouvrir {filename}",
-      "filters": {
-        "all": "tout",
-        "ready": "prêt",
-        "processing": "traitement",
-        "failed": "échec"
-      },
-      "filterPlaceholder": "filtrer par nom",
-      "filterAria": "Filtrer par nom",
-      "reading": "lecture de la bibliothèque...",
-      "empty": "la bibliothèque est vide - alimentez le pipeline ci-dessus",
-      "noMatches": "aucun résultat pour ces filtres",
-      "uncategorized": "non classé"
+      "deleteAria": "Supprimer {filename}",
+      "confirmDelete": "supprimer ?",
+      "states": {
+        "ready": "en ligne",
+        "processing": "en développement",
+        "failed": "en échec"
+      }
     },
     "lightbox": {
-      "copied": "copié",
-      "closePreview": "Fermer l'aperçu",
-      "noVariant": "aucune variante à prévisualiser pour le moment",
-      "previousImage": "Image précédente",
-      "nextImage": "Image suivante",
-      "size": "taille",
+      "close": "Fermer",
+      "prev": "Photo précédente",
+      "next": "Photo suivante",
+      "of": "sur",
+      "moveHint": "pour naviguer",
+      "noVariant": "pas encore d'aperçu - développement en cours",
+      "category": "catégorie",
+      "save": "enregistrer",
+      "uploaded": "envoyée",
+      "dimensions": "dimensions",
       "source": "source",
       "sha256": "sha-256",
-      "copyContentHash": "Copier le hash de contenu",
-      "encodedVariants": "variantes encodées",
-      "copyFormatUrl": "Copier l'URL {format}",
-      "openFormatNewTab": "Ouvrir {format} dans un nouvel onglet",
-      "of": "sur",
-      "moveHint": "pour naviguer"
-    },
-    "ledger": {
-      "label": "ledger",
-      "verifying": "vérification...",
-      "verifyChain": "vérifier la chaîne",
-      "chainIntact": "chaîne intacte - {entries} entrées vérifiées",
-      "chainBroken": "chaîne rompue à l'entrée #{id}",
-      "verificationFailed": "la vérification n'a pas démarré - réessayez",
-      "empty": "aucune entrée pour le moment - la première autorisation démarre la chaîne",
-      "collapse": "réduire",
-      "showAll": "afficher les {count} entrées"
+      "variants": "variantes",
+      "copy": "Copier {what}",
+      "copied": "copié",
+      "openTab": "Ouvrir {what} dans un nouvel onglet",
+      "delete": "supprimer la photo",
+      "confirmDelete": "vraiment supprimer ?"
     },
     "time": {
       "secondsAgo": "s",
@@ -469,6 +448,30 @@
     "links": "Voir aussi",
     "visitors": "visiteurs",
     "uptime": "disponibilité",
+    "weather": {
+      "unavailable": "indisponible",
+      "cached": "en cache",
+      "observed": "observé",
+      "displayAdjustment": "Température arrondie ; condition adaptée du code OMM",
+      "provider": "Données météo par Open-Meteo",
+      "conditions": {
+        "clear": "Dégagé",
+        "mostlyClear": "Généralement dégagé",
+        "partlyCloudy": "Partiellement nuageux",
+        "overcast": "Couvert",
+        "fog": "Brouillard",
+        "drizzle": "Bruine",
+        "freezingDrizzle": "Bruine verglaçante",
+        "rain": "Pluie",
+        "freezingRain": "Pluie verglaçante",
+        "snow": "Neige",
+        "rainShowers": "Averses",
+        "snowShowers": "Averses de neige",
+        "thunderstorm": "Orage",
+        "hailThunderstorm": "Orage avec grêle",
+        "unknown": "Inconnu"
+      }
+    },
     "searchApps": "Rechercher des applications...",
     "noMatching": "Aucun résultat",
     "navigate": "naviguer",

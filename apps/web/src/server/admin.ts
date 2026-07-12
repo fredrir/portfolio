@@ -54,35 +54,45 @@ export const adminCreateUpload = createServerFn({ method: "POST" })
     return data;
   });
 
-export interface AdminAuditEntry {
-  id: number;
-  at: string;
-  action: string;
-  entry_hash: string;
-  detail: string;
-}
-
-export const adminAuditLog = createServerFn().handler(async (): Promise<AdminAuditEntry[]> => {
-  assertAdminOrigin();
-  const { data, error } = await api.GET("/api/v1/audit", {
-    headers: adminHeaders(),
+export const adminSetCategory = createServerFn({ method: "POST" })
+  .validator((input: { id: string; category: string | null }) => input)
+  .handler(async ({ data: input }) => {
+    assertAdminOrigin();
+    const { data, error, response } = await api.PATCH("/api/v1/media/{id}", {
+      params: { path: { id: input.id } },
+      body: { category: input.category },
+      headers: adminHeaders(),
+    });
+    if (error || !data) {
+      throw new Error(`category update failed (${response.status})`);
+    }
+    return data;
   });
-  if (error || !data) throw new Error("audit list failed");
-  // `detail` is arbitrary JSON; stringify so the payload is serializable.
-  return data.map((e) => ({
-    id: e.id,
-    at: e.at,
-    action: e.action,
-    entry_hash: e.entry_hash,
-    detail: JSON.stringify(e.detail),
-  }));
-});
 
-export const adminAuditVerify = createServerFn().handler(async () => {
-  assertAdminOrigin();
-  const { data, error } = await api.GET("/api/v1/audit/verify", {
-    headers: adminHeaders(),
+export const adminDeleteMedia = createServerFn({ method: "POST" })
+  .validator((input: { id: string }) => input)
+  .handler(async ({ data: input }) => {
+    assertAdminOrigin();
+    const { error, response } = await api.DELETE("/api/v1/media/{id}", {
+      params: { path: { id: input.id } },
+      headers: adminHeaders(),
+    });
+    if (error) {
+      throw new Error(`delete failed (${response.status})`);
+    }
+    return { id: input.id };
   });
-  if (error || !data) throw new Error("audit verify failed");
-  return data;
-});
+
+export const adminRenameCategory = createServerFn({ method: "POST" })
+  .validator((input: { from: string; to: string }) => input)
+  .handler(async ({ data: input }) => {
+    assertAdminOrigin();
+    const { data, error, response } = await api.POST("/api/v1/media/categories/rename", {
+      body: { from: input.from, to: input.to },
+      headers: adminHeaders(),
+    });
+    if (error || !data) {
+      throw new Error(`category rename failed (${response.status})`);
+    }
+    return data;
+  });

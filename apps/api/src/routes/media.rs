@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use aws_sdk_s3::presigning::PresigningConfig;
 use axum::Json;
-use axum::extract::State;
+use axum::extract::{Path, State};
 use axum::http::{HeaderMap, StatusCode};
 use serde::{Deserialize, Serialize};
 use subtle::ConstantTimeEq;
@@ -13,7 +13,7 @@ use uuid::Uuid;
 use crate::problem::{ApiError, Problem};
 use crate::{AppState, audit};
 
-const MAX_UPLOAD_BYTES: i64 = 25 * 1024 * 1024;
+const MAX_UPLOAD_BYTES: i64 = 100 * 1024 * 1024;
 const PRESIGN_EXPIRY: Duration = Duration::from_secs(900);
 const ALLOWED_CONTENT_TYPES: [&str; 3] = ["image/jpeg", "image/png", "image/webp"];
 
@@ -208,6 +208,258 @@ pub async fn create_upload(
     ))
 }
 
+#[derive(Deserialize, ToSchema)]
+pub struct UpdateMediaRequest {
+    /// New gallery category; null or absent clears it (uncategorized).
+    #[serde(default)]
+    pub category: Option<String>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct UpdateMediaResponse {
+    pub id: Uuid,
+    pub category: Option<String>,
+}
+
+/// Re-categorize a media item (administration).
+#[utoipa::path(patch, path = "/api/v1/media/{id}", tag = "media",
+    request_body = UpdateMediaRequest,
+    responses(
+        (status = 200, body = UpdateMediaResponse),
+        (status = 401, description = "Missing or invalid bearer token", body = Problem),
+        (status = 404, description = "No such media item", body = Problem),
+        (status = 422, description = "Validation failed", body = Problem),
+        (status = 503, description = "Administration API disabled", body = Problem)
+    ))]
+pub async fn update_media(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Path(id): Path<Uuid>,
+    Json(body): Json<UpdateMediaRequest>,
+) -> Result<Json<UpdateMediaResponse>, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    require_admin(&state, &headers).map_err(|p| p.into_response())?;
+
+    let category = match body.category.as_deref() {
+        None => None,
+        Some(raw) => match sanitize_category(raw) {
+            Some(c) => Some(c),
+            None => {
+                let mut errors = BTreeMap::new();
+                errors.insert(
+                    "category".to_owned(),
+                    "Must be 1-64 chars of letters, digits, ._-".to_owned(),
+                );
+                return Err(ApiError::Validation(errors).into_response());
+            }
+        },
+    };
+
+    let mut tx = state
+        .pool
+        .begin()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+    let previous: Option<(Option<String>,)> =
+        sqlx::query_as("select category from media where id = $1 for update")
+            .bind(id)
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(|e| ApiError::from(e).into_response())?;
+    let Some((previous,)) = previous else {
+        return Err(Problem::new(StatusCode::NOT_FOUND, "No such media item").into_response());
+    };
+    sqlx::query("update media set category = $1, updated_at = now() where id = $2")
+        .bind(&category)
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+    audit::record(
+        &mut tx,
+        "media.category_set",
+        serde_json::json!({ "media_id": id, "from": previous, "to": category }),
+    )
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    tx.commit()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+
+    Ok(Json(UpdateMediaResponse { id, category }))
+}
+
+/// Delete a media item, its variants and stored objects (administration).
+#[utoipa::path(delete, path = "/api/v1/media/{id}", tag = "media",
+    responses(
+        (status = 204, description = "Deleted"),
+        (status = 401, description = "Missing or invalid bearer token", body = Problem),
+        (status = 404, description = "No such media item", body = Problem),
+        (status = 503, description = "Administration API disabled", body = Problem)
+    ))]
+pub async fn delete_media(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Path(id): Path<Uuid>,
+) -> Result<StatusCode, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    require_admin(&state, &headers).map_err(|p| p.into_response())?;
+
+    let mut tx = state
+        .pool
+        .begin()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+    let row: Option<(String, String, Option<String>)> = sqlx::query_as(
+        "select original_key, filename, category from media where id = $1 for update",
+    )
+    .bind(id)
+    .fetch_optional(&mut *tx)
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    let Some((original_key, filename, category)) = row else {
+        return Err(Problem::new(StatusCode::NOT_FOUND, "No such media item").into_response());
+    };
+    let variant_keys: Vec<(String,)> =
+        sqlx::query_as("select key from media_variants where media_id = $1")
+            .bind(id)
+            .fetch_all(&mut *tx)
+            .await
+            .map_err(|e| ApiError::from(e).into_response())?;
+    sqlx::query("delete from media where id = $1")
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+    audit::record(
+        &mut tx,
+        "media.deleted",
+        serde_json::json!({
+            "media_id": id,
+            "filename": filename,
+            "category": category,
+            "variants": variant_keys.len(),
+        }),
+    )
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    tx.commit()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+
+    // Variant keys are unique per row and originals embed the media id, so no
+    // other row can reference these objects. Best-effort: the DB row is gone
+    // either way, and an orphaned object is harmless.
+    for key in std::iter::once(original_key).chain(variant_keys.into_iter().map(|(k,)| k)) {
+        if let Err(e) = state
+            .s3
+            .delete_object()
+            .bucket(&state.media.bucket)
+            .key(&key)
+            .send()
+            .await
+        {
+            tracing::warn!(key, error = %e, "s3 delete failed; object orphaned");
+        }
+    }
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct RenameCategoryRequest {
+    pub from: String,
+    pub to: String,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct RenameCategoryResponse {
+    pub from: String,
+    pub to: String,
+    /// Number of media items moved.
+    pub updated: i64,
+}
+
+/// Rename a category across all media; renaming onto an existing category
+/// merges them (administration).
+#[utoipa::path(post, path = "/api/v1/media/categories/rename", tag = "media",
+    request_body = RenameCategoryRequest,
+    responses(
+        (status = 200, body = RenameCategoryResponse),
+        (status = 401, description = "Missing or invalid bearer token", body = Problem),
+        (status = 404, description = "No media in the source category", body = Problem),
+        (status = 422, description = "Validation failed", body = Problem),
+        (status = 503, description = "Administration API disabled", body = Problem)
+    ))]
+pub async fn rename_category(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(body): Json<RenameCategoryRequest>,
+) -> Result<Json<RenameCategoryResponse>, axum::response::Response> {
+    use axum::response::IntoResponse;
+
+    require_admin(&state, &headers).map_err(|p| p.into_response())?;
+
+    let mut errors = BTreeMap::new();
+    let from = sanitize_category(&body.from);
+    let to = sanitize_category(&body.to);
+    if from.is_none() {
+        errors.insert(
+            "from".to_owned(),
+            "Must be 1-64 chars of letters, digits, ._-".to_owned(),
+        );
+    }
+    if to.is_none() {
+        errors.insert(
+            "to".to_owned(),
+            "Must be 1-64 chars of letters, digits, ._-".to_owned(),
+        );
+    }
+    if !errors.is_empty() {
+        return Err(ApiError::Validation(errors).into_response());
+    }
+    let (from, to) = (from.expect("checked"), to.expect("checked"));
+    if from == to {
+        return Ok(Json(RenameCategoryResponse {
+            from,
+            to,
+            updated: 0,
+        }));
+    }
+
+    let mut tx = state
+        .pool
+        .begin()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+    let updated = sqlx::query("update media set category = $1, updated_at = now() where category = $2")
+        .bind(&to)
+        .bind(&from)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?
+        .rows_affected() as i64;
+    if updated == 0 {
+        return Err(
+            Problem::new(StatusCode::NOT_FOUND, "No media in the source category").into_response(),
+        );
+    }
+    audit::record(
+        &mut tx,
+        "media.category_renamed",
+        serde_json::json!({ "from": from, "to": to, "updated": updated }),
+    )
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
+    tx.commit()
+        .await
+        .map_err(|e| ApiError::from(e).into_response())?;
+
+    Ok(Json(RenameCategoryResponse { from, to, updated }))
+}
+
 #[derive(Serialize, ToSchema)]
 pub struct MediaVariant {
     pub format: String,
@@ -226,9 +478,13 @@ pub struct MediaItem {
     pub content_type: String,
     pub category: Option<String>,
     pub state: String,
+    /// Original upload size in bytes.
+    pub size_bytes: Option<i64>,
     pub width: Option<i32>,
     pub height: Option<i32>,
     pub content_hash: Option<String>,
+    /// UTC upload time, RFC 3339.
+    pub created_at: String,
     pub variants: Vec<MediaVariant>,
 }
 
@@ -276,9 +532,11 @@ struct MediaListRow {
     content_type: String,
     category: Option<String>,
     state: String,
+    size_bytes: Option<i64>,
     width: Option<i32>,
     height: Option<i32>,
     content_hash: Option<String>,
+    created_at: String,
     v_format: Option<String>,
     v_key: Option<String>,
     v_width: Option<i32>,
@@ -359,7 +617,9 @@ pub async fn list_media(
 
     let rows: Vec<MediaListRow> = sqlx::query_as(
         "select m.id, m.filename, m.content_type, m.category, m.state, \
-                m.width, m.height, m.content_hash, \
+                m.size_bytes, m.width, m.height, m.content_hash, \
+                to_char(m.created_at at time zone 'utc', \
+                        'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as created_at, \
                 v.format as v_format, v.key as v_key, v.width as v_width, \
                 v.height as v_height, v.size_bytes as v_size_bytes \
          from media m \
@@ -383,9 +643,11 @@ pub async fn list_media(
                 content_type: row.content_type,
                 category: row.category,
                 state: row.state,
+                size_bytes: row.size_bytes,
                 width: row.width,
                 height: row.height,
                 content_hash: row.content_hash,
+                created_at: row.created_at,
                 variants: Vec::new(),
             });
         }

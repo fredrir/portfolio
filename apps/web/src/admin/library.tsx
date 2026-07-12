@@ -1,249 +1,309 @@
 "use client";
 
-import {
-  ArrowsClockwise,
-  HourglassMedium,
-  ImageSquare,
-  MagnifyingGlass,
-  WarningCircle,
-} from "@phosphor-icons/react";
+import { ArrowCounterClockwise, Images, Trash, WarningCircle, X } from "@phosphor-icons/react";
 import type { components } from "@portfolio/api-client";
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { formatBytes } from "@/admin/format";
-import { Lightbox } from "@/admin/lightbox";
+import { bucketOf, thumbOf } from "@/admin/model";
+import type { UploadJob } from "@/admin/use-uploads";
 import type { AdminStrings } from "@/i18n/types";
-import { Instrument, useMounted } from "@/panes/platform-ui";
 import { cn } from "@/shared/utils/cn";
 
 type MediaItem = components["schemas"]["MediaItem"];
 
-type StateFilter = "all" | "ready" | "processing" | "failed";
+/** Two-step trash: first press arms the red confirm, second one deletes. */
+export function DeleteButton({
+  label,
+  confirmLabel,
+  onDelete,
+  className,
+}: {
+  label: string;
+  confirmLabel: string;
+  onDelete: () => Promise<boolean>;
+  className?: string;
+}) {
+  const [armed, setArmed] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-function bucketOf(item: MediaItem): Exclude<StateFilter, "all"> {
-  if (item.state === "ready") return "ready";
-  if (item.state === "failed") return "failed";
-  return "processing";
+  // Disarm when attention moves on.
+  useEffect(() => {
+    if (!armed) return;
+    const timer = setTimeout(() => setArmed(false), 3000);
+    return () => clearTimeout(timer);
+  }, [armed]);
+
+  return (
+    <button
+      type="button"
+      aria-label={armed ? confirmLabel : label}
+      disabled={busy}
+      onClick={() => {
+        if (!armed) {
+          setArmed(true);
+          return;
+        }
+        setBusy(true);
+        void onDelete().then((ok) => {
+          setBusy(false);
+          if (!ok) setArmed(false);
+        });
+      }}
+      className={cn(
+        "inline-flex items-center gap-1 rounded font-mono text-2xs transition-colors disabled:opacity-60",
+        armed
+          ? "bg-destructive px-2 py-1 text-destructive-foreground"
+          : "p-1.5 text-muted-foreground hover:bg-destructive/15 hover:text-destructive",
+        className,
+      )}
+    >
+      <Trash size={12} className={busy ? "motion-safe:animate-pulse" : undefined} />
+      {armed && confirmLabel}
+    </button>
+  );
 }
 
-function thumbOf(item: MediaItem): string | undefined {
+function developOf(job: UploadJob): number {
+  if (job.stage === "authorizing") return 0.08;
+  if (job.stage === "uploading") return 0.08 + 0.72 * job.sent;
+  if (job.stage === "processing") return 0.85;
+  return 1;
+}
+
+function GhostTile({
+  job,
+  t,
+  onRetry,
+  onDismiss,
+}: {
+  job: UploadJob;
+  t: AdminStrings["ingest"];
+  onRetry: () => void;
+  onDismiss: () => void;
+}) {
+  const develop = developOf(job);
+  const failed = job.stage === "failed";
+  const stageLabel =
+    job.stage === "authorizing"
+      ? t.stageAuthorizing
+      : job.stage === "uploading"
+        ? t.stageUploading.replace("{percent}", String(Math.round(job.sent * 100)))
+        : t.stageProcessing;
+
   return (
-    item.variants.find((v) => v.format === "webp")?.url ??
-    item.variants.find((v) => v.url)?.url ??
-    undefined
+    <div
+      className={cn(
+        "relative aspect-square overflow-hidden rounded-md bg-card",
+        job.stage === "processing" && "safelight-pulse",
+        failed && "ring-1 ring-destructive/50 ring-inset",
+      )}
+    >
+      <img
+        src={job.previewUrl}
+        alt={job.name}
+        className={cn("h-full w-full object-cover", !failed && "developing-print")}
+        style={
+          failed
+            ? { filter: "grayscale(1) brightness(0.4)" }
+            : ({ "--develop": develop } as React.CSSProperties)
+        }
+      />
+
+      {failed ? (
+        <>
+          <div className="absolute top-1 right-1 flex gap-0.5">
+            <button
+              type="button"
+              aria-label={t.retry.replace("{filename}", job.name)}
+              onClick={onRetry}
+              className="rounded bg-glass-medium p-1.5 text-foreground backdrop-blur-sm transition-colors hover:text-primary"
+            >
+              <ArrowCounterClockwise size={12} />
+            </button>
+            <button
+              type="button"
+              aria-label={t.dismiss.replace("{filename}", job.name)}
+              onClick={onDismiss}
+              className="rounded bg-glass-medium p-1.5 text-foreground backdrop-blur-sm transition-colors hover:text-destructive"
+            >
+              <X size={12} />
+            </button>
+          </div>
+          <div className="absolute inset-x-0 bottom-0 bg-glass-medium px-1.5 py-1 backdrop-blur-sm">
+            <p className="truncate font-mono text-2xs text-destructive">
+              <WarningCircle size={10} className="mr-1 inline" />
+              {job.detail}
+            </p>
+            <p className="truncate text-3xs text-muted-foreground">{job.name}</p>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="absolute inset-x-0 bottom-0 px-1.5 py-1">
+            <p className="truncate font-mono text-2xs text-primary">{stageLabel}</p>
+          </div>
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 bg-progress-track">
+            <div
+              className="h-full bg-primary transition-[width] duration-300 ease-out"
+              style={{ width: `${Math.round(develop * 100)}%` }}
+            />
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 
 function Tile({
   item,
-  index,
-  onOpen,
   t,
+  onOpen,
+  onDelete,
 }: {
   item: MediaItem;
-  index: number;
-  onOpen: () => void;
   t: AdminStrings["library"];
+  onOpen: () => void;
+  onDelete: () => Promise<boolean>;
 }) {
-  const mounted = useMounted();
   const thumb = thumbOf(item);
   const bucket = bucketOf(item);
-  const webpBytes = item.variants.find((v) => v.format === "webp")?.size_bytes;
+
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      aria-label={t.openAria.replace("{filename}", item.filename)}
-      style={{ transitionDelay: `${Math.min(index * 25, 400)}ms` }}
+    <div
       className={cn(
-        "group relative aspect-square overflow-hidden rounded-md border text-left outline-none",
-        "transition-opacity duration-500 focus-visible:ring-2 focus-visible:ring-ring",
-        mounted ? "opacity-100" : "opacity-0",
-        bucket === "failed"
-          ? "border-destructive/40 bg-surface-dim"
-          : "border-border-faint bg-surface-dim",
+        "group relative aspect-square overflow-hidden rounded-md bg-card",
+        bucket === "processing" && !thumb && "safelight-pulse",
+        bucket === "failed" && "ring-1 ring-destructive/50 ring-inset",
       )}
     >
-      {thumb ? (
-        <img
-          src={thumb}
-          alt={item.filename}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-[1.04]"
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={t.openAria.replace("{filename}", item.filename)}
+        className="block h-full w-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+      >
+        {thumb ? (
+          <img
+            src={thumb}
+            alt={item.filename}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-[1.03]"
+          />
+        ) : (
+          <span
+            className={cn(
+              "flex h-full w-full items-center justify-center font-mono text-2xs",
+              bucket === "failed" ? "text-destructive" : "text-muted-foreground",
+            )}
+          >
+            {bucket === "failed" && <WarningCircle size={12} className="mr-1" />}
+            {t.states[bucket]}
+          </span>
+        )}
+      </button>
+
+      <div className="absolute top-1 right-1 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+        <DeleteButton
+          label={t.deleteAria.replace("{filename}", item.filename)}
+          confirmLabel={t.confirmDelete}
+          onDelete={onDelete}
+          className="bg-glass-medium backdrop-blur-sm"
         />
-      ) : (
-        <span
-          className={cn(
-            "flex h-full w-full flex-col items-center justify-center gap-1.5 text-3xs uppercase tracking-[0.2em]",
-            bucket === "failed"
-              ? "text-destructive"
-              : "text-muted-foreground motion-safe:animate-pulse",
-          )}
-        >
-          {bucket === "failed" ? <WarningCircle size={18} /> : <HourglassMedium size={18} />}
-          {t.filters[bucket]}
-        </span>
-      )}
-      <span className="absolute inset-x-0 bottom-0 translate-y-full bg-glass-medium px-1.5 py-1 backdrop-blur-sm transition-transform duration-200 group-hover:translate-y-0 group-focus-visible:translate-y-0">
-        <span className="block truncate font-mono text-2xs">{item.filename}</span>
-        <span className="block text-3xs text-muted-foreground">
-          {item.width && item.height ? `${item.width}×${item.height}` : t.filters[bucket]}
-          {webpBytes ? ` · ${formatBytes(webpBytes)}` : ""}
-          {item.category ? ` · ${item.category}` : ""}
-        </span>
-      </span>
-    </button>
+      </div>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-full bg-glass-medium px-1.5 py-1 backdrop-blur-sm transition-transform duration-200 group-focus-within:translate-y-0 group-hover:translate-y-0">
+        <p className="truncate font-mono text-2xs">{item.filename}</p>
+        <p className="truncate text-3xs text-muted-foreground">
+          {item.width && item.height ? `${item.width}×${item.height}` : t.states[bucket]}
+          {item.size_bytes ? ` · ${formatBytes(item.size_bytes)}` : ""}
+        </p>
+      </div>
+    </div>
   );
 }
 
-export function Library({
-  media,
-  loading,
-  onRefresh,
+export function PhotoGrid({
   t,
+  media,
+  jobs,
+  loading,
+  filtered,
+  onOpen,
+  onDelete,
+  onRetryJob,
+  onDismissJob,
+  onClearFilters,
 }: {
-  media: MediaItem[];
-  loading: boolean;
-  onRefresh: () => void;
   t: AdminStrings;
+  media: MediaItem[];
+  jobs: UploadJob[];
+  loading: boolean;
+  filtered: boolean;
+  onOpen: (id: string) => void;
+  onDelete: (id: string) => Promise<boolean>;
+  onRetryJob: (id: string) => void;
+  onDismissJob: (id: string) => void;
+  onClearFilters: () => void;
 }) {
-  const library = t.library;
-  const [stateFilter, setStateFilter] = useState<StateFilter>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
-  const [openId, setOpenId] = useState<string | null>(null);
+  const skeletonKeys = useRef(Array.from({ length: 12 }, (_, i) => `skeleton-${i}`));
 
-  const counts = useMemo(() => {
-    const c = { all: media.length, ready: 0, processing: 0, failed: 0 };
-    for (const m of media) c[bucketOf(m)] += 1;
-    return c;
-  }, [media]);
+  if (loading) {
+    return (
+      <div
+        role="status"
+        aria-label={t.library.loading}
+        className="grid gap-1 [grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr))]"
+      >
+        {skeletonKeys.current.map((key) => (
+          <div key={key} className="aspect-square rounded-md bg-card motion-safe:animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
-  const categories = useMemo(() => {
-    const set = new Map<string, number>();
-    for (const m of media) {
-      const key = m.category ?? library.uncategorized;
-      set.set(key, (set.get(key) ?? 0) + 1);
-    }
-    return Array.from(set.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-  }, [media, library.uncategorized]);
-
-  const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return media.filter((m) => {
-      if (stateFilter !== "all" && bucketOf(m) !== stateFilter) return false;
-      if (categoryFilter && (m.category ?? library.uncategorized) !== categoryFilter) return false;
-      if (q && !m.filename.toLowerCase().includes(q)) return false;
-      return true;
-    });
-  }, [media, stateFilter, categoryFilter, query, library.uncategorized]);
-
-  const openIndex = visible.findIndex((m) => m.id === openId);
-  const openItem = openIndex >= 0 ? visible[openIndex] : null;
+  if (media.length === 0 && jobs.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-20 text-muted-foreground">
+        <Images size={26} />
+        {filtered ? (
+          <>
+            <p className="text-xs">{t.library.noMatches}</p>
+            <button
+              type="button"
+              onClick={onClearFilters}
+              className="rounded-full border border-border-medium px-3 py-1 font-mono text-2xs transition-colors hover:border-primary-subtle hover:text-foreground"
+            >
+              {t.library.clearFilters}
+            </button>
+          </>
+        ) : (
+          <p className="text-xs">{t.library.empty}</p>
+        )}
+      </div>
+    );
+  }
 
   return (
-    <Instrument
-      label={`${library.label} · ${visible.length}${visible.length !== media.length ? ` ${library.of} ${media.length}` : ""}`}
-      right={
-        <button
-          type="button"
-          onClick={onRefresh}
-          aria-label={library.refreshAria}
-          className="rounded p-1 text-muted-foreground transition-colors hover:bg-control-hover hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <ArrowsClockwise size={13} className={loading ? "motion-safe:animate-spin" : undefined} />
-        </button>
-      }
-    >
-      <div className="mb-2 flex flex-wrap items-center gap-1.5">
-        <div className="inline-flex overflow-hidden rounded border border-border-faint">
-          {(["all", "ready", "processing", "failed"] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setStateFilter(f)}
-              className={cn(
-                "px-2 py-0.5 font-mono text-2xs transition-colors",
-                stateFilter === f
-                  ? "bg-surface-soft text-primary"
-                  : "text-muted-foreground hover:bg-control-hover hover:text-foreground",
-              )}
-            >
-              {library.filters[f]} <span className="text-faded">{counts[f]}</span>
-            </button>
-          ))}
-        </div>
-        <label className="relative ml-auto">
-          <MagnifyingGlass
-            size={12}
-            className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-faded"
-          />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={library.filterPlaceholder}
-            aria-label={library.filterAria}
-            className="w-40 rounded border border-border-faint bg-transparent py-0.5 pr-2 pl-7 font-mono text-xs outline-none placeholder:text-placeholder focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </label>
-      </div>
-
-      {categories.length > 1 && (
-        <div className="mb-2 flex flex-wrap gap-1">
-          {categories.map(([name, count]) => (
-            <button
-              key={name}
-              type="button"
-              onClick={() => setCategoryFilter(categoryFilter === name ? null : name)}
-              className={cn(
-                "rounded border px-1.5 py-px font-mono text-2xs transition-colors",
-                categoryFilter === name
-                  ? "border-primary-hint bg-surface-selected text-primary"
-                  : "border-border-faint text-muted-foreground hover:bg-control-hover hover:text-foreground",
-              )}
-            >
-              {name} <span className="text-faded">{count}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {loading && media.length === 0 ? (
-        <p className="py-6 text-center text-muted-foreground text-xs motion-safe:animate-pulse">
-          {library.reading}
-        </p>
-      ) : visible.length === 0 ? (
-        <div className="flex flex-col items-center gap-1.5 py-8 text-muted-foreground">
-          <ImageSquare size={22} />
-          <p className="text-xs">{media.length === 0 ? library.empty : library.noMatches}</p>
-        </div>
-      ) : (
-        <div className="grid gap-1.5 [grid-template-columns:repeat(auto-fill,minmax(8rem,1fr))]">
-          {visible.map((item, i) => (
-            <Tile
-              key={item.id}
-              item={item}
-              index={i}
-              onOpen={() => setOpenId(item.id)}
-              t={library}
-            />
-          ))}
-        </div>
-      )}
-
-      {openItem && (
-        <Lightbox
-          item={openItem}
-          index={openIndex}
-          total={visible.length}
-          t={t}
-          onClose={() => setOpenId(null)}
-          onNav={(delta) => {
-            const next = visible[openIndex + delta];
-            if (next) setOpenId(next.id);
-          }}
+    <div className="grid gap-1 [grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr))]">
+      {jobs.map((job) => (
+        <GhostTile
+          key={job.id}
+          job={job}
+          t={t.ingest}
+          onRetry={() => onRetryJob(job.id)}
+          onDismiss={() => onDismissJob(job.id)}
         />
-      )}
-    </Instrument>
+      ))}
+      {media.map((item) => (
+        <Tile
+          key={item.id}
+          item={item}
+          t={t.library}
+          onOpen={() => onOpen(item.id)}
+          onDelete={() => onDelete(item.id)}
+        />
+      ))}
+    </div>
   );
 }

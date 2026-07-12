@@ -8,32 +8,23 @@ type MediaItem = components["schemas"]["MediaItem"];
 
 export type JobStage = "authorizing" | "uploading" | "processing" | "ready" | "failed";
 
-/** Pipeline station the stage maps to: authorize → s3 put → worker → live. */
-export const STATION_OF: Record<JobStage, number> = {
-  authorizing: 0,
-  uploading: 1,
-  processing: 2,
-  ready: 3,
-  failed: 0,
-};
-
 export interface UploadJob {
   id: string;
+  file: File;
   name: string;
   size: number;
+  category: string;
   stage: JobStage;
   /** 0..1 while the S3 PUT is in flight. */
   sent: number;
-  /** Station index the job died at, when stage is "failed". */
-  failedAt?: number;
   detail?: string;
   mediaId?: string;
-  previewUrl?: string;
+  previewUrl: string;
 }
 
 // Mirrors ALLOWED_CONTENT_TYPES / MAX_UPLOAD_BYTES in the API.
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_BYTES = 25 * 1024 * 1024;
+const MAX_BYTES = 100 * 1024 * 1024;
 
 function putWithProgress(
   url: string,
@@ -61,9 +52,13 @@ function putWithProgress(
 /**
  * Drives uploads through the real pipeline: authorize (audited) → presigned
  * S3 PUT with byte progress → poll until the worker settles the item.
- * `onLanded` fires once per job that reaches "ready".
+ * `onLanded` fires once per job that reaches "ready"; the caller refreshes
+ * the library and then removes the job so the real tile takes over.
  */
-export function useUploads(onLanded: () => void, errors: AdminStrings["uploadErrors"]) {
+export function useUploads(
+  onLanded: (jobId: string) => void,
+  errors: AdminStrings["uploadErrors"],
+) {
   const [jobs, setJobs] = useState<UploadJob[]>([]);
   const landedRef = useRef(new Set<string>());
   const onLandedRef = useRef(onLanded);
@@ -73,30 +68,14 @@ export function useUploads(onLanded: () => void, errors: AdminStrings["uploadErr
     setJobs((all) => all.map((j) => (j.id === id ? { ...j, ...delta } : j)));
   }, []);
 
-  const upload = useCallback(
-    async (file: File, category: string) => {
-      const id = `${file.name}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-      setJobs((all) => [
-        ...all,
-        {
-          id,
-          name: file.name,
-          size: file.size,
-          stage: "authorizing",
-          sent: 0,
-          previewUrl: URL.createObjectURL(file),
-        },
-      ]);
+  const run = useCallback(
+    async (id: string, file: File, category: string) => {
       if (!ACCEPTED_TYPES.includes(file.type)) {
-        patch(id, {
-          stage: "failed",
-          failedAt: 0,
-          detail: errors.invalidType,
-        });
+        patch(id, { stage: "failed", detail: errors.invalidType });
         return;
       }
       if (file.size > MAX_BYTES) {
-        patch(id, { stage: "failed", failedAt: 0, detail: errors.tooLarge });
+        patch(id, { stage: "failed", detail: errors.tooLarge });
         return;
       }
       try {
@@ -120,7 +99,6 @@ export function useUploads(onLanded: () => void, errors: AdminStrings["uploadErr
         } catch (err) {
           patch(id, {
             stage: "failed",
-            failedAt: 1,
             detail: err instanceof Error ? err.message : errors.uploadFailed,
           });
           return;
@@ -129,13 +107,51 @@ export function useUploads(onLanded: () => void, errors: AdminStrings["uploadErr
       } catch (err) {
         patch(id, {
           stage: "failed",
-          failedAt: 0,
           detail: err instanceof Error ? err.message : errors.authorizationFailed,
         });
       }
     },
     [patch, errors],
   );
+
+  const upload = useCallback(
+    (file: File, category: string) => {
+      const id = `${file.name}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      setJobs((all) => [
+        {
+          id,
+          file,
+          name: file.name,
+          size: file.size,
+          category,
+          stage: "authorizing",
+          sent: 0,
+          previewUrl: URL.createObjectURL(file),
+        },
+        ...all,
+      ]);
+      void run(id, file, category);
+    },
+    [run],
+  );
+
+  const retry = useCallback(
+    (id: string) => {
+      const job = jobs.find((j) => j.id === id);
+      if (!job || job.stage !== "failed") return;
+      patch(id, { stage: "authorizing", sent: 0, detail: undefined, mediaId: undefined });
+      void run(id, job.file, job.category);
+    },
+    [jobs, patch, run],
+  );
+
+  const remove = useCallback((id: string) => {
+    setJobs((all) => {
+      const job = all.find((j) => j.id === id);
+      if (job) URL.revokeObjectURL(job.previewUrl);
+      return all.filter((j) => j.id !== id);
+    });
+  }, []);
 
   // Poll processing jobs until the worker settles them.
   useEffect(() => {
@@ -148,14 +164,9 @@ export function useUploads(onLanded: () => void, errors: AdminStrings["uploadErr
             if (job.stage !== "processing" || !job.mediaId) return job;
             const item = media.find((m: MediaItem) => m.id === job.mediaId);
             if (!item) return job;
-            if (item.state === "ready") return { ...job, stage: "ready" };
+            if (item.state === "ready") return { ...job, stage: "ready" as const };
             if (item.state === "failed")
-              return {
-                ...job,
-                stage: "failed",
-                failedAt: 2,
-                detail: errors.processingFailed,
-              };
+              return { ...job, stage: "failed" as const, detail: errors.processingFailed };
             return job;
           }),
         );
@@ -166,26 +177,16 @@ export function useUploads(onLanded: () => void, errors: AdminStrings["uploadErr
     return () => clearInterval(timer);
   }, [jobs, errors.processingFailed]);
 
-  // Notify (once per job) when an upload lands, so the library can refresh.
+  // Notify (once per job) when an upload lands, so the library can refresh
+  // and retire the ghost tile.
   useEffect(() => {
     for (const job of jobs) {
       if (job.stage === "ready" && !landedRef.current.has(job.id)) {
         landedRef.current.add(job.id);
-        onLandedRef.current();
+        onLandedRef.current(job.id);
       }
     }
   }, [jobs]);
 
-  const clearSettled = useCallback(() => {
-    setJobs((all) => {
-      for (const job of all) {
-        if ((job.stage === "ready" || job.stage === "failed") && job.previewUrl) {
-          URL.revokeObjectURL(job.previewUrl);
-        }
-      }
-      return all.filter((j) => j.stage !== "ready" && j.stage !== "failed");
-    });
-  }, []);
-
-  return { jobs, upload, clearSettled };
+  return { jobs, upload, retry, remove };
 }

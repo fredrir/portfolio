@@ -128,7 +128,6 @@ export function ImageDetail({
           </button>
         </>
       )}
-
       <div className="flex min-h-[1.25rem] shrink-0 flex-wrap gap-x-3 gap-y-0.5 px-0.5 pt-2 text-2xs text-faded">
         {image.date && <span>{formatDate(image.date)}</span>}
         {image.filename && <span>{image.filename}</span>}

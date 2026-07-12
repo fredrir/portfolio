@@ -9,7 +9,7 @@ import {
 } from "react";
 import type { DictType, Locale } from "@/i18n/types";
 import { PaneHost } from "@/shared/components/pane-host";
-import type { GitHubData, SpotifyData } from "@/shared/types";
+import type { GitHubData, SpotifyData, WeatherData } from "@/shared/types";
 import type { useTutorial } from "@/tutorial/use-tutorial";
 import type { useBackground } from "./background/hooks/use-background";
 import { configMap, PANE_IDS } from "./constants";
@@ -83,6 +83,7 @@ interface ViewContext {
   floating: ReturnType<typeof useFloatingDetail>;
   githubData: GitHubData | null;
   spotifyData: SpotifyData | null;
+  weatherData: WeatherData | null;
 }
 
 const POST_PANE_STEPS = new Set(["launcher", "drag", "resize"]);
@@ -90,8 +91,19 @@ const POST_PANE_STEPS = new Set(["launcher", "drag", "resize"]);
 export type LayoutMode = "loading" | "mobile" | "maximized" | "desktop";
 
 export function useWindowManagerView(ctx: ViewContext) {
-  const { dict, locale, isMobile, tutorial, wm, bg, focus, floating, githubData, spotifyData } =
-    ctx;
+  const {
+    dict,
+    locale,
+    isMobile,
+    tutorial,
+    wm,
+    bg,
+    focus,
+    floating,
+    githubData,
+    spotifyData,
+    weatherData,
+  } = ctx;
   const { ui, tutorial: tutorialStrings, landing, journey, project, contact, navbar } = dict;
 
   const tutorialIsFloating =
@@ -207,6 +219,7 @@ export function useWindowManagerView(ctx: ViewContext) {
     <StatusBar
       locale={locale}
       ui={ui}
+      weather={weatherData}
       onOpenLauncher={() => wm.setLauncherOpen(true)}
       onOpenSettings={focus.openSettings}
     />

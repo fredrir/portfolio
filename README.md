@@ -12,8 +12,8 @@
 
 ```mermaid
 flowchart LR
-    V["Visitor / Recruiter<br/>(browser)"] --> CF["hansteen.dev platform<br/>(this system)"]
-    A["Administrator<br/>(fredrir)"] --> CF
+    V["Visitor<br/>"] --> CF["hansteen.dev"]
+    A["Admin<br/>(me)"] --> CF
     CF --> GH["GitHub<br/>source, CI, GHCR, deployments API"]
     CF --> AWS["AWS eu-north-1<br/>S3 + SQS"]
     CF --> EXT["External APIs<br/>GitHub REST, Spotify, reCAPTCHA, Formspree"]
@@ -85,11 +85,6 @@ flowchart TD
 
 ## Development
 
-Requirements: [Bun](https://bun.sh), Rust (stable), Docker with compose, and the
-[Doppler CLI](https://docs.doppler.com/docs/cli) (`doppler login`). Configuration
-lives in the Doppler project `portfolio` (`dev`/`preview`/`prd`); `doppler.yaml`
-binds this repo to the `dev` config — there is no `.env` file
-(`.env.example` documents the variable names).
 
 ```bash
 doppler setup --no-interactive              
@@ -99,12 +94,9 @@ bun install
 bun run dev                                 # db/localstack + API + web
 bun run dev:web                             # web app only, http://localhost:3000
 bun run dev:api                             # API only, http://localhost:8080
-bun run dev:seed                            # idempotent local media seed
+bun run dev:seed                            # local media seed
 doppler run -- cargo run -p portfolio-worker
 ```
-
-`bun run dev` seeds LocalStack/Postgres with bundled gallery fixtures once the
-API is healthy. Set `DEV_SEED_MEDIA=0` when you need an empty local media table.
 
 ### Checks
 

@@ -81,3 +81,11 @@ export interface SpotifyData {
   topArtists?: SpotifyArtist[];
   lastPlayedAt?: string;
 }
+
+export interface WeatherData {
+  location: string;
+  temperatureC: number;
+  weatherCode: number;
+  observedAt: string;
+  stale: boolean;
+}

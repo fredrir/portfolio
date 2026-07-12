@@ -30,6 +30,7 @@ fn test_state_with_public_base(pool: PgPool, public_base_url: Option<String>) ->
         spotify_accounts: "http://127.0.0.1:9".into(),
         recaptcha: "http://127.0.0.1:9".into(),
         posthog: "http://127.0.0.1:9".into(),
+        weather_api: "http://127.0.0.1:9".into(),
         github_username: "fredrir".into(),
         github_repo: "fredrir/portfolio".into(),
         recaptcha_secret: None,
@@ -236,6 +237,183 @@ async fn media_upload_returns_presigned_url_and_pending_record(pool: PgPool) {
         .unwrap();
     assert_eq!(state, "pending");
     assert_eq!(filename, "My_Photo_.jpg");
+}
+
+/// Authorize an upload and return the pending media id.
+async fn seed_media(pool: PgPool, filename: &str, category: Option<&str>) -> String {
+    let request = Request::post("/api/v1/media/uploads")
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::from(
+            json!({
+                "filename": filename,
+                "content_type": "image/jpeg",
+                "size_bytes": 1234,
+                "category": category
+            })
+            .to_string(),
+        ))
+        .unwrap();
+    let (status, body) = send(pool, request).await;
+    assert_eq!(status, StatusCode::CREATED);
+    body["media_id"].as_str().unwrap().to_owned()
+}
+
+#[sqlx::test]
+async fn media_category_can_be_set_and_cleared(pool: PgPool) {
+    let id = seed_media(pool.clone(), "a.jpg", Some("oslo")).await;
+
+    // No token → 401.
+    let request = Request::patch(format!("/api/v1/media/{id}"))
+        .header(header::CONTENT_TYPE, "application/json")
+        .body(Body::from(json!({ "category": "trondheim" }).to_string()))
+        .unwrap();
+    let (status, _) = send(pool.clone(), request).await;
+    assert_eq!(status, StatusCode::UNAUTHORIZED);
+
+    // Re-categorize (input is sanitized like uploads).
+    let request = Request::patch(format!("/api/v1/media/{id}"))
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::from(json!({ "category": "Trondheim" }).to_string()))
+        .unwrap();
+    let (status, body) = send(pool.clone(), request).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["category"], "trondheim");
+
+    // Null clears to uncategorized.
+    let request = Request::patch(format!("/api/v1/media/{id}"))
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::from(json!({ "category": null }).to_string()))
+        .unwrap();
+    let (status, body) = send(pool.clone(), request).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["category"], Value::Null);
+
+    let (stored,): (Option<String>,) = sqlx::query_as("select category from media")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(stored, None);
+
+    // Both changes are audited.
+    let (entries,): (i64,) =
+        sqlx::query_as("select count(*) from admin_audit where action = 'media.category_set'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(entries, 2);
+
+    // Unknown id → 404.
+    let request = Request::patch(format!("/api/v1/media/{}", uuid::Uuid::new_v4()))
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::from(json!({ "category": "x" }).to_string()))
+        .unwrap();
+    let (status, _) = send(pool, request).await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+}
+
+#[sqlx::test]
+async fn media_delete_removes_row_and_audits(pool: PgPool) {
+    let id = seed_media(pool.clone(), "gone.jpg", None).await;
+    sqlx::query(
+        "insert into media_variants (media_id, format, key, width, height, size_bytes) \
+         values ($1::uuid, 'webp', 'variants/deadbeef.webp', 10, 10, 100)",
+    )
+    .bind(&id)
+    .execute(&pool)
+    .await
+    .unwrap();
+
+    let request = Request::delete(format!("/api/v1/media/{id}"))
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::empty())
+        .unwrap();
+    let (status, _) = send(pool.clone(), request).await;
+    // S3 cleanup is best-effort (no object store in tests); the row must be gone.
+    assert_eq!(status, StatusCode::NO_CONTENT);
+
+    let (media, variants): (i64, i64) = sqlx::query_as(
+        "select (select count(*) from media), (select count(*) from media_variants)",
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!((media, variants), (0, 0));
+
+    let (entries,): (i64,) =
+        sqlx::query_as("select count(*) from admin_audit where action = 'media.deleted'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(entries, 1);
+
+    // Already gone → 404.
+    let request = Request::delete(format!("/api/v1/media/{id}"))
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::empty())
+        .unwrap();
+    let (status, _) = send(pool, request).await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+}
+
+#[sqlx::test]
+async fn category_rename_moves_all_media(pool: PgPool) {
+    seed_media(pool.clone(), "a.jpg", Some("krageroe")).await;
+    seed_media(pool.clone(), "b.jpg", Some("krageroe")).await;
+    seed_media(pool.clone(), "c.jpg", Some("oslo")).await;
+
+    let request = Request::post("/api/v1/media/categories/rename")
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::from(
+            json!({ "from": "krageroe", "to": "Kragerø Summer" }).to_string(),
+        ))
+        .unwrap();
+    let (status, body) = send(pool.clone(), request).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["to"], "krager__summer");
+    assert_eq!(body["updated"], 2);
+
+    let (moved,): (i64,) = sqlx::query_as("select count(*) from media where category = $1")
+        .bind("krager__summer")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(moved, 2);
+
+    // Untouched category stays.
+    let (oslo,): (i64,) = sqlx::query_as("select count(*) from media where category = 'oslo'")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(oslo, 1);
+
+    let (entries,): (i64,) =
+        sqlx::query_as("select count(*) from admin_audit where action = 'media.category_renamed'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(entries, 1);
+
+    // Empty source category → 404; invalid names → 422.
+    let request = Request::post("/api/v1/media/categories/rename")
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::from(json!({ "from": "nope", "to": "new" }).to_string()))
+        .unwrap();
+    let (status, _) = send(pool.clone(), request).await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+
+    let request = Request::post("/api/v1/media/categories/rename")
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::from(json!({ "from": "oslo", "to": "___" }).to_string()))
+        .unwrap();
+    let (status, _) = send(pool, request).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
 }
 
 #[sqlx::test]
@@ -531,6 +709,254 @@ async fn deployments_fail_deterministically_without_upstream(pool: PgPool) {
     .await;
     assert_eq!(status, StatusCode::BAD_GATEWAY);
     assert_eq!(body["status"], 502);
+}
+
+#[sqlx::test]
+async fn weather_serves_fresh_postgres_cache(pool: PgPool) {
+    sqlx::query("insert into upstream_cache (id, data) values ($1, $2)")
+        .bind("weather:trondheim")
+        .bind(json!({
+            "location": "Trondheim",
+            "temperatureC": 16.4,
+            "weatherCode": 2,
+            "observedAt": "2026-07-12T12:00",
+            "stale": false
+        }))
+        .execute(&pool)
+        .await
+        .unwrap();
+
+    let (status, body) = send(
+        pool,
+        Request::get("/api/v1/weather").body(Body::empty()).unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["location"], "Trondheim");
+    assert_eq!(body["temperatureC"], 16.4);
+    assert_eq!(body["stale"], false);
+}
+
+#[sqlx::test]
+async fn weather_serves_recent_stale_cache_when_upstream_fails(pool: PgPool) {
+    sqlx::query(
+        "insert into upstream_cache (id, data, updated_at) \
+         values ($1, $2, now() - interval '20 minutes')",
+    )
+    .bind("weather:trondheim")
+    .bind(json!({
+        "location": "Trondheim",
+        "temperatureC": 8.0,
+        "weatherCode": 63,
+        "observedAt": "2026-07-12T11:30",
+        "stale": false
+    }))
+    .execute(&pool)
+    .await
+    .unwrap();
+
+    let (status, body) = send(
+        pool,
+        Request::get("/api/v1/weather").body(Body::empty()).unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["weatherCode"], 63);
+    assert_eq!(body["stale"], true);
+}
+
+#[sqlx::test]
+async fn weather_returns_bad_gateway_without_cache(pool: PgPool) {
+    let (status, body) = send(
+        pool,
+        Request::get("/api/v1/weather").body(Body::empty()).unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_GATEWAY);
+    assert_eq!(body["status"], 502);
+}
+
+#[sqlx::test]
+async fn weather_fetches_and_persists_fresh_data(pool: PgPool) {
+    let provider = axum::Router::new().route(
+        "/v1/forecast",
+        axum::routing::get(|| async {
+            axum::Json(json!({
+                "current": {
+                    "time": "2026-07-12T18:15",
+                    "temperature_2m": 18.9,
+                    "weather_code": 1
+                }
+            }))
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .unwrap();
+    let provider_url = format!("http://{}", listener.local_addr().unwrap());
+    let provider_task = tokio::spawn(async move {
+        axum::serve(listener, provider).await.unwrap();
+    });
+
+    let mut state = test_state(pool.clone());
+    std::sync::Arc::get_mut(&mut state.upstreams)
+        .unwrap()
+        .weather_api = provider_url;
+    let response = app(state)
+        .oneshot(
+            Request::get("/api/v1/weather")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    provider_task.abort();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let bytes = response.into_body().collect().await.unwrap().to_bytes();
+    let body: Value = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(body["temperatureC"], 18.9);
+    assert_eq!(body["weatherCode"], 1);
+    assert_eq!(body["stale"], false);
+
+    let (cached,): (Value,) =
+        sqlx::query_as("select data from upstream_cache where id = 'weather:trondheim'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(cached["observedAt"], "2026-07-12T18:15");
+    assert_eq!(cached["weatherCode"], 1);
+}
+
+#[sqlx::test]
+async fn weather_coalesces_concurrent_refreshes_and_exposes_metrics(pool: PgPool) {
+    let calls = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let provider_calls = calls.clone();
+    let provider = axum::Router::new().route(
+        "/v1/forecast",
+        axum::routing::get(move || {
+            let calls = provider_calls.clone();
+            async move {
+                calls.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+                axum::Json(json!({
+                    "current": {
+                        "time": "2026-07-12T18:30",
+                        "temperature_2m": 19.2,
+                        "weather_code": 2
+                    }
+                }))
+            }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .unwrap();
+    let provider_url = format!("http://{}", listener.local_addr().unwrap());
+    let provider_task = tokio::spawn(async move {
+        axum::serve(listener, provider).await.unwrap();
+    });
+
+    let mut state = test_state(pool);
+    std::sync::Arc::get_mut(&mut state.upstreams)
+        .unwrap()
+        .weather_api = provider_url;
+    let router = app(state);
+    let request = || {
+        Request::get("/api/v1/weather")
+            .body(Body::empty())
+            .unwrap()
+    };
+    let (first, second) = tokio::join!(
+        router.clone().oneshot(request()),
+        router.clone().oneshot(request())
+    );
+    assert_eq!(first.unwrap().status(), StatusCode::OK);
+    assert_eq!(second.unwrap().status(), StatusCode::OK);
+    assert_eq!(calls.load(std::sync::atomic::Ordering::Relaxed), 1);
+
+    let metrics = router
+        .oneshot(
+            Request::get("/api/v1/weather/metrics")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    provider_task.abort();
+    assert_eq!(metrics.status(), StatusCode::OK);
+    let bytes = metrics.into_body().collect().await.unwrap().to_bytes();
+    let body: Value = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(body["cacheMisses"], 2);
+    assert_eq!(body["refreshSuccesses"], 1);
+    assert_eq!(body["coalescedRequests"], 1);
+}
+
+#[sqlx::test]
+async fn weather_background_refreshes_before_request_ttl(pool: PgPool) {
+    sqlx::query(
+        "insert into upstream_cache (id, data, updated_at) \
+         values ($1, $2, now() - interval '13 minutes')",
+    )
+    .bind("weather:trondheim")
+    .bind(json!({
+        "location": "Trondheim",
+        "temperatureC": 5.0,
+        "weatherCode": 63,
+        "observedAt": "2026-07-12T17:00",
+        "stale": false
+    }))
+    .execute(&pool)
+    .await
+    .unwrap();
+
+    let provider = axum::Router::new().route(
+        "/v1/forecast",
+        axum::routing::get(|| async {
+            axum::Json(json!({
+                "current": {
+                    "time": "2026-07-12T18:45",
+                    "temperature_2m": 20.1,
+                    "weather_code": 0
+                }
+            }))
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .unwrap();
+    let provider_url = format!("http://{}", listener.local_addr().unwrap());
+    let provider_task = tokio::spawn(async move {
+        axum::serve(listener, provider).await.unwrap();
+    });
+
+    let mut state = test_state(pool.clone());
+    std::sync::Arc::get_mut(&mut state.upstreams)
+        .unwrap()
+        .weather_api = provider_url;
+    portfolio_api::routes::weather::refresh_if_due(&state).await;
+
+    let (cached,): (Value,) =
+        sqlx::query_as("select data from upstream_cache where id = 'weather:trondheim'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(cached["temperatureC"], 20.1);
+    assert_eq!(cached["observedAt"], "2026-07-12T18:45");
+
+    let metrics = app(state)
+        .oneshot(
+            Request::get("/api/v1/weather/metrics")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    provider_task.abort();
+    let bytes = metrics.into_body().collect().await.unwrap().to_bytes();
+    let body: Value = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(body["backgroundRefreshes"], 1);
+    assert_eq!(body["refreshSuccesses"], 1);
 }
 
 #[sqlx::test]

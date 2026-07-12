@@ -24,104 +24,83 @@
     "cookieLabel": "Informasjonskapsler"
   },
   "admin": {
-    "pageTitle": "Administrasjon - hansteen.dev",
-    "apiUnreachable": "api utilgjengelig",
-    "subtitle": "mediepipeline · Access-beskyttet",
+    "pageTitle": "admin.hansteen.dev",
+    "apiDown": "API-et er utilgjengelig - biblioteket kan ikke lastes eller endres nå.",
+    "retry": "prøv igjen",
+    "addPhotos": "legg til bilder",
+    "actionFailed": "det gikk ikke gjennom - prøv igjen",
     "stats": {
-      "items": "elementer",
-      "live": "live",
-      "stored": "lagret"
+      "photos": "bilder",
+      "developing": "fremkalles",
+      "failed": "feilet"
     },
     "uploadErrors": {
       "invalidType": "ikke jpeg, png eller webp",
-      "tooLarge": "over 25 MiB",
+      "tooLarge": "over 100 MiB",
       "uploadFailed": "opplasting feilet",
       "authorizationFailed": "autorisasjon feilet",
       "processingFailed": "behandling feilet",
-      "networkDuringS3": "nettverksfeil under S3 PUT"
+      "networkDuringS3": "nettverksfeil under opplasting"
     },
-    "pipeline": {
-      "stations": [
-        {
-          "label": "autoriser",
-          "sub": "grant + audit"
-        },
-        {
-          "label": "s3 put",
-          "sub": "presigned"
-        },
-        {
-          "label": "worker",
-          "sub": "avif · webp"
-        },
-        {
-          "label": "live",
-          "sub": "galleri"
-        }
-      ],
-      "ingest": "inntak",
-      "clearFinished": "fjern ferdige",
-      "uploadAria": "Last opp bilder: slipp filer hvor som helst eller trykk Enter for å bla",
-      "release": "slipp for å mate pipelinen",
-      "drop": "slipp bilder hvor som helst, eller klikk for å bla",
-      "constraints": "jpeg / png / webp · <= 25 MiB",
+    "ingest": {
+      "uploadAria": "Last opp bilder: slipp filer hvor som helst, lim inn, eller trykk Enter for å bla",
+      "drop": "slipp bilder hvor som helst, lim inn, eller klikk for å bla",
+      "release": "slipp for å fremkalle",
+      "constraints": "jpeg / png / webp - opptil 100 MiB",
+      "into": "til",
       "category": "kategori",
+      "categoryAria": "Kategori for nye opplastinger",
       "uncategorized": "ukategorisert",
-      "failed": "feilet",
-      "failedAt": "{detail} · ved {station}",
-      "putProgress": "put {percent}%",
-      "stageLabels": {
-        "authorizing": "autoriserer",
-        "uploading": "laster opp",
-        "processing": "behandler",
+      "developingCount": "fremkaller {count}",
+      "stageAuthorizing": "autoriserer",
+      "stageUploading": "laster opp {percent}%",
+      "stageProcessing": "fremkalles",
+      "retry": "Prøv å laste opp {filename} på nytt",
+      "dismiss": "Fjern mislykket opplasting av {filename}"
+    },
+    "library": {
+      "searchPlaceholder": "søk",
+      "searchAria": "Søk på filnavn eller kategori (trykk / for å fokusere)",
+      "clearSearch": "Tøm søket",
+      "refresh": "Oppdater biblioteket",
+      "all": "alle",
+      "uncategorized": "ukategorisert",
+      "renameAria": "Gi kategorien {category} nytt navn",
+      "renamePlaceholder": "nytt navn",
+      "renameSave": "Lagre kategorinavn",
+      "renameCancel": "Avbryt navneendring",
+      "loading": "laster biblioteket...",
+      "empty": "ingen bilder ennå - slipp noen hvor som helst på siden",
+      "noMatches": "ingen treff",
+      "clearFilters": "nullstill filtre",
+      "openAria": "Åpne {filename}",
+      "deleteAria": "Slett {filename}",
+      "confirmDelete": "slette?",
+      "states": {
         "ready": "live",
+        "processing": "fremkalles",
         "failed": "feilet"
       }
     },
-    "library": {
-      "label": "bibliotek",
-      "of": "av",
-      "refreshAria": "Oppdater bibliotek",
-      "openAria": "Åpne {filename}",
-      "filters": {
-        "all": "alle",
-        "ready": "klare",
-        "processing": "behandles",
-        "failed": "feilet"
-      },
-      "filterPlaceholder": "filtrer på filnavn",
-      "filterAria": "Filtrer på filnavn",
-      "reading": "leser biblioteket...",
-      "empty": "biblioteket er tomt - mat pipelinen over",
-      "noMatches": "ingen treff for disse filtrene",
-      "uncategorized": "ukategorisert"
-    },
     "lightbox": {
-      "copied": "kopiert",
-      "closePreview": "Lukk forhåndsvisning",
-      "noVariant": "ingen variant å forhåndsvise ennå",
-      "previousImage": "Forrige bilde",
-      "nextImage": "Neste bilde",
-      "size": "størrelse",
+      "close": "Lukk",
+      "prev": "Forrige bilde",
+      "next": "Neste bilde",
+      "of": "av",
+      "moveHint": "for å bla",
+      "noVariant": "ingen forhåndsvisning ennå - fremkalles fortsatt",
+      "category": "kategori",
+      "save": "lagre",
+      "uploaded": "lastet opp",
+      "dimensions": "dimensjoner",
       "source": "kilde",
       "sha256": "sha-256",
-      "copyContentHash": "Kopier innholdshash",
-      "encodedVariants": "kodede varianter",
-      "copyFormatUrl": "Kopier {format}-URL",
-      "openFormatNewTab": "Åpne {format} i ny fane",
-      "of": "av",
-      "moveHint": "for å flytte"
-    },
-    "ledger": {
-      "label": "ledger",
-      "verifying": "verifiserer...",
-      "verifyChain": "verifiser kjede",
-      "chainIntact": "kjeden er intakt - {entries} oppføringer verifisert",
-      "chainBroken": "kjeden er brutt ved oppføring #{id}",
-      "verificationFailed": "verifisering kjørte ikke - prøv igjen",
-      "empty": "ingen oppføringer ennå - første autorisasjon starter kjeden",
-      "collapse": "fold sammen",
-      "showAll": "vis alle {count} oppføringer"
+      "variants": "varianter",
+      "copy": "Kopier {what}",
+      "copied": "kopiert",
+      "openTab": "Åpne {what} i ny fane",
+      "delete": "slett bildet",
+      "confirmDelete": "helt sikker?"
     },
     "time": {
       "secondsAgo": "s siden",
@@ -469,6 +448,30 @@
     "links": "Se også",
     "visitors": "besøkende",
     "uptime": "oppetid",
+    "weather": {
+      "unavailable": "utilgjengelig",
+      "cached": "bufret",
+      "observed": "observert",
+      "displayAdjustment": "Temperaturen er avrundet; værtypen er tilpasset fra WMO-koden",
+      "provider": "Værdata fra Open-Meteo",
+      "conditions": {
+        "clear": "Klart",
+        "mostlyClear": "For det meste klart",
+        "partlyCloudy": "Delvis skyet",
+        "overcast": "Overskyet",
+        "fog": "Tåke",
+        "drizzle": "Yr",
+        "freezingDrizzle": "Underkjølt yr",
+        "rain": "Regn",
+        "freezingRain": "Underkjølt regn",
+        "snow": "Snø",
+        "rainShowers": "Regnbyger",
+        "snowShowers": "Snøbyger",
+        "thunderstorm": "Tordenvær",
+        "hailThunderstorm": "Tordenvær med hagl",
+        "unknown": "Ukjent"
+      }
+    },
     "searchApps": "Søk etter applikasjoner...",
     "noMatching": "Ingen treff",
     "navigate": "naviger",
