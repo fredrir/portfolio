@@ -28,4 +28,3 @@ export function formatAperture(fNumber: number): string {
 function trimDecimals(value: number): number {
   return Number(value.toFixed(1));
 }
-
