@@ -1,5 +1,4 @@
 import {
-  ChartLine,
   Cpu,
   EnvelopeSimple,
   FileText,
@@ -13,6 +12,7 @@ import {
   Terminal,
   UserCircle,
 } from "@phosphor-icons/react";
+import { PostHogIcon } from "@/shared/components/posthog-icon";
 import type { BackgroundConfig } from "./background/types";
 import type { WindowConfig } from "./types";
 
@@ -123,8 +123,8 @@ export const WINDOW_CONFIGS: WindowConfig[] = [
   },
   {
     id: "analytics",
-    title: "vnstat --visitors",
-    icon: <ChartLine size={S} weight={W} />,
+    title: "./posthog.sh",
+    icon: <PostHogIcon size={S} weight={W} />,
     defaultOpen: false,
     order: 12,
   },

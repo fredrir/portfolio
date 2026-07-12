@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ChartLine,
   Cpu,
   EnvelopeSimple,
   FileText,
@@ -17,6 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import type { UiStrings } from "@/i18n/types";
+import { PostHogIcon } from "@/shared/components/posthog-icon";
 import { openExternalWindow, WINDOW_CONFIGS } from "../../constants";
 
 const GRID_ICONS: Record<string, React.ReactNode> = {
@@ -32,7 +32,7 @@ const GRID_ICONS: Record<string, React.ReactNode> = {
   resume: <FileText size={28} weight="duotone" />,
   engineering: <Cpu size={28} weight="duotone" />,
   deployments: <RocketLaunch size={28} weight="duotone" />,
-  analytics: <ChartLine size={28} weight="duotone" />,
+  analytics: <PostHogIcon size={28} weight="duotone" />,
 };
 
 interface Props {
