@@ -164,7 +164,7 @@ const PhotoTile = memo(function PhotoTile({
   return (
     <div
       className={cn(
-        "group relative aspect-square overflow-hidden rounded-md bg-card",
+        "group relative aspect-square overflow-hidden rounded-md bg-card [content-visibility:auto]",
         bucket === "processing" && !thumb && "safelight-pulse",
         bucket === "failed" && "ring-1 ring-destructive/50 ring-inset",
       )}
@@ -180,6 +180,7 @@ const PhotoTile = memo(function PhotoTile({
             src={thumb}
             alt={item.filename}
             loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-[1.03]"
           />
         ) : (
@@ -257,7 +258,7 @@ export function PhotoGrid({
   }
 
   return (
-    <div className="grid gap-1 [grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr))]">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-1">
       {jobs.map((job) => (
         <GhostTile key={job.id} job={job} onRetryJob={onRetryJob} onDismissJob={onDismissJob} />
       ))}

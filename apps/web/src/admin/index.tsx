@@ -4,7 +4,7 @@ import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
 import "@fontsource/ibm-plex-mono/600.css";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 
 import { IngestStrip } from "@/admin/ingest";
 import { PhotoGrid } from "@/admin/library";
@@ -47,7 +47,7 @@ function uploadState(job: UploadJob): MediaState {
 export function AdminConsole({ initialMedia = [], initialApiDown = false }: AdminConsoleProps) {
   const {
     media,
-    setMedia,
+    applySnapshot,
     apiDown,
     refreshing,
     notice,
@@ -56,7 +56,7 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
     setCategory,
     renameCategory,
   } = useMediaLibrary(initialMedia, initialApiDown);
-  const { jobs, upload, retry, remove } = useUploads(setMedia);
+  const { jobs, upload, retry, remove } = useUploads(applySnapshot);
 
   const [query, setQuery] = useState("");
   const [stateFilter, setStateFilter] = useState<StateFilter>("all");
@@ -114,7 +114,8 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
     [renameCategory],
   );
 
-  const normalizedQuery = query.trim().toLowerCase();
+  const deferredQuery = useDeferredValue(query);
+  const normalizedQuery = deferredQuery.trim().toLowerCase();
   const visibleMedia = useMemo(
     () =>
       media.filter((item) =>
@@ -173,6 +174,7 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
     setStateFilter("all");
     selectCategory(null);
   }, [selectCategory]);
+  const closeLightbox = useCallback(() => setOpenId(null), []);
 
   return (
     <div className="admin-desk h-dvh overflow-y-auto text-sm antialiased">
@@ -206,7 +208,7 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
         onQuery={setQuery}
         onStateFilter={setStateFilter}
         onCategoryFilter={selectCategory}
-        onRefresh={() => void refresh()}
+        onRefresh={refresh}
         onAdd={browse}
         onRenameCategory={handleRenameCategory}
       />
@@ -248,7 +250,7 @@ export function AdminConsole({ initialMedia = [], initialApiDown = false }: Admi
           item={openItem}
           index={openIndex}
           total={visibleMedia.length}
-          onClose={() => setOpenId(null)}
+          onClose={closeLightbox}
           onNav={navigateLightbox}
           onDelete={deleteFromLightbox}
           onSetCategory={setCategory}

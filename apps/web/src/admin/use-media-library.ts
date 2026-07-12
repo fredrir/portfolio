@@ -14,6 +14,22 @@ export function useMediaLibrary(initialMedia: MediaItem[], initialApiDown: boole
   const [refreshing, setRefreshing] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
+  const applySnapshot = useCallback((items: MediaItem[]) => {
+    setMedia(items);
+    setApiDown(false);
+  }, []);
+
+  const runAction = useCallback(async <Result>(action: () => Promise<Result>) => {
+    try {
+      const result = await action();
+      setApiDown(false);
+      return result;
+    } catch {
+      setNotice("That didn't go through. Try again.");
+      return null;
+    }
+  }, []);
+
   useEffect(() => {
     if (!notice) return;
     const timeout = window.setTimeout(() => setNotice(null), 4000);
@@ -23,57 +39,53 @@ export function useMediaLibrary(initialMedia: MediaItem[], initialApiDown: boole
   const refresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      setMedia(await adminListMedia());
-      setApiDown(false);
+      applySnapshot(await adminListMedia());
     } catch {
       setApiDown(true);
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  }, [applySnapshot]);
 
-  const deleteMedia = useCallback(async (id: string): Promise<boolean> => {
-    try {
-      await adminDeleteMedia({ data: { id } });
+  const deleteMedia = useCallback(
+    async (id: string): Promise<boolean> => {
+      const deleted = await runAction(() => adminDeleteMedia({ data: { id } }));
+      if (!deleted) return false;
       setMedia((items) => items.filter((item) => item.id !== id));
       return true;
-    } catch {
-      setNotice("That didn't go through. Try again.");
-      return false;
-    }
-  }, []);
+    },
+    [runAction],
+  );
 
-  const setCategory = useCallback(async (id: string, category: string | null): Promise<boolean> => {
-    try {
-      const updated = await adminSetCategory({ data: { id, category } });
+  const setCategory = useCallback(
+    async (id: string, category: string | null): Promise<boolean> => {
+      const updated = await runAction(() => adminSetCategory({ data: { id, category } }));
+      if (!updated) return false;
       setMedia((items) =>
         items.map((item) =>
           item.id === id ? { ...item, category: updated.category ?? null } : item,
         ),
       );
       return true;
-    } catch {
-      setNotice("That didn't go through. Try again.");
-      return false;
-    }
-  }, []);
+    },
+    [runAction],
+  );
 
-  const renameCategory = useCallback(async (from: string, to: string): Promise<boolean> => {
-    try {
-      const updated = await adminRenameCategory({ data: { from, to } });
+  const renameCategory = useCallback(
+    async (from: string, to: string): Promise<boolean> => {
+      const updated = await runAction(() => adminRenameCategory({ data: { from, to } }));
+      if (!updated) return false;
       setMedia((items) =>
         items.map((item) => (item.category === from ? { ...item, category: updated.to } : item)),
       );
       return true;
-    } catch {
-      setNotice("That didn't go through. Try again.");
-      return false;
-    }
-  }, []);
+    },
+    [runAction],
+  );
 
   return {
     media,
-    setMedia,
+    applySnapshot,
     apiDown,
     refreshing,
     notice,

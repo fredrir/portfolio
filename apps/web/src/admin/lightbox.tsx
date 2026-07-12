@@ -131,12 +131,11 @@ export function Lightbox({
             <img
               src={preview}
               alt={item.filename}
+              decoding="async"
               className="max-h-[50dvh] w-full object-contain md:max-h-[80dvh]"
             />
           ) : (
-            <p className="p-10 font-mono text-muted-foreground text-xs">
-              no preview yet — still developing
-            </p>
+            <p className="p-10 font-mono text-muted-foreground text-xs">no preview yet</p>
           )}
           {total > 1 && (
             <>

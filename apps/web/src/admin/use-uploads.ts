@@ -31,6 +31,11 @@ function putWithProgress(
   onProgress: (fraction: number) => void,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
+    if (signal.aborted) {
+      reject(new DOMException("Upload cancelled", "AbortError"));
+      return;
+    }
+
     const request = new XMLHttpRequest();
     let animationFrame = 0;
     let latestProgress = 0;
