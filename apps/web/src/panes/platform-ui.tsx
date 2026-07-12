@@ -66,15 +66,13 @@ export function Instrument({
   );
 }
 
-export function Readout({
-  value,
-  label,
-  tone = "default",
-}: {
-  value: ReactNode;
-  label: string;
+interface ReadoutProps {
+  value?: ReactNode;
+  label?: string;
   tone?: "default" | "primary";
-}) {
+}
+
+export function Readout({ value, label, tone = "default" }: ReadoutProps) {
   return (
     <div className="flex flex-col gap-0.5">
       <span
@@ -85,7 +83,9 @@ export function Readout({
       >
         {value}
       </span>
-      <span className="text-3xs text-muted-foreground uppercase tracking-[0.2em]">{label}</span>
+      {label && (
+        <span className="text-3xs text-muted-foreground uppercase tracking-[0.2em]">{label}</span>
+      )}
     </div>
   );
 }

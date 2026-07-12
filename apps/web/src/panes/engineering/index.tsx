@@ -27,14 +27,9 @@ export function EngineeringPane({ ui }: { ui: UiStrings }) {
   return (
     <PaneShell>
       <Instrument label={t.liveRequestPath}>
-        <div className="flex @sm:flex-row flex-col @sm:items-stretch gap-1.5">
+        <div className="grid grid-cols-3 gap-2">
           {hops.map((hop, i) => (
-            <div
-              key={hop.name}
-              className="flex @sm:flex-1 @sm:flex-col items-center @sm:gap-1 gap-1.5"
-            >
-              <Hop {...hop} index={i} live={live} />
-            </div>
+            <Hop key={hop.name} {...hop} index={i} live={live} />
           ))}
         </div>
       </Instrument>
