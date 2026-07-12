@@ -9,7 +9,7 @@ on:
     paths: ["infra/**", ".github/workflows/infra.yml"]
 
 concurrency:
-  group: infra-${{ github.ref }}
+  group: infra-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
