@@ -480,6 +480,50 @@ async fn spotify_reports_missing_credentials(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn spotify_serves_cache_when_captcha_fails(pool: PgPool) {
+    sqlx::query("insert into spotify_cache (id, data) values ($1, $2)")
+        .bind("spotify_last_played")
+        .bind(json!({
+            "isPlaying": true,
+            "title": "Cached Song",
+            "artist": "Cached Artist",
+            "album": "Cached Album",
+            "progressMs": 12_345,
+            "durationMs": 200_000,
+            "recentTracks": [],
+            "topArtists": []
+        }))
+        .execute(&pool)
+        .await
+        .unwrap();
+
+    let mut state = test_state(pool);
+    std::sync::Arc::get_mut(&mut state.upstreams)
+        .unwrap()
+        .recaptcha_secret = Some("test-secret".into());
+
+    let response = app(state)
+        .oneshot(
+            Request::get("/api/v1/spotify?recaptcha_token=")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let bytes = response.into_body().collect().await.unwrap().to_bytes();
+    let body: Value = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(body["title"], "Cached Song");
+    assert_eq!(body["artist"], "Cached Artist");
+    assert_eq!(body["isPlaying"], false);
+    assert!(body["ok"].is_null());
+    assert!(body["error"].is_null());
+    assert!(body["progressMs"].is_null());
+    assert!(body["durationMs"].is_null());
+}
+
+#[sqlx::test]
 async fn deployments_fail_deterministically_without_upstream(pool: PgPool) {
     let (status, body) = send(
         pool,

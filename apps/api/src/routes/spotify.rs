@@ -173,6 +173,22 @@ async fn load_cache(state: &AppState) -> Option<SpotifyData> {
     })
 }
 
+fn offline_cached(mut data: SpotifyData) -> SpotifyData {
+    data.ok = None;
+    data.error = None;
+    data.is_playing = Some(false);
+    data.progress_ms = None;
+    data.duration_ms = None;
+    data
+}
+
+async fn load_offline_cache(state: &AppState) -> Option<SpotifyData> {
+    if let Some((_, data)) = state.caches.spotify.read().await.as_ref() {
+        return Some(offline_cached(data.clone()));
+    }
+    load_cache(state).await.map(offline_cached)
+}
+
 async fn save_cache(state: &AppState, data: &SpotifyData) {
     let value = serde_json::to_value(data).unwrap_or_else(|_| json!({}));
     let result = sqlx::query(
@@ -371,6 +387,10 @@ pub async fn spotify(
     )
     .await;
     if !passed {
+        if let Some(cached) = load_offline_cache(&state).await {
+            tracing::warn!("spotify captcha failed; serving cached spotify data");
+            return Json(cached);
+        }
         return Json(SpotifyData {
             ok: Some(false),
             error: Some("captcha_failed".into()),
