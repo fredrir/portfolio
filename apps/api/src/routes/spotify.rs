@@ -1,10 +1,10 @@
 use axum::Json;
-use axum::extract::{Query, State};
+use axum::extract::State;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use utoipa::ToSchema;
 
-use crate::{AppState, Upstreams, captcha};
+use crate::{AppState, Upstreams};
 
 const CACHE_KEY: &str = "spotify_last_played";
 
@@ -171,22 +171,6 @@ async fn load_cache(state: &AppState) -> Option<SpotifyData> {
         parsed.last_played_at = Some(updated_at);
         Some(parsed)
     })
-}
-
-fn offline_cached(mut data: SpotifyData) -> SpotifyData {
-    data.ok = None;
-    data.error = None;
-    data.is_playing = Some(false);
-    data.progress_ms = None;
-    data.duration_ms = None;
-    data
-}
-
-async fn load_offline_cache(state: &AppState) -> Option<SpotifyData> {
-    if let Some((_, data)) = state.caches.spotify.read().await.as_ref() {
-        return Some(offline_cached(data.clone()));
-    }
-    load_cache(state).await.map(offline_cached)
 }
 
 async fn save_cache(state: &AppState, data: &SpotifyData) {
@@ -362,42 +346,13 @@ async fn fetch_fresh(state: &AppState) -> SpotifyData {
     }
 }
 
-#[derive(Deserialize, utoipa::IntoParams)]
-pub struct SpotifyParams {
-    /// reCAPTCHA v3 token for the `spotify_data` action.
-    pub recaptcha_token: String,
-}
-
-/// Current/recent playback and top artists (captcha-gated like the old
-/// server action; credentials-missing and upstream failures degrade to the
-/// database cache).
+/// Current/recent playback and top artists. Not captcha-gated: the data is
+/// public and the in-memory TTL below bounds upstream Spotify calls
+/// regardless of traffic; credentials-missing and upstream failures degrade
+/// to the database cache.
 #[utoipa::path(get, path = "/api/v1/spotify", tag = "spotify",
-    params(SpotifyParams),
     responses((status = 200, body = SpotifyData)))]
-pub async fn spotify(
-    State(state): State<AppState>,
-    Query(params): Query<SpotifyParams>,
-) -> Json<SpotifyData> {
-    let passed = captcha::verify(
-        &state.http,
-        &state.upstreams,
-        &params.recaptcha_token,
-        "spotify_data",
-        0.3,
-    )
-    .await;
-    if !passed {
-        if let Some(cached) = load_offline_cache(&state).await {
-            tracing::warn!("spotify captcha failed; serving cached spotify data");
-            return Json(cached);
-        }
-        return Json(SpotifyData {
-            ok: Some(false),
-            error: Some("captcha_failed".into()),
-            ..Default::default()
-        });
-    }
-
+pub async fn spotify(State(state): State<AppState>) -> Json<SpotifyData> {
     if state.upstreams.spotify_client_id.is_none()
         || state.upstreams.spotify_client_secret.is_none()
         || state.upstreams.spotify_refresh_token.is_none()

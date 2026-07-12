@@ -20,7 +20,6 @@
     "format:unsafe": "biome check --write --unsafe ."
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.3",
-    "@supabase/supabase-js": "^2.110.2"
+    "@biomejs/biome": "2.5.3"
   }
 }

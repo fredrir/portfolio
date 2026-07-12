@@ -469,9 +469,7 @@ async fn github_returns_null_when_upstream_unavailable(pool: PgPool) {
 async fn spotify_reports_missing_credentials(pool: PgPool) {
     let (status, body) = send(
         pool,
-        Request::get("/api/v1/spotify?recaptcha_token=t")
-            .body(Body::empty())
-            .unwrap(),
+        Request::get("/api/v1/spotify").body(Body::empty()).unwrap(),
     )
     .await;
     assert_eq!(status, StatusCode::OK);
@@ -480,7 +478,7 @@ async fn spotify_reports_missing_credentials(pool: PgPool) {
 }
 
 #[sqlx::test]
-async fn spotify_serves_cache_when_captcha_fails(pool: PgPool) {
+async fn spotify_serves_cache_when_upstream_unavailable(pool: PgPool) {
     sqlx::query("insert into spotify_cache (id, data) values ($1, $2)")
         .bind("spotify_last_played")
         .bind(json!({
@@ -497,17 +495,16 @@ async fn spotify_serves_cache_when_captcha_fails(pool: PgPool) {
         .await
         .unwrap();
 
+    // Credentials set, but the accounts host is unroutable: the token refresh
+    // fails and the handler degrades to the database cache.
     let mut state = test_state(pool);
-    std::sync::Arc::get_mut(&mut state.upstreams)
-        .unwrap()
-        .recaptcha_secret = Some("test-secret".into());
+    let upstreams = std::sync::Arc::get_mut(&mut state.upstreams).unwrap();
+    upstreams.spotify_client_id = Some("id".into());
+    upstreams.spotify_client_secret = Some("secret".into());
+    upstreams.spotify_refresh_token = Some("refresh".into());
 
     let response = app(state)
-        .oneshot(
-            Request::get("/api/v1/spotify?recaptcha_token=")
-                .body(Body::empty())
-                .unwrap(),
-        )
+        .oneshot(Request::get("/api/v1/spotify").body(Body::empty()).unwrap())
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);

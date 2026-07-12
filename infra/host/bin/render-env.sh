@@ -98,7 +98,5 @@ for slot in ("blue", "green"):
         "PORT": "3000",
         "NODE_ENV": "production",
         "ADMIN_TOKEN": s["ADMIN_TOKEN"],
-        "SUPABASE_URL": s.get("SUPABASE_URL"),
-        "SUPABASE_ANON_KEY": s.get("SUPABASE_ANON_KEY"),
     })
 EOF

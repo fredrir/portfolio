@@ -9,7 +9,6 @@
     "ignoreUnknown": true,
     "includes": [
       "**",
-      "!!supabase/.temp",
       "!!**/dist",
       "!!**/coverage",
       "!!apps/web/public",

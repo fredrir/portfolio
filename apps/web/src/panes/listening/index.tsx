@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { UiStrings } from "@/i18n/types";
 import { getSpotifyData } from "@/server/listening";
-import { useRecaptcha } from "@/shared/components/recaptcha-provider";
 import { useContainerSize } from "@/shared/hooks/use-container-size";
 import type { SpotifyData } from "@/shared/types";
 import { CavaVisualizer } from "./components/cava-visualizer";
@@ -27,7 +26,6 @@ export function SpotifyPane({
   const lastKnownRef = useRef<SpotifyData | null>(initialData);
   const { ref: containerRef, height } = useContainerSize();
   const compact = height > 0 && height < 200;
-  const { executeRecaptcha, configured: recaptchaConfigured } = useRecaptcha();
 
   useEffect(() => {
     if (data?.title) {
@@ -41,12 +39,7 @@ export function SpotifyPane({
 
   const fetchSpotify = useCallback(async () => {
     try {
-      if (recaptchaConfigured && !executeRecaptcha) {
-        return;
-      }
-
-      const captchaToken = executeRecaptcha ? await executeRecaptcha("spotify_data") : "";
-      const d = await getSpotifyData({ data: captchaToken });
+      const d = await getSpotifyData();
       if (d?.title) {
         setData(d);
       } else if (lastKnownRef.current?.title) {
@@ -73,10 +66,9 @@ export function SpotifyPane({
         setData({ ok: false, error: "spotify_unavailable" });
       }
     }
-  }, [executeRecaptcha, recaptchaConfigured]);
+  }, []);
 
   useEffect(() => {
-    // Spotify data is captcha-gated and loads client-side only.
     fetchSpotify();
     const interval = setInterval(fetchSpotify, SPOTIFY_POLL_INTERVAL);
     return () => clearInterval(interval);
