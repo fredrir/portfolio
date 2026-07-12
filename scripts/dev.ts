@@ -35,6 +35,25 @@ const apiWatchPaths = [
 ];
 const apiWatchExtensions = new Set([".rs", ".sql", ".toml"]);
 
+// `child.killed` only records that a signal was SENT, so it cannot be used
+// as a liveness check; exitCode/signalCode stay null until the process dies.
+function isAlive(child: ChildProcess): boolean {
+  return child.exitCode === null && child.signalCode === null;
+}
+
+// Signal the child's whole process group: doppler does not forward SIGTERM,
+// so signalling only its pid orphaned cargo + the api binary, which kept
+// :8080 and silently served stale code. Falls back to a single-pid kill for
+// children not spawned detached (no process group of their own).
+function killTree(child: ChildProcess, signal: NodeJS.Signals): void {
+  if (child.pid == null) return;
+  try {
+    process.kill(-child.pid, signal);
+  } catch {
+    child.kill(signal);
+  }
+}
+
 function envWithDefaults(extra: Record<string, string> = {}) {
   const env = { ...process.env, ...extra };
   for (const [key, value] of Object.entries(localDefaults)) {
@@ -171,6 +190,9 @@ function startWatchedApi(env: NodeJS.ProcessEnv) {
         cwd: root,
         env,
         stdio: "inherit",
+        // Own process group so killTree can reach doppler's grandchildren.
+        // Safe to detach: nothing in this tree reads stdin.
+        detached: true,
       },
     );
     children.set("api", child);
@@ -178,7 +200,10 @@ function startWatchedApi(env: NodeJS.ProcessEnv) {
     child.on("exit", (code, signal) => {
       children.delete("api");
       child = null;
-      if (stopping) return;
+      if (stopping) {
+        if (children.size === 0) process.exit(process.exitCode ?? 0);
+        return;
+      }
       if (restarting) {
         restarting = false;
         launch();
@@ -201,13 +226,13 @@ function startWatchedApi(env: NodeJS.ProcessEnv) {
     if (restartTimer) clearTimeout(restartTimer);
     restartTimer = setTimeout(() => {
       console.log("[dev] api change detected; restarting");
-      if (child && child.exitCode === null && !child.killed) {
+      if (child && isAlive(child)) {
         restarting = true;
         const oldChild = child;
-        oldChild.kill("SIGTERM");
+        killTree(oldChild, "SIGTERM");
         setTimeout(() => {
-          if (oldChild.exitCode === null && !oldChild.killed) {
-            oldChild.kill("SIGKILL");
+          if (isAlive(oldChild)) {
+            killTree(oldChild, "SIGKILL");
           }
         }, 5000).unref();
       } else {
@@ -232,15 +257,15 @@ function startWatchedApi(env: NodeJS.ProcessEnv) {
 
 function stopChildren(signal: NodeJS.Signals) {
   for (const child of children.values()) {
-    if (child.exitCode === null && !child.killed) {
-      child.kill(signal);
+    if (isAlive(child)) {
+      killTree(child, signal);
     }
   }
 
   setTimeout(() => {
     for (const child of children.values()) {
-      if (child.exitCode === null && !child.killed) {
-        child.kill("SIGKILL");
+      if (isAlive(child)) {
+        killTree(child, "SIGKILL");
       }
     }
   }, 5000).unref();
@@ -250,6 +275,9 @@ function stop(signal: NodeJS.Signals) {
   if (stopping) return;
   stopping = true;
   process.exitCode = signal === "SIGINT" ? 130 : 143;
+  // With no children left there is no exit event to finish the shutdown;
+  // exiting here prevents zombie supervisors piling up across Ctrl+C's.
+  if (children.size === 0) process.exit(process.exitCode);
   stopChildren(signal);
 }
 

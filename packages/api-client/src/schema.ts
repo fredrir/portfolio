@@ -116,7 +116,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Production deployment history (GitHub Actions runs, cached server-side). */
+        /** Production deployment history (GitHub Actions runs, cached in Postgres). */
         get: operations["deployments"];
         put?: never;
         post?: never;
@@ -206,9 +206,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Current/recent playback and top artists (captcha-gated like the old
-         *     server action; credentials-missing and upstream failures degrade to the
-         *     database cache).
+         * Current/recent playback and top artists. Not captcha-gated: the data is
+         *     public and the in-memory TTL below bounds upstream Spotify calls
+         *     regardless of traffic; credentials-missing and upstream failures degrade
+         *     to the database cache.
          */
         get: operations["spotify"];
         put?: never;
@@ -408,12 +409,30 @@ export interface components {
             name: string;
         };
         GalleryImage: {
+            /** Format: float */
+            aperture?: number | null;
+            camera?: string | null;
             contentType: string;
+            /**
+             * @description EXIF capture time when the worker extracted one, otherwise a
+             *     timestamp parsed from the filename. Local wall-clock, no timezone.
+             */
             date?: string | null;
             filename: string;
+            /** Format: float */
+            focalLengthMm?: number | null;
             /** Format: int32 */
             height?: number | null;
+            /** Format: int32 */
+            iso?: number | null;
+            /** Format: double */
+            latitude?: number | null;
+            lens?: string | null;
+            /** Format: double */
+            longitude?: number | null;
             originalSrc: string;
+            /** Format: double */
+            shutterSeconds?: number | null;
             /** Format: int64 */
             sizeBytes: number;
             src: string;
@@ -856,10 +875,7 @@ export interface operations {
     };
     spotify: {
         parameters: {
-            query: {
-                /** @description reCAPTCHA v3 token for the `spotify_data` action. */
-                recaptcha_token: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;

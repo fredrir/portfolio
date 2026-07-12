@@ -189,7 +189,7 @@
         "tags": [
           "deployments"
         ],
-        "summary": "Production deployment history (GitHub Actions runs, cached server-side).",
+        "summary": "Production deployment history (GitHub Actions runs, cached in Postgres).",
         "operationId": "deployments",
         "responses": {
           "200": {
@@ -396,19 +396,8 @@
         "tags": [
           "spotify"
         ],
-        "summary": "Current/recent playback and top artists (captcha-gated like the old\nserver action; credentials-missing and upstream failures degrade to the\ndatabase cache).",
+        "summary": "Current/recent playback and top artists. Not captcha-gated: the data is\npublic and the in-memory TTL below bounds upstream Spotify calls\nregardless of traffic; credentials-missing and upstream failures degrade\nto the database cache.",
         "operationId": "spotify",
-        "parameters": [
-          {
-            "name": "recaptcha_token",
-            "in": "query",
-            "description": "reCAPTCHA v3 token for the `spotify_data` action.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "",
@@ -890,6 +879,19 @@
           "sizeBytes"
         ],
         "properties": {
+          "aperture": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "float"
+          },
+          "camera": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "contentType": {
             "type": "string"
           },
@@ -897,10 +899,18 @@
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "EXIF capture time when the worker extracted one, otherwise a\ntimestamp parsed from the filename. Local wall-clock, no timezone."
           },
           "filename": {
             "type": "string"
+          },
+          "focalLengthMm": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "float"
           },
           "height": {
             "type": [
@@ -909,8 +919,42 @@
             ],
             "format": "int32"
           },
+          "iso": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "latitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "lens": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "longitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
           "originalSrc": {
             "type": "string"
+          },
+          "shutterSeconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
           },
           "sizeBytes": {
             "type": "integer",

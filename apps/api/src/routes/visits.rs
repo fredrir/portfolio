@@ -33,12 +33,15 @@ pub async fn record_visit(
     headers: HeaderMap,
     Json(body): Json<RecordVisitRequest>,
 ) -> Result<Json<VisitCount>, ApiError> {
+    // 0.1 is reCAPTCHA's score floor, so this only checks token validity and
+    // action: v3 scores everyone near the floor on this low-traffic site, and
+    // an inflated visit counter is not worth losing real visits over.
     let passed = captcha::verify(
         &state.http,
         &state.upstreams,
         &body.recaptcha_token,
         "record_visit",
-        0.5,
+        0.1,
     )
     .await;
     if !passed {

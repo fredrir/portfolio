@@ -87,14 +87,11 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     # Secrets come from the invoking shell: doppler run -- docker compose ...
+    # The web tier only forwards to the API; GitHub/Spotify/captcha/analytics
+    # all live in the Rust API now, so it needs just the API URL + admin token.
     environment:
       API_URL: http://api:8080
-      SUPABASE_URL: ${SUPABASE_URL:-}
-      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-}
-      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
-      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET:-}
-      SPOTIFY_REFRESH_TOKEN: ${SPOTIFY_REFRESH_TOKEN:-}
-      RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY:-}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
     ports:
       - "127.0.0.1:3000:3000"
     depends_on:

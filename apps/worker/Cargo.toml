@@ -14,6 +14,7 @@ aws-sdk-sqs = { version = "1", default-features = false, features = ["default-ht
 dotenvy = "0.15"
 hex = "0.4"
 image = { version = "0.25", features = ["avif"] }
+kamadak-exif = "0.6"
 reqwest = { version = "0.13.4", default-features = false, features = ["rustls", "json"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -22,9 +23,11 @@ sqlx = { version = "0.8", features = [
     "runtime-tokio",
     "tls-rustls",
     "postgres",
+    "time",
     "uuid",
 ] }
 thiserror = "2"
+time = "0.3"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "time"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }

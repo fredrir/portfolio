@@ -55,7 +55,6 @@ export function Instrument({
     <section className={cn("rounded-md border border-border-faint bg-surface-faint", className)}>
       <header className="flex items-center justify-between gap-2 border-border-faint border-b px-2.5 py-1.5">
         <div className="flex min-w-0 items-center gap-1.5">
-          <span className="text-2xs text-primary-dim">◈</span>
           <h2 className="truncate font-bold text-2xs text-primary uppercase tracking-[0.18em]">
             {label}
           </h2>
@@ -67,15 +66,13 @@ export function Instrument({
   );
 }
 
-export function Readout({
-  value,
-  label,
-  tone = "default",
-}: {
-  value: ReactNode;
-  label: string;
+interface ReadoutProps {
+  value?: ReactNode;
+  label?: string;
   tone?: "default" | "primary";
-}) {
+}
+
+export function Readout({ value, label, tone = "default" }: ReadoutProps) {
   return (
     <div className="flex flex-col gap-0.5">
       <span
@@ -86,7 +83,9 @@ export function Readout({
       >
         {value}
       </span>
-      <span className="text-3xs text-muted-foreground uppercase tracking-[0.2em]">{label}</span>
+      {label && (
+        <span className="text-3xs text-muted-foreground uppercase tracking-[0.2em]">{label}</span>
+      )}
     </div>
   );
 }

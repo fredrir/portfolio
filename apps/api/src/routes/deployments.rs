@@ -1,17 +1,19 @@
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use axum::Json;
 use axum::extract::State;
 use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use utoipa::ToSchema;
 
 use crate::AppState;
 use crate::problem::Problem;
 
+const CACHE_KEY: &str = "deployments";
 const CACHE_TTL: Duration = Duration::from_secs(300);
 
-#[derive(Clone, Serialize, ToSchema)]
+#[derive(Clone, Serialize, Deserialize, ToSchema)]
 pub struct Deployment {
     pub sha: String,
     pub title: String,
@@ -49,15 +51,47 @@ fn duration_seconds(start: &str, end: &str) -> i64 {
     }
 }
 
-/// Production deployment history (GitHub Actions runs, cached server-side).
+/// The cache lives in Postgres so it survives restarts (deploys, dev
+/// auto-reload); the GitHub fetch is unauthenticated (60 req/h per IP), so a
+/// wiped cache plus a rate-limited window used to blank the pane entirely.
+async fn load_cache(state: &AppState) -> Option<(f64, Vec<Deployment>)> {
+    let row: Option<(serde_json::Value, f64)> = sqlx::query_as(
+        "select data, extract(epoch from now() - updated_at)::float8 \
+         from upstream_cache where id = $1",
+    )
+    .bind(CACHE_KEY)
+    .fetch_optional(&state.pool)
+    .await
+    .ok()
+    .flatten();
+    row.and_then(|(data, age)| Some((age, serde_json::from_value(data).ok()?)))
+}
+
+async fn save_cache(state: &AppState, runs: &[Deployment]) {
+    let value = serde_json::to_value(runs).unwrap_or_else(|_| json!([]));
+    let result = sqlx::query(
+        "insert into upstream_cache (id, data, updated_at) values ($1, $2, now()) \
+         on conflict (id) do update set data = excluded.data, updated_at = now()",
+    )
+    .bind(CACHE_KEY)
+    .bind(&value)
+    .execute(&state.pool)
+    .await;
+    if let Err(err) = result {
+        tracing::error!(error = %err, "deployments cache save failed");
+    }
+}
+
+/// Production deployment history (GitHub Actions runs, cached in Postgres).
 #[utoipa::path(get, path = "/api/v1/deployments", tag = "deployments",
     responses(
         (status = 200, body = [Deployment]),
         (status = 502, description = "Upstream unavailable and no cache", body = Problem)
     ))]
 pub async fn deployments(State(state): State<AppState>) -> Result<Json<Vec<Deployment>>, Problem> {
-    if let Some((at, runs)) = state.caches.deployments.read().await.as_ref()
-        && at.elapsed() < CACHE_TTL
+    let cached = load_cache(&state).await;
+    if let Some((age, runs)) = &cached
+        && *age < CACHE_TTL.as_secs_f64()
     {
         return Ok(Json(runs.clone()));
     }
@@ -94,13 +128,13 @@ pub async fn deployments(State(state): State<AppState>) -> Result<Json<Vec<Deplo
 
     match fetched {
         Ok(runs) => {
-            *state.caches.deployments.write().await = Some((Instant::now(), runs.clone()));
+            save_cache(&state, &runs).await;
             Ok(Json(runs))
         }
         Err(err) => {
             tracing::warn!(error = %err, "deployments fetch failed; serving stale cache if any");
-            match state.caches.deployments.read().await.as_ref() {
-                Some((_, runs)) => Ok(Json(runs.clone())),
+            match cached {
+                Some((_, runs)) => Ok(Json(runs)),
                 None => Err(Problem::new(
                     StatusCode::BAD_GATEWAY,
                     "Deployment history unavailable",
