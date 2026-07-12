@@ -29,8 +29,8 @@ const SECURITY_HEADERS: Record<string, string> = {
     "style-src 'self' 'unsafe-inline'",
     // Spotify album art, GitHub avatars, media variants.
     "img-src 'self' data: https:",
-    "connect-src 'self' https://eu.i.posthog.com https://api.github.com",
-    "frame-src https://www.google.com https://open.spotify.com",
+    "connect-src 'self' https://www.google.com/recaptcha/ https://eu.i.posthog.com https://api.github.com",
+    "frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/ https://open.spotify.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

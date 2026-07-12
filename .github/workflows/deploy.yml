@@ -212,7 +212,7 @@ jobs:
             --target "$GITHUB_SHA" \
             --title "$TAG" \
             --generate-notes \
-            --notes "Deployed to production from \`${GITHUB_SHA}\`. Images: \`ghcr.io/fredrir/portfolio-{web,api,worker}:${GITHUB_SHA}\` (SBOM + provenance attested, keyless-Cosign signed, signature-verified on the host)."
+            --notes "Deployed to production from \`${GITHUB_SHA}\`. Images: \`ghcr.io/fredrir/portfolio-{web,api,worker}:${GITHUB_SHA}\`"
 
   edge:
     needs: [checks, deploy]
@@ -239,3 +239,12 @@ jobs:
           code=$(curl -s -o /dev/null -w '%{http_code}' -m 15 https://hansteen.dev/en)
           echo "apex /en -> $code"
           [ "$code" = "200" ]
+          csp=$(curl -fsSI -m 15 https://hansteen.dev/en | tr -d '\r' | awk 'tolower($0) ~ /^content-security-policy:/ { sub(/^[^:]+:[[:space:]]*/, ""); print; exit }')
+          case "$csp" in
+            *"connect-src"*"https://www.google.com/recaptcha/"*) ;;
+            *) echo "missing reCAPTCHA connect-src in CSP"; echo "$csp"; exit 1 ;;
+          esac
+          case "$csp" in
+            *"frame-src"*"https://open.spotify.com"*) ;;
+            *) echo "missing Spotify frame-src in CSP"; echo "$csp"; exit 1 ;;
+          esac
