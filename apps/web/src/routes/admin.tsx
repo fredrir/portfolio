@@ -24,10 +24,7 @@ export const Route = createFileRoute("/admin")({
     }
   },
   head: () => ({
-    meta: [
-      { title: "admin.hansteen.dev" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "admin.hansteen.dev" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: AdminPage,
 });

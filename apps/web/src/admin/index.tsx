@@ -44,10 +44,7 @@ function uploadState(job: UploadJob): MediaState {
   return job.stage === "failed" ? "failed" : "processing";
 }
 
-export function AdminConsole({
-  initialMedia = [],
-  initialApiDown = false,
-}: AdminConsoleProps) {
+export function AdminConsole({ initialMedia = [], initialApiDown = false }: AdminConsoleProps) {
   const {
     media,
     setMedia,
@@ -68,10 +65,11 @@ export function AdminConsole({
   const [openId, setOpenId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { categories, stateCounts: mediaCounts, storedBytes } = useMemo(
-    () => summarizeMedia(media),
-    [media],
-  );
+  const {
+    categories,
+    stateCounts: mediaCounts,
+    storedBytes,
+  } = useMemo(() => summarizeMedia(media), [media]);
   const categoryNames = useMemo(
     () => categories.map(([name]) => name).filter((name) => name !== UNCATEGORIZED),
     [categories],
@@ -187,7 +185,8 @@ export function AdminConsole({
             <p className="font-mono text-primary text-sm">
               release to develop
               <span className="text-muted-foreground">
-                {" "}→ {uploadCategory.trim() || UNCATEGORIZED}
+                {" "}
+                → {uploadCategory.trim() || UNCATEGORIZED}
               </span>
             </p>
           </div>

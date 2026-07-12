@@ -33,7 +33,7 @@ export function IngestStrip({
   onCategory: (value: string) => void;
   onBrowse: () => void;
 }) {
-  const active = jobs.filter((j) => j.stage !== "failed" && j.stage !== "ready");
+  const active = jobs.filter((job) => job.stage !== "failed");
   const progress = aggregateProgress(active);
 
   return (

@@ -188,8 +188,8 @@ const PhotoTile = memo(function PhotoTile({
               "flex h-full w-full items-center justify-center font-mono text-2xs",
               bucket === "failed" ? "text-destructive" : "text-muted-foreground",
             )}
-            >
-              {bucket === "failed" && <WarningCircle size={12} className="mr-1" />}
+          >
+            {bucket === "failed" && <WarningCircle size={12} className="mr-1" />}
             {stateLabel(bucket)}
           </span>
         )}
@@ -259,20 +259,10 @@ export function PhotoGrid({
   return (
     <div className="grid gap-1 [grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr))]">
       {jobs.map((job) => (
-        <GhostTile
-          key={job.id}
-          job={job}
-          onRetryJob={onRetryJob}
-          onDismissJob={onDismissJob}
-        />
+        <GhostTile key={job.id} job={job} onRetryJob={onRetryJob} onDismissJob={onDismissJob} />
       ))}
       {media.map((item) => (
-        <PhotoTile
-          key={item.id}
-          item={item}
-          onOpen={onOpen}
-          onDelete={onDelete}
-        />
+        <PhotoTile key={item.id} item={item} onOpen={onOpen} onDelete={onDelete} />
       ))}
     </div>
   );

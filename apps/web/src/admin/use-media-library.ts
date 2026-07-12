@@ -43,31 +43,26 @@ export function useMediaLibrary(initialMedia: MediaItem[], initialApiDown: boole
     }
   }, []);
 
-  const setCategory = useCallback(
-    async (id: string, category: string | null): Promise<boolean> => {
-      try {
-        const updated = await adminSetCategory({ data: { id, category } });
-        setMedia((items) =>
-          items.map((item) =>
-            item.id === id ? { ...item, category: updated.category ?? null } : item,
-          ),
-        );
-        return true;
-      } catch {
-        setNotice("That didn't go through. Try again.");
-        return false;
-      }
-    },
-    [],
-  );
+  const setCategory = useCallback(async (id: string, category: string | null): Promise<boolean> => {
+    try {
+      const updated = await adminSetCategory({ data: { id, category } });
+      setMedia((items) =>
+        items.map((item) =>
+          item.id === id ? { ...item, category: updated.category ?? null } : item,
+        ),
+      );
+      return true;
+    } catch {
+      setNotice("That didn't go through. Try again.");
+      return false;
+    }
+  }, []);
 
   const renameCategory = useCallback(async (from: string, to: string): Promise<boolean> => {
     try {
       const updated = await adminRenameCategory({ data: { from, to } });
       setMedia((items) =>
-        items.map((item) =>
-          item.category === from ? { ...item, category: updated.to } : item,
-        ),
+        items.map((item) => (item.category === from ? { ...item, category: updated.to } : item)),
       );
       return true;
     } catch {

@@ -11,12 +11,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { formatBytes } from "@/admin/format";
-import {
-  type MediaState,
-  type StateFilter,
-  stateLabel,
-  UNCATEGORIZED,
-} from "@/admin/model";
+import { type MediaState, type StateFilter, stateLabel, UNCATEGORIZED } from "@/admin/model";
 import { cn } from "@/shared/utils/cn";
 
 const STATE_DOT: Record<MediaState, string> = {

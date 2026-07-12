@@ -91,9 +91,7 @@ export function useUploads(onMediaChange: (media: MediaItem[]) => void) {
 
   const patchJob = useCallback(
     (id: string, patch: Partial<UploadJob>) => {
-      updateJobs((current) =>
-        current.map((job) => (job.id === id ? { ...job, ...patch } : job)),
-      );
+      updateJobs((current) => current.map((job) => (job.id === id ? { ...job, ...patch } : job)));
     },
     [updateJobs],
   );

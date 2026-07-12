@@ -34,7 +34,7 @@ function CopyButton({
         void navigator.clipboard
           .writeText(text)
           .then(() => {
-          setCopied(true);
+            setCopied(true);
           })
           .catch(() => undefined)
       }
@@ -225,11 +225,7 @@ export function Lightbox({
               <MetaRow label="sha-256">
                 <span className="inline-flex items-center gap-0.5">
                   <span title={item.content_hash}>{item.content_hash.slice(0, 12)}…</span>
-                  <CopyButton
-                    text={item.content_hash}
-                    label="Copy sha-256"
-                    copiedLabel="copied"
-                  />
+                  <CopyButton text={item.content_hash} label="Copy sha-256" copiedLabel="copied" />
                 </span>
               </MetaRow>
             )}
@@ -247,11 +243,7 @@ export function Lightbox({
                     </span>
                     {v.url && (
                       <span className="ml-auto inline-flex items-center">
-                        <CopyButton
-                          text={v.url}
-                          label={`Copy ${v.format}`}
-                          copiedLabel="copied"
-                        />
+                        <CopyButton text={v.url} label={`Copy ${v.format}`} copiedLabel="copied" />
                         <a
                           href={v.url}
                           target="_blank"
