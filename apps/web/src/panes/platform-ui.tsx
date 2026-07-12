@@ -55,7 +55,6 @@ export function Instrument({
     <section className={cn("rounded-md border border-border-faint bg-surface-faint", className)}>
       <header className="flex items-center justify-between gap-2 border-border-faint border-b px-2.5 py-1.5">
         <div className="flex min-w-0 items-center gap-1.5">
-          <span className="text-2xs text-primary-dim">◈</span>
           <h2 className="truncate font-bold text-2xs text-primary uppercase tracking-[0.18em]">
             {label}
           </h2>
