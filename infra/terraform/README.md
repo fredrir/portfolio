@@ -26,6 +26,12 @@ terraform init && terraform plan
 
 Credentials come from the environment: `AWS_*` (or an assumed role) and
 `CLOUDFLARE_API_TOKEN`. Never commit `terraform.tfvars` or state.
+Fetch the Cloudflare management credential explicitly from the isolated
+operations config; do not run Terraform under the repo's `dev` config:
+
+```bash
+export CLOUDFLARE_API_TOKEN="$(doppler secrets get -p portfolio -c ops CLOUDFLARE_API_TOKEN --plain)"
+```
 
 ## Conventions
 

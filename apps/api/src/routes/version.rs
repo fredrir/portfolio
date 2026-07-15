@@ -4,10 +4,10 @@ use utoipa::ToSchema;
 
 #[derive(Serialize, ToSchema)]
 pub struct VersionInfo {
-    /// Crate version of the running binary.
-    version: &'static str,
-    /// Git commit the binary was built from.
-    commit: &'static str,
+    /// Release version of the running deployment.
+    version: String,
+    /// Git commit of the running deployment.
+    commit: String,
 }
 
 /// Build information for the running deployment.
@@ -16,9 +16,16 @@ pub struct VersionInfo {
 ))]
 pub async fn version() -> Json<VersionInfo> {
     Json(VersionInfo {
-        // Release version injected at build time by CI's release job; falls
-        // back to the crate version for local/dev builds.
-        version: option_env!("APP_VERSION").unwrap_or(env!("CARGO_PKG_VERSION")),
-        commit: option_env!("GIT_SHA").unwrap_or("unknown"),
+        // Release metadata is injected into the final container rather than
+        // compiled into the binary, allowing CI to reuse the Rust build layer.
+        version: non_empty_env("APP_VERSION", env!("CARGO_PKG_VERSION")),
+        commit: non_empty_env("GIT_SHA", "unknown"),
     })
+}
+
+fn non_empty_env(name: &str, fallback: &str) -> String {
+    std::env::var(name)
+        .ok()
+        .filter(|value| !value.is_empty())
+        .unwrap_or_else(|| fallback.to_owned())
 }

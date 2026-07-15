@@ -86,9 +86,6 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
-    # Secrets come from the invoking shell: doppler run -- docker compose ...
-    # The web tier only forwards to the API; GitHub/Spotify/captcha/analytics
-    # all live in the Rust API now, so it needs just the API URL + admin token.
     environment:
       API_URL: http://api:8080
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}

@@ -94,7 +94,8 @@ jobs:
       - run: cargo test --workspace
 
   build:
-    needs: [checks, version]
+    # Build while checks run, but keep production deployment gated on both.
+    needs: [version]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -134,9 +135,9 @@ jobs:
         run: cosign sign --yes ghcr.io/fredrir/portfolio-${{ matrix.image }}@${{ steps.build.outputs.digest }}
 
   deploy:
-    needs: [build]
+    needs: [checks, build]
     runs-on: ubuntu-latest
-    environment: production
+    environment: Production
     permissions:
       contents: read
       deployments: write
@@ -217,8 +218,10 @@ jobs:
   edge:
     needs: [checks, deploy]
     runs-on: ubuntu-latest
+    environment: Production
     # Requires a Cloudflare API token with Workers Scripts:Edit +
-    # Workers Routes:Edit stored as CLOUDFLARE_WORKERS_API_TOKEN.
+    # Workers Routes:Edit stored as the Production environment secret
+    # CLOUDFLARE_WORKERS_API_TOKEN. EDGE_CD_ENABLED stays false until set.
     if: vars.EDGE_CD_ENABLED == 'true'
     steps:
       - uses: actions/checkout@v4

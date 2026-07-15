@@ -2045,11 +2045,11 @@
         "properties": {
           "commit": {
             "type": "string",
-            "description": "Git commit the binary was built from."
+            "description": "Git commit of the running deployment."
           },
           "version": {
             "type": "string",
-            "description": "Crate version of the running binary."
+            "description": "Release version of the running deployment."
           }
         }
       },

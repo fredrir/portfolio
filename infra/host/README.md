@@ -15,7 +15,7 @@ existing tenant (see ../../docs/vps-audit.md).
 
 ```bash
 ssh letzner 'bash -s' < infra/host/bootstrap.sh                    # once
-CLOUDFLARE_API_TOKEN=$(doppler secrets get CLOUDFLARE_API_TOKEN --plain) \
+CLOUDFLARE_API_TOKEN=$(doppler secrets get -p portfolio -c ops CLOUDFLARE_API_TOKEN --plain) \
   ./infra/host/install.sh                                          # each change
 ```
 

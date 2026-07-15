@@ -10,10 +10,13 @@ with machine identities holding the narrowest possible credentials.
 
 ## Decision
 
-One Doppler project (`portfolio`) with `dev`, `preview` and `prd` configs.
+One Doppler project (`portfolio`) with `dev`, `preview`, `prd` and `ops`
+configs. `ops` contains the out-of-band Cloudflare management credential;
+it is never injected into an application, and Terraform receives only this
+single explicitly fetched value.
 There is no `.env` file: local development runs through `doppler run --`
-(`doppler.yaml` binds the repo to `dev`), and `.env.example` documents
-variable names only. The host holds a read-only `prd` service token
+(`doppler.yaml` binds the repo to `dev`), and repository documentation names
+required variables without storing values. The host holds a read-only `prd` service token
 (mode 600); `render-env.sh` renders per-service systemd environment files
 (postgres, api, worker, web-blue/green, backup) on every deploy, mapping
 per-identity AWS keys (`API_AWS_*`, `WORKER_AWS_*`, `BACKUP_AWS_*`) to
@@ -28,8 +31,9 @@ pulls its own secrets at deploy time.
 - Rotation is a Doppler value change + `render-env.sh` + service restart —
   no image rebuild, satisfying the plan's rotation requirement.
 - The dev config carries LocalStack endpoints; Terraform must NOT run
-  under `doppler run` (it would target LocalStack) — extract single values
-  instead (`doppler secrets get ... --plain`).
+  under `doppler run` (it would target LocalStack) — extract the required
+  Cloudflare credential from `ops` instead (`doppler secrets get -p
+  portfolio -c ops CLOUDFLARE_API_TOKEN --plain`).
 - The Doppler service token on the host is a standing credential, scoped
   read-only to one config; compromise exposes prd values but grants no
   write or AWS/Cloudflare control beyond the runtime users' policies.

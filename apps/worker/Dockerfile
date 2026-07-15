@@ -4,16 +4,25 @@ WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY apps/api/Cargo.toml ./apps/api/Cargo.toml
 COPY apps/worker/Cargo.toml ./apps/worker/Cargo.toml
-# Cargo parses every workspace member; keep the unbuilt member minimal so its
-# source changes do not invalidate the worker image build.
-RUN mkdir -p apps/api/src && : > apps/api/src/lib.rs && : > apps/api/src/main.rs
+# Keep dependencies in an exported layer; GitHub's BuildKit cache does not
+# preserve the contents of cache mounts between runners.
+RUN mkdir -p apps/api/src apps/worker/src && \
+    : > apps/api/src/lib.rs && \
+    printf 'fn main() {}\n' > apps/api/src/main.rs && \
+    : > apps/worker/src/lib.rs && \
+    printf 'fn main() {}\n' > apps/worker/src/main.rs
+RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,target=/usr/local/cargo/git,sharing=locked \
+    cargo build --release --locked -p portfolio-worker
+RUN rm -rf apps/worker/src
 COPY apps/worker ./apps/worker
 RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,target=/usr/local/cargo/git,sharing=locked \
-    --mount=type=cache,target=/app/target,sharing=locked \
+    touch apps/worker/src/lib.rs apps/worker/src/main.rs && \
     cargo build --release --locked -p portfolio-worker && \
     install -Dm755 /app/target/release/portfolio-worker /out/portfolio-worker && \
-    install -Dm755 /app/target/release/backfill-exif /out/backfill-exif
+    install -Dm755 /app/target/release/backfill-exif /out/backfill-exif && \
+    rm -rf /app/target
 
 FROM gcr.io/distroless/cc-debian12:nonroot
 COPY --from=build /out/portfolio-worker /usr/local/bin/portfolio-worker

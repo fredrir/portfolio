@@ -1,15 +1,11 @@
-set -a
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+#!/usr/bin/env bash
+set -euo pipefail
 
-source "$PROJECT_ROOT/.env"
-set +a
-
-CLIENT_ID="$SPOTIFY_CLIENT_ID"
-CLIENT_SECRET="$SPOTIFY_CLIENT_SECRET"
+CLIENT_ID="${SPOTIFY_CLIENT_ID:-}"
+CLIENT_SECRET="${SPOTIFY_CLIENT_SECRET:-}"
 
 if [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
-  echo "Missing SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET in .env"
+  echo "Missing Spotify credentials; run with: doppler run -- bash apps/web/scripts/get-spotify-token.sh" >&2
   exit 1
 fi
 
@@ -41,9 +37,15 @@ echo ""
 read -p "Paste the 'code' from the redirect URL: " AUTH_CODE
 
 echo ""
-curl -s -X POST https://accounts.spotify.com/api/token \
-  -d "client_id=${CLIENT_ID}" \
-  -d "client_secret=${CLIENT_SECRET}" \
-  -d "grant_type=authorization_code" \
-  -d "code=${AUTH_CODE}" \
-  -d "redirect_uri=${REDIRECT_URI}"
+# Feed credentials through curl's stdin config so the client secret and auth
+# code do not appear in the process list.
+curl -sS --config - <<EOF
+url = "https://accounts.spotify.com/api/token"
+request = "POST"
+data-urlencode = "client_id=${CLIENT_ID}"
+data-urlencode = "client_secret=${CLIENT_SECRET}"
+data-urlencode = "grant_type=authorization_code"
+data-urlencode = "code=${AUTH_CODE}"
+data-urlencode = "redirect_uri=${REDIRECT_URI}"
+EOF
+echo

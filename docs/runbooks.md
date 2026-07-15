@@ -41,9 +41,15 @@ Nightly backups land in `s3://hansteen-portfolio-backups-prod/postgres/`
    (`infra/host/install.sh` does the key + cosign; the Doppler token is
    created with `doppler configs tokens create` and written to
    `/home/portfolio/.config/portfolio/doppler.token`).
-4. `CLOUDFLARE_API_TOKEN=... ./infra/host/install.sh <host>` — this also
-   fetches the tunnel connector token, so the tunnel reattaches to the
-   same Cloudflare tunnel ID with no DNS change.
+4. Run the installer with the isolated operations credential:
+
+   ```bash
+   CLOUDFLARE_API_TOKEN=$(doppler secrets get -p portfolio -c ops CLOUDFLARE_API_TOKEN --plain) \
+     ./infra/host/install.sh <host>
+   ```
+
+   This also fetches the tunnel connector token, so the tunnel reattaches
+   to the same Cloudflare tunnel ID with no DNS change.
 5. Start postgres, restore the newest dump (the inverse of
    `bin/backup.sh`: `aws s3 cp ... - | gunzip | podman exec -i postgres
    psql -U portfolio portfolio`).

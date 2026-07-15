@@ -723,9 +723,9 @@ export interface components {
             id: string;
         };
         VersionInfo: {
-            /** @description Git commit the binary was built from. */
+            /** @description Git commit of the running deployment. */
             commit: string;
-            /** @description Crate version of the running binary. */
+            /** @description Release version of the running deployment. */
             version: string;
         };
         VisitCount: {

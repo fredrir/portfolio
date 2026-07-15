@@ -26,6 +26,7 @@ npm-debug.log*
 # local env files
 .env
 .env*.local
+doppler.token
 
 # typescript
 *.tsbuildinfo
