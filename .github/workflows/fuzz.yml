@@ -23,7 +23,7 @@ jobs:
           - crate: apps/worker/fuzz
             target: s3_event_parse
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@v2
         with:
