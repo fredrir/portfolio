@@ -16,7 +16,7 @@ export function isAdminOrigin(): boolean {
     return true;
   }
 
-  if (!import.meta.env.DEV) {
+  if (!import.meta.env.DEV && process.env.ALLOW_LOCAL_ADMIN !== "1") {
     return false;
   }
 

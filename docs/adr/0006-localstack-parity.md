@@ -15,8 +15,10 @@ and make integration tests unrunnable in CI without secrets.
 (`scripts/localstack-init.sh`) that provisions the same topology as
 production Terraform: media bucket, `media-processing` queue, DLQ with
 `maxReceiveCount 5`, and the `ObjectCreated originals/` notification. The
-application code is environment-blind: `AWS_ENDPOINT_URL` presence flips
-the SDK to path-style addressing, nothing else changes.
+backend access uses the internal `AWS_ENDPOINT_URL`; the API can separately use
+`MEDIA_UPLOAD_ENDPOINT_URL` when signing browser PUTs. This distinction matters
+in containers, where `localstack:4566` is reachable by services while the host
+browser needs `localhost:4566`. Both custom endpoints use path-style addressing.
 
 ## Consequences
 

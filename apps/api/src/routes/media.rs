@@ -13,7 +13,7 @@ use uuid::Uuid;
 use crate::problem::{ApiError, Problem};
 use crate::{AppState, audit};
 
-const MAX_UPLOAD_BYTES: i64 = 100 * 1024 * 1024;
+const MAX_UPLOAD_BYTES: i64 = 30 * 1024 * 1024;
 const PRESIGN_EXPIRY: Duration = Duration::from_secs(900);
 const ALLOWED_CONTENT_TYPES: [&str; 3] = ["image/jpeg", "image/png", "image/webp"];
 
@@ -36,9 +36,6 @@ pub fn require_admin(state: &AppState, headers: &HeaderMap) -> Result<(), Proble
     }
 }
 
-/// Lowercased, charset-restricted gallery grouping key; None when nothing
-/// usable remains. Unicode letters and numbers are retained so category names
-/// can contain characters such as `æ`, `ø`, and `å`.
 pub fn sanitize_category(raw: &str) -> Option<String> {
     let cleaned: String = raw
         .to_lowercase()
@@ -80,7 +77,7 @@ pub struct CreateUploadRequest {
     /// Must be one of image/jpeg, image/png, image/webp.
     pub content_type: String,
     pub size_bytes: i64,
-    /// Gallery grouping key, e.g. an album name (sanitized, lowercased).
+    /// Gallery grouping
     #[serde(default)]
     pub category: Option<String>,
 }
@@ -88,9 +85,7 @@ pub struct CreateUploadRequest {
 #[derive(Serialize, ToSchema)]
 pub struct CreateUploadResponse {
     pub media_id: Uuid,
-    /// Presigned S3 PUT URL for the original object.
     pub upload_url: String,
-    /// Headers the client must send with the PUT exactly as given.
     pub headers: BTreeMap<String, String>,
     pub expires_in_seconds: u64,
 }
@@ -147,6 +142,19 @@ pub async fn create_upload(
     let media_id = Uuid::new_v4();
     let original_key = format!("originals/{media_id}/{filename}");
 
+    // Presign before inserting the row: a signing/configuration failure must
+    // not leave a pending upload the browser can neither use nor clean up.
+    let presigned = state
+        .upload_s3
+        .put_object()
+        .bucket(&state.media.bucket)
+        .key(&original_key)
+        .content_type(&body.content_type)
+        .content_length(body.size_bytes)
+        .presigned(PresigningConfig::expires_in(PRESIGN_EXPIRY).expect("static expiry is valid"))
+        .await
+        .map_err(|e| ApiError::Internal(format!("presigning failed: {e}")).into_response())?;
+
     let mut tx = state
         .pool
         .begin()
@@ -181,17 +189,6 @@ pub async fn create_upload(
     tx.commit()
         .await
         .map_err(|e| ApiError::from(e).into_response())?;
-
-    let presigned = state
-        .s3
-        .put_object()
-        .bucket(&state.media.bucket)
-        .key(&original_key)
-        .content_type(&body.content_type)
-        .content_length(body.size_bytes)
-        .presigned(PresigningConfig::expires_in(PRESIGN_EXPIRY).expect("static expiry is valid"))
-        .await
-        .map_err(|e| ApiError::Internal(format!("presigning failed: {e}")).into_response())?;
 
     let headers = presigned
         .headers()
@@ -334,6 +331,16 @@ pub async fn delete_media(
         .execute(&mut *tx)
         .await
         .map_err(|e| ApiError::from(e).into_response())?;
+    let variant_key_values: Vec<String> = variant_keys.iter().map(|(key,)| key.clone()).collect();
+    let unreferenced_variant_keys: Vec<(String,)> = sqlx::query_as(
+        "select distinct candidate.key \
+         from unnest($1::text[]) as candidate(key) \
+         where not exists (select 1 from media_variants where key = candidate.key)",
+    )
+    .bind(&variant_key_values)
+    .fetch_all(&mut *tx)
+    .await
+    .map_err(|e| ApiError::from(e).into_response())?;
     audit::record(
         &mut tx,
         "media.deleted",
@@ -342,6 +349,7 @@ pub async fn delete_media(
             "filename": filename,
             "category": category,
             "variants": variant_keys.len(),
+            "variant_objects_scheduled_for_deletion": unreferenced_variant_keys.len(),
         }),
     )
     .await
@@ -350,10 +358,12 @@ pub async fn delete_media(
         .await
         .map_err(|e| ApiError::from(e).into_response())?;
 
-    // Variant keys are unique per row and originals embed the media id, so no
-    // other row can reference these objects. Best-effort: the DB row is gone
-    // either way, and an orphaned object is harmless.
-    for key in std::iter::once(original_key).chain(variant_keys.into_iter().map(|(k,)| k)) {
+    // Originals embed the media id. Content-hashed variants can be shared by
+    // multiple rows, so delete only keys that became unreferenced in this tx.
+    // S3 cleanup is best-effort: the database deletion remains authoritative.
+    for key in
+        std::iter::once(original_key).chain(unreferenced_variant_keys.into_iter().map(|(key,)| key))
+    {
         if let Err(e) = state
             .s3
             .delete_object()
@@ -480,6 +490,8 @@ pub struct MediaItem {
     pub content_type: String,
     pub category: Option<String>,
     pub state: String,
+    /// Worker failure detail, available to administrators for failed items.
+    pub error: Option<String>,
     /// Original upload size in bytes.
     pub size_bytes: Option<i64>,
     pub width: Option<i32>,
@@ -552,10 +564,13 @@ pub struct MediaStatusRequest {
     pub ids: Vec<Uuid>,
 }
 
-#[derive(Serialize, ToSchema, sqlx::FromRow)]
+#[derive(Serialize, ToSchema)]
 pub struct MediaStatus {
     pub id: Uuid,
     pub state: String,
+    pub error: Option<String>,
+    /// For pending grants, whether the original object is already in S3.
+    pub object_exists: Option<bool>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -602,6 +617,7 @@ struct MediaListRow {
     content_type: String,
     category: Option<String>,
     state: String,
+    error: Option<String>,
     size_bytes: Option<i64>,
     width: Option<i32>,
     height: Option<i32>,
@@ -650,6 +666,14 @@ struct GalleryRow {
     longitude: Option<f64>,
 }
 
+#[derive(sqlx::FromRow)]
+struct MediaStatusRow {
+    id: Uuid,
+    state: String,
+    error: Option<String>,
+    original_key: String,
+}
+
 fn parse_date_from_filename(filename: &str) -> Option<String> {
     let bytes = filename.as_bytes();
     if bytes.len() < 15 || bytes[8] != b'_' {
@@ -691,6 +715,7 @@ fn media_items_from_rows(rows: Vec<MediaListRow>, public_base_url: Option<&str>)
                 content_type: row.content_type,
                 category: row.category,
                 state: row.state,
+                error: row.error,
                 size_bytes: row.size_bytes,
                 width: row.width,
                 height: row.height,
@@ -744,7 +769,7 @@ pub async fn list_media(
     }
 
     let rows: Vec<MediaListRow> = sqlx::query_as(
-        "select m.id, m.filename, m.content_type, m.category, m.state, \
+        "select m.id, m.filename, m.content_type, m.category, m.state, m.error, \
                 m.size_bytes, m.width, m.height, m.content_hash, \
                 to_char(m.created_at at time zone 'utc', \
                         'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as created_at, \
@@ -798,7 +823,7 @@ pub async fn admin_media(
         .filter(|category| !category.is_empty());
 
     let items_query = sqlx::query_as::<_, MediaListRow>(
-        "select m.id, m.filename, m.content_type, m.category, m.state, \
+        "select m.id, m.filename, m.content_type, m.category, m.state, m.error, \
                 m.size_bytes, m.width, m.height, m.content_hash, \
                 to_char(m.created_at at time zone 'utc', \
                         'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as created_at, \
@@ -880,13 +905,51 @@ pub async fn media_status(
     use axum::response::IntoResponse;
 
     require_admin(&state, &headers).map_err(|p| p.into_response())?;
-    let statuses = sqlx::query_as::<_, MediaStatus>(
-        "select id, state from media where id = any($1) order by id",
+    let rows = sqlx::query_as::<_, MediaStatusRow>(
+        "select id, state, error, original_key from media where id = any($1) order by id",
     )
     .bind(&body.ids)
     .fetch_all(&state.pool)
     .await
     .map_err(|e| ApiError::from(e).into_response())?;
+    let mut statuses = Vec::with_capacity(rows.len());
+    for row in rows {
+        let object_exists = if row.state == "pending" {
+            match state
+                .s3
+                .head_object()
+                .bucket(&state.media.bucket)
+                .key(&row.original_key)
+                .send()
+                .await
+            {
+                Ok(_) => Some(true),
+                Err(error)
+                    if error
+                        .as_service_error()
+                        .is_some_and(|service| service.is_not_found()) =>
+                {
+                    Some(false)
+                }
+                Err(error) => {
+                    tracing::warn!(
+                        media_id = %row.id,
+                        error = %error,
+                        "could not verify pending upload object"
+                    );
+                    None
+                }
+            }
+        } else {
+            None
+        };
+        statuses.push(MediaStatus {
+            id: row.id,
+            state: row.state,
+            error: row.error,
+            object_exists,
+        });
+    }
     Ok(Json(statuses))
 }
 

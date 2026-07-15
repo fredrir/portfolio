@@ -28,7 +28,7 @@ GitHub Actions (type=gha) rather than a paid registry cache.
   a few seconds in release; SQS visibility timeout (120 s) bounds
   per-message processing; poison messages park in the DLQ after 5
   receives.
-- **Uploads:** presigned PUTs capped at 25 MiB, content-type allowlisted.
+- **Uploads:** presigned PUTs capped at 30 MiB, content-type allowlisted.
 - **Delivery:** one production deploy at a time (GitHub concurrency
   group); a deploy takes ~8–15 min with warm build caches, dominated by
   the Rust release build (rav1e).

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { adminCreateUpload, adminGetMediaStatus } from "@/server/admin";
+import { adminCreateUpload, adminDeleteMedia, adminGetMediaStatus } from "@/server/admin";
 
 export type JobStage = "authorizing" | "uploading" | "processing" | "failed";
 
@@ -19,8 +19,42 @@ export interface UploadJob {
 }
 
 const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
-const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = 30 * 1024 * 1024;
 const POLL_INTERVAL_MS = 3000;
+
+class UploadRequestError extends Error {
+  constructor(
+    message: string,
+    readonly cleanupSafe: boolean,
+  ) {
+    super(message);
+    this.name = "UploadRequestError";
+  }
+}
+
+function storageErrorMessage(body: string, status: number): string {
+  if (body) {
+    try {
+      const message = new DOMParser()
+        .parseFromString(body, "application/xml")
+        .querySelector("Message")?.textContent;
+      if (message) return `Storage rejected the upload: ${message}`;
+    } catch {
+      // Fall through to the status-only message for malformed/non-XML bodies.
+    }
+  }
+  return `Storage rejected the upload (${status})`;
+}
+
+async function deleteGrant(mediaId: string): Promise<boolean> {
+  try {
+    await adminDeleteMedia({ data: { id: mediaId } });
+    return true;
+  } catch (error) {
+    // A concurrently processed cleanup is already the desired outcome.
+    return error instanceof Error && /No such media item|404/.test(error.message);
+  }
+}
 
 function putWithProgress(
   url: string,
@@ -51,7 +85,11 @@ function putWithProgress(
 
     request.open("PUT", url);
     for (const [key, value] of Object.entries(headers)) {
-      if (key.toLowerCase() !== "host") request.setRequestHeader(key, value);
+      // Browsers own these forbidden headers and will supply the signed values
+      // from the URL and File body automatically.
+      if (!["host", "content-length"].includes(key.toLowerCase())) {
+        request.setRequestHeader(key, value);
+      }
     }
 
     request.upload.onprogress = (event) => {
@@ -62,11 +100,19 @@ function putWithProgress(
     request.onload = () => {
       cleanup();
       if (request.status >= 200 && request.status < 300) resolve();
-      else reject(new Error(`Upload failed (${request.status})`));
+      else
+        reject(
+          new UploadRequestError(storageErrorMessage(request.responseText, request.status), true),
+        );
     };
     request.onerror = () => {
       cleanup();
-      reject(new Error("Network error during upload"));
+      reject(
+        new UploadRequestError(
+          "Could not reach storage. Check the upload endpoint and its CORS policy.",
+          false,
+        ),
+      );
     };
     request.onabort = () => {
       cleanup();
@@ -107,12 +153,13 @@ export function useUploads(onMediaChange: () => void) {
         return;
       }
       if (file.size > MAX_UPLOAD_BYTES) {
-        patchJob(id, { stage: "failed", detail: "File is larger than 100 MiB" });
+        patchJob(id, { stage: "failed", detail: "File is larger than 30 MiB" });
         return;
       }
 
       const controller = new AbortController();
       controllersRef.current.set(id, controller);
+      let mediaId: string | undefined;
 
       try {
         const grant = await adminCreateUpload({
@@ -123,18 +170,58 @@ export function useUploads(onMediaChange: () => void) {
             category: category || undefined,
           },
         });
-        if (controller.signal.aborted) return;
+        mediaId = grant.media_id;
+        if (controller.signal.aborted) {
+          throw new DOMException("Upload cancelled", "AbortError");
+        }
 
-        patchJob(id, { stage: "uploading", mediaId: grant.media_id });
+        patchJob(id, { stage: "uploading", mediaId });
         await putWithProgress(grant.upload_url, grant.headers, file, controller.signal, (sent) =>
           patchJob(id, { sent }),
         );
         patchJob(id, { stage: "processing", sent: 1 });
       } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") return;
+        const aborted = error instanceof DOMException && error.name === "AbortError";
+        const requestError = error instanceof UploadRequestError ? error : undefined;
+
+        // A network/CORS failure can hide a successful S3 response. Ask the
+        // backend whether the object exists before offering a destructive retry.
+        if (!aborted && requestError && !requestError.cleanupSafe && mediaId) {
+          try {
+            const [status] = await adminGetMediaStatus({ data: { ids: [mediaId] } });
+            if (
+              status &&
+              (status.state === "ready" ||
+                status.state === "processing" ||
+                status.object_exists === true)
+            ) {
+              patchJob(id, { stage: "processing", sent: 1, mediaId });
+              return;
+            }
+            if (!status) mediaId = undefined;
+            if (status?.state === "failed") {
+              patchJob(id, {
+                stage: "failed",
+                detail: status.error || "Processing failed",
+                mediaId,
+              });
+              return;
+            }
+          } catch {
+            // Preserve the grant; retry/dismiss can verify or clean it later.
+          }
+        }
+
+        const shouldCleanup = aborted || requestError?.cleanupSafe === true;
+        const cleaned = mediaId && shouldCleanup ? await deleteGrant(mediaId) : false;
+        if (aborted) return;
         patchJob(id, {
           stage: "failed",
-          detail: error instanceof Error ? error.message : "Upload failed",
+          detail:
+            error instanceof Error
+              ? `${error.message}${mediaId && shouldCleanup && !cleaned ? " Cleanup also failed." : ""}`
+              : "Upload failed",
+          mediaId: cleaned ? undefined : mediaId,
         });
       } finally {
         controllersRef.current.delete(id);
@@ -169,16 +256,59 @@ export function useUploads(onMediaChange: () => void) {
     (id: string) => {
       const job = jobsRef.current.find((candidate) => candidate.id === id);
       if (!job || job.stage !== "failed") return;
-      patchJob(id, { stage: "authorizing", sent: 0, detail: undefined, mediaId: undefined });
-      void runUpload(id, job.file, job.category);
+      patchJob(id, { stage: "authorizing", sent: 0, detail: undefined });
+      void (async () => {
+        if (job.mediaId) {
+          let status: Awaited<ReturnType<typeof adminGetMediaStatus>>[number] | undefined;
+          try {
+            [status] = await adminGetMediaStatus({ data: { ids: [job.mediaId] } });
+          } catch {
+            patchJob(id, {
+              stage: "failed",
+              detail: "Could not verify the previous upload. Try again.",
+            });
+            return;
+          }
+
+          if (
+            status &&
+            (status.state === "ready" ||
+              status.state === "processing" ||
+              status.object_exists === true)
+          ) {
+            patchJob(id, { stage: "processing", sent: 1, mediaId: job.mediaId });
+            return;
+          }
+          if (status?.state === "pending" && status.object_exists == null) {
+            patchJob(id, {
+              stage: "failed",
+              detail: "Storage could not verify the previous upload. Try again later.",
+            });
+            return;
+          }
+          if (status && !(await deleteGrant(job.mediaId))) {
+            patchJob(id, {
+              stage: "failed",
+              detail: "Could not clean up the previous upload. Try again.",
+            });
+            return;
+          }
+        }
+
+        patchJob(id, { mediaId: undefined });
+        await runUpload(id, job.file, job.category);
+      })();
     },
     [patchJob, runUpload],
   );
 
   const remove = useCallback(
     (id: string) => {
-      controllersRef.current.get(id)?.abort();
+      const job = jobsRef.current.find((candidate) => candidate.id === id);
+      const controller = controllersRef.current.get(id);
+      controller?.abort();
       controllersRef.current.delete(id);
+      if (!controller && job?.mediaId) void deleteGrant(job.mediaId);
       updateJobs((current) => {
         const removed = current.find((job) => job.id === id);
         if (removed) URL.revokeObjectURL(removed.previewUrl);
@@ -202,20 +332,33 @@ export function useUploads(onMediaChange: () => void) {
           job.stage === "processing" && job.mediaId ? [job.mediaId] : [],
         );
         const statuses = await adminGetMediaStatus({ data: { ids } });
-        const stateById = new Map(statuses.map((item) => [item.id, item.state]));
+        const statusById = new Map(statuses.map((item) => [item.id, item]));
         const completedIds = new Set<string>();
 
         updateJobs((current) =>
           current.flatMap((job) => {
             if (job.stage !== "processing" || !job.mediaId) return [job];
-            const state = stateById.get(job.mediaId);
-            if (state === "ready") {
+            const status = statusById.get(job.mediaId);
+            if (!status) {
+              return [
+                {
+                  ...job,
+                  stage: "failed",
+                  detail: "Upload record no longer exists",
+                  mediaId: undefined,
+                },
+              ];
+            }
+            if (status.state === "ready") {
               completedIds.add(job.id);
               URL.revokeObjectURL(job.previewUrl);
               return [];
             }
-            if (state === "failed") {
-              return [{ ...job, stage: "failed", detail: "Processing failed" }];
+            if (status.state === "failed") {
+              return [{ ...job, stage: "failed", detail: status.error || "Processing failed" }];
+            }
+            if (status.state === "pending" && status.object_exists === false) {
+              return [{ ...job, stage: "failed", detail: "Uploaded object could not be found" }];
             }
             return [job];
           }),

@@ -196,6 +196,13 @@ export function Lightbox({
             </button>
           </div>
 
+          {item.error && (
+            <div className="rounded border border-destructive/30 bg-destructive/10 px-2.5 py-2">
+              <p className="text-2xs text-faded">processing error</p>
+              <p className="mt-0.5 break-words font-mono text-destructive text-xs">{item.error}</p>
+            </div>
+          )}
+
           <label className="block">
             <span className="mb-1 block text-2xs text-faded">category</span>
             <span className="flex items-center gap-1.5">

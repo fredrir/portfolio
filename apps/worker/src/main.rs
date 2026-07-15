@@ -26,11 +26,8 @@ struct Ctx {
 
 #[derive(Debug)]
 enum WorkerError {
-    /// Retrying cannot succeed; the media is marked failed and the message
-    /// is deleted.
     Permanent(String),
-    /// Worth retrying; the message stays on the queue and the DLQ redrive
-    /// policy bounds the attempts.
+    Abandoned(String),
     Transient(String),
 }
 
@@ -167,6 +164,10 @@ async fn handle_message(ctx: &Ctx, message: Message) {
 
         match result {
             Ok(()) => {}
+            Err(WorkerError::Abandoned(reason)) => {
+                tracing::warn!(%key, %reason, "abandoned upload; removing record");
+                remove_abandoned(ctx, &key).await;
+            }
             Err(WorkerError::Permanent(reason)) => {
                 tracing::error!(%key, %reason, "permanent failure");
                 mark_failed(ctx, &key, &reason).await;
@@ -278,7 +279,7 @@ async fn handle_original(ctx: &Ctx, key: &str, idempotency_id: &str) -> Result<(
             if e.as_service_error()
                 .is_some_and(|error| error.is_no_such_key())
             {
-                WorkerError::Permanent("original upload was not completed".into())
+                WorkerError::Abandoned("original upload was not completed".into())
             } else {
                 WorkerError::Transient(format!("get_object: {e}"))
             }
@@ -418,6 +419,10 @@ async fn reconcile_stale_media(ctx: &Ctx) {
     let idempotency_id = format!("reconcile/{media_id}");
     match handle_original(ctx, &key, &idempotency_id).await {
         Ok(()) => {}
+        Err(WorkerError::Abandoned(reason)) => {
+            tracing::warn!(%key, %reason, "removing stale abandoned upload");
+            remove_abandoned(ctx, &key).await;
+        }
         Err(WorkerError::Permanent(reason)) => {
             tracing::error!(%key, %reason, "stale media permanently failed");
             mark_failed(ctx, &key, &reason).await;
@@ -425,6 +430,18 @@ async fn reconcile_stale_media(ctx: &Ctx) {
         Err(WorkerError::Transient(reason)) => {
             tracing::warn!(%key, %reason, "stale media retry failed");
         }
+    }
+}
+
+async fn remove_abandoned(ctx: &Ctx, original_key: &str) {
+    let result = sqlx::query(
+        "delete from media where original_key = $1 and state in ('pending', 'processing')",
+    )
+    .bind(original_key)
+    .execute(&ctx.pool)
+    .await;
+    if let Err(err) = result {
+        tracing::error!(error = %err, %original_key, "failed to remove abandoned media");
     }
 }
 

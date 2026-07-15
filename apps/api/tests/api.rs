@@ -40,9 +40,11 @@ fn test_state_with_public_base(pool: PgPool, public_base_url: Option<String>) ->
         posthog_api_key: None,
         posthog_project_id: None,
     };
+    let s3 = aws_sdk_s3::Client::from_conf(config);
     AppState {
         pool,
-        s3: aws_sdk_s3::Client::from_conf(config),
+        s3: s3.clone(),
+        upload_s3: s3,
         media: MediaConfig {
             bucket: "test-media".into(),
             admin_token: Some(TEST_ADMIN_TOKEN.into()),
@@ -215,6 +217,30 @@ async fn media_upload_rejects_bad_content_type(pool: PgPool) {
 }
 
 #[sqlx::test]
+async fn media_upload_rejects_files_larger_than_worker_limit(pool: PgPool) {
+    let request = Request::post("/api/v1/media/uploads")
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::from(
+            json!({
+                "filename": "too-large.jpg",
+                "content_type": "image/jpeg",
+                "size_bytes": 30 * 1024 * 1024 + 1
+            })
+            .to_string(),
+        ))
+        .unwrap();
+    let (status, body) = send(pool.clone(), request).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(body["errors"]["size_bytes"].is_string());
+    let count: i64 = sqlx::query_scalar("select count(*) from media")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(count, 0);
+}
+
+#[sqlx::test]
 async fn media_upload_returns_presigned_url_and_pending_record(pool: PgPool) {
     let request = Request::post("/api/v1/media/uploads")
         .header(header::CONTENT_TYPE, "application/json")
@@ -232,6 +258,10 @@ async fn media_upload_returns_presigned_url_and_pending_record(pool: PgPool) {
     let (status, body) = send(pool.clone(), request).await;
     assert_eq!(status, StatusCode::CREATED);
     let url = body["upload_url"].as_str().unwrap();
+    assert!(
+        url.starts_with("http://localhost:4566/"),
+        "browser-facing endpoint in url: {url}"
+    );
     assert!(url.contains("test-media"), "bucket in url: {url}");
     assert!(url.contains("originals/"), "key prefix in url: {url}");
     assert!(body["media_id"].is_string());
@@ -364,6 +394,45 @@ async fn media_delete_removes_row_and_audits(pool: PgPool) {
         .unwrap();
     let (status, _) = send(pool, request).await;
     assert_eq!(status, StatusCode::NOT_FOUND);
+}
+
+#[sqlx::test]
+async fn media_delete_preserves_shared_variant_objects(pool: PgPool) {
+    let first = seed_media(pool.clone(), "first.jpg", None).await;
+    let second = seed_media(pool.clone(), "second.jpg", None).await;
+    for media_id in [&first, &second] {
+        sqlx::query(
+            "insert into media_variants (media_id, format, key, width, height, size_bytes) \
+             values ($1::uuid, 'webp', 'variants/shared.webp', 10, 10, 100)",
+        )
+        .bind(media_id)
+        .execute(&pool)
+        .await
+        .unwrap();
+    }
+
+    let request = Request::delete(format!("/api/v1/media/{first}"))
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::empty())
+        .unwrap();
+    let (status, _) = send(pool.clone(), request).await;
+    assert_eq!(status, StatusCode::NO_CONTENT);
+
+    let remaining: i64 = sqlx::query_scalar(
+        "select count(*) from media_variants where key = 'variants/shared.webp'",
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!(remaining, 1);
+    let scheduled_objects: i64 = sqlx::query_scalar(
+        "select (detail->>'variant_objects_scheduled_for_deletion')::bigint \
+         from admin_audit where action = 'media.deleted' order by id desc limit 1",
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!(scheduled_objects, 0);
 }
 
 #[sqlx::test]
@@ -645,27 +714,44 @@ async fn media_category_filter_and_pending_gate(pool: PgPool) {
 
 #[sqlx::test]
 async fn admin_media_filters_in_postgres_and_returns_complete_facets(pool: PgPool) {
-    for (key, filename, size, state, category) in [
-        ("ready", "Trip-ready.jpg", 100_i64, "ready", Some("travel")),
-        ("pending", "city.png", 200, "pending", Some("oslo")),
-        ("failed", "broken-trip.webp", 300, "failed", None),
+    for (key, filename, size, state, category, error) in [
+        (
+            "ready",
+            "Trip-ready.jpg",
+            100_i64,
+            "ready",
+            Some("travel"),
+            None,
+        ),
+        ("pending", "city.png", 200, "pending", Some("oslo"), None),
+        (
+            "failed",
+            "broken-trip.webp",
+            300,
+            "failed",
+            None,
+            Some("failed to decode image"),
+        ),
         (
             "processing",
             "Trip-processing.jpg",
             400,
             "processing",
             Some("travel"),
+            None,
         ),
     ] {
         sqlx::query(
-            "insert into media (original_key, filename, content_type, size_bytes, state, category) \
-             values ($1, $2, 'image/jpeg', $3, $4, $5)",
+            "insert into media \
+                (original_key, filename, content_type, size_bytes, state, category, error) \
+             values ($1, $2, 'image/jpeg', $3, $4, $5, $6)",
         )
         .bind(format!("originals/{key}"))
         .bind(filename)
         .bind(size)
         .bind(state)
         .bind(category)
+        .bind(error)
         .execute(&pool)
         .await
         .unwrap();
@@ -707,18 +793,34 @@ async fn admin_media_filters_in_postgres_and_returns_complete_facets(pool: PgPoo
             .fetch_one(&pool)
             .await
             .unwrap();
+    let failed_id: uuid::Uuid =
+        sqlx::query_scalar("select id from media where filename = 'broken-trip.webp'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
     let request = Request::post("/api/v1/media/status")
         .header(header::CONTENT_TYPE, "application/json")
         .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
         .body(Body::from(
-            json!({ "ids": [ready_id, uuid::Uuid::new_v4()] }).to_string(),
+            json!({ "ids": [ready_id, failed_id, uuid::Uuid::new_v4()] }).to_string(),
         ))
         .unwrap();
     let (status, body) = send(pool, request).await;
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(body.as_array().unwrap().len(), 1);
-    assert_eq!(body[0]["id"], ready_id.to_string());
-    assert_eq!(body[0]["state"], "ready");
+    let statuses = body.as_array().unwrap();
+    assert_eq!(statuses.len(), 2);
+    let ready = statuses
+        .iter()
+        .find(|status| status["id"] == ready_id.to_string())
+        .unwrap();
+    assert_eq!(ready["state"], "ready");
+    assert!(ready["error"].is_null());
+    let failed = statuses
+        .iter()
+        .find(|status| status["id"] == failed_id.to_string())
+        .unwrap();
+    assert_eq!(failed["state"], "failed");
+    assert_eq!(failed["error"], "failed to decode image");
 }
 
 #[sqlx::test]

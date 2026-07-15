@@ -167,7 +167,7 @@ const PhotoTile = memo(function PhotoTile({
             )}
           >
             {bucket === "failed" && <WarningCircle size={12} className="mr-1" />}
-            {stateLabel(bucket)}
+            <span title={item.error ?? undefined}>{stateLabel(bucket)}</span>
           </span>
         )}
       </button>

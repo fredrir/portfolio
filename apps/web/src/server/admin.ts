@@ -22,6 +22,24 @@ function adminHeaders(): Record<string, string> {
   return { ...traceHeaders(), authorization: `Bearer ${token}` };
 }
 
+function apiErrorMessage(error: unknown, fallback: string, status: number): string {
+  if (!error || typeof error !== "object") return `${fallback} (${status})`;
+  const problem = error as {
+    title?: unknown;
+    detail?: unknown;
+    errors?: unknown;
+  };
+  if (typeof problem.detail === "string" && problem.detail) return problem.detail;
+  if (problem.errors && typeof problem.errors === "object") {
+    const messages = Object.values(problem.errors).filter(
+      (message): message is string => typeof message === "string",
+    );
+    if (messages.length > 0) return messages.join("; ");
+  }
+  if (typeof problem.title === "string" && problem.title) return problem.title;
+  return `${fallback} (${status})`;
+}
+
 export interface AdminMediaQuery {
   query?: string;
   state?: "ready" | "processing" | "failed";
@@ -69,7 +87,7 @@ export const adminCreateUpload = createServerFn({ method: "POST" })
       headers: adminHeaders(),
     });
     if (error || !data) {
-      throw new Error(`upload authorization failed (${response.status})`);
+      throw new Error(apiErrorMessage(error, "Upload authorization failed", response.status));
     }
     return data;
   });
@@ -98,7 +116,7 @@ export const adminDeleteMedia = createServerFn({ method: "POST" })
       headers: adminHeaders(),
     });
     if (error) {
-      throw new Error(`delete failed (${response.status})`);
+      throw new Error(apiErrorMessage(error, "Delete failed", response.status));
     }
     return { id: input.id };
   });

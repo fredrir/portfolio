@@ -23,7 +23,8 @@ confidential.
 - Cloudflare Access service token (the only path to the origin)
 - Tunnel connector token (host file, mode 600)
 - CI deploy key (restricted by forced command + no-pty/no-forwarding)
-- Runtime IAM users: api (PutObject originals/*), worker (queue consume +
+- Runtime IAM users: api (Put/Get/DeleteObject originals/* + DeleteObject
+  unreferenced variants/*), worker (queue consume +
   GetObject originals/* + PutObject variants/* and cv/*), media-reader
   (GetObject variants/* and cv/*), backup (Put/GetObject postgres/* + scoped
   ListBucket)

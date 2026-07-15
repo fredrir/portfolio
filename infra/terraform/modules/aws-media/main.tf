@@ -235,8 +235,14 @@ data "aws_iam_policy_document" "api" {
   statement {
     sid       = "PresignOriginalUploads"
     effect    = "Allow"
-    actions   = ["s3:PutObject"]
+    actions   = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"]
     resources = ["${aws_s3_bucket.media.arn}/originals/*"]
+  }
+  statement {
+    sid       = "DeleteUnreferencedVariants"
+    effect    = "Allow"
+    actions   = ["s3:DeleteObject"]
+    resources = ["${aws_s3_bucket.media.arn}/variants/*"]
   }
 }
 

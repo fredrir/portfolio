@@ -33,6 +33,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         s3_builder = s3_builder.force_path_style(true);
     }
     let s3 = aws_sdk_s3::Client::from_conf(s3_builder.build());
+    let upload_s3 = match std::env::var("MEDIA_UPLOAD_ENDPOINT_URL")
+        .ok()
+        .filter(|endpoint| !endpoint.is_empty())
+    {
+        Some(endpoint) => {
+            let config = aws_sdk_s3::config::Builder::from(&aws_config)
+                .endpoint_url(endpoint)
+                .force_path_style(true)
+                .build();
+            aws_sdk_s3::Client::from_conf(config)
+        }
+        None => s3.clone(),
+    };
 
     let media = MediaConfig {
         bucket: std::env::var("MEDIA_BUCKET").unwrap_or_else(|_| "portfolio-media-dev".into()),
@@ -58,6 +71,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let state = AppState {
         pool,
         s3,
+        upload_s3,
         media,
         http,
         upstreams: std::sync::Arc::new(upstreams),

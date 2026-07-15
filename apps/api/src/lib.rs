@@ -21,7 +21,10 @@ const REQUEST_ID: HeaderName = HeaderName::from_static("x-request-id");
 #[derive(Clone)]
 pub struct AppState {
     pub pool: PgPool,
+    /// S3 client for backend reads/deletes through the runtime's internal endpoint.
     pub s3: aws_sdk_s3::Client,
+    /// S3 client used only to create URLs reachable by the administrator's browser.
+    pub upload_s3: aws_sdk_s3::Client,
     pub media: MediaConfig,
     pub http: reqwest::Client,
     pub upstreams: Arc<Upstreams>,

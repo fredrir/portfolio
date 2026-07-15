@@ -493,7 +493,7 @@ export interface components {
             year: string;
         };
         CreateUploadRequest: {
-            /** @description Gallery grouping key, e.g. an album name (sanitized, lowercased). */
+            /** @description Gallery grouping */
             category?: string | null;
             /** @description Must be one of image/jpeg, image/png, image/webp. */
             content_type: string;
@@ -504,13 +504,11 @@ export interface components {
         CreateUploadResponse: {
             /** Format: int64 */
             expires_in_seconds: number;
-            /** @description Headers the client must send with the PUT exactly as given. */
             headers: {
                 [key: string]: string;
             };
             /** Format: uuid */
             media_id: string;
-            /** @description Presigned S3 PUT URL for the original object. */
             upload_url: string;
         };
         CvVersion: {
@@ -605,6 +603,8 @@ export interface components {
             content_type: string;
             /** @description UTC upload time, RFC 3339. */
             created_at: string;
+            /** @description Worker failure detail, available to administrators for failed items. */
+            error?: string | null;
             filename: string;
             /** Format: int32 */
             height?: number | null;
@@ -621,8 +621,11 @@ export interface components {
             width?: number | null;
         };
         MediaStatus: {
+            error?: string | null;
             /** Format: uuid */
             id: string;
+            /** @description For pending grants, whether the original object is already in S3. */
+            object_exists?: boolean | null;
             state: string;
         };
         MediaStatusRequest: {

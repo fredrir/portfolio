@@ -46,8 +46,10 @@ services:
       AWS_REGION: eu-north-1
       AWS_ENDPOINT_URL: http://localstack:4566
       MEDIA_BUCKET: portfolio-media-dev
+      # Presigned URLs are consumed by the host browser, not by a container.
+      MEDIA_UPLOAD_ENDPOINT_URL: http://localhost:4566
       MEDIA_PUBLIC_BASE_URL: http://localhost:4566/portfolio-media-dev
-      ADMIN_TOKEN: dev-admin-token
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-dev-admin-token}
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
@@ -88,7 +90,9 @@ services:
       dockerfile: apps/web/Dockerfile
     environment:
       API_URL: http://api:8080
-      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-dev-admin-token}
+      # The production-mode image is safe to expose as admin on loopback only.
+      ALLOW_LOCAL_ADMIN: "1"
     ports:
       - "127.0.0.1:3000:3000"
     depends_on:

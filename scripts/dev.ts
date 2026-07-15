@@ -14,6 +14,7 @@ const localDefaults: Record<string, string> = {
   AWS_REGION: "eu-north-1",
   AWS_ENDPOINT_URL: "http://127.0.0.1:4566",
   MEDIA_BUCKET: "portfolio-media-dev",
+  MEDIA_UPLOAD_ENDPOINT_URL: "http://localhost:4566",
   MEDIA_PUBLIC_BASE_URL: "http://localhost:4566/portfolio-media-dev",
   MEDIA_QUEUE_URL: "http://127.0.0.1:4566/000000000000/media-processing",
   ADMIN_TOKEN: "dev-admin-token",

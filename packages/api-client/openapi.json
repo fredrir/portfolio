@@ -1203,7 +1203,7 @@
               "string",
               "null"
             ],
-            "description": "Gallery grouping key, e.g. an album name (sanitized, lowercased)."
+            "description": "Gallery grouping"
           },
           "content_type": {
             "type": "string",
@@ -1234,7 +1234,6 @@
           },
           "headers": {
             "type": "object",
-            "description": "Headers the client must send with the PUT exactly as given.",
             "additionalProperties": {
               "type": "string"
             },
@@ -1247,8 +1246,7 @@
             "format": "uuid"
           },
           "upload_url": {
-            "type": "string",
-            "description": "Presigned S3 PUT URL for the original object."
+            "type": "string"
           }
         }
       },
@@ -1586,6 +1584,13 @@
             "type": "string",
             "description": "UTC upload time, RFC 3339."
           },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Worker failure detail, available to administrators for failed items."
+          },
           "filename": {
             "type": "string"
           },
@@ -1633,9 +1638,22 @@
           "state"
         ],
         "properties": {
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "object_exists": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "For pending grants, whether the original object is already in S3."
           },
           "state": {
             "type": "string"
