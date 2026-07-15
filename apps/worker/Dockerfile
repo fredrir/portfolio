@@ -1,5 +1,5 @@
 # Build from the repository root: docker build -f apps/worker/Dockerfile .
-FROM rust:1.96-slim-bookworm AS build
+FROM rust:1.97-slim-bookworm AS build
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY apps/api/Cargo.toml ./apps/api/Cargo.toml
