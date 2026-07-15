@@ -39,3 +39,9 @@ variable "visibility_timeout_seconds" {
   type    = number
   default = 120
 }
+
+variable "upload_allowed_origins" {
+  description = "Browser origins allowed to upload originals with presigned PUT URLs"
+  type        = list(string)
+  default     = []
+}

@@ -220,8 +220,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: Production
     # Requires a Cloudflare API token with Workers Scripts:Edit +
-    # Workers Routes:Edit stored as the Production environment secret
-    # CLOUDFLARE_WORKERS_API_TOKEN. EDGE_CD_ENABLED stays false until set.
+    # Workers Routes:Edit stored as CLOUDFLARE_WORKERS_API_TOKEN.
+    # EDGE_CD_ENABLED gates this job.
     if: vars.EDGE_CD_ENABLED == 'true'
     steps:
       - uses: actions/checkout@v4

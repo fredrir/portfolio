@@ -26,12 +26,17 @@ provider "aws" {
 # Reads CLOUDFLARE_API_TOKEN from the environment.
 provider "cloudflare" {}
 
+locals {
+  admin_hostname = "admin.hansteen.dev"
+}
+
 module "media" {
-  source               = "../../modules/aws-media"
-  project              = var.project
-  environment          = "prod"
-  create_backup_bucket = true
-  create_iam_users     = true
+  source                 = "../../modules/aws-media"
+  project                = var.project
+  environment            = "prod"
+  create_backup_bucket   = true
+  create_iam_users       = true
+  upload_allowed_origins = ["https://${local.admin_hostname}"]
 }
 
 module "github_oidc" {
@@ -49,7 +54,7 @@ module "ingress" {
   hostname           = var.hostname
   tunnel_name        = "${var.project}-origin"
   edge_hostnames     = var.edge_hostnames
-  admin_hostname     = "admin.hansteen.dev"
+  admin_hostname     = local.admin_hostname
   admin_emails       = ["fhansteen@gmail.com"]
   enable_workers_vpc = var.enable_workers_vpc
 }

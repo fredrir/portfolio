@@ -43,6 +43,23 @@ resource "aws_s3_bucket_public_access_block" "media" {
   restrict_public_buckets = true
 }
 
+# The administration UI uploads originals directly to presigned S3 URLs, so
+# browsers must be allowed to preflight and perform the signed PUT. Keep the
+# origin list explicit at each environment root rather than allowing every
+# website to use an otherwise-leaked upload URL.
+resource "aws_s3_bucket_cors_configuration" "media" {
+  count  = length(var.upload_allowed_origins) > 0 ? 1 : 0
+  bucket = aws_s3_bucket.media.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT"]
+    allowed_origins = var.upload_allowed_origins
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3600
+  }
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "media" {
   bucket = aws_s3_bucket.media.id
 
