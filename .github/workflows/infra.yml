@@ -22,7 +22,7 @@ jobs:
       run:
         working-directory: infra/terraform/${{ matrix.root }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.15.6"
@@ -34,7 +34,7 @@ jobs:
   tflint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init && tflint --recursive --minimum-failure-severity=error
         working-directory: infra/terraform
