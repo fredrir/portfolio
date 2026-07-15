@@ -409,7 +409,9 @@ async fn category_rename_moves_all_media(pool: PgPool) {
     let request = Request::post("/api/v1/media/categories/rename")
         .header(header::CONTENT_TYPE, "application/json")
         .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
-        .body(Body::from(json!({ "from": "nope", "to": "new" }).to_string()))
+        .body(Body::from(
+            json!({ "from": "nope", "to": "new" }).to_string(),
+        ))
         .unwrap();
     let (status, _) = send(pool.clone(), request).await;
     assert_eq!(status, StatusCode::NOT_FOUND);
@@ -417,7 +419,9 @@ async fn category_rename_moves_all_media(pool: PgPool) {
     let request = Request::post("/api/v1/media/categories/rename")
         .header(header::CONTENT_TYPE, "application/json")
         .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
-        .body(Body::from(json!({ "from": "oslo", "to": "___" }).to_string()))
+        .body(Body::from(
+            json!({ "from": "oslo", "to": "___" }).to_string(),
+        ))
         .unwrap();
     let (status, _) = send(pool, request).await;
     assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
@@ -673,12 +677,10 @@ async fn admin_media_filters_in_postgres_and_returns_complete_facets(pool: PgPoo
     let (status, _) = send(pool.clone(), unauthorized).await;
     assert_eq!(status, StatusCode::UNAUTHORIZED);
 
-    let request = Request::get(
-        "/api/v1/media/admin?query=TRIP&state=ready&category=travel",
-    )
-    .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
-    .body(Body::empty())
-    .unwrap();
+    let request = Request::get("/api/v1/media/admin?query=TRIP&state=ready&category=travel")
+        .header(header::AUTHORIZATION, format!("Bearer {TEST_ADMIN_TOKEN}"))
+        .body(Body::empty())
+        .unwrap();
     let (status, body) = send(pool.clone(), request).await;
     assert_eq!(status, StatusCode::OK);
 
@@ -877,9 +879,7 @@ async fn weather_fetches_and_persists_fresh_data(pool: PgPool) {
             }))
         }),
     );
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let provider_url = format!("http://{}", listener.local_addr().unwrap());
     let provider_task = tokio::spawn(async move {
         axum::serve(listener, provider).await.unwrap();
@@ -890,11 +890,7 @@ async fn weather_fetches_and_persists_fresh_data(pool: PgPool) {
         .unwrap()
         .weather_api = provider_url;
     let response = app(state)
-        .oneshot(
-            Request::get("/api/v1/weather")
-                .body(Body::empty())
-                .unwrap(),
-        )
+        .oneshot(Request::get("/api/v1/weather").body(Body::empty()).unwrap())
         .await
         .unwrap();
     provider_task.abort();
@@ -936,9 +932,7 @@ async fn weather_coalesces_concurrent_refreshes_and_exposes_metrics(pool: PgPool
             }
         }),
     );
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let provider_url = format!("http://{}", listener.local_addr().unwrap());
     let provider_task = tokio::spawn(async move {
         axum::serve(listener, provider).await.unwrap();
@@ -949,11 +943,7 @@ async fn weather_coalesces_concurrent_refreshes_and_exposes_metrics(pool: PgPool
         .unwrap()
         .weather_api = provider_url;
     let router = app(state);
-    let request = || {
-        Request::get("/api/v1/weather")
-            .body(Body::empty())
-            .unwrap()
-    };
+    let request = || Request::get("/api/v1/weather").body(Body::empty()).unwrap();
     let (first, second) = tokio::join!(
         router.clone().oneshot(request()),
         router.clone().oneshot(request())
@@ -1009,9 +999,7 @@ async fn weather_background_refreshes_before_request_ttl(pool: PgPool) {
             }))
         }),
     );
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let provider_url = format!("http://{}", listener.local_addr().unwrap());
     let provider_task = tokio::spawn(async move {
         axum::serve(listener, provider).await.unwrap();
