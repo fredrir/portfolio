@@ -435,13 +435,14 @@ pub async fn rename_category(
         .begin()
         .await
         .map_err(|e| ApiError::from(e).into_response())?;
-    let updated = sqlx::query("update media set category = $1, updated_at = now() where category = $2")
-        .bind(&to)
-        .bind(&from)
-        .execute(&mut *tx)
-        .await
-        .map_err(|e| ApiError::from(e).into_response())?
-        .rows_affected() as i64;
+    let updated =
+        sqlx::query("update media set category = $1, updated_at = now() where category = $2")
+            .bind(&to)
+            .bind(&from)
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| ApiError::from(e).into_response())?
+            .rows_affected() as i64;
     if updated == 0 {
         return Err(
             Problem::new(StatusCode::NOT_FOUND, "No media in the source category").into_response(),
