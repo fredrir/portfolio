@@ -1,61 +1,37 @@
 "use client";
 
 import { ArrowCounterClockwise, Images, Trash, WarningCircle, X } from "@phosphor-icons/react";
-import { memo, useEffect, useState } from "react";
+import { memo } from "react";
 
 import { formatBytes } from "@/admin/format";
 import type { UploadJob } from "@/admin/hooks/use-uploads";
 import { bucketOf, type MediaItem, stateLabel, thumbOf } from "@/admin/model";
 import { cn } from "@/shared/utils/cn";
 
-/** Two-step trash: first press arms the red confirm, second one deletes. */
 export function DeleteButton({
   label,
-  confirmLabel,
-  onDelete,
+  onClick,
   className,
+  children,
 }: {
   label: string;
-  confirmLabel: string;
-  onDelete: () => Promise<boolean>;
+  onClick: () => void;
   className?: string;
+  children?: React.ReactNode;
 }) {
-  const [armed, setArmed] = useState(false);
-  const [busy, setBusy] = useState(false);
-
-  // Disarm when attention moves on.
-  useEffect(() => {
-    if (!armed) return;
-    const timer = setTimeout(() => setArmed(false), 3000);
-    return () => clearTimeout(timer);
-  }, [armed]);
-
   return (
     <button
       type="button"
-      aria-label={armed ? confirmLabel : label}
-      disabled={busy}
-      onClick={() => {
-        if (!armed) {
-          setArmed(true);
-          return;
-        }
-        setBusy(true);
-        void onDelete().then((ok) => {
-          setBusy(false);
-          if (!ok) setArmed(false);
-        });
-      }}
+      aria-label={label}
+      title={label}
+      onClick={onClick}
       className={cn(
-        "inline-flex items-center gap-1 rounded font-mono text-2xs transition-colors disabled:opacity-60",
-        armed
-          ? "bg-destructive px-2 py-1 text-destructive-foreground"
-          : "p-1.5 text-muted-foreground hover:bg-destructive/15 hover:text-destructive",
+        "inline-flex min-h-9 min-w-9 items-center justify-center gap-1.5 rounded px-2 font-mono text-2xs text-muted-foreground transition-colors hover:bg-destructive/15 hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring",
         className,
       )}
     >
-      <Trash size={12} className={busy ? "motion-safe:animate-pulse" : undefined} />
-      {armed && confirmLabel}
+      <Trash size={14} />
+      {children}
     </button>
   );
 }
@@ -152,11 +128,11 @@ function GhostTile({
 const PhotoTile = memo(function PhotoTile({
   item,
   onOpen,
-  onDelete,
+  onRequestDelete,
 }: {
   item: MediaItem;
   onOpen: (id: string) => void;
-  onDelete: (id: string) => Promise<boolean>;
+  onRequestDelete: (item: MediaItem) => void;
 }) {
   const thumb = thumbOf(item);
   const bucket = bucketOf(item);
@@ -196,11 +172,10 @@ const PhotoTile = memo(function PhotoTile({
         )}
       </button>
 
-      <div className="absolute top-1 right-1 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+      <div className="absolute top-1 right-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100">
         <DeleteButton
           label={`Delete ${item.filename}`}
-          confirmLabel="delete?"
-          onDelete={() => onDelete(item.id)}
+          onClick={() => onRequestDelete(item)}
           className="bg-glass-medium backdrop-blur-sm"
         />
       </div>
@@ -221,7 +196,7 @@ export function PhotoGrid({
   jobs,
   filtered,
   onOpen,
-  onDelete,
+  onRequestDelete,
   onRetryJob,
   onDismissJob,
   onClearFilters,
@@ -230,7 +205,7 @@ export function PhotoGrid({
   jobs: UploadJob[];
   filtered: boolean;
   onOpen: (id: string) => void;
-  onDelete: (id: string) => Promise<boolean>;
+  onRequestDelete: (item: MediaItem) => void;
   onRetryJob: (id: string) => void;
   onDismissJob: (id: string) => void;
   onClearFilters: () => void;
@@ -263,7 +238,7 @@ export function PhotoGrid({
         <GhostTile key={job.id} job={job} onRetryJob={onRetryJob} onDismissJob={onDismissJob} />
       ))}
       {media.map((item) => (
-        <PhotoTile key={item.id} item={item} onOpen={onOpen} onDelete={onDelete} />
+        <PhotoTile key={item.id} item={item} onOpen={onOpen} onRequestDelete={onRequestDelete} />
       ))}
     </div>
   );

@@ -1,14 +1,15 @@
 use std::io::Cursor;
 
 use image::codecs::avif::AvifEncoder;
-use image::{DynamicImage, ImageFormat, ImageReader, Limits};
+use image::metadata::Orientation;
+use image::{DynamicImage, ImageDecoder, ImageFormat, ImageReader, Limits};
 use sha2::{Digest, Sha256};
 
 const MAX_DIMENSION: u32 = 12_000;
 /// Upper bound on the image crate's decode allocation (~256 MB), independent of
 /// the per-dimension cap: guards against small files that decode huge.
 const MAX_DECODE_ALLOC: u64 = 256 * 1024 * 1024;
-const AVIF_SPEED: u8 = 8;
+const AVIF_SPEED: u8 = 10;
 const AVIF_QUALITY: u8 = 62;
 const WEBP_QUALITY: f32 = 82.0;
 
@@ -66,11 +67,22 @@ pub fn process_image(original: &[u8]) -> Result<Processed, ProcessError> {
     // Cap decode allocation so a small file that decodes to a huge canvas
     // (e.g. 12000×12000 → ~576 MB) cannot OOM the CPU-only host.
     limits.max_alloc = Some(MAX_DECODE_ALLOC);
-    reader.limits(limits);
+    reader.limits(limits.clone());
 
-    let decoded = reader
-        .decode()
+    // Decoders return the stored pixel matrix. Phones and cameras commonly
+    // keep portrait pixels sideways and rely on EXIF orientation for display.
+    // Read and apply that transform before re-encoding because the variants
+    // intentionally discard all metadata.
+    let mut decoder = reader
+        .into_decoder()
         .map_err(|e| ProcessError::Decode(e.to_string()))?;
+    limits
+        .reserve(decoder.total_bytes())
+        .map_err(|e| ProcessError::Decode(e.to_string()))?;
+    let orientation = decoder.orientation().unwrap_or(Orientation::NoTransforms);
+    let mut decoded =
+        DynamicImage::from_decoder(decoder).map_err(|e| ProcessError::Decode(e.to_string()))?;
+    decoded.apply_orientation(orientation);
     let (width, height) = (decoded.width(), decoded.height());
 
     // Normalize the color model so both encoders accept the buffer.
@@ -142,6 +154,60 @@ mod tests {
         bytes
     }
 
+    fn sample_jpeg_with_orientation(orientation: u8) -> Vec<u8> {
+        let img = image::RgbImage::from_fn(2, 3, |x, y| {
+            image::Rgb([(x * 80) as u8, (y * 80) as u8, 128])
+        });
+        let mut jpeg = Vec::new();
+        DynamicImage::ImageRgb8(img)
+            .write_to(&mut Cursor::new(&mut jpeg), ImageFormat::Jpeg)
+            .unwrap();
+
+        // Minimal big-endian TIFF IFD containing only EXIF Orientation.
+        let mut app1 = vec![
+            0xff,
+            0xe1,
+            0x00,
+            0x22, // APP1 marker and segment length (32-byte payload + length)
+            b'E',
+            b'x',
+            b'i',
+            b'f',
+            0,
+            0,
+            b'M',
+            b'M',
+            0,
+            42,
+            0,
+            0,
+            0,
+            8, // first IFD offset
+            0,
+            1, // one IFD entry
+            0x01,
+            0x12, // Orientation tag
+            0,
+            3, // SHORT
+            0,
+            0,
+            0,
+            1, // one value
+            0,
+            orientation,
+            0,
+            0, // inline SHORT value
+            0,
+            0,
+            0,
+            0, // no next IFD
+        ];
+        app1.extend_from_slice(&jpeg[2..]);
+        jpeg.truncate(2);
+        jpeg.extend_from_slice(&app1);
+        jpeg
+    }
+
     #[test]
     fn processes_png_into_avif_and_webp() {
         let original = sample_png(64, 48);
@@ -170,6 +236,17 @@ mod tests {
         let b = process_image(&original).unwrap();
         assert_eq!(a.variants[0].key, b.variants[0].key);
         assert_eq!(a.variants[1].key, b.variants[1].key);
+    }
+
+    #[test]
+    fn applies_exif_orientation_before_stripping_metadata() {
+        let original = sample_jpeg_with_orientation(6);
+        let processed = process_image(&original).unwrap();
+
+        assert_eq!((processed.width, processed.height), (3, 2));
+        for variant in &processed.variants {
+            assert_eq!((variant.width, variant.height), (3, 2));
+        }
     }
 
     #[test]

@@ -242,9 +242,14 @@ data "aws_iam_policy_document" "api" {
 
 data "aws_iam_policy_document" "worker" {
   statement {
-    sid       = "ConsumeMediaQueue"
-    effect    = "Allow"
-    actions   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"]
+    sid    = "ConsumeMediaQueue"
+    effect = "Allow"
+    actions = [
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+    ]
     resources = [aws_sqs_queue.media.arn]
   }
   statement {

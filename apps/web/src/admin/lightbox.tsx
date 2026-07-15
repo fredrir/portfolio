@@ -66,7 +66,7 @@ export function Lightbox({
   total,
   onClose,
   onNav,
-  onDelete,
+  onRequestDelete,
   onSetCategory,
 }: {
   item: MediaItem;
@@ -74,10 +74,11 @@ export function Lightbox({
   total: number;
   onClose: () => void;
   onNav: (delta: 1 | -1) => void;
-  onDelete: (id: string) => Promise<boolean>;
+  onRequestDelete: (item: MediaItem) => void;
   onSetCategory: (id: string, category: string | null) => Promise<boolean>;
 }) {
-  const closeRef = useRef<HTMLButtonElement>(null);
+  const mobileCloseRef = useRef<HTMLButtonElement>(null);
+  const desktopCloseRef = useRef<HTMLButtonElement>(null);
   const bucket = bucketOf(item);
 
   const [category, setCategory] = useState(item.category ?? "");
@@ -87,7 +88,10 @@ export function Lightbox({
   const dirty = category.trim() !== (item.category ?? "");
 
   useEffect(() => {
-    closeRef.current?.focus();
+    const closeButton = window.matchMedia("(min-width: 768px)").matches
+      ? desktopCloseRef.current
+      : mobileCloseRef.current;
+    closeButton?.focus();
   }, []);
 
   useEffect(() => {
@@ -127,6 +131,15 @@ export function Lightbox({
       />
       <div className="relative flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-border-faint bg-background shadow-lg md:flex-row">
         <figure className="relative flex min-h-0 flex-1 items-center justify-center bg-card">
+          <button
+            ref={mobileCloseRef}
+            type="button"
+            aria-label="Close selected image"
+            onClick={onClose}
+            className="absolute top-2 right-2 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-overlay-medium text-white shadow-lg backdrop-blur-sm transition-colors hover:bg-overlay-heavy focus-visible:ring-2 focus-visible:ring-ring md:hidden"
+          >
+            <X size={20} weight="bold" />
+          </button>
           {preview ? (
             <img
               src={preview}
@@ -173,11 +186,11 @@ export function Lightbox({
               </span>
             </div>
             <button
-              ref={closeRef}
+              ref={desktopCloseRef}
               type="button"
-              aria-label="Close"
+              aria-label="Close selected image"
               onClick={onClose}
-              className="rounded p-1 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+              className="hidden rounded p-1 text-muted-foreground transition-colors hover:bg-surface-dim hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring md:inline-flex"
             >
               <X size={14} />
             </button>
@@ -263,10 +276,11 @@ export function Lightbox({
           <div className="mt-auto flex items-center justify-between gap-2 pt-2">
             <DeleteButton
               label="delete photo"
-              confirmLabel="really delete?"
-              onDelete={() => onDelete(item.id)}
+              onClick={() => onRequestDelete(item)}
               className="border border-border-faint"
-            />
+            >
+              delete image
+            </DeleteButton>
             {total > 1 && (
               <p className="font-mono text-2xs text-faded">
                 {index + 1} of {total} · ← → to move

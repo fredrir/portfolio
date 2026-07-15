@@ -10,8 +10,10 @@ use uuid::Uuid;
 
 const ORIGINALS_PREFIX: &str = "originals/";
 const MAX_ORIGINAL_BYTES: usize = 30 * 1024 * 1024;
-const PROCESSING_TIMEOUT: Duration = Duration::from_secs(90);
 const MAX_RECEIVE_COUNT: i32 = 5;
+const VISIBILITY_TIMEOUT_SECONDS: i32 = 120;
+const VISIBILITY_HEARTBEAT: Duration = Duration::from_secs(40);
+const RECONCILE_INTERVAL: Duration = Duration::from_secs(60);
 
 #[derive(Clone)]
 struct Ctx {
@@ -87,6 +89,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let shutdown = tokio::signal::ctrl_c();
     tokio::pin!(shutdown);
+    let mut reconcile = tokio::time::interval(RECONCILE_INTERVAL);
+    reconcile.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
 
     loop {
         tokio::select! {
@@ -97,7 +101,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             received = ctx.sqs
                 .receive_message()
                 .queue_url(&ctx.queue_url)
-                .max_number_of_messages(5)
+                // Processing is CPU-bound and deliberately sequential. Taking
+                // a batch here only starts the visibility clock on messages
+                // that are still waiting locally behind the first image.
+                .max_number_of_messages(1)
+                .visibility_timeout(VISIBILITY_TIMEOUT_SECONDS)
                 .wait_time_seconds(20)
                 .message_system_attribute_names(
                     aws_sdk_sqs::types::MessageSystemAttributeName::ApproximateReceiveCount,
@@ -115,6 +123,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
+            _ = reconcile.tick() => reconcile_stale_media(&ctx).await,
         }
     }
 
@@ -154,11 +163,7 @@ async fn handle_message(ctx: &Ctx, message: Message) {
             continue;
         }
 
-        let result = tokio::time::timeout(PROCESSING_TIMEOUT, handle_record(ctx, record)).await;
-        let result = match result {
-            Ok(inner) => inner,
-            Err(_) => Err(WorkerError::Transient("processing timed out".into())),
-        };
+        let result = handle_record_with_heartbeat(ctx, &message, record).await;
 
         match result {
             Ok(()) => {}
@@ -186,10 +191,50 @@ async fn handle_message(ctx: &Ctx, message: Message) {
 async fn handle_record(ctx: &Ctx, record: &S3Record) -> Result<(), WorkerError> {
     let key = record.decoded_key();
     let idempotency_id = record.idempotency_id();
+    handle_original(ctx, &key, &idempotency_id).await
+}
 
+async fn handle_record_with_heartbeat(
+    ctx: &Ctx,
+    message: &Message,
+    record: &S3Record,
+) -> Result<(), WorkerError> {
+    let Some(receipt_handle) = message.receipt_handle.as_deref() else {
+        return handle_record(ctx, record).await;
+    };
+
+    let processing = handle_record(ctx, record);
+    tokio::pin!(processing);
+    let mut heartbeat = tokio::time::interval_at(
+        tokio::time::Instant::now() + VISIBILITY_HEARTBEAT,
+        VISIBILITY_HEARTBEAT,
+    );
+
+    loop {
+        tokio::select! {
+            result = &mut processing => return result,
+            _ = heartbeat.tick() => {
+                if let Err(err) = ctx.sqs
+                    .change_message_visibility()
+                    .queue_url(&ctx.queue_url)
+                    .receipt_handle(receipt_handle)
+                    .visibility_timeout(VISIBILITY_TIMEOUT_SECONDS)
+                    .send()
+                    .await
+                {
+                    // Keep working: abandoning a spawn_blocking encoder would
+                    // not stop its CPU work and would make duplication likelier.
+                    tracing::error!(error = %err, "failed to extend message visibility");
+                }
+            }
+        }
+    }
+}
+
+async fn handle_original(ctx: &Ctx, key: &str, idempotency_id: &str) -> Result<(), WorkerError> {
     let (already_processed,): (bool,) =
         sqlx::query_as("select exists(select 1 from processed_events where id = $1)")
-            .bind(&idempotency_id)
+            .bind(idempotency_id)
             .fetch_one(&ctx.pool)
             .await?;
     if already_processed {
@@ -199,7 +244,7 @@ async fn handle_record(ctx: &Ctx, record: &S3Record) -> Result<(), WorkerError> 
 
     let media: Option<(Uuid, String)> =
         sqlx::query_as("select id, state from media where original_key = $1")
-            .bind(&key)
+            .bind(key)
             .fetch_optional(&ctx.pool)
             .await?;
     let Some((media_id, state)) = media else {
@@ -226,10 +271,18 @@ async fn handle_record(ctx: &Ctx, record: &S3Record) -> Result<(), WorkerError> 
         .s3
         .get_object()
         .bucket(&ctx.bucket)
-        .key(&key)
+        .key(key)
         .send()
         .await
-        .map_err(|e| WorkerError::Transient(format!("get_object: {e}")))?;
+        .map_err(|e| {
+            if e.as_service_error()
+                .is_some_and(|error| error.is_no_such_key())
+            {
+                WorkerError::Permanent("original upload was not completed".into())
+            } else {
+                WorkerError::Transient(format!("get_object: {e}"))
+            }
+        })?;
     // Reject oversized objects from the advertised length before buffering the
     // whole body into memory.
     if let Some(len) = object.content_length()
@@ -322,7 +375,7 @@ async fn handle_record(ctx: &Ctx, record: &S3Record) -> Result<(), WorkerError> 
         .await?;
     }
     sqlx::query("insert into processed_events (id) values ($1) on conflict do nothing")
-        .bind(&idempotency_id)
+        .bind(idempotency_id)
         .execute(&mut *tx)
         .await?;
     tx.commit().await?;
@@ -336,6 +389,43 @@ async fn handle_record(ctx: &Ctx, record: &S3Record) -> Result<(), WorkerError> 
         "media processed"
     );
     Ok(())
+}
+
+/// S3 notifications are best-effort and a worker can be terminated after it
+/// marks a row processing but before SQS redelivery completes. Retry one stale
+/// row at a time so those cases converge without an operator moving DLQ items.
+async fn reconcile_stale_media(ctx: &Ctx) {
+    let stale: Result<Option<(Uuid, String)>, sqlx::Error> = sqlx::query_as(
+        "select id, original_key from media \
+         where (state = 'processing' and updated_at < now() - interval '5 minutes') \
+            or (state = 'pending' and updated_at < now() - interval '20 minutes') \
+         order by updated_at \
+         limit 1",
+    )
+    .fetch_optional(&ctx.pool)
+    .await;
+    let Some((media_id, key)) = (match stale {
+        Ok(row) => row,
+        Err(err) => {
+            tracing::error!(error = %err, "failed to find stale media");
+            return;
+        }
+    }) else {
+        return;
+    };
+
+    tracing::warn!(%media_id, %key, "retrying stale media");
+    let idempotency_id = format!("reconcile/{media_id}");
+    match handle_original(ctx, &key, &idempotency_id).await {
+        Ok(()) => {}
+        Err(WorkerError::Permanent(reason)) => {
+            tracing::error!(%key, %reason, "stale media permanently failed");
+            mark_failed(ctx, &key, &reason).await;
+        }
+        Err(WorkerError::Transient(reason)) => {
+            tracing::warn!(%key, %reason, "stale media retry failed");
+        }
+    }
 }
 
 async fn mark_failed(ctx: &Ctx, original_key: &str, reason: &str) {

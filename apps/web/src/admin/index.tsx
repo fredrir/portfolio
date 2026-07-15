@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { DeleteConfirmDialog } from "@/admin/delete-confirm-dialog";
 import { useMediaLibrary } from "@/admin/hooks/use-media-library";
 import { type UploadJob, useUploads } from "@/admin/hooks/use-uploads";
 import { PhotoGrid } from "@/admin/library";
@@ -8,6 +9,7 @@ import { Lightbox } from "@/admin/lightbox";
 import {
   type AdminMediaLibrary,
   emptyMediaLibrary,
+  type MediaItem,
   type MediaState,
   type StateFilter,
   UNCATEGORIZED,
@@ -43,6 +45,8 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [uploadCategory, setUploadCategory] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [deleteCandidate, setDeleteCandidate] = useState<MediaItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const deferredQuery = useDeferredValue(query);
   const mediaFilters = useMemo(
     () => ({
@@ -131,18 +135,26 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
   const openIndex = media.findIndex((item) => item.id === openId);
   const openItem = openIndex >= 0 ? media[openIndex] : null;
 
-  const deleteFromLightbox = useCallback(
-    async (id: string) => {
-      const index = media.findIndex((item) => item.id === id);
-      const deleted = await deleteMedia(id);
-      if (deleted) {
-        const next = media[index + 1] ?? media[index - 1];
-        setOpenId(next?.id ?? null);
-      }
-      return deleted;
-    },
-    [deleteMedia, media],
-  );
+  const confirmDelete = useCallback(async () => {
+    if (!deleteCandidate || deleting) return;
+
+    const candidate = deleteCandidate;
+    const index = media.findIndex((item) => item.id === candidate.id);
+    setDeleting(true);
+    const deleted = await deleteMedia(candidate.id);
+    setDeleting(false);
+
+    if (!deleted) return;
+    if (openId === candidate.id) {
+      const next = media[index + 1] ?? media[index - 1];
+      setOpenId(next?.id ?? null);
+    }
+    setDeleteCandidate(null);
+  }, [deleteCandidate, deleteMedia, deleting, media, openId]);
+
+  const cancelDelete = useCallback(() => {
+    if (!deleting) setDeleteCandidate(null);
+  }, [deleting]);
 
   const navigateLightbox = useCallback(
     (delta: 1 | -1) => {
@@ -191,7 +203,7 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
           jobs={visibleJobs}
           filtered={Boolean(normalizedQuery || stateFilter !== "all" || categoryFilter)}
           onOpen={setOpenId}
-          onDelete={deleteMedia}
+          onRequestDelete={setDeleteCandidate}
           onRetryJob={retry}
           onDismissJob={remove}
           onClearFilters={clearFilters}
@@ -205,13 +217,22 @@ export function AdminConsole({ initialLibrary, initialApiDown = false }: AdminCo
           total={media.length}
           onClose={closeLightbox}
           onNav={navigateLightbox}
-          onDelete={deleteFromLightbox}
+          onRequestDelete={setDeleteCandidate}
           onSetCategory={setCategory}
         />
       )}
 
+      {deleteCandidate && (
+        <DeleteConfirmDialog
+          item={deleteCandidate}
+          busy={deleting}
+          onCancel={cancelDelete}
+          onConfirm={() => void confirmDelete()}
+        />
+      )}
+
       {notice && (
-        <output className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded border border-destructive/40 bg-card px-3 py-1.5 font-mono text-destructive text-xs shadow-lg">
+        <output className="fixed bottom-5 left-1/2 z-[70] -translate-x-1/2 rounded border border-destructive/40 bg-card px-3 py-1.5 font-mono text-destructive text-xs shadow-lg">
           {notice}
         </output>
       )}
