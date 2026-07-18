@@ -38,7 +38,7 @@ jobs:
       # Report-only while the baseline is established; the artifact is the
       # deliverable. Flip to gating once the missed-mutant list is triaged.
       - run: cargo mutants --workspace --timeout 300 -j 2 || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: mutants-report
