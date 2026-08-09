@@ -142,6 +142,14 @@ jobs:
       contents: read
       deployments: write
     steps:
+      # The host only accepts SSH over the tailnet; the runner joins with an
+      # ephemeral key and disappears when the job ends. DEPLOY_HOST is the
+      # host's tailnet name, DEPLOY_KNOWN_HOSTS its keyscan under that name.
+      - name: Join tailnet
+        uses: tailscale/github-action@v3
+        with:
+          authkey: ${{ secrets.TS_AUTHKEY }}
+
       - name: Deploy via forced-command SSH
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
