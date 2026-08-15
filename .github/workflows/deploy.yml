@@ -146,7 +146,7 @@ jobs:
       # ephemeral key and disappears when the job ends. DEPLOY_HOST is the
       # host's tailnet name, DEPLOY_KNOWN_HOSTS its keyscan under that name.
       - name: Join tailnet
-        uses: tailscale/github-action@v3
+        uses: tailscale/github-action@v4
         with:
           authkey: ${{ secrets.TS_AUTHKEY }}
 
