@@ -1,6 +1,6 @@
 # check=skip=SecretsUsedInArgOrEnv
 # Build from the repository root: docker build -f apps/web/Dockerfile .
-FROM oven/bun:1.3-slim AS build
+FROM oven/bun:1.4-slim AS build
 WORKDIR /app
 # Every workspace member's package.json must be present or the frozen
 # install fails — update this list when adding workspace packages.
