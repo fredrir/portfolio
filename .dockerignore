@@ -31,3 +31,5 @@ mutants.out
 
 *.tsbuildinfo
 npm-debug.log*
+.infra-build-recipe
+.infra-deploy
