@@ -20,7 +20,7 @@ ENV VITE_RECAPTCHA_SITE_KEY=${VITE_RECAPTCHA_SITE_KEY} \
     VITE_POSTHOG_KEY=${VITE_POSTHOG_KEY} \
     VITE_POSTHOG_HOST=${VITE_POSTHOG_HOST} \
     VITE_APP_VERSION=${VITE_APP_VERSION}
-RUN mkdir -p apps/web/.output && cd apps/web && bun run build
+RUN cd apps/web && bun run build
 
 FROM gcr.io/distroless/cc-debian12:nonroot AS certs
 
