@@ -1,0 +1,37 @@
+name: Mutation testing
+'on':
+  schedule:
+  - cron: 0 2 * * 6
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: mutants-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  mutants:
+    if: ${{ github.ref == 'refs/heads/main' && github.ref_protected && github.repository_owner_id == '114402558'
+      }}
+    runs-on: buildkit-amd64
+    timeout-minutes: 55
+    steps:
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      with:
+        persist-credentials: false
+    - name: Run native mutants
+      run: 'export BUILDKITD_FLAGS="$BUILDKITD_FLAGS --oci-worker-net=host"
+
+        buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
+        --opt platform=linux/amd64 --opt target=mutation-results --opt build-arg:CI_REVISION="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+        --output type=local,dest="$RUNNER_TEMP/reports"'
+    - name: Retain reports
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: mutants-report
+        path: ${{ runner.temp }}/reports/
+        if-no-files-found: error
+        retention-days: 14
+    - name: Check outcome
+      run: "test -s \"$RUNNER_TEMP/reports/mutants.out/outcomes.json\"\ncase \"$(cat \"$RUNNER_TEMP/reports/exit-code\"\
+        )\" in\n  0|2|3) ;;\n  *) exit 1 ;;\nesac"

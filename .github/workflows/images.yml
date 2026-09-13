@@ -12,7 +12,7 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@ce87fab2bc3ba6323535fc206b71dde59ba05822
+    uses: fredrir/infra/.github/workflows/build-image.yml@c2b1be6f6cf468f67d7a21a28efa9e684809d7d0
     with:
       image: ghcr.io/fredrir/portfolio-api
       context: .
@@ -20,7 +20,10 @@ jobs:
       test-command: 'export BUILDKITD_FLAGS="$BUILDKITD_FLAGS --oci-worker-net=host"
 
         buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
-        --opt platform=linux/amd64 --opt target=rust-tests'
+        --opt platform=linux/amd64 --opt target=rust-tests
+
+        buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
+        --opt platform=linux/amd64 --opt target=quality-tests --opt build-arg:CI_REVISION="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"'
       build-args: APP_VERSION=${{ github.sha }}
   web:
     permissions:
@@ -28,7 +31,7 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@ce87fab2bc3ba6323535fc206b71dde59ba05822
+    uses: fredrir/infra/.github/workflows/build-image.yml@c2b1be6f6cf468f67d7a21a28efa9e684809d7d0
     with:
       image: ghcr.io/fredrir/portfolio-web
       context: .
@@ -50,7 +53,7 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@ce87fab2bc3ba6323535fc206b71dde59ba05822
+    uses: fredrir/infra/.github/workflows/build-image.yml@c2b1be6f6cf468f67d7a21a28efa9e684809d7d0
     with:
       image: ghcr.io/fredrir/portfolio-worker
       context: .
@@ -58,5 +61,8 @@ jobs:
       test-command: 'export BUILDKITD_FLAGS="$BUILDKITD_FLAGS --oci-worker-net=host"
 
         buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
-        --opt platform=linux/amd64 --opt target=rust-tests'
+        --opt platform=linux/amd64 --opt target=rust-tests
+
+        buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
+        --opt platform=linux/amd64 --opt target=quality-tests --opt build-arg:CI_REVISION="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"'
       build-args: APP_VERSION=${{ github.sha }}
