@@ -12,11 +12,12 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@8e0af06efaa451db44c46e3ec22243aa7231bd98
+    uses: fredrir/infra/.github/workflows/build-image.yml@4a01c3c9a58ac347ab5314e222dff5e18f0d8877
     with:
       image: ghcr.io/fredrir/portfolio-api
       context: .
       dockerfile: apps/api/Dockerfile
+      timeout-minutes: 150
       test-command: 'export BUILDKITD_FLAGS="$BUILDKITD_FLAGS --oci-worker-net=host"
 
         buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
@@ -31,11 +32,12 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@8e0af06efaa451db44c46e3ec22243aa7231bd98
+    uses: fredrir/infra/.github/workflows/build-image.yml@4a01c3c9a58ac347ab5314e222dff5e18f0d8877
     with:
       image: ghcr.io/fredrir/portfolio-web
       context: .
       dockerfile: apps/web/Dockerfile
+      timeout-minutes: 150
       test-command: 'export BUILDKITD_FLAGS="$BUILDKITD_FLAGS --oci-worker-net=host"
 
         buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
@@ -53,11 +55,12 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@8e0af06efaa451db44c46e3ec22243aa7231bd98
+    uses: fredrir/infra/.github/workflows/build-image.yml@4a01c3c9a58ac347ab5314e222dff5e18f0d8877
     with:
       image: ghcr.io/fredrir/portfolio-worker
       context: .
       dockerfile: apps/worker/Dockerfile
+      timeout-minutes: 150
       test-command: 'export BUILDKITD_FLAGS="$BUILDKITD_FLAGS --oci-worker-net=host"
 
         buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
