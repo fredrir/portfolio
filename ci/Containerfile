@@ -1,0 +1,52 @@
+FROM docker.io/library/rust@sha256:2775a09d208ff0d7c1f50490c45b62db929e87ba1dcbc3f2132ac71a704bcdd3 AS rust
+FROM docker.io/oven/bun@sha256:d56a2534ffd262e92c12fd3249d3924d296d97086da773f821d7d0477435ea04 AS bun
+FROM docker.io/library/postgres@sha256:051f7b7b3abdd564d5d1bd1e8c4b9c1b6e77087d1dd22020ede611c096a272e0 AS rust-base
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential ca-certificates git pkg-config libssl-dev && rm -rf /var/lib/apt/lists/*
+COPY --from=rust /usr/local/cargo /usr/local/cargo
+COPY --from=rust /usr/local/rustup /usr/local/rustup
+ENV CARGO_HOME=/usr/local/cargo RUSTUP_HOME=/usr/local/rustup PATH=/usr/local/cargo/bin:$PATH CARGO_BUILD_JOBS=2
+RUN rustup component add rustfmt clippy
+WORKDIR /app
+COPY . .
+FROM rust-base AS rust-tests
+RUN bash ci/rust.sh
+
+FROM bun AS web-tests
+WORKDIR /app
+COPY package.json bun.lock ./
+COPY apps/web/package.json apps/web/package.json
+COPY apps/edge/package.json apps/edge/package.json
+COPY packages/api-client/package.json packages/api-client/package.json
+RUN bun install --frozen-lockfile
+COPY . .
+RUN bun run lint && bun run --filter '@portfolio/web' typecheck && bun run --filter '@portfolio/edge' typecheck && bun run --filter '@portfolio/web' build
+
+FROM rust-base AS quality-tests
+COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
+RUN cargo install --locked cargo-audit --version 0.22.2
+RUN bun install --frozen-lockfile
+RUN cp packages/api-client/openapi.json /tmp/openapi.json && cp packages/api-client/src/schema.ts /tmp/schema.ts \
+    && cd packages/api-client && bun run generate \
+    && cmp openapi.json /tmp/openapi.json && cmp src/schema.ts /tmp/schema.ts
+ARG CI_REVISION
+RUN test -n "$CI_REVISION" && cargo audit
+
+FROM rust-base AS mutation-tools
+RUN cargo install --locked cargo-mutants --version 27.1.0
+FROM mutation-tools AS mutation-test
+ARG CI_REVISION
+RUN test -n "$CI_REVISION" && bash ci/mutants.sh
+FROM scratch AS mutation-results
+COPY --from=mutation-test /reports/ /
+
+FROM rust-base AS fuzz-tools
+RUN apt-get update && apt-get install -y --no-install-recommends clang && rm -rf /var/lib/apt/lists/*
+RUN rustup toolchain install nightly-2026-09-01 --profile minimal
+RUN cargo install --locked cargo-fuzz --version 0.13.2
+FROM fuzz-tools AS fuzz-test
+ARG CI_REVISION
+ARG FUZZ_CRATE
+ARG FUZZ_TARGET
+RUN test -n "$CI_REVISION" && bash ci/fuzz.sh "$FUZZ_CRATE" "$FUZZ_TARGET"
+FROM scratch AS fuzz-results
+COPY --from=fuzz-test /reports/ /
