@@ -22,7 +22,13 @@ ENV VITE_RECAPTCHA_SITE_KEY=${VITE_RECAPTCHA_SITE_KEY} \
     VITE_APP_VERSION=${VITE_APP_VERSION}
 RUN cd apps/web && bun run build
 
+FROM gcr.io/distroless/cc-debian12:nonroot AS certs
+
 FROM node:26-slim
+# The slim runtime ships no trust store, which apt needs to reach the security mirror over HTTPS.
+COPY --from=certs /etc/ssl/certs/ca-certificates.crt /usr/lib/ssl/cert.pem
+RUN sed -i 's|http://|https://|g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update --error-on=any && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 WORKDIR /app
 COPY --from=build /app/apps/web/.output ./.output
