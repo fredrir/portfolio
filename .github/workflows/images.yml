@@ -12,19 +12,15 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@931cd1e9b6aee88250c9681397e7ee0b733bd0ab
+    uses: fredrir/infra/.github/workflows/build-image.yml@1f2eecbc81ba184252f9ed85f893fa5eb3b5150a
     with:
       image: ghcr.io/fredrir/portfolio-api
       context: .
       dockerfile: apps/api/Dockerfile
       timeout-minutes: 150
-      test-command: 'export BUILDKITD_FLAGS="$BUILDKITD_FLAGS --oci-worker-net=host"
+      test-command: 'bash .infra-build-recipe/scripts/ci/build-test-target.sh ci/Containerfile rust-tests
 
-        buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
-        --opt platform=linux/amd64 --opt target=rust-tests
-
-        buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
-        --opt platform=linux/amd64 --opt target=quality-tests --opt build-arg:CI_REVISION="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"'
+        bash .infra-build-recipe/scripts/ci/build-test-target.sh ci/Containerfile quality-tests --opt build-arg:CI_REVISION="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"'
       build-args: APP_VERSION=${{ github.sha }}
   web:
     permissions:
@@ -32,16 +28,13 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@931cd1e9b6aee88250c9681397e7ee0b733bd0ab
+    uses: fredrir/infra/.github/workflows/build-image.yml@1f2eecbc81ba184252f9ed85f893fa5eb3b5150a
     with:
       image: ghcr.io/fredrir/portfolio-web
       context: .
       dockerfile: apps/web/Dockerfile
       timeout-minutes: 150
-      test-command: 'export BUILDKITD_FLAGS="$BUILDKITD_FLAGS --oci-worker-net=host"
-
-        buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
-        --opt platform=linux/amd64 --opt target=web-tests'
+      test-command: bash .infra-build-recipe/scripts/ci/build-test-target.sh ci/Containerfile web-tests
       build-args: 'VITE_RECAPTCHA_SITE_KEY=${{ vars.VITE_RECAPTCHA_SITE_KEY }}
 
         VITE_POSTHOG_KEY=${{ vars.VITE_POSTHOG_KEY }}
@@ -55,17 +48,13 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@931cd1e9b6aee88250c9681397e7ee0b733bd0ab
+    uses: fredrir/infra/.github/workflows/build-image.yml@1f2eecbc81ba184252f9ed85f893fa5eb3b5150a
     with:
       image: ghcr.io/fredrir/portfolio-worker
       context: .
       dockerfile: apps/worker/Dockerfile
       timeout-minutes: 150
-      test-command: 'export BUILDKITD_FLAGS="$BUILDKITD_FLAGS --oci-worker-net=host"
+      test-command: 'bash .infra-build-recipe/scripts/ci/build-test-target.sh ci/Containerfile rust-tests
 
-        buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
-        --opt platform=linux/amd64 --opt target=rust-tests
-
-        buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
-        --opt platform=linux/amd64 --opt target=quality-tests --opt build-arg:CI_REVISION="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"'
+        bash .infra-build-recipe/scripts/ci/build-test-target.sh ci/Containerfile quality-tests --opt build-arg:CI_REVISION="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"'
       build-args: APP_VERSION=${{ github.sha }}
