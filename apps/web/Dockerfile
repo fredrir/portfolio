@@ -9,7 +9,7 @@ COPY apps/web/package.json apps/web/package.json
 COPY apps/edge/package.json apps/edge/package.json
 COPY packages/api-client/package.json packages/api-client/package.json
 RUN bun install --frozen-lockfile
-COPY biome.jsonc tsconfig.json ./
+COPY .gitignore biome.jsonc tsconfig.json ./
 COPY apps/edge apps/edge
 COPY packages/api-client packages/api-client
 COPY apps/web apps/web

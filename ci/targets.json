@@ -9,18 +9,10 @@
     "bun.lock",
     "ci/"
   ],
-  "ignored": [
-    "docs/",
-    "README.md",
-    "LICENSE"
-  ],
+  "ignored": ["docs/", "README.md", "LICENSE"],
   "targets": {
-    "portfolio-api": [
-      "apps/api/"
-    ],
-    "portfolio-worker": [
-      "apps/worker/"
-    ],
+    "portfolio-api": ["apps/api/"],
+    "portfolio-worker": ["apps/worker/"],
     "portfolio-web": [
       "apps/web/",
       "apps/edge/",
