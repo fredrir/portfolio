@@ -5,7 +5,7 @@ WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY apps/api/Cargo.toml apps/api/Cargo.toml
 COPY apps/worker/Cargo.toml apps/worker/Cargo.toml
-RUN mkdir -p apps/api/src apps/worker/src && touch apps/api/src/lib.rs apps/worker/src/lib.rs
+RUN mkdir -p apps/api/src apps/worker/src && touch apps/api/src/lib.rs apps/api/src/main.rs apps/worker/src/lib.rs apps/worker/src/main.rs
 RUN --mount=type=cache,id=portfolio-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,id=portfolio-cargo-git,target=/usr/local/cargo/git,sharing=locked \
     cargo fetch --locked
