@@ -8,9 +8,13 @@ COPY --from=rust /usr/local/cargo /usr/local/cargo
 COPY --from=rust /usr/local/rustup /usr/local/rustup
 ENV CARGO_HOME=/usr/local/cargo RUSTUP_HOME=/usr/local/rustup PATH=/usr/local/cargo/bin:$PATH CARGO_BUILD_JOBS=2
 RUN rustup component add rustfmt clippy
+RUN cargo install --locked cargo-audit --version 0.22.2
 WORKDIR /app
+
+FROM rust-base AS source
 COPY . .
-FROM rust-base AS rust-tests
+
+FROM source AS rust-tests
 RUN bash ci/rust.sh
 
 FROM bun AS web-tests
@@ -23,9 +27,8 @@ RUN bun install --frozen-lockfile
 COPY . .
 RUN bun run lint && bun run --filter '@portfolio/web' typecheck && bun run --filter '@portfolio/edge' typecheck && bun run --filter '@portfolio/web' build
 
-FROM rust-base AS quality-tests
+FROM source AS quality-tests
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
-RUN cargo install --locked cargo-audit --version 0.22.2
 RUN bun install --frozen-lockfile
 RUN cp packages/api-client/openapi.json /tmp/openapi.json && cp packages/api-client/src/schema.ts /tmp/schema.ts \
     && cd packages/api-client && bun run generate \
@@ -36,6 +39,7 @@ RUN test -n "$CI_REVISION" && cargo audit
 FROM rust-base AS mutation-tools
 RUN cargo install --locked cargo-mutants --version 27.1.0
 FROM mutation-tools AS mutation-test
+COPY . .
 ARG CI_REVISION
 RUN test -n "$CI_REVISION" && bash ci/mutants.sh
 FROM scratch AS mutation-results
@@ -46,6 +50,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends clang && rm -rf
 RUN rustup toolchain install nightly-2026-09-01 --profile minimal
 RUN cargo install --locked cargo-fuzz --version 0.13.2
 FROM fuzz-tools AS fuzz-test
+COPY . .
 ARG CI_REVISION
 ARG FUZZ_CRATE
 ARG FUZZ_TARGET

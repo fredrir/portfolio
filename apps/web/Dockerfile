@@ -9,6 +9,8 @@ COPY apps/web/package.json apps/web/package.json
 COPY apps/edge/package.json apps/edge/package.json
 COPY packages/api-client/package.json packages/api-client/package.json
 RUN bun install --frozen-lockfile
+COPY biome.jsonc tsconfig.json ./
+COPY apps/edge apps/edge
 COPY packages/api-client packages/api-client
 COPY apps/web apps/web
 # Bundled into the client at build time.
@@ -20,6 +22,7 @@ ENV VITE_RECAPTCHA_SITE_KEY=${VITE_RECAPTCHA_SITE_KEY} \
     VITE_POSTHOG_KEY=${VITE_POSTHOG_KEY} \
     VITE_POSTHOG_HOST=${VITE_POSTHOG_HOST} \
     VITE_APP_VERSION=${VITE_APP_VERSION}
+RUN timeout 10 sh -ec "bun run lint; bun run --filter '@portfolio/web' typecheck; bun run --filter '@portfolio/edge' typecheck"
 RUN cd apps/web && bun run build
 
 FROM gcr.io/distroless/cc-debian12:nonroot AS certs

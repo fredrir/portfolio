@@ -3,6 +3,12 @@ name: Build images
   push:
     branches:
     - main
+    paths-ignore:
+    - "**/*.md"
+    - "docs/**"
+concurrency:
+  group: images-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -16,11 +22,9 @@ jobs:
     with:
       image: ghcr.io/fredrir/portfolio-api
       context: .
-      dockerfile: apps/api/Dockerfile
+      dockerfile: Containerfile
+      target: api
       timeout-minutes: 150
-      test-command: 'infra pipeline image --root .infra-build-recipe --context . --dockerfile ci/Containerfile --target rust-tests --check-only --timeout 150m
-
-        infra pipeline image --root .infra-build-recipe --context . --dockerfile ci/Containerfile --target quality-tests --check-only --timeout 150m --build-arg "CI_REVISION=$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"'
       build-args: APP_VERSION=${{ github.sha }}
   web:
     permissions:
@@ -34,7 +38,6 @@ jobs:
       context: .
       dockerfile: apps/web/Dockerfile
       timeout-minutes: 150
-      test-command: infra pipeline image --root .infra-build-recipe --context . --dockerfile ci/Containerfile --target web-tests --check-only --timeout 150m
       build-args: 'VITE_RECAPTCHA_SITE_KEY=${{ vars.VITE_RECAPTCHA_SITE_KEY }}
 
         VITE_POSTHOG_KEY=${{ vars.VITE_POSTHOG_KEY }}
@@ -52,9 +55,7 @@ jobs:
     with:
       image: ghcr.io/fredrir/portfolio-worker
       context: .
-      dockerfile: apps/worker/Dockerfile
+      dockerfile: Containerfile
+      target: worker
       timeout-minutes: 150
-      test-command: 'infra pipeline image --root .infra-build-recipe --context . --dockerfile ci/Containerfile --target rust-tests --check-only --timeout 150m
-
-        infra pipeline image --root .infra-build-recipe --context . --dockerfile ci/Containerfile --target quality-tests --check-only --timeout 150m --build-arg "CI_REVISION=$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"'
       build-args: APP_VERSION=${{ github.sha }}
