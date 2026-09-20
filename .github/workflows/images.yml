@@ -4,7 +4,7 @@ name: Build images
     branches:
     - main
     paths-ignore:
-    - "**/*.md"
+    - "README.md"
     - "docs/**"
 concurrency:
   group: images-${{ github.ref }}
