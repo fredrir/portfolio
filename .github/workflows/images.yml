@@ -18,7 +18,7 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@25cbb5389a5d5df996709e2c5a1b4d1443861172
+    uses: fredrir/infra/.github/workflows/build-image.yml@0549725e3fe2af85a9c4da8ed9948712efa97890
     with:
       image: ghcr.io/fredrir/portfolio-api
       context: .
@@ -33,7 +33,7 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@25cbb5389a5d5df996709e2c5a1b4d1443861172
+    uses: fredrir/infra/.github/workflows/build-image.yml@0549725e3fe2af85a9c4da8ed9948712efa97890
     with:
       image: ghcr.io/fredrir/portfolio-web
       context: .
@@ -53,7 +53,7 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: fredrir/infra/.github/workflows/build-image.yml@25cbb5389a5d5df996709e2c5a1b4d1443861172
+    uses: fredrir/infra/.github/workflows/build-image.yml@0549725e3fe2af85a9c4da8ed9948712efa97890
     with:
       image: ghcr.io/fredrir/portfolio-worker
       context: .
