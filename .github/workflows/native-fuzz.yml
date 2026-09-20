@@ -1,8 +1,8 @@
 name: Fuzzing
-'on':
+on:
   schedule:
-  - cron: 0 3 * * 6
-  workflow_dispatch: {}
+    - cron: 0 3 * * 6
+  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
@@ -10,40 +10,20 @@ concurrency:
   cancel-in-progress: false
 jobs:
   fuzz:
-    if: ${{ github.ref == 'refs/heads/main' && github.ref_protected && github.repository_owner_id == '114402558'
-      }}
-    runs-on: buildkit-amd64
-    timeout-minutes: 45
+    if: github.ref == 'refs/heads/main' && github.ref_protected && github.repository_owner_id == '114402558'
     strategy:
       fail-fast: false
       matrix:
         include:
-        - crate: apps/api
-          target: sanitize
-        - crate: apps/api
-          target: contact_validate
-        - crate: apps/worker
-          target: s3_event_parse
-    steps:
-    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      with:
-        persist-credentials: false
-    - name: Run native fuzz
-      run: 'export BUILDKITD_FLAGS="$BUILDKITD_FLAGS --oci-worker-net=host"
-
-        buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=. --local dockerfile=ci --opt filename=Containerfile
-        --opt platform=linux/amd64 --opt target=fuzz-results --opt build-arg:CI_REVISION="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
-        --output type=local,dest="$RUNNER_TEMP/reports" --opt build-arg:FUZZ_CRATE="$FUZZ_CRATE" --opt build-arg:FUZZ_TARGET="$FUZZ_TARGET"'
-      env:
-        FUZZ_CRATE: ${{ matrix.crate }}
-        FUZZ_TARGET: ${{ matrix.target }}
-    - name: Retain reports
-      if: always()
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      with:
-        name: fuzz-${{ matrix.target }}
-        path: ${{ runner.temp }}/reports/
-        if-no-files-found: error
-        retention-days: 14
-    - name: Check outcome
-      run: test "$(cat "$RUNNER_TEMP/reports/exit-code")" = 0
+          - crate: apps/api
+            target: sanitize
+          - crate: apps/api
+            target: contact_validate
+          - crate: apps/worker
+            target: s3_event_parse
+    uses: fredrir/infra/.github/workflows/test-image.yml@25cbb5389a5d5df996709e2c5a1b4d1443861172
+    with:
+      target: fuzz-results
+      artifact: fuzz-${{ matrix.target }}
+      build-args: '{"FUZZ_CRATE":"${{ matrix.crate }}","FUZZ_TARGET":"${{ matrix.target }}"}'
+      report-check: test "$(cat "$RUNNER_TEMP/reports/exit-code")" = 0

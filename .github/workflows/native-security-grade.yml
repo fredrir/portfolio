@@ -9,7 +9,7 @@ jobs:
   observatory:
     if: ${{ github.ref == 'refs/heads/main' && github.ref_protected && github.repository_owner_id == '114402558'
       }}
-    runs-on: buildkit-amd64
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
     - name: Check Observatory, TLS and headers
