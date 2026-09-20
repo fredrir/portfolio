@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "shared": [
+    "Cargo.toml",
+    "Cargo.lock",
+    "Containerfile",
+    ".dockerignore",
+    "package.json",
+    "bun.lock",
+    "ci/"
+  ],
+  "ignored": [
+    "docs/",
+    "README.md",
+    "LICENSE"
+  ],
+  "targets": {
+    "portfolio-api": [
+      "apps/api/"
+    ],
+    "portfolio-worker": [
+      "apps/worker/"
+    ],
+    "portfolio-web": [
+      "apps/web/",
+      "apps/edge/",
+      "packages/api-client/",
+      "biome.jsonc",
+      "tsconfig.json"
+    ]
+  }
+}

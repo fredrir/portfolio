@@ -8,7 +8,6 @@ COPY --from=rust /usr/local/cargo /usr/local/cargo
 COPY --from=rust /usr/local/rustup /usr/local/rustup
 ENV CARGO_HOME=/usr/local/cargo RUSTUP_HOME=/usr/local/rustup PATH=/usr/local/cargo/bin:$PATH CARGO_BUILD_JOBS=2
 RUN rustup component add rustfmt clippy
-RUN cargo install --locked cargo-audit --version 0.22.2
 WORKDIR /app
 
 FROM rust-base AS source
@@ -27,8 +26,12 @@ RUN bun install --frozen-lockfile
 COPY . .
 RUN bun run lint && bun run --filter '@portfolio/web' typecheck && bun run --filter '@portfolio/edge' typecheck && bun run --filter '@portfolio/web' build
 
-FROM source AS quality-tests
+FROM rust-base AS quality-tools
+RUN cargo install --locked cargo-audit --version 0.22.2
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
+
+FROM quality-tools AS quality-tests
+COPY . .
 RUN bun install --frozen-lockfile
 RUN cp packages/api-client/openapi.json /tmp/openapi.json && cp packages/api-client/src/schema.ts /tmp/schema.ts \
     && cd packages/api-client && bun run generate \
