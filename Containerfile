@@ -30,7 +30,7 @@ RUN --mount=type=cache,id=portfolio-cargo-registry,target=/usr/local/cargo/regis
 FROM scratch AS check-reports
 COPY --from=checks /infra-checks /infra-checks/
 
-FROM gcr.io/distroless/cc-debian12:nonroot AS api
+FROM gcr.io/distroless/cc-debian12:nonroot@sha256:9dac0a79194e45a7da0158a9c6da57b217585af0786db3845d1f0ec1a0dd182f AS api
 COPY --from=build /out/portfolio-api /usr/local/bin/portfolio-api
 ARG GIT_SHA
 ARG APP_VERSION
@@ -38,7 +38,7 @@ ENV GIT_SHA=${GIT_SHA} APP_VERSION=${APP_VERSION} API_ADDR=0.0.0.0:8080
 EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/portfolio-api"]
 
-FROM gcr.io/distroless/cc-debian12:nonroot AS worker
+FROM gcr.io/distroless/cc-debian12:nonroot@sha256:9dac0a79194e45a7da0158a9c6da57b217585af0786db3845d1f0ec1a0dd182f AS worker
 COPY --from=build /out/portfolio-worker /usr/local/bin/portfolio-worker
 COPY --from=build /out/backfill-exif /usr/local/bin/backfill-exif
 ENTRYPOINT ["/usr/local/bin/portfolio-worker"]
