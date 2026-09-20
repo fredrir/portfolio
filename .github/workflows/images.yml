@@ -22,6 +22,7 @@ jobs:
     with:
       image: ghcr.io/fredrir/portfolio-api
       context: .
+      check-target: check-reports
       dockerfile: Containerfile
       target: api
       timeout-minutes: 150
@@ -36,6 +37,7 @@ jobs:
     with:
       image: ghcr.io/fredrir/portfolio-web
       context: .
+      check-target: check-reports
       dockerfile: apps/web/Dockerfile
       timeout-minutes: 150
       build-args: 'VITE_RECAPTCHA_SITE_KEY=${{ vars.VITE_RECAPTCHA_SITE_KEY }}
@@ -55,6 +57,7 @@ jobs:
     with:
       image: ghcr.io/fredrir/portfolio-worker
       context: .
+      check-target: check-reports
       dockerfile: Containerfile
       target: worker
       timeout-minutes: 150

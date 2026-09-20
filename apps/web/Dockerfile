@@ -22,8 +22,12 @@ ENV VITE_RECAPTCHA_SITE_KEY=${VITE_RECAPTCHA_SITE_KEY} \
     VITE_POSTHOG_KEY=${VITE_POSTHOG_KEY} \
     VITE_POSTHOG_HOST=${VITE_POSTHOG_HOST} \
     VITE_APP_VERSION=${VITE_APP_VERSION}
-RUN timeout 10 sh -ec "bun run lint; bun run --filter '@portfolio/web' typecheck; bun run --filter '@portfolio/edge' typecheck"
+RUN --mount=type=bind,source=.infra-artifacts/infra,target=/usr/local/bin/infra \
+    infra ci measure --stage portfolio-web --budget 10s --report-dir /infra-checks -- sh -ec "bun run lint; bun run --filter '@portfolio/web' typecheck; bun run --filter '@portfolio/edge' typecheck"
 RUN cd apps/web && bun run build
+
+FROM scratch AS check-reports
+COPY --from=build /infra-checks /infra-checks/
 
 FROM gcr.io/distroless/cc-debian12:nonroot AS certs
 

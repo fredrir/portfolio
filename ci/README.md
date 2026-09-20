@@ -1,5 +1,6 @@
 | Check | Command |
 | --- | --- |
+| Container check binary (Linux) | `install -Dm755 "$(command -v infra)" .infra-artifacts/infra` |
 | Fast Rust checks | `cargo fmt --all --check && cargo metadata --locked --offline --no-deps --format-version 1` |
 | Rust integration suite | `docker build -f ci/Containerfile --target rust-tests .` |
 | OpenAPI drift and dependency audit | `docker build -f ci/Containerfile --target quality-tests --build-arg CI_REVISION=$(git rev-parse HEAD) .` |

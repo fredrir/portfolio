@@ -15,7 +15,8 @@ COPY apps/api apps/api
 COPY apps/worker apps/worker
 
 FROM source AS checks
-RUN timeout 10 sh -ec 'cargo fmt --all --check; cargo metadata --locked --offline --no-deps --format-version 1 > /dev/null'
+RUN --mount=type=bind,source=.infra-artifacts/infra,target=/usr/local/bin/infra \
+    infra ci measure --stage portfolio-rust --budget 10s --report-dir /infra-checks -- sh -ec 'cargo fmt --all --check; cargo metadata --locked --offline --no-deps --format-version 1 > /dev/null'
 
 FROM checks AS build
 RUN --mount=type=cache,id=portfolio-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
@@ -25,6 +26,9 @@ RUN --mount=type=cache,id=portfolio-cargo-registry,target=/usr/local/cargo/regis
     install -Dm755 target/release/portfolio-api /out/portfolio-api && \
     install -Dm755 target/release/portfolio-worker /out/portfolio-worker && \
     install -Dm755 target/release/backfill-exif /out/backfill-exif
+
+FROM scratch AS check-reports
+COPY --from=checks /infra-checks /infra-checks/
 
 FROM gcr.io/distroless/cc-debian12:nonroot AS api
 COPY --from=build /out/portfolio-api /usr/local/bin/portfolio-api
