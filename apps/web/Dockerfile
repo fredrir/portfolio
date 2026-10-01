@@ -36,6 +36,7 @@ FROM node:26-slim
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /usr/lib/ssl/cert.pem
 RUN sed -i 's|http://|https://|g' /etc/apt/sources.list.d/debian.sources \
     && apt-get update --error-on=any && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 WORKDIR /app
 COPY --from=build /app/apps/web/.output ./.output
