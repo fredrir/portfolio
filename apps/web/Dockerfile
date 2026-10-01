@@ -23,7 +23,7 @@ ENV VITE_RECAPTCHA_SITE_KEY=${VITE_RECAPTCHA_SITE_KEY} \
     VITE_POSTHOG_HOST=${VITE_POSTHOG_HOST} \
     VITE_APP_VERSION=${VITE_APP_VERSION}
 RUN --mount=type=bind,source=.infra-artifacts/infra,target=/usr/local/bin/infra \
-    infra ci measure --stage portfolio-web --budget 10s --report-dir /infra-checks -- sh -ec "bun run lint; bun run --filter '@portfolio/web' typecheck; bun run --filter '@portfolio/edge' typecheck"
+    infra ci measure --stage portfolio-web --budget 10s --report-dir /infra-checks -- infra ci project check --project portfolio --suite web-fast
 RUN cd apps/web && bun run build
 
 FROM scratch AS check-reports

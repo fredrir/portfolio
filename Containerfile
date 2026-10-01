@@ -16,7 +16,7 @@ COPY apps/worker apps/worker
 
 FROM source AS checks
 RUN --mount=type=bind,source=.infra-artifacts/infra,target=/usr/local/bin/infra \
-    infra ci measure --stage portfolio-rust --budget 10s --report-dir /infra-checks -- sh -ec 'cargo fmt --all --check; cargo metadata --locked --offline --no-deps --format-version 1 > /dev/null'
+    infra ci measure --stage portfolio-rust --budget 10s --report-dir /infra-checks -- infra ci project check --project portfolio --suite fast
 
 FROM checks AS build
 RUN --mount=type=cache,id=portfolio-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
